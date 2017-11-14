@@ -19,6 +19,10 @@ import com.varteq.catslovers.R;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 public class IntroActivity extends AppCompatActivity {
 
     float initialX;
@@ -26,15 +30,19 @@ public class IntroActivity extends AppCompatActivity {
     private int counter = 0;
     private int imageSwitcherImages[] = {R.drawable.cat1, R.drawable.cat2, R.drawable.cat3};
     private MyViewPagerAdapter myViewPagerAdapter;
-    public ViewPager viewPager;
+    @BindView(R.id.view_pager)
+    ViewPager viewPager;
     private List<View> layouts = new ArrayList<>();
     private TextView[] dots;
-    private LinearLayout dotsLayout;
+    @BindView(R.id.dots_layout)
+    LinearLayout dotsLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_intro);
+
+        ButterKnife.bind(this);
 
         for (int i = 0; i < imageSwitcherImages.length; i++) {
             ImageView imageView = new ImageView(getApplicationContext());
@@ -46,7 +54,6 @@ public class IntroActivity extends AppCompatActivity {
         }
 
         dots = new TextView[imageSwitcherImages.length];
-        dotsLayout = (LinearLayout) findViewById(R.id.dots_layout);
         for (int i = 0; i < imageSwitcherImages.length; i++) {
             dots[i] = new TextView(this);
             dots[i].setText(Html.fromHtml("&#8226;"));
@@ -55,24 +62,21 @@ public class IntroActivity extends AppCompatActivity {
         }
 
         selectBottomDot(0);
-        viewPager = (ViewPager) findViewById(R.id.view_pager);
 
         myViewPagerAdapter = new MyViewPagerAdapter();
         viewPager.setAdapter(myViewPagerAdapter);
         viewPager.addOnPageChangeListener(viewPagerPageChangeListener);
         viewPager.setOffscreenPageLimit(2);
+    }
 
-        findViewById(R.id.go_to_login_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(IntroActivity.this, LoginActivity.class));
-            }
-        });
+    @OnClick(R.id.go_to_login_button)
+    void goToLogin() {
+        startActivity(new Intent(IntroActivity.this, LoginActivity.class));
     }
 
     private void selectBottomDot(int currentPage) {
         for (int i = 0; i < imageSwitcherImages.length; i++) {
-            dots[i].setTextColor(getResources().getColor(android.R.color.darker_gray));
+            dots[i].setTextColor(getResources().getColor(R.color.colorPrimaryLight));
         }
         dots[currentPage].setTextColor(getResources().getColor(R.color.white));
     }

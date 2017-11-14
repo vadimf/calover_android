@@ -21,9 +21,16 @@
         </activity>
         <activity
             android:name=".view.IntroActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
-        <activity android:name=".view.LoginActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".view.LoginActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".view.ConfirmNumberActivity"
+            android:label="" />
+        <activity
+            android:name=".view.ValidateNumberActivity"
+            android:label="" />
     </application>
 
 </manifest>

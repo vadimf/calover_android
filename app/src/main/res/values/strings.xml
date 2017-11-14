@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">CatsLovers</string>
     <string name="title_activity_start">StartActivity</string>
-    <string name="continue_button_title">CONTINUE</string>
+    <string name="continue_button_title">Continue</string>
+    <string name="confirm_phone_number">please confirm your country code\n Enter your mobile #</string>
+    <string name="approve_button_title">Approve</string>
+    <string name="confirm_your_number">Code sent.\n Confirm your number</string>
 </resources>
