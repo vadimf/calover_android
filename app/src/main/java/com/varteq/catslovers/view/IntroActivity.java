@@ -1,5 +1,6 @@
 package com.varteq.catslovers.view;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -50,38 +51,37 @@ public class IntroActivity extends AppCompatActivity {
             dots[i] = new TextView(this);
             dots[i].setText(Html.fromHtml("&#8226;"));
             dots[i].setTextSize(30);
-            dots[i].setTextColor(getResources().getColor(android.R.color.darker_gray));
             dotsLayout.addView(dots[i]);
         }
-        dots[0].setTextColor(getResources().getColor(R.color.white));
 
-        // adding bottom dots
-        addBottomDots(0);
+        selectBottomDot(0);
         viewPager = (ViewPager) findViewById(R.id.view_pager);
 
         myViewPagerAdapter = new MyViewPagerAdapter();
         viewPager.setAdapter(myViewPagerAdapter);
         viewPager.addOnPageChangeListener(viewPagerPageChangeListener);
         viewPager.setOffscreenPageLimit(2);
+
+        findViewById(R.id.go_to_login_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(IntroActivity.this, LoginActivity.class));
+            }
+        });
     }
 
-    private void addBottomDots(int currentPage) {
-
-    }
-
-    private int getItem(int i) {
-        return viewPager.getCurrentItem() + i;
+    private void selectBottomDot(int currentPage) {
+        for (int i = 0; i < imageSwitcherImages.length; i++) {
+            dots[i].setTextColor(getResources().getColor(android.R.color.darker_gray));
+        }
+        dots[currentPage].setTextColor(getResources().getColor(R.color.white));
     }
 
     ViewPager.OnPageChangeListener viewPagerPageChangeListener = new ViewPager.OnPageChangeListener() {
 
         @Override
         public void onPageSelected(int position) {
-            addBottomDots(position);
-            for (int i = 0; i < imageSwitcherImages.length; i++) {
-                dots[i].setTextColor(getResources().getColor(android.R.color.darker_gray));
-            }
-            dots[position].setTextColor(getResources().getColor(R.color.white));
+            selectBottomDot(position);
         }
 
         @Override
@@ -104,7 +104,6 @@ public class IntroActivity extends AppCompatActivity {
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
             container.addView(layouts.get(position));
-
             return layouts.get(position);
         }
 
