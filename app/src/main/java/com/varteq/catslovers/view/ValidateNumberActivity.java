@@ -1,10 +1,17 @@
 package com.varteq.catslovers.view;
 
+import android.app.Dialog;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
+import android.view.View;
+import android.view.Window;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -36,6 +43,8 @@ public class ValidateNumberActivity extends AppCompatActivity implements TextWat
 
     private List<EditText> editTextList = new ArrayList<>();
     private boolean borderColorApplied;
+    private String SHOW_DIALOG_KEY = "show_dialog";
+    private boolean isDialogVisible;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,10 +53,22 @@ public class ValidateNumberActivity extends AppCompatActivity implements TextWat
 
         ButterKnife.bind(this);
 
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(SHOW_DIALOG_KEY) &&
+                    savedInstanceState.getBoolean(SHOW_DIALOG_KEY))
+                showSuccessDialog();
+        }
+
         editText1.addTextChangedListener(this);
         editText2.addTextChangedListener(this);
         editText3.addTextChangedListener(this);
         editText4.addTextChangedListener(this);
+
+        editText4.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE)
+                validateCode();
+            return false;
+        });
 
         InputFilter[] maxCountFilter = new InputFilter[]{new InputFilter.LengthFilter(MAX_CHARS_COUNT)};
         editText1.setFilters(maxCountFilter);
@@ -70,14 +91,48 @@ public class ValidateNumberActivity extends AppCompatActivity implements TextWat
             }
         }
         onCodeValidate(true);
+
+        showSuccessDialog();
         //TODO: validateRequest
+    }
+
+    private void showSuccessDialog() {
+        final Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_success_login);
+        dialog.setCancelable(false);
+
+        Button okButton = dialog.findViewById(R.id.ok_button);
+        okButton.setOnClickListener(v -> {
+            dialog.dismiss();
+            ValidateNumberActivity.this.finish();
+            Intent intent = new Intent(getApplicationContext(), CatProfileActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+        });
+
+        Button laterButton = dialog.findViewById(R.id.later_button);
+        laterButton.setOnClickListener(v -> {
+            dialog.dismiss();
+        });
+
+        dialog.show();
+        isDialogVisible = true;
+    }
+
+    @OnClick(R.id.resend_button)
+    void onResendClick() {
+        onBackPressed();
     }
 
     private void onCodeValidate(boolean isCorrect) {
         int resId;
         if (isCorrect)
             resId = R.drawable.correct_code;
-        else resId = R.drawable.incorrect_code;
+        else {
+            resId = R.drawable.incorrect_code;
+            resendButton.setVisibility(View.VISIBLE);
+        }
 
         for (EditText item : editTextList)
             item.setBackgroundResource(resId);
@@ -130,6 +185,23 @@ public class ValidateNumberActivity extends AppCompatActivity implements TextWat
         for (EditText item : editTextList) {
             if (item.getId() == nextViewId)
                 item.requestFocus();
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(SHOW_DIALOG_KEY, isDialogVisible);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (isDialogVisible) return;
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        try {
+            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+        } catch (Exception e) {
         }
     }
 }

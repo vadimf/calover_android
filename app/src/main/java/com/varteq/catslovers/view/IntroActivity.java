@@ -49,6 +49,7 @@ public class IntroActivity extends AppCompatActivity {
             imageView.setLayoutParams(new LinearLayout.LayoutParams(
                     ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.MATCH_PARENT
             ));
+            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             imageView.setImageResource(imageSwitcherImages[i]);
             layouts.add(imageView);
         }
@@ -71,7 +72,7 @@ public class IntroActivity extends AppCompatActivity {
 
     @OnClick(R.id.go_to_login_button)
     void goToLogin() {
-        startActivity(new Intent(IntroActivity.this, LoginActivity.class));
+        startActivity(new Intent(this, LoginActivity.class));
     }
 
     private void selectBottomDot(int currentPage) {

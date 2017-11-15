@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.varteq.catslovers">
 
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -11,7 +13,6 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".view.SplashActivity"
-            android:label="@string/title_activity_start"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -31,6 +32,10 @@
         <activity
             android:name=".view.ValidateNumberActivity"
             android:label="" />
+        <activity
+            android:name=".view.CatProfileActivity"
+            android:label="@string/new_cat_profile_screen_title"
+            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>
