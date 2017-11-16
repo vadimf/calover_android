@@ -15,6 +15,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.varteq.catslovers.Auth;
 import com.varteq.catslovers.R;
 
 import java.util.ArrayList;
@@ -92,6 +93,8 @@ public class ValidateNumberActivity extends AppCompatActivity implements TextWat
         }
         onCodeValidate(true);
 
+        Auth.setUserLogin(this, true);
+
         showSuccessDialog();
         //TODO: validateRequest
     }
@@ -105,10 +108,8 @@ public class ValidateNumberActivity extends AppCompatActivity implements TextWat
         Button okButton = dialog.findViewById(R.id.ok_button);
         okButton.setOnClickListener(v -> {
             dialog.dismiss();
-            ValidateNumberActivity.this.finish();
-            Intent intent = new Intent(getApplicationContext(), CatProfileActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
+            ValidateNumberActivity.this.finishAffinity();
+            startActivity(new Intent(getApplicationContext(), CatProfileActivity.class));
         });
 
         Button laterButton = dialog.findViewById(R.id.later_button);

@@ -3,6 +3,8 @@ package com.varteq.catslovers.view;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
@@ -13,6 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.makeramen.roundedimageview.RoundedImageView;
+import com.varteq.catslovers.Auth;
 import com.varteq.catslovers.R;
 
 import butterknife.BindView;
@@ -47,10 +50,22 @@ public class LoginActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         nameEditText.requestFocus();
 
+        Uri avatarUri = Auth.getUserAvatar(this);
+        if (avatarUri != null && !avatarUri.toString().isEmpty())
+            avatar.setImageURI(avatarUri);
+        else {
+            Bitmap image = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+            image.eraseColor(getResources().getColor(R.color.transparent));
+            avatar.setImageBitmap(image);
+        }
+
         findViewById(R.id.continue_button).setOnClickListener(
                 view -> {
-                    if (isInputValid())
+                    if (isInputValid()) {
+                        Auth.saveUser(this, nameEditText.getText().toString(),
+                                emailEditText.getText().toString());
                         startActivity(new Intent(LoginActivity.this, ConfirmNumberActivity.class));
+                    }
                 });
     }
 
@@ -92,7 +107,9 @@ public class LoginActivity extends AppCompatActivity {
         switch (requestCode) {
             case RESULT_LOAD_IMAGE:
                 if (null != data) {
-                    avatar.setImageURI(data.getData());
+                    Uri avatarUri = data.getData();
+                    Auth.saveUserAvatar(this, avatarUri);
+                    avatar.setImageURI(avatarUri);
                 }
                 break;
         }

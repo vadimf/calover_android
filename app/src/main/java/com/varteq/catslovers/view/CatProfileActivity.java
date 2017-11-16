@@ -2,6 +2,7 @@ package com.varteq.catslovers.view;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +11,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.makeramen.roundedimageview.RoundedImageView;
+import com.varteq.catslovers.Auth;
+import com.varteq.catslovers.ColorPickerDialog;
 import com.varteq.catslovers.R;
 
 import java.util.ArrayList;
@@ -19,13 +22,11 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import eltos.simpledialogfragment.SimpleDialog;
-import eltos.simpledialogfragment.color.SimpleColorDialog;
 
-public class CatProfileActivity extends AppCompatActivity implements View.OnClickListener, SimpleDialog.OnDialogResultListener {
+public class CatProfileActivity extends AppCompatActivity implements View.OnClickListener {
 
     @BindView(R.id.cat_profile_avatar_roundedImageView)
-    RoundedImageView roundedImageView;
+    RoundedImageView avatarImageView;
     @BindView(R.id.pet_name_textView)
     TextView petNameTextView;
     @BindView(R.id.nickname_textView)
@@ -49,7 +50,6 @@ public class CatProfileActivity extends AppCompatActivity implements View.OnClic
     @BindView(R.id.color_six_roundedImageView)
     RoundedImageView colorSixRoundedImageView;
 
-    private String COLOR_DIALOG = "color_dialog";
     private int clickedRoundViewId;
     private List<RoundedImageView> colorPickers;
 
@@ -59,6 +59,14 @@ public class CatProfileActivity extends AppCompatActivity implements View.OnClic
         setContentView(R.layout.activity_cat_profile);
 
         ButterKnife.bind(this);
+
+        Uri avatarUri = Auth.getUserAvatar(this);
+        if (avatarUri != null && !avatarUri.toString().isEmpty())
+            avatarImageView.setImageURI(avatarUri);
+        else
+            avatarImageView.setImageBitmap(getBitmapWithColor(getResources().getColor(R.color.transparent)));
+
+        nicknameTextView.setText(Auth.getUserName(this));
 
         colorOneRoundedImageView.setOnClickListener(this);
         colorTwoRoundedImageView.setOnClickListener(this);
@@ -90,32 +98,20 @@ public class CatProfileActivity extends AppCompatActivity implements View.OnClic
     @Override
     public void onClick(View view) {
         if (view instanceof RoundedImageView) {
-            SimpleColorDialog.build()
-                    .title(R.string.pick_a_color)
-                    .colorPreset(Color.RED)
-                    .allowCustom(true)
-                    .show(this, COLOR_DIALOG);
+            ColorPickerDialog colorPickerDialog = new ColorPickerDialog(this, Color.GREEN, color -> {
+                for (RoundedImageView imageView : colorPickers)
+                    if (imageView.getId() == clickedRoundViewId) {
+                        imageView.setImageBitmap(getBitmapWithColor(color));
+                    }
+            });
+            colorPickerDialog.show();
             clickedRoundViewId = view.getId();
         }
     }
 
-    @Override
-    public boolean onResult(String dialogTag, int which, Bundle extras) {
-
-        if (COLOR_DIALOG.equals(dialogTag)) {
-            switch (which) {
-                case BUTTON_POSITIVE:
-                    for (RoundedImageView imageView : colorPickers)
-                        if (imageView.getId() == clickedRoundViewId) {
-                            Bitmap image = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
-                            image.eraseColor(extras.getInt(SimpleColorDialog.COLOR));
-                            imageView.setImageBitmap(image);
-                        }
-                    break;
-            }
-            return true;
-        }
-
-        return false;
+    private Bitmap getBitmapWithColor(int color) {
+        Bitmap image = Bitmap.createBitmap(10, 10, Bitmap.Config.ARGB_8888);
+        image.eraseColor(color);
+        return image;
     }
 }
