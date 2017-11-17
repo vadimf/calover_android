@@ -1,15 +1,9 @@
 package com.varteq.catslovers.view;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Patterns;
 import android.widget.Button;
 import android.widget.EditText;
@@ -22,7 +16,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends PhotoPickerActivity {
 
     @BindView(R.id.avatar)
     RoundedImageView avatar;
@@ -71,7 +65,7 @@ public class LoginActivity extends AppCompatActivity {
 
     @OnClick(R.id.upload_photo_button)
     void uploadPhoto() {
-        pickPhotoWithPermission();
+        pickPhotoWithPermission(getString(R.string.select_avatar));
     }
 
     private boolean isInputValid() {
@@ -90,49 +84,12 @@ public class LoginActivity extends AppCompatActivity {
         return true;
     }
 
-    private void performSelectAvatarIntent() {
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        intent.setType("image/*");
-
-        startActivityForResult(Intent.createChooser(intent, getString(R.string.select_avatar)),
-                RESULT_LOAD_IMAGE);
-    }
-
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode != RESULT_OK) {
-            return;
-        }
-        switch (requestCode) {
-            case RESULT_LOAD_IMAGE:
-                if (null != data) {
-                    Uri avatarUri = data.getData();
-                    Auth.saveUserAvatar(this, avatarUri);
-                    avatar.setImageURI(avatarUri);
-                }
-                break;
-        }
-    }
-
-    public void pickPhotoWithPermission() {
-        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                    REQUEST_CODE_IMAGE_PERMISSION);
-        } else performSelectAvatarIntent();
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-        if (requestCode == REQUEST_CODE_IMAGE_PERMISSION) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                performSelectAvatarIntent();
-            } else {
-                //Permission denied
-            }
+    protected void onImageSelected(Uri uri) {
+        super.onImageSelected(uri);
+        if (null != uri) {
+            Auth.saveUserAvatar(this, uri);
+            avatar.setImageURI(uri);
         }
     }
 }

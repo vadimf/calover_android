@@ -117,7 +117,7 @@
                 style="@style/PrimaryBorderlessButton"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:background="@drawable/arrow_down"
+                android:background="@drawable/ic_expand_less_24dp"
                 app:layout_constraintBottom_toBottomOf="@+id/color_textView"
                 app:layout_constraintEnd_toStartOf="@+id/end_guideline"
                 app:layout_constraintTop_toTopOf="@+id/color_textView" />
@@ -354,11 +354,11 @@
 
             <CheckBox
                 android:id="@+id/yes_checkBox"
+                style="@style/PrimaryCheckBox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:button="@drawable/checkbox_selector"
-                style="@style/PrimaryCheckBox"
                 android:checked="false"
                 android:text="@string/yes_button_title"
                 app:layout_constraintBottom_toBottomOf="@+id/castrated_textView"
@@ -392,7 +392,7 @@
                 style="@style/PrimaryBorderlessButton"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:background="@drawable/calendar"
+                android:background="@drawable/ic_today_24dp"
                 app:layout_constraintBottom_toBottomOf="@+id/flea_treatment_textView"
                 app:layout_constraintEnd_toStartOf="@+id/end_guideline"
                 app:layout_constraintTop_toTopOf="@+id/flea_treatment_textView" />
@@ -412,7 +412,7 @@
                 style="@style/PrimaryBorderlessButton"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:background="@drawable/arrow_down"
+                android:background="@drawable/ic_expand_less_24dp"
                 app:layout_constraintBottom_toBottomOf="@+id/description_textView"
                 app:layout_constraintEnd_toStartOf="@+id/end_guideline"
                 app:layout_constraintTop_toTopOf="@+id/description_textView" />
@@ -438,6 +438,107 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/description_editText" />
+
+            <TextView
+                android:id="@+id/pet_name_photos_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                style="@style/PrimaryTextView"
+                android:text="Cat"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@+id/start_guideline"
+                app:layout_constraintTop_toBottomOf="@+id/info_divider1" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                style="@style/PrimaryTextView"
+                android:text="Photo's"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@+id/pet_name_photos_textView"
+                app:layout_constraintStart_toEndOf="@+id/pet_name_photos_textView"
+                app:layout_constraintTop_toTopOf="@+id/pet_name_photos_textView" />
+
+            <TextView
+                android:id="@+id/photo_count_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                style="@style/PrimaryTextView"
+                android:text="509"
+                app:layout_constraintStart_toStartOf="@+id/start_guideline"
+                app:layout_constraintTop_toBottomOf="@+id/pet_name_photos_textView" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                style="@style/PrimaryTextView"
+                android:text="photos"
+                app:layout_constraintBottom_toBottomOf="@+id/photo_count_textView"
+                app:layout_constraintStart_toEndOf="@+id/photo_count_textView"
+                app:layout_constraintTop_toTopOf="@+id/photo_count_textView" />
+
+            <Button
+                android:id="@+id/upload_image_button"
+                style="@style/PrimaryBorderlessButton"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/ic_add_24dp"
+                app:layout_constraintBottom_toBottomOf="@+id/photo_count_textView"
+                app:layout_constraintEnd_toStartOf="@+id/end_guideline"
+                app:layout_constraintTop_toTopOf="@+id/pet_name_photos_textView" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                style="@style/PrimaryTextView"
+                android:text="Upload picture"
+                app:layout_constraintBottom_toBottomOf="@+id/upload_image_button"
+                app:layout_constraintEnd_toStartOf="@+id/upload_image_button"
+                app:layout_constraintTop_toTopOf="@+id/upload_image_button" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/photos_RecyclerView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:layout_constraintEnd_toStartOf="@+id/end_guideline"
+                app:layout_constraintStart_toStartOf="@+id/start_guideline"
+                app:layout_constraintTop_toBottomOf="@+id/photo_count_textView" />
+
+            <View
+                android:id="@+id/info_divider2"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginTop="8dp"
+                android:background="@color/colorPrimaryLight"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/photos_RecyclerView" />
+
+            <TextView
+                android:id="@+id/group_partners_textView"
+                style="@style/PrimaryTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Group Partners"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@+id/start_guideline"
+                app:layout_constraintTop_toBottomOf="@+id/info_divider2" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/group_partners_RecyclerView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:layout_constraintEnd_toStartOf="@+id/end_guideline"
+                app:layout_constraintStart_toStartOf="@+id/start_guideline"
+                app:layout_constraintTop_toBottomOf="@+id/group_partners_textView" />
 
         </android.support.constraint.ConstraintLayout>
 
