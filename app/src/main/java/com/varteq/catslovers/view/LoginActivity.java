@@ -54,7 +54,7 @@ public class LoginActivity extends AppCompatActivity {
         if (avatarUri != null && !avatarUri.toString().isEmpty())
             avatar.setImageURI(avatarUri);
         else {
-            Bitmap image = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+            Bitmap image = Bitmap.createBitmap(10, 10, Bitmap.Config.ARGB_8888);
             image.eraseColor(getResources().getColor(R.color.transparent));
             avatar.setImageBitmap(image);
         }

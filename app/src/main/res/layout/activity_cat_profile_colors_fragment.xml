@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context="com.varteq.catslovers.view.CatProfileActivity">
+
+    <com.makeramen.roundedimageview.RoundedImageView
+        android:id="@+id/color_one_roundedImageView"
+        android:layout_width="60dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:scaleType="centerCrop"
+        android:src="@color/green"
+        app:layout_constraintDimensionRatio="w,1:1"
+        app:layout_constraintEnd_toStartOf="@+id/color_two_roundedImageView"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:riv_border_color="@color/colorPrimary"
+        app:riv_border_width="2dp"
+        app:riv_corner_radius="29dp"
+        app:riv_oval="true" />
+
+    <com.makeramen.roundedimageview.RoundedImageView
+        android:id="@+id/color_two_roundedImageView"
+        android:layout_width="60dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        android:src="@color/colorAccent"
+        app:layout_constraintBottom_toBottomOf="@+id/color_one_roundedImageView"
+        app:layout_constraintDimensionRatio="w,1:1"
+        app:layout_constraintEnd_toStartOf="@+id/color_three_roundedImageView"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/color_one_roundedImageView"
+        app:layout_constraintTop_toTopOf="@+id/color_one_roundedImageView"
+        app:layout_constraintVertical_bias="0.0"
+        app:riv_border_color="@color/colorPrimary"
+        app:riv_border_width="2dp"
+        app:riv_corner_radius="29dp"
+        app:riv_oval="true" />
+
+    <com.makeramen.roundedimageview.RoundedImageView
+        android:id="@+id/color_three_roundedImageView"
+        android:layout_width="60dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        android:src="@color/transparent"
+        app:layout_constraintBottom_toBottomOf="@+id/color_two_roundedImageView"
+        app:layout_constraintDimensionRatio="w,1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/color_two_roundedImageView"
+        app:layout_constraintTop_toTopOf="@+id/color_two_roundedImageView"
+        app:riv_border_color="@color/colorPrimary"
+        app:riv_border_width="2dp"
+        app:riv_corner_radius="29dp"
+        app:riv_oval="true" />
+
+    <TextView
+        android:id="@+id/color_one_textView"
+        style="@style/PrimaryTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Color One"
+        app:layout_constraintEnd_toEndOf="@+id/color_one_roundedImageView"
+        app:layout_constraintStart_toStartOf="@+id/color_one_roundedImageView"
+        app:layout_constraintTop_toBottomOf="@+id/color_one_roundedImageView" />
+
+    <TextView
+        android:id="@+id/color_two_textView"
+        style="@style/PrimaryTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Color Two"
+        app:layout_constraintBottom_toBottomOf="@+id/color_one_textView"
+        app:layout_constraintEnd_toEndOf="@+id/color_two_roundedImageView"
+        app:layout_constraintStart_toStartOf="@+id/color_two_roundedImageView"
+        app:layout_constraintTop_toTopOf="@+id/color_one_textView" />
+
+    <TextView
+        android:id="@+id/color_three_textView"
+        style="@style/PrimaryTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Color Three"
+        app:layout_constraintBottom_toBottomOf="@+id/color_two_textView"
+        app:layout_constraintEnd_toEndOf="@+id/color_three_roundedImageView"
+        app:layout_constraintStart_toStartOf="@+id/color_three_roundedImageView"
+        app:layout_constraintTop_toTopOf="@+id/color_two_textView" />
+
+    <com.makeramen.roundedimageview.RoundedImageView
+        android:id="@+id/color_four_roundedImageView"
+        android:layout_width="60dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:scaleType="centerCrop"
+        android:src="@color/transparent"
+        app:layout_constraintDimensionRatio="h,1:1"
+        app:layout_constraintEnd_toStartOf="@+id/color_five_roundedImageView"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/color_one_textView"
+        app:riv_border_color="@color/colorPrimary"
+        app:riv_border_width="2dp"
+        app:riv_corner_radius="29dp"
+        app:riv_oval="true" />
+
+    <com.makeramen.roundedimageview.RoundedImageView
+        android:id="@+id/color_five_roundedImageView"
+        android:layout_width="60dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        android:src="@color/transparent"
+        app:layout_constraintBottom_toBottomOf="@+id/color_four_roundedImageView"
+        app:layout_constraintDimensionRatio="h,1:1"
+        app:layout_constraintEnd_toStartOf="@+id/color_six_roundedImageView"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/color_four_roundedImageView"
+        app:layout_constraintTop_toTopOf="@+id/color_four_roundedImageView"
+        app:riv_border_color="@color/colorPrimary"
+        app:riv_border_width="2dp"
+        app:riv_corner_radius="29dp"
+        app:riv_oval="true" />
+
+    <com.makeramen.roundedimageview.RoundedImageView
+        android:id="@+id/color_six_roundedImageView"
+        android:layout_width="60dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        android:src="@color/transparent"
+        app:layout_constraintBottom_toBottomOf="@+id/color_five_roundedImageView"
+        app:layout_constraintDimensionRatio="h,1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/color_five_roundedImageView"
+        app:layout_constraintTop_toTopOf="@+id/color_five_roundedImageView"
+        app:riv_border_color="@color/colorPrimary"
+        app:riv_border_width="2dp"
+        app:riv_corner_radius="29dp"
+        app:riv_oval="true" />
+
+    <TextView
+        android:id="@+id/color_four_textView"
+        style="@style/PrimaryTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Color Four"
+        app:layout_constraintEnd_toEndOf="@+id/color_four_roundedImageView"
+        app:layout_constraintStart_toStartOf="@+id/color_four_roundedImageView"
+        app:layout_constraintTop_toBottomOf="@+id/color_four_roundedImageView" />
+
+    <TextView
+        android:id="@+id/color_five_textView"
+        style="@style/PrimaryTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Color Five"
+        app:layout_constraintBottom_toBottomOf="@+id/color_four_textView"
+        app:layout_constraintEnd_toEndOf="@+id/color_five_roundedImageView"
+        app:layout_constraintStart_toStartOf="@+id/color_five_roundedImageView"
+        app:layout_constraintTop_toTopOf="@+id/color_four_textView" />
+
+    <TextView
+        android:id="@+id/color_six_textView"
+        style="@style/PrimaryTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Color Six"
+        app:layout_constraintBottom_toBottomOf="@+id/color_five_textView"
+        app:layout_constraintEnd_toEndOf="@+id/color_six_roundedImageView"
+        app:layout_constraintStart_toStartOf="@+id/color_six_roundedImageView"
+        app:layout_constraintTop_toTopOf="@+id/color_five_textView" />
+
+</android.support.constraint.ConstraintLayout>

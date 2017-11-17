@@ -11,4 +11,16 @@
     <string name="success_and_new_card_open">Success\n+\nNew Pet\nCard Open</string>
     <string name="pick_a_color">Choose a color</string>
     <string name="new_cat_profile_screen_title">New Cat Profile</string>
+    <string name="title_activity_main">Feedstation</string>
+
+    <!--Bottom menu-->
+    <string name="map_menu">MAP</string>
+    <string name="feed_menu">FEED</string>
+    <string name="chat_menu">CHAT</string>
+    <string name="cats_menu">CATS</string>
+
+    <!--Maps-->
+    <string name="nearby">Nearby</string>
+    <string name="explor">Explor</string>
+    <string name="action_save">Save</string>
 </resources>

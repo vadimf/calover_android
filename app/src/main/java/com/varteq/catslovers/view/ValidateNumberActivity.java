@@ -28,7 +28,7 @@ import butterknife.OnClick;
 public class ValidateNumberActivity extends AppCompatActivity implements TextWatcher {
 
     private String TAG = ValidateNumberActivity.class.getSimpleName();
-    private final int MAX_CHARS_COUNT = 2;
+    private final int MAX_CHARS_COUNT = 1;
     @BindView(R.id.editText1)
     EditText editText1;
     @BindView(R.id.editText2)
@@ -92,6 +92,11 @@ public class ValidateNumberActivity extends AppCompatActivity implements TextWat
             }
         }
         onCodeValidate(true);
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        try {
+            imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+        } catch (Exception e) {
+        }
 
         Auth.setUserLogin(this, true);
 

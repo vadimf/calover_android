@@ -19,7 +19,7 @@ public class ConfirmNumberActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_confirm_number);
 
-        numberEditText = (EditText) findViewById(R.id.mobile_number_editText);
+        numberEditText = findViewById(R.id.mobile_number_editText);
         numberEditText.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE)
                 confirmNumber();
