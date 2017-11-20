@@ -11,9 +11,20 @@ import java.util.List;
 
 public class CatPhotosAdapter extends RecyclerView.Adapter<CatPhotosAdapter.PhotoViewHolder> {
 
+    private OnImageClickListener externalClickListener;
     private List<Uri> photoList;
+    private View.OnClickListener internalClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) view.getLayoutParams();
+            int itemPosition = lp.getViewLayoutPosition();
+            if (externalClickListener != null)
+                externalClickListener.onImageClicked(photoList.get(itemPosition));
+        }
+    };
 
-    public CatPhotosAdapter(List<Uri> photoList) {
+    public CatPhotosAdapter(List<Uri> photoList, OnImageClickListener externalClickListener) {
+        this.externalClickListener = externalClickListener;
         this.photoList = photoList;
     }
 
@@ -34,6 +45,7 @@ public class CatPhotosAdapter extends RecyclerView.Adapter<CatPhotosAdapter.Phot
                 from(viewGroup.getContext()).
                 inflate(R.layout.card_cat_photo, viewGroup, false);
 
+        itemView.setOnClickListener(internalClickListener);
         return new PhotoViewHolder(itemView);
     }
 
@@ -42,7 +54,11 @@ public class CatPhotosAdapter extends RecyclerView.Adapter<CatPhotosAdapter.Phot
 
         public PhotoViewHolder(View v) {
             super(v);
-            imageView = (ImageView) v.findViewById(R.id.cat_photo_imageView);
+            imageView = v.findViewById(R.id.cat_photo_imageView);
         }
+    }
+
+    public interface OnImageClickListener {
+        void onImageClicked(Uri imageUri);
     }
 }

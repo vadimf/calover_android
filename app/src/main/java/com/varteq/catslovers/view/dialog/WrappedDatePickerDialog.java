@@ -1,13 +1,15 @@
-package com.varteq.catslovers;
+package com.varteq.catslovers.view.dialog;
 
 import android.app.DatePickerDialog;
 import android.content.Context;
 
+import com.varteq.catslovers.R;
+
 import java.util.Calendar;
 
-public class DatePickerFragment {
+public class WrappedDatePickerDialog {
 
-    public DatePickerFragment(Context context, DatePickerDialog.OnDateSetListener listener) {
+    public WrappedDatePickerDialog(Context context, DatePickerDialog.OnDateSetListener listener) {
         // Use the current date as the default date in the picker
         final Calendar c = Calendar.getInstance();
         int year = c.get(Calendar.YEAR);
@@ -15,7 +17,8 @@ public class DatePickerFragment {
         int day = c.get(Calendar.DAY_OF_MONTH);
 
         // Create a new instance of DatePickerDialog and return it
-        DatePickerDialog dialog = new DatePickerDialog(context, listener, year, month, day);
+        //AlertDialog.THEME_HOLO_LIGHT android.R.style.Theme_DeviceDefault_Light_Dialog
+        DatePickerDialog dialog = new DatePickerDialog(context, R.style.PrimaryDialog, listener, year, month, day);
         dialog.show();
     }
 }

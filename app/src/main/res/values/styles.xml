@@ -22,6 +22,17 @@
         <item name="android:windowBackground">@drawable/background_splash</item>
     </style>
 
+    <style name="PrimaryDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <!--<item name="android:actionBarStyle">@style/MyActionBar</item>
+        <item name="android:actionBarTabStyle">@style/MyActionBarTabStyle</item>
+        <item name="android:windowBackground">@drawable/bg</item>
+        <item name="android:datePickerStyle">@android:style/Widget.DatePicker</item>
+        <item name="android:actionBarTabTextStyle">@style/MyActionBarTabText</item>
+        <item name="android:actionButtonStyle">@style/PrimaryBorderlessButton</item>
+        <item name="android:colorBackground">@color/colorPrimary</item>-->
+        <item name="colorAccent">@color/colorPrimary</item>
+    </style>
+
     <style name="PrimaryCheckBox" parent="Theme.AppCompat.Light">
         <item name="android:textSize">@dimen/normal_text_size</item>
         <item name="android:textColor">@color/colorPrimary</item>

@@ -23,15 +23,21 @@
 
     <Button
         android:id="@+id/color_picker_ok_button"
+        style="@style/PrimaryBorderlessButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        style="@style/PrimaryBorderlessButton"
         android:text="@android:string/ok"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/opacitybar"
-        app:layout_constraintStart_toStartOf="@+id/opacitybar"
+        app:layout_constraintEnd_toStartOf="@+id/color_picker_cancel_button"
+        app:layout_constraintTop_toBottomOf="@+id/opacitybar" />
+
+    <Button
+        android:id="@+id/color_picker_cancel_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/PrimaryBorderlessButton"
+        android:text="@android:string/no"
+        app:layout_constraintEnd_toEndOf="@+id/color_picker"
         app:layout_constraintTop_toBottomOf="@+id/opacitybar" />
 
 </android.support.constraint.ConstraintLayout>

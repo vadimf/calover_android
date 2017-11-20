@@ -1,9 +1,12 @@
 package com.varteq.catslovers.view;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -20,9 +23,9 @@ import android.widget.TextView;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.varteq.catslovers.Auth;
 import com.varteq.catslovers.CatPhotosAdapter;
-import com.varteq.catslovers.ColorPickerDialog;
-import com.varteq.catslovers.DatePickerFragment;
 import com.varteq.catslovers.R;
+import com.varteq.catslovers.view.dialog.ColorPickerDialog;
+import com.varteq.catslovers.view.dialog.WrappedDatePickerDialog;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -122,10 +125,33 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
                         colorSixRoundedImageView));
 
         photoList = new ArrayList<>();
-        photosAdapter = new CatPhotosAdapter(photoList);
+        photosAdapter = new CatPhotosAdapter(photoList, this::showImage);
         photosRecyclerView.setAdapter(photosAdapter);
         photosRecyclerView.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+    }
+
+    private void showImage(Uri imageUri) {
+        if (imageUri == null) return;
+
+        Intent intent = new Intent();
+        Uri uri;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            //uri = FileProvider.getUriForFile(getApplicationContext(), BuildConfig.APPLICATION_ID + ".media.fileprovider", new File(chatEntry.getAvatar().getFile()));
+
+            List<ResolveInfo> resInfoList = getPackageManager().queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+            for (ResolveInfo resolveInfo : resInfoList) {
+                String packageName = resolveInfo.activityInfo.packageName;
+                grantUriPermission(packageName, imageUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            }
+        } else {
+            //uri = Uri.fromFile(new File(chatEntry.getAvatar().getFile()));
+        }
+
+        intent.setAction(Intent.ACTION_VIEW);
+        intent.setDataAndType(imageUri, "image/*");
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        startActivity(intent);
     }
 
     @Override
@@ -160,12 +186,13 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
         if (uri != null) {
             photoList.add(0, uri);
             photosAdapter.notifyItemInserted(0);
+            photosRecyclerView.scrollToPosition(0);
         }
     }
 
     @OnClick(R.id.flea_treatment_picker_button)
     void showFleaTreatmentPicker() {
-        new DatePickerFragment(this, null);
+        new WrappedDatePickerDialog(this, null);
     }
 
     @OnClick(R.id.expand_colors_button)

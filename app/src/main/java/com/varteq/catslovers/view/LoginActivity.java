@@ -33,9 +33,6 @@ public class LoginActivity extends PhotoPickerActivity {
     @BindView(R.id.upload_photo_button)
     Button uploadPhotoButton;
 
-    private final int RESULT_LOAD_IMAGE = 0;
-    private final int REQUEST_CODE_IMAGE_PERMISSION = 100;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

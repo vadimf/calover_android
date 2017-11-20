@@ -1,24 +1,37 @@
-package com.varteq.catslovers;
+package com.varteq.catslovers.view.dialog;
 
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.widget.RelativeLayout;
-import android.widget.RelativeLayout.LayoutParams;
+import android.os.Bundle;
+import android.widget.Button;
 
 import com.larswerkman.holocolorpicker.ColorPicker;
+import com.larswerkman.holocolorpicker.OpacityBar;
+import com.varteq.catslovers.R;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class ColorPickerDialog extends AlertDialog {
 
-    private ColorPicker colorPickerView;
+    @BindView(R.id.color_picker)
+    ColorPicker colorPickerView;
+    @BindView(R.id.opacitybar)
+    OpacityBar opacityBar;
+    @BindView(R.id.color_picker_ok_button)
+    Button okButton;
+    @BindView(R.id.color_picker_cancel_button)
+    Button cancelButton;
+
     private final ColorPicker.OnColorSelectedListener onColorSelectedListener;
 
     public ColorPickerDialog(Context context, int initialColor, ColorPicker.OnColorSelectedListener onColorSelectedListener) {
-        super(context);
+        super(context, R.style.PrimaryDialog);
 
         this.onColorSelectedListener = onColorSelectedListener;
 
-        RelativeLayout relativeLayout = new RelativeLayout(context);
+        /*RelativeLayout relativeLayout = new RelativeLayout(context);
         LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
         layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
 
@@ -30,8 +43,28 @@ public class ColorPickerDialog extends AlertDialog {
         setButton(BUTTON_POSITIVE, context.getString(android.R.string.ok), onClickListener);
         setButton(BUTTON_NEGATIVE, context.getString(android.R.string.cancel), onClickListener);
 
-        setView(relativeLayout);
+        setView(relativeLayout);*/
 
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.dialog_color_picker);
+        ButterKnife.bind(this);
+        colorPickerView.addOpacityBar(opacityBar);
+
+        okButton.setOnClickListener(view -> {
+            int selectedColor = colorPickerView.getColor();
+            onColorSelectedListener.onColorSelected(selectedColor);
+            dismiss();
+        });
+
+        cancelButton.setOnClickListener(view -> dismiss());
+    }
+
+    public int getCurrentColor() {
+        return colorPickerView.getColor();
     }
 
     private OnClickListener onClickListener = new DialogInterface.OnClickListener() {
@@ -47,9 +80,4 @@ public class ColorPickerDialog extends AlertDialog {
             }
         }
     };
-
-    public interface OnColorSelectedListener {
-        public void onColorSelected(int color);
-    }
-
 }
