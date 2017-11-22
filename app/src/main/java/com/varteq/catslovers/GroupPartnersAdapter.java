@@ -6,59 +6,88 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.makeramen.roundedimageview.RoundedImageView;
+import com.varteq.catslovers.model.GroupPartner;
 
 import java.util.List;
 
-public class GroupPartnersAdapter extends RecyclerView.Adapter<GroupPartnersAdapter.PhotoViewHolder> {
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
-    private OnImageClickListener externalClickListener;
-    private List<Uri> photoList;
+public class GroupPartnersAdapter extends RecyclerView.Adapter<GroupPartnersAdapter.GroupPartnerViewHolder> {
+
+    private OnPersonClickListener externalClickListener;
+    private List<GroupPartner> personList;
+    private Uri addNewPartnerUri = Uri.parse("addNewPartnerUri");
     private View.OnClickListener internalClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) view.getLayoutParams();
             int itemPosition = lp.getViewLayoutPosition();
-            if (externalClickListener != null)
-                externalClickListener.onImageClicked(photoList.get(itemPosition));
+            if (externalClickListener != null) {
+                if (personList.get(itemPosition).getAvatarUri() != addNewPartnerUri)
+                    externalClickListener.onPersonClicked(personList.get(itemPosition).getAvatarUri());
+                else
+                    externalClickListener.onAddPerson();
+            }
         }
     };
 
-    public GroupPartnersAdapter(List<Uri> photoList, OnImageClickListener externalClickListener) {
+    public GroupPartnersAdapter(List<GroupPartner> personList, OnPersonClickListener externalClickListener) {
         this.externalClickListener = externalClickListener;
-        this.photoList = photoList;
+        this.personList = personList;
+        this.personList.add(this.personList.size(), new GroupPartner(addNewPartnerUri, "", false));
     }
 
     @Override
     public int getItemCount() {
-        return photoList.size();
+        return personList.size();
     }
 
     @Override
-    public void onBindViewHolder(PhotoViewHolder photoViewHolder, int i) {
-        Uri imageURI = photoList.get(i);
-        photoViewHolder.imageView.setImageURI(imageURI);
+    public void onBindViewHolder(GroupPartnerViewHolder viewHolder, int i) {
+        GroupPartner person = personList.get(i);
+        if (person.getAvatarUri() != addNewPartnerUri) {
+            if (person.getAvatarUri()!=null)
+                viewHolder.partnerAvatarImageView.setImageURI(person.getAvatarUri());
+            else
+                viewHolder.partnerAvatarImageView.setImageResource(R.drawable.ic_person);
+        }
+        else
+            viewHolder.partnerAvatarImageView.setImageResource(R.drawable.ic_add_group_partner);
+        viewHolder.partnerNameTextView.setText(person.getName());
+        viewHolder.isAdminImageView.setVisibility(person.isAdmin() ? View.VISIBLE : View.INVISIBLE);
     }
 
     @Override
-    public PhotoViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+    public GroupPartnerViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View itemView = LayoutInflater.
                 from(viewGroup.getContext()).
                 inflate(R.layout.card_group_partner, viewGroup, false);
 
         itemView.setOnClickListener(internalClickListener);
-        return new PhotoViewHolder(itemView);
+        return new GroupPartnerViewHolder(itemView);
     }
 
-    public class PhotoViewHolder extends RecyclerView.ViewHolder {
-        protected ImageView imageView;
+    public class GroupPartnerViewHolder extends RecyclerView.ViewHolder {
 
-        public PhotoViewHolder(View v) {
+        @BindView(R.id.partner_avatar_RoundedImageView)
+        RoundedImageView partnerAvatarImageView;
+        @BindView(R.id.is_admin_ImageView)
+        ImageView isAdminImageView;
+        @BindView(R.id.partner_name_TextView)
+        TextView partnerNameTextView;
+
+        public GroupPartnerViewHolder(View v) {
             super(v);
-            imageView = v.findViewById(R.id.cat_photo_imageView);
+            ButterKnife.bind(this, v);
         }
     }
 
-    public interface OnImageClickListener {
-        void onImageClicked(Uri imageUri);
+    public interface OnPersonClickListener {
+        void onPersonClicked(Uri imageUri);
+        void onAddPerson();
     }
 }

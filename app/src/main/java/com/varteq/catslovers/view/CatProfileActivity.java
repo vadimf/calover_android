@@ -23,7 +23,9 @@ import android.widget.TextView;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.varteq.catslovers.Auth;
 import com.varteq.catslovers.CatPhotosAdapter;
+import com.varteq.catslovers.GroupPartnersAdapter;
 import com.varteq.catslovers.R;
+import com.varteq.catslovers.model.GroupPartner;
 import com.varteq.catslovers.view.dialog.ColorPickerDialog;
 import com.varteq.catslovers.view.dialog.WrappedDatePickerDialog;
 
@@ -94,6 +96,9 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
     private List<Uri> photoList;
     private CatPhotosAdapter photosAdapter;
 
+    private List<GroupPartner> groupPartnersList;
+    private GroupPartnersAdapter groupPartnersAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -129,6 +134,31 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
         photosRecyclerView.setAdapter(photosAdapter);
         photosRecyclerView.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+
+        groupPartnersList = new ArrayList<>();
+        groupPartnersList.add(new GroupPartner(null, "Admin", true));
+        groupPartnersList.add(new GroupPartner(null, "User1", false));
+        groupPartnersAdapter = new GroupPartnersAdapter(groupPartnersList, new GroupPartnersAdapter.OnPersonClickListener() {
+
+            @Override
+            public void onPersonClicked(Uri imageUri) {
+
+            }
+
+            @Override
+            public void onAddPerson() {
+                addGroupPartner();
+            }
+        });
+        groupPartnersRecyclerView.setAdapter(groupPartnersAdapter);
+        groupPartnersRecyclerView.setLayoutManager(
+                new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+    }
+
+    private void addGroupPartner() {
+        groupPartnersList.add(1, new GroupPartner(null, "User"+((int)(Math.random() * 999999) + 111111), false));
+        groupPartnersAdapter.notifyItemInserted(1);
+        groupPartnersRecyclerView.scrollToPosition(0);
     }
 
     private void showImage(Uri imageUri) {
