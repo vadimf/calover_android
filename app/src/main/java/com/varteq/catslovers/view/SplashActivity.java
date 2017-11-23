@@ -13,7 +13,7 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         if (Auth.isUserLoggedIn(this))
-            startActivity(new Intent(this, CatProfileActivity.class));
+            startActivity(new Intent(this, MainActivity.class));
         else
             startActivity(new Intent(this, IntroActivity.class));
         finish();

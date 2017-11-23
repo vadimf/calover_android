@@ -21,7 +21,8 @@
 
     <!--Maps-->
     <string name="nearby">Nearby</string>
-    <string name="explor">Explor</string>
+    <string name="explore">Explore</string>
     <string name="action_save">Save</string>
     <string name="select_cat_photo">Select cat photo</string>
+    <string name="my_cats">my cats</string>
 </resources>

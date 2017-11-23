@@ -22,15 +22,17 @@ import android.widget.TextView;
 
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.varteq.catslovers.Auth;
-import com.varteq.catslovers.CatPhotosAdapter;
-import com.varteq.catslovers.GroupPartnersAdapter;
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.Utils;
-import com.varteq.catslovers.ViewColorsAdapter;
+import com.varteq.catslovers.model.CatProfile;
 import com.varteq.catslovers.model.GroupPartner;
+import com.varteq.catslovers.view.adapters.CatPhotosAdapter;
+import com.varteq.catslovers.view.adapters.GroupPartnersAdapter;
+import com.varteq.catslovers.view.adapters.ViewColorsAdapter;
 import com.varteq.catslovers.view.dialog.ColorPickerDialog;
 import com.varteq.catslovers.view.dialog.WrappedDatePickerDialog;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -42,6 +44,9 @@ import butterknife.OnClick;
 
 public class CatProfileActivity extends PhotoPickerActivity implements View.OnClickListener {
 
+    public static final String CAT_KEY = "cat_key";
+    public static final String MODE_KEY = "mode_key";
+    public static final String IS_EDIT_MODE_KEY = "is_mode_key";
     @BindView(R.id.cat_profile_avatar_roundedImageView)
     RoundedImageView avatarImageView;
     @BindView(R.id.pet_name_textView)
@@ -127,12 +132,30 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
     private List<Integer> colorsList;
     private ViewColorsAdapter viewColorsAdapter;
 
+    private CatProfile catProfile;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cat_profile);
 
         ButterKnife.bind(this);
+
+        if (getIntent() != null) {
+            if (getIntent().hasExtra(CAT_KEY)) {
+                catProfile = (CatProfile) getIntent().getSerializableExtra(CAT_KEY);
+                petNameTextView.setText(catProfile.getPetName());
+            }
+            if (getIntent().hasExtra(IS_EDIT_MODE_KEY) && !getIntent().getBooleanExtra(IS_EDIT_MODE_KEY, true))
+                currentMode = CatProfileScreenMode.VIEW_MODE;
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
+        if (savedInstanceState != null) {
+            Serializable mode = savedInstanceState.getSerializable(MODE_KEY);
+            if (mode != null && mode instanceof CatProfileScreenMode)
+                currentMode = (CatProfileScreenMode) mode;
+        }
 
         Uri avatarUri = Auth.getUserAvatar(this);
         if (avatarUri != null && !avatarUri.toString().isEmpty())
@@ -411,5 +434,11 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
             colorPickerDialog.show();
             clickedRoundViewId = view.getId();
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable(MODE_KEY, currentMode);
     }
 }

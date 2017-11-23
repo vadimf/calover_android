@@ -1,4 +1,4 @@
-package com.varteq.catslovers;
+package com.varteq.catslovers.view.adapters;
 
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
@@ -6,6 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+
+import com.varteq.catslovers.R;
 
 import java.util.List;
 

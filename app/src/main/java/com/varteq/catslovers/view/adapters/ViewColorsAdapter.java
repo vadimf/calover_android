@@ -1,4 +1,4 @@
-package com.varteq.catslovers;
+package com.varteq.catslovers.view.adapters;
 
 import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.makeramen.roundedimageview.RoundedImageView;
+import com.varteq.catslovers.R;
+import com.varteq.catslovers.Utils;
 
 import java.util.List;
 
