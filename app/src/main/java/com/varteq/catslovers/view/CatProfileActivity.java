@@ -3,7 +3,6 @@ package com.varteq.catslovers.view;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
@@ -18,6 +17,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.makeramen.roundedimageview.RoundedImageView;
@@ -25,6 +25,8 @@ import com.varteq.catslovers.Auth;
 import com.varteq.catslovers.CatPhotosAdapter;
 import com.varteq.catslovers.GroupPartnersAdapter;
 import com.varteq.catslovers.R;
+import com.varteq.catslovers.Utils;
+import com.varteq.catslovers.ViewColorsAdapter;
 import com.varteq.catslovers.model.GroupPartner;
 import com.varteq.catslovers.view.dialog.ColorPickerDialog;
 import com.varteq.catslovers.view.dialog.WrappedDatePickerDialog;
@@ -91,6 +93,29 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
     @BindView(R.id.group_partners_RecyclerView)
     RecyclerView groupPartnersRecyclerView;
 
+    @BindView(R.id.info_LinearLayout)
+    LinearLayout infoLinearLayout;
+    @BindView(R.id.follow_button)
+    Button followButton;
+    @BindView(R.id.reply_button)
+    Button replyButton;
+
+    @BindView(R.id.view_colors_RecyclerView)
+    RecyclerView viewColorsRecyclerView;
+    @BindView(R.id.flea_treatment_value_textView)
+    TextView fleaTreatmentValueTextView;
+
+    @BindView(R.id.upload_image_LinearLayout)
+    LinearLayout uploadImageLinearLayout;
+    private Menu actionBarMenu;
+
+    public enum CatProfileScreenMode {
+        EDIT_MODE,
+        VIEW_MODE
+    }
+
+    private CatProfileScreenMode currentMode = CatProfileScreenMode.EDIT_MODE;
+
     private int clickedRoundViewId;
     private List<RoundedImageView> colorPickers;
     private List<Uri> photoList;
@@ -98,6 +123,9 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
 
     private List<GroupPartner> groupPartnersList;
     private GroupPartnersAdapter groupPartnersAdapter;
+
+    private List<Integer> colorsList;
+    private ViewColorsAdapter viewColorsAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,7 +138,15 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
         if (avatarUri != null && !avatarUri.toString().isEmpty())
             avatarImageView.setImageURI(avatarUri);
         else
-            avatarImageView.setImageBitmap(getBitmapWithColor(getResources().getColor(R.color.transparent)));
+            avatarImageView.setImageBitmap(Utils.getBitmapWithColor(getResources().getColor(R.color.transparent)));
+
+        avatarImageView.setOnClickListener(view -> {
+            if (currentMode.equals(CatProfileScreenMode.VIEW_MODE))
+                currentMode = CatProfileScreenMode.EDIT_MODE;
+            else currentMode = CatProfileScreenMode.VIEW_MODE;
+
+            setupUIMode();
+        });
 
         nicknameTextView.setText(Auth.getUserName(this));
 
@@ -138,21 +174,117 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
         groupPartnersList = new ArrayList<>();
         groupPartnersList.add(new GroupPartner(null, "Admin", true));
         groupPartnersList.add(new GroupPartner(null, "User1", false));
-        groupPartnersAdapter = new GroupPartnersAdapter(groupPartnersList, new GroupPartnersAdapter.OnPersonClickListener() {
+        groupPartnersAdapter = new GroupPartnersAdapter(groupPartnersList, currentMode.equals(CatProfileScreenMode.EDIT_MODE),
+                new GroupPartnersAdapter.OnPersonClickListener() {
 
-            @Override
-            public void onPersonClicked(Uri imageUri) {
+                    @Override
+                    public void onPersonClicked(Uri imageUri) {
 
-            }
+                    }
 
-            @Override
-            public void onAddPerson() {
-                addGroupPartner();
-            }
-        });
+                    @Override
+                    public void onAddPerson() {
+                        addGroupPartner();
+                    }
+                });
         groupPartnersRecyclerView.setAdapter(groupPartnersAdapter);
         groupPartnersRecyclerView.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+
+        colorsList = new ArrayList<>();
+        colorsList.add(Color.GREEN);
+        colorsList.add(Color.RED);
+
+        viewColorsAdapter = new ViewColorsAdapter(colorsList);
+        viewColorsRecyclerView.setAdapter(viewColorsAdapter);
+        viewColorsRecyclerView.setLayoutManager(
+                new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+
+        setupUIMode();
+    }
+
+    private void compressColorsList() {
+        while (colorsList.contains(null))
+            colorsList.remove(null);
+    }
+
+    private void resizeColorsListWithEmptyValues() {
+        while (colorPickers.size() > colorsList.size())
+            colorsList.add(null);
+    }
+
+    private void setupColorPickersColors() {
+        for (int i = 0; i < colorPickers.size(); i++) {
+            if (i < colorsList.size())
+                colorPickers.get(i).setImageBitmap(Utils.getBitmapWithColor(colorsList.get(i)));
+            else
+                colorPickers.get(i).setImageBitmap(Utils.getBitmapWithColor(getResources().getColor(R.color.transparent)));
+        }
+    }
+
+    private void setupUIMode() {
+        if (currentMode.equals(CatProfileScreenMode.EDIT_MODE))
+            setupEditMode();
+        else
+            setupViewMode();
+    }
+
+    private void setupViewMode() {
+        currentMode = CatProfileScreenMode.VIEW_MODE;
+
+        infoLinearLayout.setVisibility(View.VISIBLE);
+
+        // colorsList settings
+        compressColorsList();
+        viewColorsRecyclerView.setVisibility(View.VISIBLE);
+        expandColorsButton.setVisibility(View.GONE);
+        colorConstraintLayout.setVisibility(View.GONE);
+
+        yesCheckBox.setEnabled(false);
+        noCheckBox.setEnabled(false);
+
+        // flea treatment settings
+        fleaTreatmentPickerButton.setVisibility(View.GONE);
+        fleaTreatmentValueTextView.setVisibility(View.VISIBLE);
+
+        uploadImageLinearLayout.setVisibility(View.GONE);
+
+        descriptionEditText.setEnabled(false);
+
+        groupPartnersAdapter.switchToViewMode();
+
+        if (actionBarMenu != null && actionBarMenu.findItem(R.id.app_bar_save) != null)
+            actionBarMenu.findItem(R.id.app_bar_save).setVisible(false);
+    }
+
+    private void setupEditMode() {
+        currentMode = CatProfileScreenMode.EDIT_MODE;
+
+        infoLinearLayout.setVisibility(View.GONE);
+
+        // colorsList settings
+        viewColorsRecyclerView.setVisibility(View.GONE);
+        expandColorsButton.setVisibility(View.VISIBLE);
+        colorConstraintLayout.setVisibility(View.GONE);
+        expandCollapseColors();
+        setupColorPickersColors();
+        resizeColorsListWithEmptyValues();
+
+        yesCheckBox.setEnabled(true);
+        noCheckBox.setEnabled(true);
+
+        // flea treatment settings
+        fleaTreatmentPickerButton.setVisibility(View.VISIBLE);
+        fleaTreatmentValueTextView.setVisibility(View.GONE);
+
+        uploadImageLinearLayout.setVisibility(View.VISIBLE);
+
+        descriptionEditText.setEnabled(true);
+
+        groupPartnersAdapter.switchToEditMode();
+
+        if (actionBarMenu != null && actionBarMenu.findItem(R.id.app_bar_save) != null)
+            actionBarMenu.findItem(R.id.app_bar_save).setVisible(true);
     }
 
     private void addGroupPartner() {
@@ -188,6 +320,11 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_edit_cat_profile_activity, menu);
+        if (currentMode.equals(CatProfileScreenMode.EDIT_MODE))
+            menu.findItem(R.id.app_bar_save).setVisible(true);
+        else
+            menu.findItem(R.id.app_bar_save).setVisible(false);
+        actionBarMenu = menu;
         return true;
     }
 
@@ -265,19 +402,14 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
     public void onClick(View view) {
         if (view instanceof RoundedImageView) {
             ColorPickerDialog colorPickerDialog = new ColorPickerDialog(this, Color.GREEN, color -> {
-                for (RoundedImageView imageView : colorPickers)
-                    if (imageView.getId() == clickedRoundViewId) {
-                        imageView.setImageBitmap(getBitmapWithColor(color));
+                for (int i = 0; i < colorPickers.size(); i++)
+                    if (colorPickers.get(i).getId() == clickedRoundViewId) {
+                        colorPickers.get(i).setImageBitmap(Utils.getBitmapWithColor(color));
+                        colorsList.set(i, color);
                     }
             });
             colorPickerDialog.show();
             clickedRoundViewId = view.getId();
         }
-    }
-
-    private Bitmap getBitmapWithColor(int color) {
-        Bitmap image = Bitmap.createBitmap(10, 10, Bitmap.Config.ARGB_8888);
-        image.eraseColor(color);
-        return image;
     }
 }

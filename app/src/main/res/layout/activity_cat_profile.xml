@@ -92,6 +92,40 @@
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
                 app:layout_constraintTop_toBottomOf="@+id/nickname_textView" />
 
+            <LinearLayout
+                android:id="@+id/info_LinearLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                app:layout_constraintBottom_toBottomOf="@+id/information_textView"
+                app:layout_constraintEnd_toStartOf="@+id/end_guideline"
+                app:layout_constraintTop_toTopOf="@+id/information_textView">
+
+                <TextView
+                    android:id="@+id/textView"
+                    style="@style/PrimaryTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="follow cat" />
+
+                <Button
+                    android:id="@+id/follow_button"
+                    style="@style/PrimaryBorderlessButton"
+                    android:layout_width="@dimen/normal_button_size"
+                    android:layout_height="@dimen/normal_button_size"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:background="@drawable/ic_add_24dp" />
+
+                <Button
+                    android:id="@+id/reply_button"
+                    style="@style/PrimaryBorderlessButton"
+                    android:layout_width="@dimen/normal_button_size"
+                    android:layout_height="@dimen/normal_button_size"
+                    android:background="@drawable/ic_reply_24dp" />
+
+            </LinearLayout>
+
             <View
                 android:id="@+id/info_divider"
                 android:layout_width="match_parent"
@@ -107,16 +141,24 @@
                 style="@style/PrimaryTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="16dp"
                 android:text="Color"
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
                 app:layout_constraintTop_toBottomOf="@+id/info_divider" />
 
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/view_colors_RecyclerView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="@+id/color_textView"
+                app:layout_constraintEnd_toStartOf="@+id/end_guideline"
+                app:layout_constraintTop_toTopOf="@+id/color_textView" />
+
             <Button
                 android:id="@+id/expand_colors_button"
                 style="@style/PrimaryBorderlessButton"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="@dimen/normal_button_size"
+                android:layout_height="@dimen/normal_button_size"
                 android:background="@drawable/ic_expand_less_24dp"
                 app:layout_constraintBottom_toBottomOf="@+id/color_textView"
                 app:layout_constraintEnd_toStartOf="@+id/end_guideline"
@@ -137,7 +179,7 @@
                     android:layout_height="0dp"
                     android:layout_marginTop="8dp"
                     android:scaleType="centerCrop"
-                    android:src="@color/green"
+                    android:src="@color/transparent"
                     app:layout_constraintDimensionRatio="w,1:1"
                     app:layout_constraintEnd_toStartOf="@+id/color_two_roundedImageView"
                     app:layout_constraintHorizontal_bias="0.5"
@@ -153,7 +195,7 @@
                     android:layout_width="60dp"
                     android:layout_height="0dp"
                     android:scaleType="centerCrop"
-                    android:src="@color/colorAccent"
+                    android:src="@color/transparent"
                     app:layout_constraintBottom_toBottomOf="@+id/color_one_roundedImageView"
                     app:layout_constraintDimensionRatio="w,1:1"
                     app:layout_constraintEnd_toStartOf="@+id/color_three_roundedImageView"
@@ -390,9 +432,19 @@
             <Button
                 android:id="@+id/flea_treatment_picker_button"
                 style="@style/PrimaryBorderlessButton"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="@dimen/normal_button_size"
+                android:layout_height="@dimen/normal_button_size"
                 android:background="@drawable/ic_today_24dp"
+                app:layout_constraintBottom_toBottomOf="@+id/flea_treatment_textView"
+                app:layout_constraintEnd_toStartOf="@+id/end_guideline"
+                app:layout_constraintTop_toTopOf="@+id/flea_treatment_textView" />
+
+            <TextView
+                android:id="@+id/flea_treatment_value_textView"
+                style="@style/PrimaryTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="45 days"
                 app:layout_constraintBottom_toBottomOf="@+id/flea_treatment_textView"
                 app:layout_constraintEnd_toStartOf="@+id/end_guideline"
                 app:layout_constraintTop_toTopOf="@+id/flea_treatment_textView" />
@@ -410,8 +462,8 @@
             <Button
                 android:id="@+id/expand_description_button"
                 style="@style/PrimaryBorderlessButton"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="@dimen/normal_button_size"
+                android:layout_height="@dimen/normal_button_size"
                 android:background="@drawable/ic_expand_less_24dp"
                 app:layout_constraintBottom_toBottomOf="@+id/description_textView"
                 app:layout_constraintEnd_toStartOf="@+id/end_guideline"
@@ -481,25 +533,30 @@
                 app:layout_constraintStart_toEndOf="@+id/photo_count_textView"
                 app:layout_constraintTop_toTopOf="@+id/photo_count_textView" />
 
-            <Button
-                android:id="@+id/upload_image_button"
-                style="@style/PrimaryBorderlessButton"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:background="@drawable/ic_add_24dp"
-                app:layout_constraintBottom_toBottomOf="@+id/photo_count_textView"
-                app:layout_constraintEnd_toStartOf="@+id/end_guideline"
-                app:layout_constraintTop_toTopOf="@+id/pet_name_photos_textView" />
-
-            <TextView
+            <LinearLayout
+                android:id="@+id/upload_image_LinearLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                style="@style/PrimaryTextView"
-                android:text="Upload picture"
-                app:layout_constraintBottom_toBottomOf="@+id/upload_image_button"
-                app:layout_constraintEnd_toStartOf="@+id/upload_image_button"
-                app:layout_constraintTop_toTopOf="@+id/upload_image_button" />
+                android:gravity="center"
+                app:layout_constraintBottom_toBottomOf="@+id/photo_count_textView"
+                app:layout_constraintEnd_toStartOf="@+id/end_guideline"
+                app:layout_constraintTop_toTopOf="@+id/pet_name_photos_textView">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    style="@style/PrimaryTextView"
+                    android:text="Upload picture" />
+
+                <Button
+                    android:id="@+id/upload_image_button"
+                    style="@style/PrimaryBorderlessButton"
+                    android:layout_width="@dimen/normal_button_size"
+                    android:layout_height="@dimen/normal_button_size"
+                    android:background="@drawable/ic_add_24dp" />
+
+            </LinearLayout>
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/photos_RecyclerView"

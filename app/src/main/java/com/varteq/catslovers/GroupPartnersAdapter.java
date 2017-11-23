@@ -21,6 +21,7 @@ public class GroupPartnersAdapter extends RecyclerView.Adapter<GroupPartnersAdap
     private OnPersonClickListener externalClickListener;
     private List<GroupPartner> personList;
     private Uri addNewPartnerUri = Uri.parse("addNewPartnerUri");
+    private final GroupPartner addNewPartnerView = new GroupPartner(addNewPartnerUri, "", false);
     private View.OnClickListener internalClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
@@ -35,10 +36,28 @@ public class GroupPartnersAdapter extends RecyclerView.Adapter<GroupPartnersAdap
         }
     };
 
-    public GroupPartnersAdapter(List<GroupPartner> personList, OnPersonClickListener externalClickListener) {
+    public GroupPartnersAdapter(List<GroupPartner> personList, boolean isEditMode, OnPersonClickListener externalClickListener) {
         this.externalClickListener = externalClickListener;
         this.personList = personList;
-        this.personList.add(this.personList.size(), new GroupPartner(addNewPartnerUri, "", false));
+
+        if (isEditMode)
+            switchToEditMode();
+    }
+
+    public void switchToEditMode() {
+        int lastPos = personList.size() - 1;
+        if (personList.get(lastPos) != addNewPartnerView) {
+            personList.add(lastPos + 1, addNewPartnerView);
+            notifyItemInserted(lastPos + 1);
+        }
+    }
+
+    public void switchToViewMode() {
+        int lastPos = personList.size() - 1;
+        if (personList.get(lastPos) == addNewPartnerView) {
+            personList.remove(lastPos);
+            notifyItemRemoved(lastPos);
+        }
     }
 
     @Override
@@ -49,7 +68,7 @@ public class GroupPartnersAdapter extends RecyclerView.Adapter<GroupPartnersAdap
     @Override
     public void onBindViewHolder(GroupPartnerViewHolder viewHolder, int i) {
         GroupPartner person = personList.get(i);
-        if (person.getAvatarUri() != addNewPartnerUri) {
+        if (person != addNewPartnerView) {
             if (person.getAvatarUri()!=null)
                 viewHolder.partnerAvatarImageView.setImageURI(person.getAvatarUri());
             else
