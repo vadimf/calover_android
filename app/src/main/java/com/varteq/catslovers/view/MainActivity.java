@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.view.fragments.CatsFragment;
+import com.varteq.catslovers.view.fragments.FeedFragment;
 import com.varteq.catslovers.view.fragments.MapFragment;
 
 
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
 
     CatsFragment catsFragment;
     MapFragment mapFragment;
+    FeedFragment feedFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,15 +93,18 @@ public class MainActivity extends AppCompatActivity {
                         mapFragment = new MapFragment();
                     setFragment(mapFragment);
                     toolbarTitle.setText("Map");
-                    catsToolsRelativeLayout.setVisibility(View.INVISIBLE);
+                    catsToolsRelativeLayout.setVisibility(View.VISIBLE);
                     break;
                 case R.id.action_feed:
+                    if (feedFragment == null)
+                        feedFragment = new FeedFragment();
+                    setFragment(feedFragment);
                     toolbarTitle.setText("Feed");
-                    catsToolsRelativeLayout.setVisibility(View.INVISIBLE);
+                    catsToolsRelativeLayout.setVisibility(View.VISIBLE);
                     break;
                 case R.id.action_chat:
                     toolbarTitle.setText("Chat");
-                    catsToolsRelativeLayout.setVisibility(View.INVISIBLE);
+                    catsToolsRelativeLayout.setVisibility(View.VISIBLE);
                     break;
                 case R.id.action_cats:
                     if (catsFragment == null)

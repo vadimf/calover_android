@@ -46,6 +46,21 @@
         <item name="android:textColor">@color/colorPrimary</item>
     </style>
 
+    <style name="SecondarySemiBoldTextView" parent="Theme.AppCompat.Light">
+        <item name="android:textSize">@dimen/normal_text_size</item>
+        <item name="android:textColor">@color/greyish_blue</item>
+    </style>
+
+    <style name="SecondaryTextView" parent="Theme.AppCompat.Light">
+        <item name="android:textSize">@dimen/normal_text_size</item>
+        <item name="android:textColor">@color/greyish_blue</item>
+    </style>
+
+    <style name="SecondarySmallTextView" parent="Theme.AppCompat.Light">
+        <item name="android:textSize">@dimen/small_text_size</item>
+        <item name="android:textColor">@color/greyish_blue</item>
+    </style>
+
     <style name="PrimaryMediumTextView" parent="Theme.AppCompat.Light">
         <item name="android:textSize">@dimen/medium_text_size</item>
         <item name="android:textColor">@color/colorPrimary</item>

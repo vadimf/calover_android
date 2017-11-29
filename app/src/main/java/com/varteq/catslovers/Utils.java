@@ -1,5 +1,6 @@
 package com.varteq.catslovers;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 
 public class Utils {
@@ -9,4 +10,10 @@ public class Utils {
         image.eraseColor(color);
         return image;
     }
+
+    public static int convertDpToPx(float dp, Context context){
+        float factor = context.getResources().getDisplayMetrics().density;
+        return (int) (dp * factor);
+    }
+
 }
