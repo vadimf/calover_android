@@ -2,8 +2,10 @@ package com.varteq.catslovers.view;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -16,6 +18,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.varteq.catslovers.Auth;
+import com.varteq.catslovers.AuthPresenter;
 import com.varteq.catslovers.R;
 
 import java.util.ArrayList;
@@ -28,6 +31,7 @@ import butterknife.OnClick;
 public class ValidateNumberActivity extends AppCompatActivity implements TextWatcher {
 
     private String TAG = ValidateNumberActivity.class.getSimpleName();
+    public static String PHONE_NUMBER_KEY = "phone_number";
     private final int MAX_CHARS_COUNT = 1;
     @BindView(R.id.editText1)
     EditText editText1;
@@ -41,11 +45,14 @@ public class ValidateNumberActivity extends AppCompatActivity implements TextWat
     Button approveButton;
     @BindView(R.id.resend_button)
     Button resendButton;
+    private AlertDialog userDialog;
 
     private List<EditText> editTextList = new ArrayList<>();
     private boolean borderColorApplied;
     private String SHOW_DIALOG_KEY = "show_dialog";
     private boolean isDialogVisible;
+    private String username;
+    private AuthPresenter presenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +66,12 @@ public class ValidateNumberActivity extends AppCompatActivity implements TextWat
                     savedInstanceState.getBoolean(SHOW_DIALOG_KEY))
                 showSuccessDialog();
         }
+
+        if (getIntent() != null && getIntent().hasExtra(PHONE_NUMBER_KEY))
+            username = getIntent().getStringExtra(PHONE_NUMBER_KEY);
+
+        presenter = new AuthPresenter(username, this);
+        presenter.resetPassword();
 
         editText1.addTextChangedListener(this);
         editText2.addTextChangedListener(this);
@@ -86,11 +99,16 @@ public class ValidateNumberActivity extends AppCompatActivity implements TextWat
     @OnClick(R.id.approve_button)
     void validateCode() {
         for (EditText item : editTextList) {
-            if (item.getText().length() != MAX_CHARS_COUNT) {
+            if (item.getText().length() != MAX_CHARS_COUNT && item.getId() != editText4.getId()) {
                 onCodeValidate(false);
                 return;
             }
         }
+        String code = editText1.getText().toString() + editText2.getText().toString() + editText3.getText().toString();
+        presenter.confirmCode(code);
+    }
+
+    public void onSuccessSignIn() {
         onCodeValidate(true);
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         try {
@@ -101,7 +119,6 @@ public class ValidateNumberActivity extends AppCompatActivity implements TextWat
         Auth.setUserLogin(this, true);
 
         showSuccessDialog();
-        //TODO: validateRequest
     }
 
     private void showSuccessDialog() {
@@ -209,5 +226,21 @@ public class ValidateNumberActivity extends AppCompatActivity implements TextWat
             imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
         } catch (Exception e) {
         }
+    }
+
+    public void showDialogMessage(String title, String body) {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(title).setMessage(body).setNeutralButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                try {
+                    userDialog.dismiss();
+                } catch (Exception e) {
+                    //
+                }
+            }
+        });
+        userDialog = builder.create();
+        userDialog.show();
     }
 }

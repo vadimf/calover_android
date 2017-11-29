@@ -10,6 +10,8 @@ import android.widget.EditText;
 
 import com.varteq.catslovers.R;
 
+import static com.varteq.catslovers.view.ValidateNumberActivity.PHONE_NUMBER_KEY;
+
 public class ConfirmNumberActivity extends AppCompatActivity {
 
     private EditText numberEditText;
@@ -32,8 +34,11 @@ public class ConfirmNumberActivity extends AppCompatActivity {
     }
 
     private void confirmNumber() {
-        if (isNumberValid())
-            startActivity(new Intent(ConfirmNumberActivity.this, ValidateNumberActivity.class));
+        if (isNumberValid()) {
+            Intent intent = new Intent(ConfirmNumberActivity.this, ValidateNumberActivity.class);
+            intent.putExtra(PHONE_NUMBER_KEY, numberEditText.getText().toString());
+            startActivity(intent);
+        }
     }
 
     @Override

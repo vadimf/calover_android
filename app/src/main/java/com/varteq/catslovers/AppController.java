@@ -8,4 +8,10 @@ public class AppController extends Application {
     static {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        CognitoAuthHelper.init(getApplicationContext());
+    }
 }
