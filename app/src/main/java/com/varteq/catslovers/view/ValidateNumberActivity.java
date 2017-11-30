@@ -19,6 +19,7 @@ import android.widget.EditText;
 
 import com.varteq.catslovers.Auth;
 import com.varteq.catslovers.AuthPresenter;
+import com.varteq.catslovers.Log;
 import com.varteq.catslovers.R;
 
 import java.util.ArrayList;
@@ -58,6 +59,8 @@ public class ValidateNumberActivity extends AppCompatActivity implements TextWat
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_validate_number);
+
+        Log.d(TAG, "onCreate");
 
         ButterKnife.bind(this);
 
@@ -105,10 +108,12 @@ public class ValidateNumberActivity extends AppCompatActivity implements TextWat
             }
         }
         String code = editText1.getText().toString() + editText2.getText().toString() + editText3.getText().toString();
+        Log.d(TAG, "confirmCode");
         presenter.confirmCode(code);
     }
 
     public void onSuccessSignIn() {
+        Log.d(TAG, "onSuccessSignIn");
         onCodeValidate(true);
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         try {
@@ -122,6 +127,7 @@ public class ValidateNumberActivity extends AppCompatActivity implements TextWat
     }
 
     private void showSuccessDialog() {
+        Log.d(TAG, "showSuccessDialog");
         final Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_success_login);

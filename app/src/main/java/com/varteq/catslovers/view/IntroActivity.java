@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.varteq.catslovers.Log;
 import com.varteq.catslovers.R;
 
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import butterknife.OnClick;
 
 public class IntroActivity extends AppCompatActivity {
 
+    private String TAG = IntroActivity.class.getSimpleName();
     float initialX;
     private ImageSwitcher myImageSwitcher;
     private int counter = 0;
@@ -41,6 +43,8 @@ public class IntroActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_intro);
+
+        Log.d(TAG, "onCreate");
 
         ButterKnife.bind(this);
 
@@ -72,6 +76,7 @@ public class IntroActivity extends AppCompatActivity {
 
     @OnClick(R.id.go_to_login_button)
     void goToLogin() {
+        Log.d(TAG, "goToLogin");
         startActivity(new Intent(this, LoginActivity.class));
     }
 

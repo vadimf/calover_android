@@ -10,6 +10,7 @@ import android.widget.EditText;
 
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.varteq.catslovers.Auth;
+import com.varteq.catslovers.Log;
 import com.varteq.catslovers.R;
 
 import butterknife.BindView;
@@ -18,6 +19,7 @@ import butterknife.OnClick;
 
 public class LoginActivity extends PhotoPickerActivity {
 
+    private String TAG = LoginActivity.class.getSimpleName();
     @BindView(R.id.avatar)
     RoundedImageView avatar;
     @BindView(R.id.continue_button)
@@ -38,6 +40,8 @@ public class LoginActivity extends PhotoPickerActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        Log.d(TAG, "onCreate");
+
         ButterKnife.bind(this);
         nameEditText.requestFocus();
 
@@ -53,6 +57,7 @@ public class LoginActivity extends PhotoPickerActivity {
         findViewById(R.id.continue_button).setOnClickListener(
                 view -> {
                     if (isInputValid()) {
+                        Log.d(TAG, "continue_button OnClick");
                         Auth.saveUser(this, nameEditText.getText().toString(),
                                 emailEditText.getText().toString());
                         startActivity(new Intent(LoginActivity.this, ConfirmNumberActivity.class));

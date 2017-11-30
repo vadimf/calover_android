@@ -11,6 +11,7 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.varteq.catslovers.Log;
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.view.fragments.CatsFragment;
 import com.varteq.catslovers.view.fragments.MapFragment;
@@ -18,6 +19,7 @@ import com.varteq.catslovers.view.fragments.MapFragment;
 
 public class MainActivity extends AppCompatActivity {
 
+    private String TAG = MainActivity.class.getSimpleName();
     View view;
 
     TextView timerText;
@@ -37,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Log.d(TAG, "onCreate");
 
         mBottomNavigationView = findViewById(R.id.bottom_navigation);
         BottomNavigationViewHelper.disableShiftMode(mBottomNavigationView);
@@ -87,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
         mBottomNavigationView.setOnNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.action_map:
+                    Log.d(TAG, "action_map");
                     if (mapFragment == null)
                         mapFragment = new MapFragment();
                     setFragment(mapFragment);
@@ -94,14 +99,17 @@ public class MainActivity extends AppCompatActivity {
                     catsToolsRelativeLayout.setVisibility(View.INVISIBLE);
                     break;
                 case R.id.action_feed:
+                    Log.d(TAG, "action_feed");
                     toolbarTitle.setText("Feed");
                     catsToolsRelativeLayout.setVisibility(View.INVISIBLE);
                     break;
                 case R.id.action_chat:
+                    Log.d(TAG, "action_chat");
                     toolbarTitle.setText("Chat");
                     catsToolsRelativeLayout.setVisibility(View.INVISIBLE);
                     break;
                 case R.id.action_cats:
+                    Log.d(TAG, "action_cats");
                     if (catsFragment == null)
                         catsFragment = new CatsFragment();
                     setFragment(catsFragment);

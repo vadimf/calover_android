@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.varteq.catslovers.Auth;
+import com.varteq.catslovers.Log;
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.Utils;
 import com.varteq.catslovers.model.CatProfile;
@@ -44,6 +45,7 @@ import butterknife.OnClick;
 
 public class CatProfileActivity extends PhotoPickerActivity implements View.OnClickListener {
 
+    private String TAG = CatProfileActivity.class.getSimpleName();
     public static final String CAT_KEY = "cat_key";
     public static final String MODE_KEY = "mode_key";
     public static final String IS_EDIT_MODE_KEY = "is_mode_key";
@@ -139,6 +141,8 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cat_profile);
 
+        Log.d(TAG, "onCreate");
+
         ButterKnife.bind(this);
 
         if (getIntent() != null) {
@@ -202,11 +206,12 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
 
                     @Override
                     public void onPersonClicked(Uri imageUri) {
-
+                        Log.d(TAG, "onPersonClicked " + imageUri);
                     }
 
                     @Override
                     public void onAddPerson() {
+                        Log.d(TAG, "onAddPerson");
                         addGroupPartner();
                     }
                 });
@@ -253,6 +258,7 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
     }
 
     private void setupViewMode() {
+        Log.d(TAG, "setupViewMode");
         currentMode = CatProfileScreenMode.VIEW_MODE;
 
         infoLinearLayout.setVisibility(View.VISIBLE);
@@ -281,6 +287,7 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
     }
 
     private void setupEditMode() {
+        Log.d(TAG, "setupEditMode");
         currentMode = CatProfileScreenMode.EDIT_MODE;
 
         infoLinearLayout.setVisibility(View.GONE);
@@ -318,6 +325,7 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
 
     private void showImage(Uri imageUri) {
         if (imageUri == null) return;
+        Log.d(TAG, "showImage " + imageUri);
 
         Intent intent = new Intent();
         Uri uri;
@@ -355,6 +363,7 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.app_bar_save:
+                Log.d(TAG, "app_bar_save");
                 startActivity(new Intent(this, MainActivity.class));
                 return true;
             case android.R.id.home:
@@ -374,6 +383,7 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
     protected void onImageSelected(Uri uri) {
         super.onImageSelected(uri);
         if (uri != null) {
+            Log.d(TAG, "onImageSelected " + uri);
             photoList.add(0, uri);
             photosAdapter.notifyItemInserted(0);
             photosRecyclerView.scrollToPosition(0);
@@ -424,6 +434,7 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
     @Override
     public void onClick(View view) {
         if (view instanceof RoundedImageView) {
+            Log.d(TAG, "onClick RoundedImageView");
             ColorPickerDialog colorPickerDialog = new ColorPickerDialog(this, Color.GREEN, color -> {
                 for (int i = 0; i < colorPickers.size(); i++)
                     if (colorPickers.get(i).getId() == clickedRoundViewId) {

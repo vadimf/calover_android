@@ -8,18 +8,22 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import com.varteq.catslovers.Log;
 import com.varteq.catslovers.R;
 
 import static com.varteq.catslovers.view.ValidateNumberActivity.PHONE_NUMBER_KEY;
 
 public class ConfirmNumberActivity extends AppCompatActivity {
 
+    private String TAG = ConfirmNumberActivity.class.getSimpleName();
     private EditText numberEditText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_confirm_number);
+
+        Log.d(TAG, "onCreate");
 
         numberEditText = findViewById(R.id.mobile_number_editText);
         numberEditText.setOnEditorActionListener((v, actionId, event) -> {
@@ -35,6 +39,7 @@ public class ConfirmNumberActivity extends AppCompatActivity {
 
     private void confirmNumber() {
         if (isNumberValid()) {
+            Log.d(TAG, "confirmNumber");
             Intent intent = new Intent(ConfirmNumberActivity.this, ValidateNumberActivity.class);
             intent.putExtra(PHONE_NUMBER_KEY, numberEditText.getText().toString());
             startActivity(intent);
