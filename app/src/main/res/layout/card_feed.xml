@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+                                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                                    android:id="@+id/cardView"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="4dp"
+                                    android:layout_marginTop="4dp"
+                                    app:cardCornerRadius="10dp">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="match_parent"
+                android:layout_height="216dp"
+                app:srcCompat="@color/colorPrimaryLight"/>
+
+            <View
+                android:id="@+id/toolbarGradientView"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_alignParentRight="true"
+                android:background="@drawable/toolbar_gradient_background">
+
+            </View>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/relativeLayout1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RelativeLayout
+                android:id="@+id/headerRelativeLayout"
+                android:layout_width="match_parent"
+                android:layout_height="58dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="192dp">
+
+                <TextView
+                    android:id="@+id/nameTextView"
+                    style="@style/SecondarySemiBoldTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@+id/avatarImageView"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_toEndOf="@+id/avatarImageView"
+                    android:text="Dana Ariely"
+                    android:textColor="@color/greyish_blue"/>
+
+                <TextView
+                    android:id="@+id/timeTextView"
+                    style="@style/SecondarySmallTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginTop="30dp"
+                    android:text="One hour ago"/>
+
+
+                <TextView
+                    android:id="@+id/timeUnderTextView"
+                    style="@style/SecondarySmallTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@+id/avatarImageView"
+                    android:layout_marginStart="72dp"
+                    android:text="One hour ago"/>
+
+                <com.makeramen.roundedimageview.RoundedImageView
+                    android:id="@+id/avatarImageView"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="16dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/twitter96"
+                    app:layout_constraintDimensionRatio="w,1:1"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintVertical_bias="0.0"
+                    app:riv_corner_radius="29dp"
+                    app:riv_oval="true"/>
+
+
+            </RelativeLayout>
+
+            <ImageButton
+                android:id="@+id/menuButton"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="12dp"
+                android:background="@android:color/transparent"
+                app:srcCompat="@drawable/ic_more_vert_black_24dp"/>
+
+            <ImageView
+                android:id="@+id/playImageView"
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center_vertical"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/ic_play_arrow_white_24dp"/>
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/relativeLayout1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/messageTextView"
+                style="@style/SecondaryTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="32dp"
+                android:text="Just a lazy afternoon on the backyard deck"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="31dp">
+
+                <ImageButton
+                    android:id="@+id/goIntoButton"
+                    android:layout_width="18dp"
+                    android:layout_height="15dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginRight="16dp"
+                    android:background="@color/transparent"
+                    android:scaleType="fitCenter"
+                    app:srcCompat="@drawable/ic_arrow_into"/>
+
+                <TextView
+                    android:id="@+id/likesTextView"
+                    style="@style/SecondaryTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginStart="11dp"
+                    android:layout_toEndOf="@+id/likeButton"
+                    android:text="34k"
+                    android:textSize="12sp"/>
+
+                <ImageButton
+                    android:id="@+id/likeButton"
+                    android:layout_width="20dp"
+                    android:layout_height="18dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginStart="16dp"
+                    android:background="@color/transparent"
+                    android:scaleType="fitCenter"
+                    app:srcCompat="@drawable/ic_heart"/>
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+</android.support.v7.widget.CardView>

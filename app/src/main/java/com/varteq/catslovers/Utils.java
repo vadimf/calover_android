@@ -1,5 +1,6 @@
 package com.varteq.catslovers;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 
 import java.util.ArrayList;
@@ -37,4 +38,10 @@ public class Utils {
         }
         return new String(password);
     }
+
+    public static int convertDpToPx(float dp, Context context){
+        float factor = context.getResources().getDisplayMetrics().density;
+        return (int) (dp * factor);
+    }
+
 }

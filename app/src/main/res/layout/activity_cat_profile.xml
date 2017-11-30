@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.varteq.catslovers.view.CatProfileActivity">
+                                             xmlns:app="http://schemas.android.com/apk/res-auto"
+                                             xmlns:tools="http://schemas.android.com/tools"
+                                             android:layout_width="match_parent"
+                                             android:layout_height="match_parent"
+                                             tools:context="com.varteq.catslovers.view.CatProfileActivity">
 
     <ScrollView
         android:layout_height="match_parent"
@@ -58,7 +58,7 @@
 
             <TextView
                 android:id="@+id/nickname_textView"
-                style="@style/PrimaryTextView"
+                style="@style/SecondaryTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -126,16 +126,6 @@
 
             </LinearLayout>
 
-            <View
-                android:id="@+id/info_divider"
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:layout_marginTop="8dp"
-                android:background="@color/colorPrimaryLight"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/information_textView" />
-
             <TextView
                 android:id="@+id/color_textView"
                 style="@style/PrimaryTextView"
@@ -144,7 +134,7 @@
                 android:layout_marginTop="16dp"
                 android:text="Color"
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
-                app:layout_constraintTop_toBottomOf="@+id/info_divider" />
+                app:layout_constraintTop_toBottomOf="@+id/information_textView" />
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/view_colors_RecyclerView"
@@ -227,7 +217,7 @@
 
                 <TextView
                     android:id="@+id/color_one_textView"
-                    style="@style/PrimaryTextView"
+                    style="@style/SecondarySmallTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -238,7 +228,7 @@
 
                 <TextView
                     android:id="@+id/color_two_textView"
-                    style="@style/PrimaryTextView"
+                    style="@style/SecondarySmallTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Color Two"
@@ -249,7 +239,7 @@
 
                 <TextView
                     android:id="@+id/color_three_textView"
-                    style="@style/PrimaryTextView"
+                    style="@style/SecondarySmallTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Color Three"
@@ -311,7 +301,7 @@
 
                 <TextView
                     android:id="@+id/color_four_textView"
-                    style="@style/PrimaryTextView"
+                    style="@style/SecondarySmallTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -322,7 +312,7 @@
 
                 <TextView
                     android:id="@+id/color_five_textView"
-                    style="@style/PrimaryTextView"
+                    style="@style/SecondarySmallTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Color Five"
@@ -333,7 +323,7 @@
 
                 <TextView
                     android:id="@+id/color_six_textView"
-                    style="@style/PrimaryTextView"
+                    style="@style/SecondarySmallTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Color Six"
@@ -344,181 +334,38 @@
 
             </android.support.constraint.ConstraintLayout>
 
-            <TextView
-                android:id="@+id/age_textView"
-                style="@style/PrimaryTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Age"
-                app:layout_constraintStart_toStartOf="@+id/start_guideline"
-                app:layout_constraintTop_toBottomOf="@+id/color_constraintLayout" />
-
-            <TextView
-                android:id="@+id/age_value_textView"
-                style="@style/PrimaryTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="12 years"
-                app:layout_constraintBottom_toBottomOf="@+id/age_textView"
-                app:layout_constraintEnd_toStartOf="@+id/end_guideline"
-                app:layout_constraintTop_toTopOf="@+id/age_textView" />
-
-            <TextView
-                android:id="@+id/weight_textView"
-                style="@style/PrimaryTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Weight"
-                app:layout_constraintStart_toStartOf="@+id/start_guideline"
-                app:layout_constraintTop_toBottomOf="@+id/age_textView" />
-
-            <TextView
-                android:id="@+id/weight_value_textView"
-                style="@style/PrimaryTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="2 kg"
-                app:layout_constraintBottom_toBottomOf="@+id/weight_textView"
-                app:layout_constraintEnd_toStartOf="@+id/end_guideline"
-                app:layout_constraintTop_toTopOf="@+id/weight_textView" />
-
-            <TextView
-                android:id="@+id/castrated_textView"
-                style="@style/PrimaryTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Castrated"
-                app:layout_constraintStart_toStartOf="@+id/start_guideline"
-                app:layout_constraintTop_toBottomOf="@+id/weight_textView" />
-
-            <CheckBox
-                android:id="@+id/yes_checkBox"
-                style="@style/PrimaryCheckBox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:button="@drawable/checkbox_selector"
-                android:checked="false"
-                android:text="@string/yes_button_title"
-                app:layout_constraintBottom_toBottomOf="@+id/castrated_textView"
-                app:layout_constraintEnd_toStartOf="@+id/no_checkBox"
-                app:layout_constraintTop_toTopOf="@+id/castrated_textView" />
-
-            <CheckBox
-                android:id="@+id/no_checkBox"
-                style="@style/PrimaryCheckBox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:button="@drawable/checkbox_selector"
-                android:checked="false"
-                android:text="No"
-                app:layout_constraintBottom_toBottomOf="@+id/yes_checkBox"
-                app:layout_constraintEnd_toStartOf="@+id/end_guideline"
-                app:layout_constraintTop_toTopOf="@+id/yes_checkBox" />
-
-            <TextView
-                android:id="@+id/flea_treatment_textView"
-                style="@style/PrimaryTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Next flea treatment"
-                app:layout_constraintStart_toStartOf="@+id/start_guideline"
-                app:layout_constraintTop_toBottomOf="@+id/castrated_textView" />
-
-            <Button
-                android:id="@+id/flea_treatment_picker_button"
-                style="@style/PrimaryBorderlessButton"
-                android:layout_width="@dimen/normal_button_size"
-                android:layout_height="@dimen/normal_button_size"
-                android:background="@drawable/ic_today_24dp"
-                app:layout_constraintBottom_toBottomOf="@+id/flea_treatment_textView"
-                app:layout_constraintEnd_toStartOf="@+id/end_guideline"
-                app:layout_constraintTop_toTopOf="@+id/flea_treatment_textView" />
-
-            <TextView
-                android:id="@+id/flea_treatment_value_textView"
-                style="@style/PrimaryTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="45 days"
-                app:layout_constraintBottom_toBottomOf="@+id/flea_treatment_textView"
-                app:layout_constraintEnd_toStartOf="@+id/end_guideline"
-                app:layout_constraintTop_toTopOf="@+id/flea_treatment_textView" />
-
-            <TextView
-                android:id="@+id/description_textView"
-                style="@style/PrimaryTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Description"
-                app:layout_constraintStart_toStartOf="@+id/start_guideline"
-                app:layout_constraintTop_toBottomOf="@+id/flea_treatment_textView" />
-
-            <Button
-                android:id="@+id/expand_description_button"
-                style="@style/PrimaryBorderlessButton"
-                android:layout_width="@dimen/normal_button_size"
-                android:layout_height="@dimen/normal_button_size"
-                android:background="@drawable/ic_expand_less_24dp"
-                app:layout_constraintBottom_toBottomOf="@+id/description_textView"
-                app:layout_constraintEnd_toStartOf="@+id/end_guideline"
-                app:layout_constraintTop_toTopOf="@+id/description_textView" />
-
-            <EditText
-                android:id="@+id/description_editText"
-                style="@style/PrimaryLightEditText"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:maxLines="3"
-                android:text="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore sit amet."
-                app:layout_constraintEnd_toStartOf="@+id/end_guideline"
-                app:layout_constraintStart_toStartOf="@+id/start_guideline"
-                app:layout_constraintTop_toBottomOf="@+id/description_textView" />
-
-            <View
-                android:id="@+id/info_divider1"
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:layout_marginTop="8dp"
-                android:background="@color/colorPrimaryLight"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/description_editText" />
+            <include layout="@layout/activity_cat_profile_description_fragment"
+                     android:id="@+id/description_fragment"
+                />
 
             <TextView
                 android:id="@+id/pet_name_photos_textView"
+                style="@style/PrimaryTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                style="@style/PrimaryTextView"
-                android:text="Cat"
+                android:text="Cat's"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
-                app:layout_constraintTop_toBottomOf="@+id/info_divider1" />
+                app:layout_constraintTop_toBottomOf="@+id/description_editText"/>
 
             <TextView
+                style="@style/PrimaryTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                style="@style/PrimaryTextView"
-                android:text="Photo's"
+                android:text="photos ONLY"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="@+id/pet_name_photos_textView"
                 app:layout_constraintStart_toEndOf="@+id/pet_name_photos_textView"
-                app:layout_constraintTop_toTopOf="@+id/pet_name_photos_textView" />
+                app:layout_constraintTop_toTopOf="@+id/pet_name_photos_textView"/>
 
             <TextView
                 android:id="@+id/photo_count_textView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                style="@style/PrimaryTextView"
+                style="@style/SecondarySmallTextView"
                 android:text="509"
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
                 app:layout_constraintTop_toBottomOf="@+id/pet_name_photos_textView" />
@@ -527,7 +374,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                style="@style/PrimaryTextView"
+                style="@style/SecondarySmallTextView"
                 android:text="photos"
                 app:layout_constraintBottom_toBottomOf="@+id/photo_count_textView"
                 app:layout_constraintStart_toEndOf="@+id/photo_count_textView"
@@ -567,26 +414,16 @@
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
                 app:layout_constraintTop_toBottomOf="@+id/photo_count_textView" />
 
-            <View
-                android:id="@+id/info_divider2"
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:layout_marginTop="8dp"
-                android:background="@color/colorPrimaryLight"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/photos_RecyclerView" />
-
             <TextView
                 android:id="@+id/group_partners_textView"
                 style="@style/PrimaryTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Group Partners"
+                android:text="Cat's followers"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
-                app:layout_constraintTop_toBottomOf="@+id/info_divider2" />
+                app:layout_constraintTop_toBottomOf="@+id/photos_RecyclerView"/>
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/group_partners_RecyclerView"
