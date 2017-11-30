@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:tools="http://schemas.android.com/tools"
+       xmlns:app="http://schemas.android.com/apk/res-auto"
+       xmlns:android="http://schemas.android.com/apk/res/android"
+       tools:showIn="@layout/activity_cat_profile"
+   >
+
+    <TextView
+        android:id="@+id/age_textView"
+        style="@style/PrimaryTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Age"
+        app:layout_constraintStart_toStartOf="@+id/start_guideline"
+        app:layout_constraintTop_toBottomOf="@+id/color_constraintLayout"/>
+
+    <TextView
+        android:id="@+id/age_value_textView"
+        style="@style/SecondarySmallTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="12 years"
+        app:layout_constraintBottom_toBottomOf="@+id/age_textView"
+        app:layout_constraintEnd_toStartOf="@+id/end_guideline"
+        app:layout_constraintTop_toTopOf="@+id/age_textView"/>
+
+    <TextView
+        android:id="@+id/weight_textView"
+        style="@style/PrimaryTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Weight"
+        app:layout_constraintStart_toStartOf="@+id/start_guideline"
+        app:layout_constraintTop_toBottomOf="@+id/age_textView"/>
+
+    <TextView
+        android:id="@+id/weight_value_textView"
+        style="@style/SecondarySmallTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="2 kg"
+        app:layout_constraintBottom_toBottomOf="@+id/weight_textView"
+        app:layout_constraintEnd_toStartOf="@+id/end_guideline"
+        app:layout_constraintTop_toTopOf="@+id/weight_textView"/>
+
+    <TextView
+        android:id="@+id/castrated_textView"
+        style="@style/PrimaryTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Neutered"
+        app:layout_constraintStart_toStartOf="@+id/start_guideline"
+        app:layout_constraintTop_toBottomOf="@+id/weight_textView"/>
+
+    <CheckBox
+        android:id="@+id/no_checkBox"
+        style="@style/PrimaryCheckBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:button="@drawable/checkbox_selector"
+        android:checked="false"
+        app:layout_constraintBottom_toBottomOf="@+id/castrated_textView"
+        app:layout_constraintEnd_toStartOf="@+id/end_guideline"
+        app:layout_constraintTop_toTopOf="@+id/yes_checkBox"/>
+
+    <TextView
+        android:id="@+id/flea_treatment_textView"
+        style="@style/PrimaryTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Next flea treatment"
+        app:layout_constraintStart_toStartOf="@+id/start_guideline"
+        app:layout_constraintTop_toBottomOf="@+id/castrated_textView"/>
+
+    <Button
+        android:id="@+id/flea_treatment_picker_button"
+        style="@style/PrimaryBorderlessButton"
+        android:layout_width="@dimen/normal_button_size"
+        android:layout_height="@dimen/normal_button_size"
+        android:background="@drawable/ic_today_24dp"
+        app:layout_constraintBottom_toBottomOf="@+id/flea_treatment_textView"
+        app:layout_constraintEnd_toStartOf="@+id/end_guideline"
+        app:layout_constraintTop_toTopOf="@+id/flea_treatment_textView"/>
+
+    <TextView
+        android:id="@+id/flea_treatment_value_textView"
+        style="@style/SecondarySmallTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="45 days"
+        app:layout_constraintBottom_toBottomOf="@+id/flea_treatment_textView"
+        app:layout_constraintEnd_toStartOf="@+id/end_guideline"
+        app:layout_constraintTop_toTopOf="@+id/flea_treatment_textView"/>
+
+    <TextView
+        android:id="@+id/description_textView"
+        style="@style/PrimaryTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Description"
+        app:layout_constraintStart_toStartOf="@+id/start_guideline"
+        app:layout_constraintTop_toBottomOf="@+id/flea_treatment_textView"/>
+
+    <Button
+        android:id="@+id/expand_description_button"
+        style="@style/PrimaryBorderlessButton"
+        android:layout_width="@dimen/normal_button_size"
+        android:layout_height="@dimen/normal_button_size"
+        android:background="@drawable/ic_expand_less_24dp"
+        app:layout_constraintBottom_toBottomOf="@+id/description_textView"
+        app:layout_constraintEnd_toStartOf="@+id/end_guideline"
+        app:layout_constraintTop_toTopOf="@+id/description_textView"/>
+
+    <EditText
+        android:id="@+id/description_editText"
+        style="@style/SecondarySmallTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:maxLines="3"
+        android:text="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore sit amet."
+        app:layout_constraintEnd_toStartOf="@+id/end_guideline"
+        app:layout_constraintStart_toStartOf="@+id/start_guideline"
+        app:layout_constraintTop_toBottomOf="@+id/description_textView"/>
+
+</merge>

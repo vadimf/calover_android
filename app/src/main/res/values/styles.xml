@@ -70,6 +70,11 @@
         <item name="android:backgroundTint">@color/colorPrimaryLight</item>
     </style>
 
+    <style name="PrimaryEditText" parent="PrimaryLightEditText.WithoutBackgroundTint">
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:backgroundTint">@color/colorPrimary</item>
+    </style>
+
     <style name="PrimaryLightEditText.WithoutBackgroundTint" parent="Widget.AppCompat.EditText">
         <item name="android:textSize">@dimen/normal_text_size</item>
         <item name="android:textColorHint">@color/colorPrimaryLight</item>

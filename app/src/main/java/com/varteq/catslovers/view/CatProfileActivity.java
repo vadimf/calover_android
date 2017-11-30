@@ -1,5 +1,6 @@
 package com.varteq.catslovers.view;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -10,6 +11,7 @@ import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -35,7 +37,9 @@ import com.varteq.catslovers.view.dialog.WrappedDatePickerDialog;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -53,6 +57,9 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
     TextView petNameTextView;
     @BindView(R.id.nickname_textView)
     TextView nicknameTextView;
+
+    @BindView(R.id.information_textView)
+    TextView informationTextView;
 
     @BindView(R.id.expand_colors_button)
     Button expandColorsButton;
@@ -77,8 +84,11 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
     @BindView(R.id.description_editText)
     EditText descriptionEditText;
 
-    @BindView(R.id.yes_checkBox)
-    CheckBox yesCheckBox;
+    @BindView(R.id.age_value_textView)
+    TextView ageValueTextView;
+    @BindView(R.id.weight_value_textView)
+    TextView weightValueTextView;
+
     @BindView(R.id.no_checkBox)
     CheckBox noCheckBox;
 
@@ -263,12 +273,10 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
         expandColorsButton.setVisibility(View.GONE);
         colorConstraintLayout.setVisibility(View.GONE);
 
-        yesCheckBox.setEnabled(false);
         noCheckBox.setEnabled(false);
 
         // flea treatment settings
         fleaTreatmentPickerButton.setVisibility(View.GONE);
-        fleaTreatmentValueTextView.setVisibility(View.VISIBLE);
 
         uploadImageLinearLayout.setVisibility(View.GONE);
 
@@ -278,6 +286,17 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
 
         if (actionBarMenu != null && actionBarMenu.findItem(R.id.app_bar_save) != null)
             actionBarMenu.findItem(R.id.app_bar_save).setVisible(false);
+
+        informationTextView.setVisibility(View.VISIBLE);
+
+        fleaTreatmentValueTextView.setText("45 days");
+        ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) fleaTreatmentValueTextView.getLayoutParams();
+        layoutParams.rightMargin = Utils.convertDpToPx(0, this);
+
+        fleaTreatmentValueTextView.setLayoutParams(layoutParams);
+
+        ageValueTextView.setOnClickListener(null);
+        weightValueTextView.setOnClickListener(null);
     }
 
     private void setupEditMode() {
@@ -293,12 +312,10 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
         setupColorPickersColors();
         resizeColorsListWithEmptyValues();
 
-        yesCheckBox.setEnabled(true);
         noCheckBox.setEnabled(true);
 
         // flea treatment settings
         fleaTreatmentPickerButton.setVisibility(View.VISIBLE);
-        fleaTreatmentValueTextView.setVisibility(View.GONE);
 
         uploadImageLinearLayout.setVisibility(View.VISIBLE);
 
@@ -308,10 +325,66 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
 
         if (actionBarMenu != null && actionBarMenu.findItem(R.id.app_bar_save) != null)
             actionBarMenu.findItem(R.id.app_bar_save).setVisible(true);
+
+        informationTextView.setVisibility(View.GONE);
+
+        weightValueTextView.setOnClickListener(view -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(CatProfileActivity.this);
+            View dialogView = LayoutInflater.from(CatProfileActivity.this).inflate(R.layout.dialog_weight, null, false);
+            builder.setView(dialogView);
+            builder.setPositiveButton("OK", (dialogInterface, i) -> weightValueTextView.setText(((EditText) dialogView.findViewById(R.id.yearsEditText)).getText() + " kg"));
+            builder.setNegativeButton("Cancel", (dialogInterface, i) -> {
+                    }
+            );
+            builder.show();
+        });
+
+        fleaTreatmentValueTextView.setText("10.08.2017");
+        ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) fleaTreatmentValueTextView.getLayoutParams();
+        layoutParams.rightMargin = fleaTreatmentPickerButton.getLayoutParams().width + Utils.convertDpToPx(8, this);
+        fleaTreatmentValueTextView.setLayoutParams(layoutParams);
+
+
+        ageValueTextView.setOnClickListener(view -> new WrappedDatePickerDialog(CatProfileActivity.this, (datePicker, i, i1, i2) -> {
+            Calendar now = Calendar.getInstance();
+            Calendar birthday = Calendar.getInstance();
+            birthday.set(Calendar.YEAR, i);
+            birthday.set(Calendar.MONTH, i1);
+            birthday.set(Calendar.DAY_OF_MONTH, i2);
+            birthday.set(Calendar.MILLISECOND, 0);
+
+            long birthdayMillis = birthday.getTimeInMillis();
+            long nowMillis = now.getTimeInMillis();
+            long timePassedMonthes = (TimeUnit.MILLISECONDS.toDays(nowMillis - birthdayMillis)) / 30;
+
+            int years = ((int) timePassedMonthes) / 12;
+            int month = ((int) timePassedMonthes) - (years * 12);
+
+            String age = null;
+            if (years > 0) {
+                if (month > 0) {
+                    age = years + " years, " + String.valueOf(month) + " months";
+                } else if (month == 0) {
+                    age = years + " years";
+                }
+            } else if (years == 0) {
+                if (month > 0) {
+                    age = String.valueOf(month) + " months";
+                } else if (month == 0) {
+                    age = "newborn";
+
+                }
+            }
+            if (age == null) {
+                age = "incorrect date";
+            }
+            ageValueTextView.setText(age);
+
+        }));
     }
 
     private void addGroupPartner() {
-        groupPartnersList.add(1, new GroupPartner(null, "User"+((int)(Math.random() * 999999) + 111111), false));
+        groupPartnersList.add(1, new GroupPartner(null, "User" + ((int) (Math.random() * 999999) + 111111), false));
         groupPartnersAdapter.notifyItemInserted(1);
         groupPartnersRecyclerView.scrollToPosition(0);
     }
@@ -382,7 +455,23 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
 
     @OnClick(R.id.flea_treatment_picker_button)
     void showFleaTreatmentPicker() {
-        new WrappedDatePickerDialog(this, null);
+        new WrappedDatePickerDialog(this, (datePicker, i, i1, i2) -> {
+            i1++;
+            String month;
+            String day;
+            String year = String.valueOf(i);
+            if (i2 < 10) {
+                day = "0" + String.valueOf(i2);
+            } else {
+                day = String.valueOf(i2);
+            }
+            if (i1 < 10) {
+                month = "0" + String.valueOf(i1);
+            } else {
+                month = String.valueOf(i1);
+            }
+            fleaTreatmentValueTextView.setText(day + "." + month + "." + year);
+        });
     }
 
     @OnClick(R.id.expand_colors_button)
@@ -407,17 +496,10 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
         }
     }
 
-    @OnCheckedChanged(R.id.yes_checkBox)
-    void onYesChecked(boolean checked) {
-        if (checked) {
-            noCheckBox.setChecked(false);
-        }
-    }
 
     @OnCheckedChanged(R.id.no_checkBox)
     void onNoChecked(boolean checked) {
         if (checked) {
-            yesCheckBox.setChecked(false);
         }
     }
 

@@ -96,9 +96,11 @@ public class MainActivity extends AppCompatActivity {
                     catsToolsRelativeLayout.setVisibility(View.VISIBLE);
                     break;
                 case R.id.action_feed:
+                    /*
                     if (feedFragment == null)
                         feedFragment = new FeedFragment();
                     setFragment(feedFragment);
+                    */
                     toolbarTitle.setText("Feed");
                     catsToolsRelativeLayout.setVisibility(View.VISIBLE);
                     break;
