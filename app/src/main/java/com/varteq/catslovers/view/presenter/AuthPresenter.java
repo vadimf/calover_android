@@ -1,4 +1,6 @@
-package com.varteq.catslovers;
+package com.varteq.catslovers.view.presenter;
+
+import android.widget.Toast;
 
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoDevice;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUser;
@@ -16,13 +18,29 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.ForgotPas
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.GenericHandler;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.SignUpHandler;
 import com.amazonaws.services.cognitoidentityprovider.model.UserNotFoundException;
+import com.varteq.catslovers.Auth;
+import com.varteq.catslovers.CognitoAuthHelper;
+import com.varteq.catslovers.ItemToDisplay;
+import com.varteq.catslovers.Log;
+import com.varteq.catslovers.Utils;
+import com.varteq.catslovers.api.BaseParser;
+import com.varteq.catslovers.api.ServiceGenerator;
+import com.varteq.catslovers.api.entity.AuthToken;
+import com.varteq.catslovers.api.entity.BaseResponse;
+import com.varteq.catslovers.api.entity.ErrorResponse;
 import com.varteq.catslovers.view.ValidateNumberActivity;
 
+import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class AuthPresenter {
 
+    private String TAG = AuthPresenter.class.getSimpleName();
     private ForgotPasswordContinuation forgotPasswordContinuation;
     private String password = Utils.getPass(16);
     private String username;
@@ -67,23 +85,9 @@ public class AuthPresenter {
         // Read user data and register
         CognitoUserAttributes userAttributes = new CognitoUserAttributes();
 
-
-        //userAttributes.addAttribute(CognitoAuthHelper.getSignUpFieldsC2O().get("Given name").toString(), userInput);
-        userAttributes.addAttribute(CognitoAuthHelper.getSignUpFieldsC2O().get("Phone number").toString(), username);
-
-        /*userInput = email.getText().toString();
-        if (userInput != null) {
-            if (userInput.length() > 0) {
-                userAttributes.addAttribute(CognitoAuthHelper.getSignUpFieldsC2O().get(email.getHint()).toString(), userInput);
-            }
-        }*/
-
-        /*userInput = phone.getText().toString();
-        if (userInput != null) {
-            if (userInput.length() > 0) {
-                userAttributes.addAttribute(CognitoAuthHelper.getSignUpFieldsC2O().get(phone.getHint()).toString(), userInput);
-            }
-        }*/
+        userAttributes.addAttribute("name", Auth.getUserName(view));
+        userAttributes.addAttribute("email", Auth.getEmail(view));
+        userAttributes.addAttribute("phone_number", username);
 
         //showWaitDialog("Signing up...");
 
@@ -128,15 +132,59 @@ public class AuthPresenter {
         }
     };
 
+    public void testAuth() {
+        getAuthToken("r");
+    }
+
+    private String token = "eyJraWQiOiJKMWQwYUxSakxqSGpDMUlKZzVOUnBWWFBIbjFxKzhZRDRCbEEyeHFsa3VZPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI2ZDA2OTJlMy0wNTY5LTRmM2EtODk2NC0zYTRlZmNhN2I2MTciLCJkZXZpY2Vfa2V5IjoiZXUtY2VudHJhbC0xX2E3NzdkMDVlLWNmYjItNDM2Zi1hOWViLTk4OGFhYTcwMTZiOSIsImV2ZW50X2lkIjoiOTgyMWY0MTQtZDVkZC0xMWU3LWI4YjAtYTEwN2RlYzQ1YzEwIiwidG9rZW5fdXNlIjoiYWNjZXNzIiwic2NvcGUiOiJhd3MuY29nbml0by5zaWduaW4udXNlci5hZG1pbiIsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5ldS1jZW50cmFsLTEuYW1hem9uYXdzLmNvbVwvZXUtY2VudHJhbC0xX3N0WHd6bTF4USIsImV4cCI6MTUxMjA2MjI1NSwiaWF0IjoxNTEyMDU4NjU1LCJqdGkiOiI1MmE4ZGFlNi0xMWE5LTRjNGYtODBlZC1kYmJkMDgyZTk5ZjkiLCJjbGllbnRfaWQiOiIzZGYyMmtpNHBsN3Z1YWtwZXI4Z3EybWRyZCIsInVzZXJuYW1lIjoiNmQwNjkyZTMtMDU2OS00ZjNhLTg5NjQtM2E0ZWZjYTdiNjE3In0.HTki3hGwUPzcZgmwp7KoBIXjd0y6RaMSsh3wCG84MMugSVJLOOaAiLFUxaghntrDsNvJ8AF-SwoG5dFgnc2i48zM8nFCCfNV1MAVU8_v8lyv-8LHpGB6zNmyYoKo9jgVfm1SHCXYtw_4yjaa3GMdrrf2QCC5yuE2JePLcDiZe6W29ZOsoy6irKvrTPPofCpCE2W0GBsvR-QD7tx25dOF0ypD7CjTS2hK_GMUJzKTXdBZOMM-BgGwcDkaY8szr9auoBgbr6YrFiOMN_N4ZaxzfB12VtMxLm7KomENJPDW22XeJ9IjTVxkuUCpcYqMQl6j-ebjOMce_jK7kmaF9Sl17Q";
+
+    private void getAuthToken(String token) {
+        Call<BaseResponse<AuthToken>> call = ServiceGenerator.getApiService().auth(token);
+        call.enqueue(new Callback<BaseResponse<AuthToken>>() {
+            @Override
+            public void onResponse(Call<BaseResponse<AuthToken>> call, Response<BaseResponse<AuthToken>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    new BaseParser<AuthToken>(response) {
+
+                        @Override
+                        protected void onSuccess(AuthToken data) {
+                            if (data.getToken() != null) {
+                                Log.i(TAG, "getApiService().auth success");
+                                Log.i(TAG, data.getToken());
+                                Auth.setAuthToken(view, data.getToken());
+                                view.onSuccessSignIn();
+                            }
+                        }
+
+                        @Override
+                        protected void onFail(ErrorResponse error) {
+                            Log.d(TAG, error.getMessage() + error.getCode());
+                        }
+                    };
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseResponse<AuthToken>> call, Throwable t) {
+                if (t instanceof IOException) {
+                    Toast.makeText(view, "this is an actual network failure :( inform the user and possibly retry", Toast.LENGTH_SHORT).show();
+                    // logging probably not necessary
+                }
+                Log.e(TAG, "getApiService().auth onFailure " + t.getMessage());
+            }
+        });
+    }
+
     AuthenticationHandler authenticationHandler = new AuthenticationHandler() {
         @Override
         public void onSuccess(CognitoUserSession cognitoUserSession, CognitoDevice device) {
             //Log.e(TAG, "Auth Success");
             CognitoAuthHelper.setCurrSession(cognitoUserSession);
             CognitoAuthHelper.newDevice(device);
-            //Log.i("my", cognitoUserSession.getAccessToken().getJWTToken());
+            Log.i(TAG, cognitoUserSession.getAccessToken().getJWTToken());
             //closeWaitDialog();
-            view.onSuccessSignIn();
+
+            getAuthToken(cognitoUserSession.getAccessToken().getJWTToken());
         }
 
         @Override
@@ -206,14 +254,13 @@ public class AuthPresenter {
         if (username != null) {
             CognitoAuthHelper.setUser(username);
         }
-        // TODO: generate pass
         AuthenticationDetails authenticationDetails = new AuthenticationDetails(username, password, null);
         continuation.setAuthenticationDetails(authenticationDetails);
         continuation.continueTask();
     }
 
-    private void getForgotPasswordCode(ForgotPasswordContinuation forgotPasswordContinuation) {
-        this.forgotPasswordContinuation = forgotPasswordContinuation;
+    private void getForgotPasswordCode(ForgotPasswordContinuation continuation) {
+        this.forgotPasswordContinuation = continuation;
 
         listener = code -> {
             forgotPasswordContinuation.setPassword(password);
@@ -232,21 +279,4 @@ public class AuthPresenter {
             listener = null;
         }
     }
-
-    /*private void showCodeDialog(CodeDialogClickListener listener) {
-        final Dialog dialog = new Dialog(this);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.dialog_test_verification_code);
-        dialog.setCancelable(false);
-
-        EditText codeEditText = dialog.findViewById(R.id.code_EditText);
-        Button okButton = dialog.findViewById(R.id.ok_button);
-        okButton.setOnClickListener(v -> {
-            dialog.dismiss();
-            if (listener!=null)
-                listener.onCodeConfirmed(codeEditText.getText().toString());
-        });
-
-        dialog.show();
-    }*/
 }

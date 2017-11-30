@@ -18,9 +18,9 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.varteq.catslovers.Auth;
-import com.varteq.catslovers.AuthPresenter;
 import com.varteq.catslovers.Log;
 import com.varteq.catslovers.R;
+import com.varteq.catslovers.view.presenter.AuthPresenter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +33,7 @@ public class ValidateNumberActivity extends AppCompatActivity implements TextWat
 
     private String TAG = ValidateNumberActivity.class.getSimpleName();
     public static String PHONE_NUMBER_KEY = "phone_number";
-    private final int MAX_CHARS_COUNT = 1;
+    private final int MAX_CHARS_COUNT = 2;
     @BindView(R.id.editText1)
     EditText editText1;
     @BindView(R.id.editText2)

@@ -13,6 +13,8 @@ public class Auth {
 
     private static String USER_LOGGED_IN_KEY = "user_logged_in";
 
+    private static String TOKEN_KEY = "token";
+
     public static void saveUser(Context context, String name, String email) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         preferences.edit().putString(USER_NAME_KEY, name)
@@ -41,8 +43,18 @@ public class Auth {
         return preferences.getString(USER_NAME_KEY, "");
     }
 
+    public static String getEmail(Context context) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return preferences.getString(USER_EMAIL_KEY, "");
+    }
+
     public static Uri getUserAvatar(Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         return Uri.parse(preferences.getString(USER_AVATAR_KEY, ""));
+    }
+
+    public static void setAuthToken(Context context, String token) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        preferences.edit().putString(TOKEN_KEY, token).apply();
     }
 }
