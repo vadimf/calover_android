@@ -18,6 +18,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.varteq.catslovers.R;
@@ -49,7 +50,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         this.googleMap = googleMap;
 
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-33.867, 151.206);
+        LatLng sydney = new LatLng(-33.866915, 151.204631);
         LatLng sydney1 = new LatLng(-33.967, 151.996);
 
         //fake markers
@@ -57,12 +58,20 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 .icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(R.drawable.ic_star))) // insert image from request
                 .anchor(markerPositionX, markerPositionY)
                 .position(sydney));
-        this.googleMap.addMarker(new MarkerOptions()
+        /*this.googleMap.addMarker(new MarkerOptions()
                 .icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(R.drawable.ic_star))) // insert image from request
                 .anchor(markerPositionX, markerPositionY)
-                .position(sydney1));
+                .position(sydney1));*/
 
-        this.googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        //this.googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(sydney)      // Sets the center of the map to Mountain View
+                .zoom(17)                   // Sets the zoom
+                .bearing(90)                // Sets the orientation of the camera to east
+                .tilt(30)                   // Sets the tilt of the camera to 30 degrees
+                .build();                   // Creates a CameraPosition from the builder
+        this.googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
     }
 
     //method to integrate photo to marker
