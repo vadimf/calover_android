@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Patterns;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -60,6 +61,10 @@ public class ConfirmNumberActivity extends AppCompatActivity {
         if (numberEditText.getText() == null ||
                 numberEditText.getText().toString().isEmpty()) {
             numberEditText.setError("Number should not be empty");
+            return false;
+        } else if (numberEditText.getText().length() < 10 ||
+                !Patterns.PHONE.matcher(numberEditText.getText()).matches()) {
+            numberEditText.setError("Incorrect number");
             return false;
         } else return true;
     }

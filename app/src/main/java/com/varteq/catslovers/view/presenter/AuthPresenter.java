@@ -17,6 +17,8 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.Authentic
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.ForgotPasswordHandler;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.GenericHandler;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.SignUpHandler;
+import com.amazonaws.services.cognitoidentityprovider.model.CodeMismatchException;
+import com.amazonaws.services.cognitoidentityprovider.model.InvalidParameterException;
 import com.amazonaws.services.cognitoidentityprovider.model.UserNotFoundException;
 import com.varteq.catslovers.Auth;
 import com.varteq.catslovers.CognitoAuthHelper;
@@ -27,10 +29,12 @@ import com.varteq.catslovers.api.BaseParser;
 import com.varteq.catslovers.api.ServiceGenerator;
 import com.varteq.catslovers.api.entity.AuthToken;
 import com.varteq.catslovers.api.entity.BaseResponse;
+import com.varteq.catslovers.api.entity.Cat;
 import com.varteq.catslovers.api.entity.ErrorResponse;
 import com.varteq.catslovers.view.ValidateNumberActivity;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -77,6 +81,13 @@ public class AuthPresenter {
             view.showDialogMessage(null, CognitoAuthHelper.formatException(e));
             if (e instanceof UserNotFoundException) {
                 signUp();
+            } else if (e instanceof CodeMismatchException) {
+                view.onCodeValidate(false);
+                getForgotPasswordCode(forgotPasswordContinuation);
+            }
+            // Cannot reset password for the user as there is no registered/verified email or phone_number
+            else if (e instanceof InvalidParameterException) {
+                confirmSignUp();
             }
         }
     };
@@ -103,18 +114,20 @@ public class AuthPresenter {
             //closeWaitDialog();
             Boolean regState = signUpConfirmationState;
             if (!signUpConfirmationState) {
-                confirmSignUp(cognitoUserCodeDeliveryDetails);
+                confirmSignUp();
             }
         }
 
         @Override
         public void onFailure(Exception exception) {
             //closeWaitDialog();
+            if (exception instanceof InvalidParameterException)
+                view.onInvalidPhoneFormat(exception.getMessage());
             view.showDialogMessage("Sign up failed", CognitoAuthHelper.formatException(exception));
         }
     };
 
-    private void confirmSignUp(CognitoUserCodeDeliveryDetails cognitoUserCodeDeliveryDetails) {
+    private void confirmSignUp() {
         listener = code -> CognitoAuthHelper.getPool().getUser(username).
                 confirmSignUpInBackground(code, true, confHandler);
     }
@@ -128,15 +141,13 @@ public class AuthPresenter {
 
         @Override
         public void onFailure(Exception exception) {
+            if (exception instanceof CodeMismatchException) {
+                view.onCodeValidate(false);
+                confirmSignUp();
+            }
             view.showDialogMessage("Confirmation failed", CognitoAuthHelper.formatException(exception));
         }
     };
-
-    public void testAuth() {
-        getAuthToken("r");
-    }
-
-    private String token = "eyJraWQiOiJKMWQwYUxSakxqSGpDMUlKZzVOUnBWWFBIbjFxKzhZRDRCbEEyeHFsa3VZPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI2ZDA2OTJlMy0wNTY5LTRmM2EtODk2NC0zYTRlZmNhN2I2MTciLCJkZXZpY2Vfa2V5IjoiZXUtY2VudHJhbC0xX2E3NzdkMDVlLWNmYjItNDM2Zi1hOWViLTk4OGFhYTcwMTZiOSIsImV2ZW50X2lkIjoiOTgyMWY0MTQtZDVkZC0xMWU3LWI4YjAtYTEwN2RlYzQ1YzEwIiwidG9rZW5fdXNlIjoiYWNjZXNzIiwic2NvcGUiOiJhd3MuY29nbml0by5zaWduaW4udXNlci5hZG1pbiIsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5ldS1jZW50cmFsLTEuYW1hem9uYXdzLmNvbVwvZXUtY2VudHJhbC0xX3N0WHd6bTF4USIsImV4cCI6MTUxMjA2MjI1NSwiaWF0IjoxNTEyMDU4NjU1LCJqdGkiOiI1MmE4ZGFlNi0xMWE5LTRjNGYtODBlZC1kYmJkMDgyZTk5ZjkiLCJjbGllbnRfaWQiOiIzZGYyMmtpNHBsN3Z1YWtwZXI4Z3EybWRyZCIsInVzZXJuYW1lIjoiNmQwNjkyZTMtMDU2OS00ZjNhLTg5NjQtM2E0ZWZjYTdiNjE3In0.HTki3hGwUPzcZgmwp7KoBIXjd0y6RaMSsh3wCG84MMugSVJLOOaAiLFUxaghntrDsNvJ8AF-SwoG5dFgnc2i48zM8nFCCfNV1MAVU8_v8lyv-8LHpGB6zNmyYoKo9jgVfm1SHCXYtw_4yjaa3GMdrrf2QCC5yuE2JePLcDiZe6W29ZOsoy6irKvrTPPofCpCE2W0GBsvR-QD7tx25dOF0ypD7CjTS2hK_GMUJzKTXdBZOMM-BgGwcDkaY8szr9auoBgbr6YrFiOMN_N4ZaxzfB12VtMxLm7KomENJPDW22XeJ9IjTVxkuUCpcYqMQl6j-ebjOMce_jK7kmaF9Sl17Q";
 
     private void getAuthToken(String token) {
         Call<BaseResponse<AuthToken>> call = ServiceGenerator.getApiService().auth(token);
@@ -152,7 +163,8 @@ public class AuthPresenter {
                                 Log.i(TAG, "getApiService().auth success");
                                 Log.i(TAG, data.getToken());
                                 Auth.setAuthToken(view, data.getToken());
-                                view.onSuccessSignIn();
+                                ServiceGenerator.setToken(data.getToken());
+                                getCats();
                             }
                         }
 
@@ -171,6 +183,23 @@ public class AuthPresenter {
                     // logging probably not necessary
                 }
                 Log.e(TAG, "getApiService().auth onFailure " + t.getMessage());
+            }
+        });
+    }
+
+    private void getCats() {
+        Call<BaseResponse<List<Cat>>> call = ServiceGenerator.getApiServiceWithToken().getCats();
+        call.enqueue(new Callback<BaseResponse<List<com.varteq.catslovers.api.entity.Cat>>>() {
+
+            @Override
+            public void onResponse(Call<BaseResponse<List<Cat>>> call, Response<BaseResponse<List<Cat>>> response) {
+                Auth.setUserPetCount(view, 1);
+                view.onSuccessSignIn();
+            }
+
+            @Override
+            public void onFailure(Call<BaseResponse<List<Cat>>> call, Throwable t) {
+                view.onSuccessSignIn();
             }
         });
     }

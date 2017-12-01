@@ -27,6 +27,11 @@ import com.varteq.catslovers.Auth;
 import com.varteq.catslovers.Log;
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.Utils;
+import com.varteq.catslovers.api.BaseParser;
+import com.varteq.catslovers.api.ServiceGenerator;
+import com.varteq.catslovers.api.entity.BaseResponse;
+import com.varteq.catslovers.api.entity.Cat;
+import com.varteq.catslovers.api.entity.ErrorResponse;
 import com.varteq.catslovers.model.CatProfile;
 import com.varteq.catslovers.model.GroupPartner;
 import com.varteq.catslovers.view.adapters.CatPhotosAdapter;
@@ -46,6 +51,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class CatProfileActivity extends PhotoPickerActivity implements View.OnClickListener {
 
@@ -125,6 +133,8 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
     @BindView(R.id.upload_image_LinearLayout)
     LinearLayout uploadImageLinearLayout;
     private Menu actionBarMenu;
+    private long petBirthdayMillis;
+    private long fleaTreatmentDateMilis;
 
     public enum CatProfileScreenMode {
         EDIT_MODE,
@@ -360,9 +370,9 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
             birthday.set(Calendar.DAY_OF_MONTH, i2);
             birthday.set(Calendar.MILLISECOND, 0);
 
-            long birthdayMillis = birthday.getTimeInMillis();
+            petBirthdayMillis = birthday.getTimeInMillis();
             long nowMillis = now.getTimeInMillis();
-            long timePassedMonthes = (TimeUnit.MILLISECONDS.toDays(nowMillis - birthdayMillis)) / 30;
+            long timePassedMonthes = (TimeUnit.MILLISECONDS.toDays(nowMillis - petBirthdayMillis)) / 30;
 
             int years = ((int) timePassedMonthes) / 12;
             int month = ((int) timePassedMonthes) - (years * 12);
@@ -437,7 +447,7 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
         switch (item.getItemId()) {
             case R.id.app_bar_save:
                 Log.d(TAG, "app_bar_save");
-                startActivity(new Intent(this, MainActivity.class));
+                saveCat();
                 return true;
             case android.R.id.home:
                 onBackPressed();
@@ -463,10 +473,69 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
         }
     }
 
+    private void saveCat() {
+        int feedstationId = 0;
+        String name = petNameTextView.getText().toString();
+        String nickname = nicknameTextView.getText().toString();
+
+        compressColorsList();
+        String colors = "";
+        for (int color : colorsList)
+            colors += String.valueOf(color) + ",";
+        if (!colors.isEmpty())
+            colors = colors.substring(0, colors.length() - 1);
+        resizeColorsListWithEmptyValues();
+
+        int age = (int) (petBirthdayMillis / 1000L);
+        String sex = null;
+        String w = weightValueTextView.getText().toString();
+        float weight = Float.parseFloat(w.substring(0, w.length() - 3));
+        boolean castrated = noCheckBox.isChecked();
+        String description = descriptionEditText.getText().toString();
+        String type = "pet";
+        int nextFleaTreatment = (int) (fleaTreatmentDateMilis / 1000L);
+
+        Call<BaseResponse<Cat>> call = ServiceGenerator.getApiServiceWithToken().createCat(feedstationId, name,
+                nickname, colors, age, sex, weight, castrated, description, type, nextFleaTreatment);
+        call.enqueue(new Callback<BaseResponse<Cat>>() {
+            @Override
+            public void onResponse(Call<BaseResponse<Cat>> call, Response<BaseResponse<Cat>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    new BaseParser<Cat>(response) {
+
+                        @Override
+                        protected void onSuccess(Cat data) {
+                            /*if (data.getToken() != null) {
+                                Log.i(TAG, "getApiService().auth success");
+                                Log.i(TAG, data.getToken());
+
+                            }*/
+                            CatProfileActivity.this.finishAffinity();
+                            startActivity(new Intent(CatProfileActivity.this, MainActivity.class));
+                        }
+
+                        @Override
+                        protected void onFail(ErrorResponse error) {
+                            Log.d(TAG, error.getMessage() + error.getCode());
+                        }
+                    };
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseResponse<Cat>> call, Throwable t) {
+                Log.e(TAG, "createCat onFailure " + t.getMessage());
+            }
+        });
+    }
+
     @OnClick(R.id.flea_treatment_picker_button)
     void showFleaTreatmentPicker() {
         new WrappedDatePickerDialog(this, (datePicker, i, i1, i2) -> {
             i1++;
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(i, i1, i2);
+            fleaTreatmentDateMilis = calendar.getTimeInMillis();
             String month;
             String day;
             String year = String.valueOf(i);

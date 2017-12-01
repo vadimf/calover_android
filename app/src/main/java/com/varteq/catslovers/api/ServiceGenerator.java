@@ -1,6 +1,8 @@
 package com.varteq.catslovers.api;
 
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -33,6 +35,24 @@ public class ServiceGenerator {
 
     private static Retrofit retrofit = builder.build();
     private static ApiService apiService = retrofit.create(ApiService.class);
+    private static ApiService apiServiceWithToken;
+    private static String token;
+
+    private static Interceptor tokenInterceptor =
+            chain -> {
+                Request original = chain.request();
+
+                // Request customization: add request headers
+                Request.Builder requestBuilder = original.newBuilder()
+                        .header("Authorization", "Bearer " + token);
+
+                Request request = requestBuilder.build();
+                return chain.proceed(request);
+            };
+
+    public static void setToken(String token) {
+        ServiceGenerator.token = token;
+    }
 
     public static void changeApiBaseUrl(String newApiBaseUrl) {
         apiBaseUrl = newApiBaseUrl;
@@ -53,6 +73,20 @@ public class ServiceGenerator {
 
     public static ApiService getApiService() {
         return apiService;
+    }
+
+    public static ApiService getApiServiceWithToken() {
+        if (!httpClient.interceptors().contains(tokenInterceptor)) {
+            httpClient.addInterceptor(tokenInterceptor);
+
+            builder = new Retrofit.Builder()
+                    .baseUrl(apiBaseUrl)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .client(httpClient.build());
+            retrofit = builder.build();
+            apiServiceWithToken = retrofit.create(ApiService.class);
+        }
+        return apiServiceWithToken;
     }
 
     /*public static <S> S createService(Class<S> serviceClass, AccessToken token) {

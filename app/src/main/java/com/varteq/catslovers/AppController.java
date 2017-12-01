@@ -3,6 +3,8 @@ package com.varteq.catslovers;
 import android.app.Application;
 import android.support.v7.app.AppCompatDelegate;
 
+import com.varteq.catslovers.api.ServiceGenerator;
+
 public class AppController extends Application {
 
     static {
@@ -13,5 +15,6 @@ public class AppController extends Application {
     public void onCreate() {
         super.onCreate();
         CognitoAuthHelper.init(getApplicationContext());
+        ServiceGenerator.setToken(Auth.getAuthToken(this));
     }
 }

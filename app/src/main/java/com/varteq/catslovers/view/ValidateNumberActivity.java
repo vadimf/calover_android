@@ -16,6 +16,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.varteq.catslovers.Auth;
 import com.varteq.catslovers.Log;
@@ -74,7 +75,7 @@ public class ValidateNumberActivity extends AppCompatActivity implements TextWat
             username = getIntent().getStringExtra(PHONE_NUMBER_KEY);
 
         presenter = new AuthPresenter(username, this);
-        presenter.resetPassword();
+        //presenter.resetPassword();
 
         editText1.addTextChangedListener(this);
         editText2.addTextChangedListener(this);
@@ -143,6 +144,8 @@ public class ValidateNumberActivity extends AppCompatActivity implements TextWat
         Button laterButton = dialog.findViewById(R.id.later_button);
         laterButton.setOnClickListener(v -> {
             dialog.dismiss();
+            ValidateNumberActivity.this.finishAffinity();
+            startActivity(new Intent(getApplicationContext(), MainActivity.class));
         });
 
         dialog.show();
@@ -154,7 +157,7 @@ public class ValidateNumberActivity extends AppCompatActivity implements TextWat
         onBackPressed();
     }
 
-    private void onCodeValidate(boolean isCorrect) {
+    public void onCodeValidate(boolean isCorrect) {
         int resId;
         if (isCorrect)
             resId = R.drawable.correct_code;
@@ -234,7 +237,10 @@ public class ValidateNumberActivity extends AppCompatActivity implements TextWat
         }
     }
 
+    private boolean showMessage = false;
+
     public void showDialogMessage(String title, String body) {
+        if (!showMessage) return;
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(title).setMessage(body).setNeutralButton("OK", new DialogInterface.OnClickListener() {
             @Override
@@ -248,5 +254,10 @@ public class ValidateNumberActivity extends AppCompatActivity implements TextWat
         });
         userDialog = builder.create();
         userDialog.show();
+    }
+
+    public void onInvalidPhoneFormat(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+        onBackPressed();
     }
 }

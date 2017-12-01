@@ -14,6 +14,7 @@ public class Auth {
     private static String USER_LOGGED_IN_KEY = "user_logged_in";
 
     private static String TOKEN_KEY = "token";
+    private static String PET_COUNT_KEY = "pet_cnt";
 
     public static void saveUser(Context context, String name, String email) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -56,5 +57,20 @@ public class Auth {
     public static void setAuthToken(Context context, String token) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         preferences.edit().putString(TOKEN_KEY, token).apply();
+    }
+
+    public static String getAuthToken(Context context) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return preferences.getString(TOKEN_KEY, "");
+    }
+
+    public static void setUserPetCount(Context context, int petCnt) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        preferences.edit().putInt(PET_COUNT_KEY, petCnt).apply();
+    }
+
+    public static int getUserPetCount(Context context) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return preferences.getInt(PET_COUNT_KEY, 0);
     }
 }

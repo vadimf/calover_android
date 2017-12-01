@@ -1,6 +1,6 @@
 package com.varteq.catslovers.api;
 
-import com.varteq.catslovers.api.entity.ErrorResponse;
+import com.varteq.catslovers.api.entity.ErrorData;
 
 import java.lang.annotation.Annotation;
 
@@ -10,16 +10,16 @@ import retrofit2.Response;
 
 public class ErrorUtils {
 
-    public static ErrorResponse parseError(Response<?> response) {
-        Converter<ResponseBody, ErrorResponse> converter = ServiceGenerator.retrofit()
-                .responseBodyConverter(ErrorResponse.class, new Annotation[0]);
+    public static ErrorData parseError(Response<?> response) {
+        Converter<ResponseBody, ErrorData> converter = ServiceGenerator.retrofit()
+                .responseBodyConverter(ErrorData.class, new Annotation[0]);
 
-        ErrorResponse error;
+        ErrorData error;
 
         try {
             error = converter.convert(response.errorBody());
         } catch (Exception e) {
-            return null;//new ErrorResponse();
+            return null;//new ErrorData();
         }
 
         return error;
