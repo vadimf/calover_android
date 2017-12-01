@@ -19,6 +19,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -63,6 +64,8 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
     public static final String IS_EDIT_MODE_KEY = "is_mode_key";
     @BindView(R.id.cat_profile_avatar_roundedImageView)
     RoundedImageView avatarImageView;
+    @BindView(R.id.addPhotoButton)
+    ImageButton addPhotoButton;
     @BindView(R.id.pet_name_textView)
     TextView petNameTextView;
     @BindView(R.id.nickname_textView)
@@ -240,8 +243,8 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
         colorsList = new ArrayList<>();
-        colorsList.add(Color.GREEN);
-        colorsList.add(Color.RED);
+        colorsList.add(Color.GRAY);
+        colorsList.add(Color.WHITE);
 
         viewColorsAdapter = new ViewColorsAdapter(colorsList);
         viewColorsRecyclerView.setAdapter(viewColorsAdapter);
@@ -279,9 +282,11 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
 
     private void setupViewMode() {
         Log.d(TAG, "setupViewMode");
+        viewColorsAdapter.notifyDataSetChanged();
         currentMode = CatProfileScreenMode.VIEW_MODE;
 
         infoLinearLayout.setVisibility(View.VISIBLE);
+        addPhotoButton.setVisibility(View.INVISIBLE);
 
         // colorsList settings
         compressColorsList();
@@ -320,6 +325,7 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
         currentMode = CatProfileScreenMode.EDIT_MODE;
 
         infoLinearLayout.setVisibility(View.GONE);
+        addPhotoButton.setVisibility(View.VISIBLE);
 
         // colorsList settings
         viewColorsRecyclerView.setVisibility(View.GONE);
@@ -586,7 +592,7 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
     public void onClick(View view) {
         if (view instanceof RoundedImageView) {
             Log.d(TAG, "onClick RoundedImageView");
-            ColorPickerDialog colorPickerDialog = new ColorPickerDialog(this, Color.GREEN, color -> {
+            ColorPickerDialog colorPickerDialog = new ColorPickerDialog(this, Color.RED, color -> {
                 for (int i = 0; i < colorPickers.size(); i++)
                     if (colorPickers.get(i).getId() == clickedRoundViewId) {
                         colorPickers.get(i).setImageBitmap(Utils.getBitmapWithColor(color));
