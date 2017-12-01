@@ -75,7 +75,7 @@ public class ValidateNumberActivity extends AppCompatActivity implements TextWat
             username = getIntent().getStringExtra(PHONE_NUMBER_KEY);
 
         presenter = new AuthPresenter(username, this);
-        //presenter.resetPassword();
+        presenter.resetPassword();
 
         editText1.addTextChangedListener(this);
         editText2.addTextChangedListener(this);
@@ -154,7 +154,8 @@ public class ValidateNumberActivity extends AppCompatActivity implements TextWat
 
     @OnClick(R.id.resend_button)
     void onResendClick() {
-        onBackPressed();
+        //onBackPressed();
+        presenter.resendCode();
     }
 
     public void onCodeValidate(boolean isCorrect) {

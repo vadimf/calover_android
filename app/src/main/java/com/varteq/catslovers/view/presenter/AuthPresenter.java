@@ -17,8 +17,10 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.Authentic
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.ForgotPasswordHandler;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.GenericHandler;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.SignUpHandler;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.VerificationHandler;
 import com.amazonaws.services.cognitoidentityprovider.model.CodeMismatchException;
 import com.amazonaws.services.cognitoidentityprovider.model.InvalidParameterException;
+import com.amazonaws.services.cognitoidentityprovider.model.NotAuthorizedException;
 import com.amazonaws.services.cognitoidentityprovider.model.UserNotFoundException;
 import com.varteq.catslovers.Auth;
 import com.varteq.catslovers.CognitoAuthHelper;
@@ -233,7 +235,10 @@ public class AuthPresenter {
         @Override
         public void onFailure(Exception e) {
             //closeWaitDialog();
-
+            if (e instanceof NotAuthorizedException) {
+                resetPassword();
+                Toast.makeText(view, "Verification code sent. Please confirm you number again", Toast.LENGTH_LONG).show();
+            }
             view.showDialogMessage("Sign-in failed", CognitoAuthHelper.formatException(e));
         }
 
@@ -296,6 +301,20 @@ public class AuthPresenter {
             forgotPasswordContinuation.setVerificationCode(code);
             forgotPasswordContinuation.continueTask();
         };
+    }
+
+    public void resendCode() {
+        CognitoAuthHelper.getPool().getUser(username).resendConfirmationCodeInBackground(new VerificationHandler() {
+            @Override
+            public void onSuccess(CognitoUserCodeDeliveryDetails verificationCodeDeliveryMedium) {
+
+            }
+
+            @Override
+            public void onFailure(Exception exception) {
+
+            }
+        });
     }
 
     interface CodeDialogClickListener {

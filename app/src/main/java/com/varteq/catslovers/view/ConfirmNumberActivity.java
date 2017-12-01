@@ -62,7 +62,7 @@ public class ConfirmNumberActivity extends AppCompatActivity {
                 numberEditText.getText().toString().isEmpty()) {
             numberEditText.setError("Number should not be empty");
             return false;
-        } else if (numberEditText.getText().length() < 10 ||
+        } else if (numberEditText.getText().length() < 11 ||
                 !Patterns.PHONE.matcher(numberEditText.getText()).matches()) {
             numberEditText.setError("Incorrect number");
             return false;

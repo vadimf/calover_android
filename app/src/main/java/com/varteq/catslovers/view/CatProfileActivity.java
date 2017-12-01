@@ -190,13 +190,13 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
         else
             avatarImageView.setImageBitmap(Utils.getBitmapWithColor(getResources().getColor(R.color.transparent)));
 
-        avatarImageView.setOnClickListener(view -> {
+        /*avatarImageView.setOnClickListener(view -> {
             if (currentMode.equals(CatProfileScreenMode.VIEW_MODE))
                 currentMode = CatProfileScreenMode.EDIT_MODE;
             else currentMode = CatProfileScreenMode.VIEW_MODE;
 
             setupUIMode();
-        });
+        });*/
 
         nicknameTextView.setText(Auth.getUserName(this));
 
