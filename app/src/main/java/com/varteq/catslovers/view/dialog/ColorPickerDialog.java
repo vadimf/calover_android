@@ -3,11 +3,13 @@ package com.varteq.catslovers.view.dialog;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.Button;
 
 import com.larswerkman.holocolorpicker.ColorPicker;
 import com.larswerkman.holocolorpicker.OpacityBar;
+import com.larswerkman.holocolorpicker.ValueBar;
 import com.varteq.catslovers.R;
 
 import butterknife.BindView;
@@ -19,6 +21,8 @@ public class ColorPickerDialog extends AlertDialog {
     ColorPicker colorPickerView;
     @BindView(R.id.opacitybar)
     OpacityBar opacityBar;
+    @BindView(R.id.valuebar)
+    ValueBar valuebar;
     @BindView(R.id.color_picker_ok_button)
     Button okButton;
     @BindView(R.id.color_picker_cancel_button)
@@ -52,8 +56,10 @@ public class ColorPickerDialog extends AlertDialog {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog_color_picker);
         ButterKnife.bind(this);
+        colorPickerView.setColor(Color.rgb(76, 47, 0));
+        colorPickerView.setOldCenterColor(Color.rgb(76, 47, 0));
         colorPickerView.addOpacityBar(opacityBar);
-
+        colorPickerView.addValueBar(valuebar);
         okButton.setOnClickListener(view -> {
             int selectedColor = colorPickerView.getColor();
             onColorSelectedListener.onColorSelected(selectedColor);

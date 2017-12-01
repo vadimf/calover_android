@@ -14,6 +14,44 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <ImageButton
+                android:id="@+id/addPhotoButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="44dp"
+                android:background="@color/transparent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.117"
+                app:layout_constraintStart_toEndOf="@+id/cat_profile_avatar_roundedImageView"
+                app:layout_constraintTop_toTopOf="@+id/cat_profile_avatar_roundedImageView"
+                app:srcCompat="@drawable/ic_add_a_photo_primary_24dp"/>
+
+            <ImageView
+                android:id="@+id/petImageView"
+                android:layout_width="170dp"
+                android:layout_height="70dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:background="@color/colorPrimary"
+                android:padding="2dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@color/cardview_light_background"/>
+
+            <ImageView
+                android:id="@+id/strayImageView"
+                android:layout_width="170dp"
+                android:layout_height="70dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginTop="8dp"
+                android:background="@color/colorPrimary"
+                android:padding="2dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@color/cardview_light_background"/>
+
             <android.support.constraint.Guideline
                 android:id="@+id/avatar_end_guideline"
                 android:layout_width="wrap_content"
@@ -39,11 +77,11 @@
                 app:layout_constraintDimensionRatio="w,1:1"
                 app:layout_constraintEnd_toStartOf="@+id/avatar_end_guideline"
                 app:layout_constraintStart_toStartOf="@+id/avatar_start_guideline"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/petImageView"
                 app:riv_border_color="@color/colorPrimary"
                 app:riv_border_width="2dp"
                 app:riv_corner_radius="29dp"
-                app:riv_oval="true" />
+                app:riv_oval="true"/>
 
             <TextView
                 android:id="@+id/pet_name_textView"
@@ -175,8 +213,6 @@
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:riv_border_color="@color/colorPrimary"
-                    app:riv_border_width="2dp"
                     app:riv_corner_radius="29dp"
                     app:riv_oval="true" />
 
@@ -193,8 +229,6 @@
                     app:layout_constraintStart_toEndOf="@+id/color_one_roundedImageView"
                     app:layout_constraintTop_toTopOf="@+id/color_one_roundedImageView"
                     app:layout_constraintVertical_bias="0.0"
-                    app:riv_border_color="@color/colorPrimary"
-                    app:riv_border_width="2dp"
                     app:riv_corner_radius="29dp"
                     app:riv_oval="true" />
 
@@ -210,8 +244,6 @@
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toEndOf="@+id/color_two_roundedImageView"
                     app:layout_constraintTop_toTopOf="@+id/color_two_roundedImageView"
-                    app:riv_border_color="@color/colorPrimary"
-                    app:riv_border_width="2dp"
                     app:riv_corner_radius="29dp"
                     app:riv_oval="true" />
 
@@ -260,8 +292,6 @@
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/color_one_textView"
-                    app:riv_border_color="@color/colorPrimary"
-                    app:riv_border_width="2dp"
                     app:riv_corner_radius="29dp"
                     app:riv_oval="true" />
 
@@ -277,8 +307,6 @@
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toEndOf="@+id/color_four_roundedImageView"
                     app:layout_constraintTop_toTopOf="@+id/color_four_roundedImageView"
-                    app:riv_border_color="@color/colorPrimary"
-                    app:riv_border_width="2dp"
                     app:riv_corner_radius="29dp"
                     app:riv_oval="true" />
 
@@ -294,8 +322,6 @@
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toEndOf="@+id/color_five_roundedImageView"
                     app:layout_constraintTop_toTopOf="@+id/color_five_roundedImageView"
-                    app:riv_border_color="@color/colorPrimary"
-                    app:riv_border_width="2dp"
                     app:riv_corner_radius="29dp"
                     app:riv_oval="true" />
 

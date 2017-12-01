@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
+                                             xmlns:tools="http://schemas.android.com/tools"
+                                             android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <com.larswerkman.holocolorpicker.ColorPicker
@@ -16,28 +17,40 @@
         android:id="@+id/opacitybar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@+id/color_picker_ok_button"
         app:layout_constraintEnd_toEndOf="@+id/color_picker"
         app:layout_constraintStart_toStartOf="@+id/color_picker"
-        app:layout_constraintTop_toBottomOf="@+id/color_picker" />
+        app:layout_constraintTop_toBottomOf="@+id/color_picker"/>
+
+    <com.larswerkman.holocolorpicker.ValueBar
+        android:id="@+id/valuebar"
+        android:layout_width="wrap_content"
+        android:layout_height="25dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="@+id/color_picker"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/opacitybar"/>
 
     <Button
         android:id="@+id/color_picker_ok_button"
         style="@style/PrimaryBorderlessButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:text="@android:string/ok"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/color_picker_cancel_button"
-        app:layout_constraintTop_toBottomOf="@+id/opacitybar" />
+        app:layout_constraintEnd_toEndOf="@+id/valuebar"
+        app:layout_constraintTop_toBottomOf="@+id/valuebar"/>
 
     <Button
         android:id="@+id/color_picker_cancel_button"
+        style="@style/PrimaryBorderlessButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        style="@style/PrimaryBorderlessButton"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
         android:text="@android:string/no"
-        app:layout_constraintEnd_toEndOf="@+id/color_picker"
-        app:layout_constraintTop_toBottomOf="@+id/opacitybar" />
+        app:layout_constraintEnd_toStartOf="@+id/color_picker_ok_button"
+        app:layout_constraintTop_toBottomOf="@+id/valuebar"/>
 
 </android.support.constraint.ConstraintLayout>
