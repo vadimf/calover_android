@@ -16,8 +16,8 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.varteq.catslovers.R;
-import com.varteq.catslovers.Utils;
 import com.varteq.catslovers.model.Feed;
+import com.varteq.catslovers.utils.Utils;
 import com.varteq.catslovers.view.MediaViewerActivity;
 
 import java.util.List;

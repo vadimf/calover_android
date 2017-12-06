@@ -5,11 +5,12 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 
-public class Auth {
+public class Profile {
 
     private static String USER_NAME_KEY = "user_name";
     private static String USER_EMAIL_KEY = "user_email";
     private static String USER_AVATAR_KEY = "user_avatar";
+    private static String USER_PHONE = "user_phone";
 
     private static String USER_LOGGED_IN_KEY = "user_logged_in";
 
@@ -72,5 +73,15 @@ public class Auth {
     public static int getUserPetCount(Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         return preferences.getInt(PET_COUNT_KEY, 0);
+    }
+
+    public static void setUserPhone(Context context, String phone) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        preferences.edit().putString(USER_PHONE, phone).apply();
+    }
+
+    public static String getUserPhone(Context context) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return preferences.getString(USER_PHONE, "");
     }
 }

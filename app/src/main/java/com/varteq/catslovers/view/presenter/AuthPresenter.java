@@ -1,5 +1,6 @@
 package com.varteq.catslovers.view.presenter;
 
+import android.os.Bundle;
 import android.widget.Toast;
 
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoDevice;
@@ -22,17 +23,22 @@ import com.amazonaws.services.cognitoidentityprovider.model.CodeMismatchExceptio
 import com.amazonaws.services.cognitoidentityprovider.model.InvalidParameterException;
 import com.amazonaws.services.cognitoidentityprovider.model.NotAuthorizedException;
 import com.amazonaws.services.cognitoidentityprovider.model.UserNotFoundException;
-import com.varteq.catslovers.Auth;
+import com.quickblox.core.QBEntityCallback;
+import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.users.model.QBUser;
+import com.varteq.catslovers.AppController;
 import com.varteq.catslovers.CognitoAuthHelper;
 import com.varteq.catslovers.ItemToDisplay;
 import com.varteq.catslovers.Log;
-import com.varteq.catslovers.Utils;
+import com.varteq.catslovers.Profile;
 import com.varteq.catslovers.api.BaseParser;
 import com.varteq.catslovers.api.ServiceGenerator;
 import com.varteq.catslovers.api.entity.AuthToken;
 import com.varteq.catslovers.api.entity.BaseResponse;
 import com.varteq.catslovers.api.entity.Cat;
 import com.varteq.catslovers.api.entity.ErrorResponse;
+import com.varteq.catslovers.utils.ChatHelper;
+import com.varteq.catslovers.utils.Utils;
 import com.varteq.catslovers.view.ValidateNumberActivity;
 
 import java.io.IOException;
@@ -98,8 +104,8 @@ public class AuthPresenter {
         // Read user data and register
         CognitoUserAttributes userAttributes = new CognitoUserAttributes();
 
-        userAttributes.addAttribute("name", Auth.getUserName(view));
-        userAttributes.addAttribute("email", Auth.getEmail(view));
+        userAttributes.addAttribute("name", Profile.getUserName(view));
+        userAttributes.addAttribute("email", Profile.getEmail(view));
         userAttributes.addAttribute("phone_number", username);
 
         //showWaitDialog("Signing up...");
@@ -164,9 +170,9 @@ public class AuthPresenter {
                             if (data.getToken() != null) {
                                 Log.i(TAG, "getApiService().auth success");
                                 Log.i(TAG, data.getToken());
-                                Auth.setAuthToken(view, data.getToken());
+                                Profile.setAuthToken(view, data.getToken());
                                 ServiceGenerator.setToken(data.getToken());
-                                getCats();
+                                loginToQB(null);
                             }
                         }
 
@@ -189,13 +195,47 @@ public class AuthPresenter {
         });
     }
 
+    private void loginToQB(String profile) {
+        final QBUser qbUser = new QBUser(username, AppController.USER_PASS);
+        qbUser.setFullName(Profile.getUserName(view));
+        //qbUser.setExternalId(profile.getUserId());
+        //qbUser.setWebsite(profile.getPicture());
+        //qbUser.setFullName(profile.getFirstName() + " " + profile.getLastName());
+
+        ChatHelper.getInstance().login(qbUser, new QBEntityCallback<Void>() {
+            @Override
+            public void onSuccess(Void aVoid, Bundle bundle) {
+                Log.i(TAG, "chat login success");
+                getCats();
+            }
+
+            @Override
+            public void onError(QBResponseException e) {
+                Log.e(TAG, e.getMessage());
+                ChatHelper.getInstance().singUp(qbUser, new QBEntityCallback<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid, Bundle bundle) {
+                        Log.i(TAG, "chat singUp success");
+                        getCats();
+                    }
+
+                    @Override
+                    public void onError(QBResponseException e) {
+                        Log.e(TAG, "chat singUp error");
+                        getCats();
+                    }
+                });
+            }
+        });
+    }
+
     private void getCats() {
         Call<BaseResponse<List<Cat>>> call = ServiceGenerator.getApiServiceWithToken().getCats();
         call.enqueue(new Callback<BaseResponse<List<com.varteq.catslovers.api.entity.Cat>>>() {
 
             @Override
             public void onResponse(Call<BaseResponse<List<Cat>>> call, Response<BaseResponse<List<Cat>>> response) {
-                Auth.setUserPetCount(view, 1);
+                Profile.setUserPetCount(view, 1);
                 view.onSuccessSignIn();
             }
 
@@ -209,12 +249,12 @@ public class AuthPresenter {
     AuthenticationHandler authenticationHandler = new AuthenticationHandler() {
         @Override
         public void onSuccess(CognitoUserSession cognitoUserSession, CognitoDevice device) {
-            //Log.e(TAG, "Auth Success");
+            //Log.e(TAG, "Profile Success");
             CognitoAuthHelper.setCurrSession(cognitoUserSession);
             CognitoAuthHelper.newDevice(device);
             Log.i(TAG, cognitoUserSession.getAccessToken().getJWTToken());
             //closeWaitDialog();
-
+            Profile.setUserPhone(view, username);
             getAuthToken(cognitoUserSession.getAccessToken().getJWTToken());
         }
 

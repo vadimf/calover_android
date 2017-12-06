@@ -9,8 +9,8 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.makeramen.roundedimageview.RoundedImageView;
-import com.varteq.catslovers.Auth;
 import com.varteq.catslovers.Log;
+import com.varteq.catslovers.Profile;
 import com.varteq.catslovers.R;
 
 import butterknife.BindView;
@@ -45,7 +45,7 @@ public class LoginActivity extends PhotoPickerActivity {
         ButterKnife.bind(this);
         nameEditText.requestFocus();
 
-        Uri avatarUri = Auth.getUserAvatar(this);
+        Uri avatarUri = Profile.getUserAvatar(this);
         if (avatarUri != null && !avatarUri.toString().isEmpty())
             avatar.setImageURI(avatarUri);
         else {
@@ -58,7 +58,7 @@ public class LoginActivity extends PhotoPickerActivity {
                 view -> {
                     if (isInputValid()) {
                         Log.d(TAG, "continue_button OnClick");
-                        Auth.saveUser(this, nameEditText.getText().toString(),
+                        Profile.saveUser(this, nameEditText.getText().toString(),
                                 emailEditText.getText().toString());
                         startActivity(new Intent(LoginActivity.this, ConfirmNumberActivity.class));
                     }
@@ -90,7 +90,7 @@ public class LoginActivity extends PhotoPickerActivity {
     protected void onImageSelected(Uri uri) {
         super.onImageSelected(uri);
         if (null != uri) {
-            Auth.saveUserAvatar(this, uri);
+            Profile.saveUserAvatar(this, uri);
             avatar.setImageURI(uri);
         }
     }

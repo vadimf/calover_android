@@ -18,8 +18,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.varteq.catslovers.Auth;
 import com.varteq.catslovers.Log;
+import com.varteq.catslovers.Profile;
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.view.presenter.AuthPresenter;
 
@@ -122,7 +122,7 @@ public class ValidateNumberActivity extends AppCompatActivity implements TextWat
         } catch (Exception e) {
         }
 
-        Auth.setUserLogin(this, true);
+        Profile.setUserLogin(this, true);
 
         showSuccessDialog();
     }

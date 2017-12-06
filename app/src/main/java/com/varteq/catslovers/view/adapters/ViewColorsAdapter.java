@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.varteq.catslovers.R;
-import com.varteq.catslovers.Utils;
+import com.varteq.catslovers.utils.Utils;
 
 import java.util.List;
 

@@ -11,11 +11,18 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.quickblox.core.QBEntityCallback;
+import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.users.model.QBUser;
+import com.varteq.catslovers.AppController;
 import com.varteq.catslovers.Log;
+import com.varteq.catslovers.Profile;
 import com.varteq.catslovers.R;
+import com.varteq.catslovers.utils.ChatHelper;
 import com.varteq.catslovers.view.fragments.CatsFragment;
 import com.varteq.catslovers.view.fragments.FeedFragment;
 import com.varteq.catslovers.view.fragments.MapFragment;
+import com.varteq.catslovers.view.fragments.MessagesFragment;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -36,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     CatsFragment catsFragment;
     MapFragment mapFragment;
     FeedFragment feedFragment;
+    MessagesFragment messagesFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case R.id.action_chat:
                     Log.d(TAG, "action_chat");
+                    checkQBLogin();
                     toolbarTitle.setText("Chat");
                     catsToolsRelativeLayout.setVisibility(View.VISIBLE);
                     break;
@@ -126,6 +135,60 @@ public class MainActivity extends AppCompatActivity {
             }
             return true;
         });
+    }
+
+    private void checkQBLogin() {
+        //Map<String, String> settings = CognitoAuthHelper.getCurrUser().getAttributes().getAttributes();
+
+        //if (CognitoAuthHelper.getCurrUser()==null) return;
+        //if (!settings.containsKey("username")) return;
+        if (ChatHelper.getCurrentUser() != null) {
+            showChat();
+            return;
+        }
+        //Profile.setUserPhone(this, "+380935772101");
+        //Profile.saveUser(this, "John", "j@t.com");
+        if (Profile.getUserPhone(this).isEmpty()) {
+            return;
+            //Profile.setUserPhone(this, "+380935772102");
+        }
+
+        final QBUser qbUser = new QBUser(Profile.getUserPhone(this), AppController.USER_PASS);
+        //qbUser.setExternalId(profile.getUserId());
+        //qbUser.setWebsite(profile.getPicture());
+        qbUser.setFullName(Profile.getUserName(this));
+
+        ChatHelper.getInstance().login(qbUser, new QBEntityCallback<Void>() {
+            @Override
+            public void onSuccess(Void aVoid, Bundle bundle) {
+                Log.i(TAG, "chat login success");
+                showChat();
+            }
+
+            @Override
+            public void onError(QBResponseException e) {
+                Log.e(TAG, e.getMessage());
+                ChatHelper.getInstance().singUp(qbUser, new QBEntityCallback<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid, Bundle bundle) {
+                        Log.i(TAG, "chat singUp success");
+                        showChat();
+                    }
+
+                    @Override
+                    public void onError(QBResponseException e) {
+                        Log.e(TAG, "chat singUp error");
+                    }
+                });
+            }
+        });
+    }
+
+    private void showChat() {
+        if (messagesFragment == null)
+            messagesFragment = new MessagesFragment();
+        setFragment(messagesFragment);
+        //startActivity(new Intent(MainActivity.this, DialogsActivity.class));
     }
 
 }
