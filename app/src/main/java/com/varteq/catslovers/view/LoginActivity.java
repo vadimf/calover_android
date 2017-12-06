@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Patterns;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.varteq.catslovers.Auth;
@@ -24,10 +25,10 @@ public class LoginActivity extends PhotoPickerActivity {
     RoundedImageView avatar;
     @BindView(R.id.continue_button)
     Button continueButton;
-    @BindView(R.id.twitter_button)
-    Button twitterButton;
-    @BindView(R.id.facebook_button)
-    Button facebookButton;
+    @BindView(R.id.twitter_linearLayout)
+    LinearLayout twitterButton;
+    @BindView(R.id.facebook_linearLayout)
+    LinearLayout facebookButton;
     @BindView(R.id.email_editText)
     EditText emailEditText;
     @BindView(R.id.name_editText)

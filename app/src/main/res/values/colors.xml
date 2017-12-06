@@ -10,7 +10,7 @@
     <color name="background_purple">#d4cdea</color>
 
     <color name="black_80">#cc000000</color>
-    <color name="greyish_blue_60">#99607c9c</color>
+    <color name="colorSecondaryLight">#99607c9c</color>
     <color name="rusty_red">#c21010</color>
     <color name="greyish_blue">#607c9c</color>
     <color name="yellow_orange">#ffb900</color>

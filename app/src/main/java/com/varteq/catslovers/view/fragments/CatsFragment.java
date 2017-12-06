@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SeekBar;
 
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.model.CatProfile;
@@ -28,6 +29,10 @@ public class CatsFragment extends Fragment {
     RecyclerView catsRecyclerView;
     private HashMap<String, List<CatProfile>> catsHashMap;
     private CatsListAdapter catsListAdapter;
+
+    final private int SEEKBAR_STEPS_COUNT = 7;
+    @BindView(R.id.seekBar)
+    SeekBar seekBar;
 
     @Nullable
     @Override
@@ -81,6 +86,9 @@ public class CatsFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        ButterKnife.bind(this, view);
+
+        seekBar.setMax(SEEKBAR_STEPS_COUNT - 1);
     }
 
     @Override

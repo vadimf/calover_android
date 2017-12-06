@@ -2,9 +2,9 @@
     <string name="app_name">CatsLovers</string>
     <string name="title_activity_start">StartActivity</string>
     <string name="continue_button_title">Continue</string>
-    <string name="confirm_phone_number">please confirm your country code\n Enter your mobile #</string>
+    <string name="confirm_phone_number">Please confirm your country code\n Enter your Mobile #</string>
     <string name="approve_button_title">Approve</string>
-    <string name="confirm_your_number">Code sent.\n Confirm your number</string>
+    <string name="confirm_your_number">Code sent.\n confirm your number</string>
     <string name="select_avatar">Select avatar</string>
     <string name="maybe_later_button_title">Maybe later</string>
     <string name="yes_button_title">Yes</string>
@@ -24,5 +24,11 @@
     <string name="explore">Explore</string>
     <string name="action_save">Save</string>
     <string name="select_cat_photo">Select cat photo</string>
-    <string name="my_cats">my cats</string>
+    <string name="my_cats">My cats</string>
+
+    <!--Boarding-->
+    <string name="onboarding_text_1">THE\nCATS LOVERS\nSOCIAL\nNETWORK</string>
+    <string name="onboarding_text_2">COMMUNAL\nTREATMENT\nFOR ALL FEEDING\nSTATIONS</string>
+    <string name="onboarding_text_3">ALL YOUR CAT\nNEEDS IN ONE\nTOUCH</string>
+    <string name="button_onboarding_start">OK, LET\'S START</string>
 </resources>
