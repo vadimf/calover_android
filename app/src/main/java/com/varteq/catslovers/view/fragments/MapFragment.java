@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -23,12 +24,19 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.varteq.catslovers.R;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private GoogleMap googleMap;
 
     final private float markerPositionX = 0.5f; // Anchors the marker on center vertical
     final private float markerPositionY = 1.0f; // Anchors the marker on the bottom
+
+    @BindView(R.id.seekBar)
+    SeekBar seekBar;
+    final private int SEEKBAR_STEPS_COUNT = 7;
 
     @Nullable
     @Override
@@ -39,9 +47,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        ButterKnife.bind(this, view);
         // Obtain the SupportMapFragment and get notified when the googleMap is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        seekBar.setMax(SEEKBAR_STEPS_COUNT - 1);
     }
 
 

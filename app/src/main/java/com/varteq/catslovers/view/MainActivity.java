@@ -45,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
     FeedFragment feedFragment;
     MessagesFragment messagesFragment;
 
+    final String STATE_NAVIGATION_SELECTED = "navigationSelected";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,7 +72,10 @@ public class MainActivity extends AppCompatActivity {
 
         // TODO: 16.11.17 check is timer need or not
         runDialogTimer();
-        mBottomNavigationView.setSelectedItemId(R.id.action_map);
+        if (savedInstanceState != null)
+            mBottomNavigationView.setSelectedItemId(savedInstanceState.getInt(STATE_NAVIGATION_SELECTED, 0));
+        else
+            mBottomNavigationView.setSelectedItemId(R.id.action_map);
     }
 
     private void runDialogTimer() {
@@ -105,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
                     if (mapFragment == null)
                         mapFragment = new MapFragment();
                     setFragment(mapFragment);
-                    toolbarTitle.setText("Map");
+                    toolbarTitle.setText("Feedstations");
                     catsToolsRelativeLayout.setVisibility(View.VISIBLE);
                     break;
                 case R.id.action_feed:
@@ -194,4 +199,9 @@ public class MainActivity extends AppCompatActivity {
         //startActivity(new Intent(MainActivity.this, DialogsActivity.class));
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(STATE_NAVIGATION_SELECTED, mBottomNavigationView.getSelectedItemId());
+    }
 }

@@ -4,11 +4,12 @@
                                              xmlns:tools="http://schemas.android.com/tools"
                                              android:layout_width="match_parent"
                                              android:layout_height="match_parent"
+                                             android:background="@color/white"
                                              tools:context="com.varteq.catslovers.view.CatProfileActivity">
 
     <ScrollView
-        android:layout_height="match_parent"
-        android:layout_width="match_parent">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
@@ -28,43 +29,64 @@
                 app:layout_constraintTop_toTopOf="@+id/cat_profile_avatar_roundedImageView"
                 app:srcCompat="@drawable/ic_add_a_photo_primary_24dp"/>
 
-            <ImageView
-                android:id="@+id/petImageView"
-                android:layout_width="170dp"
-                android:layout_height="70dp"
+            <FrameLayout
+                android:id="@+id/petLayout"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="12dp"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:background="@color/colorPrimary"
-                android:padding="2dp"
-                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/cat_profile_animal_type_selected_shape"
+                app:layout_constraintEnd_toStartOf="@+id/strayLayout"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="@+id/start_guideline"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@color/cardview_light_background"/>
+                >
 
-            <ImageView
-                android:id="@+id/strayImageView"
-                android:layout_width="170dp"
-                android:layout_height="70dp"
+                <TextView
+                    android:id="@+id/animal_type_pet_textView"
+                    style="@style/PrimaryTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="PET"/>
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/strayLayout"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
                 android:layout_marginEnd="8dp"
-                android:layout_marginTop="8dp"
-                android:background="@color/colorPrimary"
-                android:padding="2dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@color/cardview_light_background"/>
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/cat_profile_animal_type_unselected_shape"
+                app:layout_constraintEnd_toStartOf="@+id/end_guideline"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/petLayout"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/animal_type_stray_textView"
+                    style="@style/PrimaryTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="STRAY"/>
+            </FrameLayout>
 
             <android.support.constraint.Guideline
                 android:id="@+id/avatar_end_guideline"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                app:layout_constraintGuide_percent="0.65" />
+                app:layout_constraintGuide_percent="0.65"/>
 
             <android.support.constraint.Guideline
                 android:id="@+id/avatar_start_guideline"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                app:layout_constraintGuide_percent="0.35" />
+                app:layout_constraintGuide_percent="0.35"/>
 
             <com.makeramen.roundedimageview.RoundedImageView
                 android:id="@+id/cat_profile_avatar_roundedImageView"
@@ -77,7 +99,7 @@
                 app:layout_constraintDimensionRatio="w,1:1"
                 app:layout_constraintEnd_toStartOf="@+id/avatar_end_guideline"
                 app:layout_constraintStart_toStartOf="@+id/avatar_start_guideline"
-                app:layout_constraintTop_toBottomOf="@+id/petImageView"
+                app:layout_constraintTop_toBottomOf="@+id/petLayout"
                 app:riv_border_color="@color/colorPrimary"
                 app:riv_border_width="2dp"
                 app:riv_corner_radius="29dp"
@@ -92,7 +114,7 @@
                 android:text="Pet name"
                 app:layout_constraintEnd_toEndOf="@+id/cat_profile_avatar_roundedImageView"
                 app:layout_constraintStart_toStartOf="@+id/cat_profile_avatar_roundedImageView"
-                app:layout_constraintTop_toBottomOf="@+id/cat_profile_avatar_roundedImageView" />
+                app:layout_constraintTop_toBottomOf="@+id/cat_profile_avatar_roundedImageView"/>
 
             <TextView
                 android:id="@+id/nickname_textView"
@@ -103,7 +125,7 @@
                 android:text="Nick Name"
                 app:layout_constraintEnd_toEndOf="@+id/pet_name_textView"
                 app:layout_constraintStart_toStartOf="@+id/pet_name_textView"
-                app:layout_constraintTop_toBottomOf="@+id/pet_name_textView" />
+                app:layout_constraintTop_toBottomOf="@+id/pet_name_textView"/>
 
 
             <android.support.constraint.Guideline
@@ -111,14 +133,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                app:layout_constraintGuide_begin="16dp" />
+                app:layout_constraintGuide_begin="16dp"/>
 
             <android.support.constraint.Guideline
                 android:id="@+id/end_guideline"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                app:layout_constraintGuide_end="16dp" />
+                app:layout_constraintGuide_end="16dp"/>
 
             <TextView
                 android:id="@+id/information_textView"
@@ -128,7 +150,7 @@
                 android:layout_marginTop="8dp"
                 android:text="Information"
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
-                app:layout_constraintTop_toBottomOf="@+id/nickname_textView" />
+                app:layout_constraintTop_toBottomOf="@+id/nickname_textView"/>
 
             <LinearLayout
                 android:id="@+id/info_LinearLayout"
@@ -140,11 +162,11 @@
                 app:layout_constraintTop_toTopOf="@+id/information_textView">
 
                 <TextView
-                    android:id="@+id/textView"
+                    android:id="@+id/dialogTextView"
                     style="@style/PrimaryTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="follow cat" />
+                    android:text="follow cat"/>
 
                 <Button
                     android:id="@+id/follow_button"
@@ -153,14 +175,14 @@
                     android:layout_height="@dimen/normal_button_size"
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
-                    android:background="@drawable/ic_add_24dp" />
+                    android:background="@drawable/ic_add_24dp"/>
 
                 <Button
                     android:id="@+id/reply_button"
                     style="@style/PrimaryBorderlessButton"
                     android:layout_width="@dimen/normal_button_size"
                     android:layout_height="@dimen/normal_button_size"
-                    android:background="@drawable/ic_reply_24dp" />
+                    android:background="@drawable/ic_reply_24dp"/>
 
             </LinearLayout>
 
@@ -172,7 +194,7 @@
                 android:layout_marginTop="16dp"
                 android:text="Color"
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
-                app:layout_constraintTop_toBottomOf="@+id/information_textView" />
+                app:layout_constraintTop_toBottomOf="@+id/information_textView"/>
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/view_colors_RecyclerView"
@@ -180,7 +202,7 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintBottom_toBottomOf="@+id/color_textView"
                 app:layout_constraintEnd_toStartOf="@+id/end_guideline"
-                app:layout_constraintTop_toTopOf="@+id/color_textView" />
+                app:layout_constraintTop_toTopOf="@+id/color_textView"/>
 
             <Button
                 android:id="@+id/expand_colors_button"
@@ -190,7 +212,7 @@
                 android:background="@drawable/ic_expand_less_24dp"
                 app:layout_constraintBottom_toBottomOf="@+id/color_textView"
                 app:layout_constraintEnd_toStartOf="@+id/end_guideline"
-                app:layout_constraintTop_toTopOf="@+id/color_textView" />
+                app:layout_constraintTop_toTopOf="@+id/color_textView"/>
 
             <android.support.constraint.ConstraintLayout
                 android:id="@+id/color_constraintLayout"
@@ -214,7 +236,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:riv_corner_radius="29dp"
-                    app:riv_oval="true" />
+                    app:riv_oval="true"/>
 
                 <com.makeramen.roundedimageview.RoundedImageView
                     android:id="@+id/color_two_roundedImageView"
@@ -230,7 +252,7 @@
                     app:layout_constraintTop_toTopOf="@+id/color_one_roundedImageView"
                     app:layout_constraintVertical_bias="0.0"
                     app:riv_corner_radius="29dp"
-                    app:riv_oval="true" />
+                    app:riv_oval="true"/>
 
                 <com.makeramen.roundedimageview.RoundedImageView
                     android:id="@+id/color_three_roundedImageView"
@@ -245,7 +267,7 @@
                     app:layout_constraintStart_toEndOf="@+id/color_two_roundedImageView"
                     app:layout_constraintTop_toTopOf="@+id/color_two_roundedImageView"
                     app:riv_corner_radius="29dp"
-                    app:riv_oval="true" />
+                    app:riv_oval="true"/>
 
                 <TextView
                     android:id="@+id/color_one_textView"
@@ -256,7 +278,7 @@
                     android:text="Color One"
                     app:layout_constraintEnd_toEndOf="@+id/color_one_roundedImageView"
                     app:layout_constraintStart_toStartOf="@+id/color_one_roundedImageView"
-                    app:layout_constraintTop_toBottomOf="@+id/color_one_roundedImageView" />
+                    app:layout_constraintTop_toBottomOf="@+id/color_one_roundedImageView"/>
 
                 <TextView
                     android:id="@+id/color_two_textView"
@@ -267,7 +289,7 @@
                     app:layout_constraintBottom_toBottomOf="@+id/color_one_textView"
                     app:layout_constraintEnd_toEndOf="@+id/color_two_roundedImageView"
                     app:layout_constraintStart_toStartOf="@+id/color_two_roundedImageView"
-                    app:layout_constraintTop_toTopOf="@+id/color_one_textView" />
+                    app:layout_constraintTop_toTopOf="@+id/color_one_textView"/>
 
                 <TextView
                     android:id="@+id/color_three_textView"
@@ -278,7 +300,7 @@
                     app:layout_constraintBottom_toBottomOf="@+id/color_two_textView"
                     app:layout_constraintEnd_toEndOf="@+id/color_three_roundedImageView"
                     app:layout_constraintStart_toStartOf="@+id/color_three_roundedImageView"
-                    app:layout_constraintTop_toTopOf="@+id/color_two_textView" />
+                    app:layout_constraintTop_toTopOf="@+id/color_two_textView"/>
 
                 <com.makeramen.roundedimageview.RoundedImageView
                     android:id="@+id/color_four_roundedImageView"
@@ -293,7 +315,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/color_one_textView"
                     app:riv_corner_radius="29dp"
-                    app:riv_oval="true" />
+                    app:riv_oval="true"/>
 
                 <com.makeramen.roundedimageview.RoundedImageView
                     android:id="@+id/color_five_roundedImageView"
@@ -308,7 +330,7 @@
                     app:layout_constraintStart_toEndOf="@+id/color_four_roundedImageView"
                     app:layout_constraintTop_toTopOf="@+id/color_four_roundedImageView"
                     app:riv_corner_radius="29dp"
-                    app:riv_oval="true" />
+                    app:riv_oval="true"/>
 
                 <com.makeramen.roundedimageview.RoundedImageView
                     android:id="@+id/color_six_roundedImageView"
@@ -323,7 +345,7 @@
                     app:layout_constraintStart_toEndOf="@+id/color_five_roundedImageView"
                     app:layout_constraintTop_toTopOf="@+id/color_five_roundedImageView"
                     app:riv_corner_radius="29dp"
-                    app:riv_oval="true" />
+                    app:riv_oval="true"/>
 
                 <TextView
                     android:id="@+id/color_four_textView"
@@ -334,7 +356,7 @@
                     android:text="Color Four"
                     app:layout_constraintEnd_toEndOf="@+id/color_four_roundedImageView"
                     app:layout_constraintStart_toStartOf="@+id/color_four_roundedImageView"
-                    app:layout_constraintTop_toBottomOf="@+id/color_four_roundedImageView" />
+                    app:layout_constraintTop_toBottomOf="@+id/color_four_roundedImageView"/>
 
                 <TextView
                     android:id="@+id/color_five_textView"
@@ -345,7 +367,7 @@
                     app:layout_constraintBottom_toBottomOf="@+id/color_four_textView"
                     app:layout_constraintEnd_toEndOf="@+id/color_five_roundedImageView"
                     app:layout_constraintStart_toStartOf="@+id/color_five_roundedImageView"
-                    app:layout_constraintTop_toTopOf="@+id/color_four_textView" />
+                    app:layout_constraintTop_toTopOf="@+id/color_four_textView"/>
 
                 <TextView
                     android:id="@+id/color_six_textView"
@@ -356,12 +378,13 @@
                     app:layout_constraintBottom_toBottomOf="@+id/color_five_textView"
                     app:layout_constraintEnd_toEndOf="@+id/color_six_roundedImageView"
                     app:layout_constraintStart_toStartOf="@+id/color_six_roundedImageView"
-                    app:layout_constraintTop_toTopOf="@+id/color_five_textView" />
+                    app:layout_constraintTop_toTopOf="@+id/color_five_textView"/>
 
             </android.support.constraint.ConstraintLayout>
 
-            <include layout="@layout/activity_cat_profile_description_fragment"
-                     android:id="@+id/description_fragment"
+            <include
+                android:id="@+id/description_fragment"
+                layout="@layout/activity_cat_profile_description_fragment"
                 />
 
             <TextView
@@ -388,23 +411,23 @@
 
             <TextView
                 android:id="@+id/photo_count_textView"
+                style="@style/SecondarySmallTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                style="@style/SecondarySmallTextView"
                 android:text="509"
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
-                app:layout_constraintTop_toBottomOf="@+id/pet_name_photos_textView" />
+                app:layout_constraintTop_toBottomOf="@+id/pet_name_photos_textView"/>
 
             <TextView
+                style="@style/SecondarySmallTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                style="@style/SecondarySmallTextView"
                 android:text="photos"
                 app:layout_constraintBottom_toBottomOf="@+id/photo_count_textView"
                 app:layout_constraintStart_toEndOf="@+id/photo_count_textView"
-                app:layout_constraintTop_toTopOf="@+id/photo_count_textView" />
+                app:layout_constraintTop_toTopOf="@+id/photo_count_textView"/>
 
             <LinearLayout
                 android:id="@+id/upload_image_LinearLayout"
@@ -416,18 +439,18 @@
                 app:layout_constraintTop_toTopOf="@+id/pet_name_photos_textView">
 
                 <TextView
+                    style="@style/PrimaryTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
-                    style="@style/PrimaryTextView"
-                    android:text="Upload picture" />
+                    android:text="Upload picture"/>
 
                 <Button
                     android:id="@+id/upload_image_button"
                     style="@style/PrimaryBorderlessButton"
                     android:layout_width="@dimen/normal_button_size"
                     android:layout_height="@dimen/normal_button_size"
-                    android:background="@drawable/ic_add_24dp" />
+                    android:background="@drawable/ic_add_24dp"/>
 
             </LinearLayout>
 
@@ -438,7 +461,7 @@
                 android:layout_marginTop="8dp"
                 app:layout_constraintEnd_toStartOf="@+id/end_guideline"
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
-                app:layout_constraintTop_toBottomOf="@+id/photo_count_textView" />
+                app:layout_constraintTop_toBottomOf="@+id/photo_count_textView"/>
 
             <TextView
                 android:id="@+id/group_partners_textView"
@@ -460,7 +483,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/end_guideline"
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
-                app:layout_constraintTop_toBottomOf="@+id/group_partners_textView" />
+                app:layout_constraintTop_toBottomOf="@+id/group_partners_textView"/>
 
         </android.support.constraint.ConstraintLayout>
 

@@ -1,152 +1,220 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.varteq.catslovers.view.LoginActivity">
+                                             xmlns:app="http://schemas.android.com/apk/res-auto"
+                                             xmlns:tools="http://schemas.android.com/tools"
+                                             android:layout_width="match_parent"
+                                             android:layout_height="match_parent"
+                                             tools:context="com.varteq.catslovers.view.LoginActivity">
 
-    <com.makeramen.roundedimageview.RoundedImageView
-        android:id="@+id/avatar"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_gravity="center"
-        android:layout_marginEnd="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/cat1"
-        app:layout_constraintBottom_toTopOf="@+id/upload_photo_button"
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/constraintLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="0dp"
+        android:background="@color/very_light_purple"
+        android:paddingBottom="16dp"
         app:layout_constraintDimensionRatio="w,1:1"
-        app:layout_constraintEnd_toStartOf="@+id/guidelineEnd"
-        app:layout_constraintStart_toStartOf="@+id/guidelineStart"
-        app:layout_constraintTop_toTopOf="parent"
-        app:riv_border_color="@color/colorPrimary"
-        app:riv_border_width="2dp"
-        app:riv_corner_radius="29dp"
-        app:riv_oval="true" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.makeramen.roundedimageview.RoundedImageView
+            android:id="@+id/avatar"
+            android:layout_width="0dp"
+            android:layout_height="89dp"
+            android:layout_gravity="center"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="24dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/cat1"
+            app:layout_constraintBottom_toTopOf="@+id/upload_photo_button"
+            app:layout_constraintDimensionRatio="w,1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:riv_border_color="@color/colorPrimary"
+            app:riv_border_width="2dp"
+            app:riv_corner_radius="29dp"
+            app:riv_oval="true"/>
+
+        <Button
+            android:id="@+id/upload_photo_button"
+            style="@style/PrimaryBorderlessButton"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:text="Upload photo"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <FrameLayout
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/add_photo_circle"
+            app:layout_constraintBottom_toTopOf="@+id/upload_photo_button"
+            app:layout_constraintEnd_toEndOf="@+id/avatar"
+            app:layout_constraintStart_toStartOf="@+id/avatar"
+            app:layout_constraintTop_toTopOf="@+id/upload_photo_button">
+
+            <ImageView
+                android:id="@+id/cameraImageView"
+                android:layout_width="20dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                app:srcCompat="@drawable/ic_photo_camera_black_24dp">
+
+            </ImageView>
+        </FrameLayout>
+
+    </android.support.constraint.ConstraintLayout>
+
 
     <Button
         android:id="@+id/continue_button"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
         style="@style/PrimaryButton"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
         android:text="@string/continue_button_title"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/guidelineEnd"
-        app:layout_constraintStart_toStartOf="@+id/guidelineStart" />
+        app:layout_constraintStart_toStartOf="@+id/guidelineStart"/>
 
-    <ImageView
-        android:id="@+id/twitter_icon"
+    <LinearLayout
+        android:id="@+id/twitter_linearLayout"
+        style="@style/SocialButtonLayout"
         android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toBottomOf="@+id/twitter_button"
-        app:layout_constraintDimensionRatio="w,1:1"
-        app:layout_constraintStart_toStartOf="@+id/guidelineStart"
-        app:layout_constraintTop_toTopOf="@+id/twitter_button"
-        app:srcCompat="@drawable/twitter96" />
-
-    <Button
-        android:id="@+id/twitter_button"
-        style="@style/PrimaryBorderlessButton"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:layout_marginStart="8dp"
-        android:text="Twitter"
-        android:textAlignment="textStart"
-        app:layout_constraintBottom_toTopOf="@+id/continue_button"
-        app:layout_constraintStart_toEndOf="@+id/twitter_icon" />
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="12dp"
+        app:layout_constraintEnd_toStartOf="@+id/guidelineEnd"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/facebook_linearLayout"
+        app:layout_constraintTop_toTopOf="@+id/facebook_linearLayout">
 
-    <ImageView
-        android:id="@+id/facebook_icon"
+        <ImageView
+            android:id="@+id/twitter_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_centerVertical="true"
+            app:layout_constraintTop_toTopOf="@+id/twitter_button"
+            app:srcCompat="@drawable/twitter96"/>
+
+        <TextView
+            android:id="@+id/twitter_button"
+            style="@style/PrimaryTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="16dp"
+            android:layout_toEndOf="@+id/twitter_icon"
+            android:text="Twitter"
+            android:textAlignment="textStart"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/facebook_linearLayout"
+        style="@style/SocialButtonLayout"
         android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toBottomOf="@+id/facebook_button"
-        app:layout_constraintDimensionRatio="h,1:1"
-        app:layout_constraintStart_toStartOf="@+id/guidelineStart"
-        app:layout_constraintTop_toTopOf="@+id/facebook_button"
-        app:srcCompat="@drawable/facebook96" />
-
-    <Button
-        android:id="@+id/facebook_button"
-        style="@style/PrimaryBorderlessButton"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="12dp"
         android:layout_marginStart="8dp"
-        android:text="Facebook"
-        app:layout_constraintBottom_toTopOf="@+id/twitter_button"
-        app:layout_constraintStart_toEndOf="@+id/facebook_icon" />
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toStartOf="@+id/twitter_linearLayout"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toStartOf="@+id/guidelineStart"
+        app:layout_constraintTop_toBottomOf="@+id/connect_with_textView">
+
+        <ImageView
+            android:id="@+id/facebook_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            app:srcCompat="@drawable/facebook96"/>
+
+        <TextView
+            android:id="@+id/facebook_button"
+            style="@style/PrimaryTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="Facebook"/>
+    </LinearLayout>
+
 
     <android.support.constraint.Guideline
         android:id="@+id/guidelineStart"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_begin="16dp" />
+        app:layout_constraintGuide_begin="16dp"/>
 
     <android.support.constraint.Guideline
         android:id="@+id/guidelineEnd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_end="16dp" />
+        app:layout_constraintGuide_end="16dp"/>
 
     <TextView
         android:id="@+id/connect_with_textView"
+        style="@style/SecondarySmallTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
+        android:layout_marginTop="32dp"
         android:text="Or connect with"
-        style="@style/PrimaryTextView"
-        app:layout_constraintBottom_toTopOf="@+id/facebook_button"
-        app:layout_constraintStart_toStartOf="@+id/guidelineStart" />
+        app:layout_constraintStart_toStartOf="@+id/guidelineStart"
+        app:layout_constraintTop_toBottomOf="@+id/email_editText"/>
 
     <EditText
         android:id="@+id/email_editText"
+        style="@style/SecondaryLightEditText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:layout_marginEnd="8dp"
-        style="@style/PrimaryLightEditText"
         android:ems="10"
-        android:hint="Email"
+        android:hint="mail@yourmail.com"
         android:inputType="textEmailAddress"
-        app:layout_constraintBottom_toTopOf="@+id/connect_with_textView"
         app:layout_constraintEnd_toStartOf="@+id/guidelineEnd"
-        app:layout_constraintStart_toStartOf="@+id/guidelineStart" />
+        app:layout_constraintStart_toStartOf="@+id/guidelineStart"
+        app:layout_constraintTop_toBottomOf="@+id/email_textView"/>
+
+    <TextView
+        android:id="@+id/name_textView"
+        style="@style/SecondarySmallTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Name"
+        app:layout_constraintEnd_toStartOf="@+id/guidelineEnd"
+        app:layout_constraintStart_toStartOf="@+id/guidelineStart"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout"/>
+
+    <TextView
+        android:id="@+id/email_textView"
+        style="@style/SecondarySmallTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Mail"
+        app:layout_constraintEnd_toStartOf="@+id/guidelineEnd"
+        app:layout_constraintStart_toStartOf="@+id/guidelineStart"
+        app:layout_constraintTop_toBottomOf="@+id/name_editText"/>
 
     <EditText
         android:id="@+id/name_editText"
+        style="@style/SecondaryLightEditText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        style="@style/PrimaryLightEditText"
         android:ems="10"
-        android:hint="Name"
+        android:hint="Your full name"
         android:inputType="textPersonName"
-        app:layout_constraintBottom_toTopOf="@+id/email_editText"
         app:layout_constraintEnd_toStartOf="@+id/guidelineEnd"
-        app:layout_constraintStart_toStartOf="@+id/guidelineStart" />
+        app:layout_constraintStart_toStartOf="@+id/name_textView"
+        app:layout_constraintTop_toBottomOf="@+id/name_textView"/>
 
-    <Button
-        android:id="@+id/upload_photo_button"
-        style="@style/PrimaryBorderlessButton"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:text="Upload photo"
-        app:layout_constraintBottom_toTopOf="@+id/name_editText"
-        app:layout_constraintEnd_toStartOf="@+id/guidelineEnd"
-        app:layout_constraintStart_toStartOf="@+id/guidelineStart" />
 
 </android.support.constraint.ConstraintLayout>

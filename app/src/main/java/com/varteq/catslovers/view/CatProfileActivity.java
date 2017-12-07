@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,6 +20,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -62,6 +64,18 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
     public static final String CAT_KEY = "cat_key";
     public static final String MODE_KEY = "mode_key";
     public static final String IS_EDIT_MODE_KEY = "is_mode_key";
+    public static final int CAT_TYPE_PET = 0;
+    public static final int CAT_TYPE_STRAY = 1;
+
+    @BindView(R.id.petLayout)
+    FrameLayout petLayout;
+    @BindView(R.id.strayLayout)
+    FrameLayout strayLayout;
+    @BindView(R.id.animal_type_pet_textView)
+    TextView animalTypePetTextView;
+    @BindView(R.id.animal_type_stray_textView)
+    TextView animalTypeStrayTextView;
+
     @BindView(R.id.cat_profile_avatar_roundedImageView)
     RoundedImageView avatarImageView;
     @BindView(R.id.addPhotoButton)
@@ -138,6 +152,7 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
     private Menu actionBarMenu;
     private long petBirthdayMillis;
     private long fleaTreatmentDateMilis;
+    private int catType;
 
     public enum CatProfileScreenMode {
         EDIT_MODE,
@@ -353,9 +368,12 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
 
         weightValueTextView.setOnClickListener(view -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(CatProfileActivity.this);
-            View dialogView = LayoutInflater.from(CatProfileActivity.this).inflate(R.layout.dialog_weight, null, false);
+            View dialogView = LayoutInflater.from(CatProfileActivity.this).inflate(R.layout.dialog_edittext, null, false);
+            ((TextView) dialogView.findViewById(R.id.dialogTextView)).setText("Enter cat's weight");
+            ((EditText) dialogView.findViewById(R.id.dialogEditText)).setHint("weight");
+            ((EditText) dialogView.findViewById(R.id.dialogEditText)).setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
             builder.setView(dialogView);
-            builder.setPositiveButton("OK", (dialogInterface, i) -> weightValueTextView.setText(((EditText) dialogView.findViewById(R.id.yearsEditText)).getText() + " kg"));
+            builder.setPositiveButton("OK", (dialogInterface, i) -> weightValueTextView.setText(((EditText) dialogView.findViewById(R.id.dialogEditText)).getText() + " kg"));
             builder.setNegativeButton("Cancel", (dialogInterface, i) -> {
                     }
             );
@@ -463,6 +481,28 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
         }
     }
 
+    @OnClick(R.id.petLayout)
+    void selectAnimalTypePet() {
+        if (currentMode == CatProfileScreenMode.EDIT_MODE) {
+            petLayout.setBackgroundResource(R.drawable.cat_profile_animal_type_selected_shape);
+            strayLayout.setBackgroundResource(R.drawable.cat_profile_animal_type_unselected_shape);
+            animalTypePetTextView.setTextAppearance(this, R.style.PrimaryTextView);
+            animalTypeStrayTextView.setTextAppearance(this, R.style.SecondaryTextView);
+            catType = CAT_TYPE_PET;
+        }
+    }
+
+    @OnClick(R.id.strayLayout)
+    void selectAnimalTypeStray() {
+        if (currentMode == CatProfileScreenMode.EDIT_MODE) {
+            petLayout.setBackgroundResource(R.drawable.cat_profile_animal_type_unselected_shape);
+            strayLayout.setBackgroundResource(R.drawable.cat_profile_animal_type_selected_shape);
+            animalTypePetTextView.setTextAppearance(this, R.style.SecondaryTextView);
+            animalTypeStrayTextView.setTextAppearance(this, R.style.PrimaryTextView);
+            catType = CAT_TYPE_STRAY;
+        }
+    }
+
     @OnClick(R.id.upload_image_button)
     void uploadCatImage() {
         pickPhotoWithPermission(getString(R.string.select_cat_photo));
@@ -498,7 +538,8 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
         float weight = Float.parseFloat(w.substring(0, w.length() - 3));
         boolean castrated = noCheckBox.isChecked();
         String description = descriptionEditText.getText().toString();
-        String type = "pet";
+
+        String type = (catType == CAT_TYPE_PET) ? "pet" : "stray";
         int nextFleaTreatment = (int) (fleaTreatmentDateMilis / 1000L);
 
         Call<BaseResponse<Cat>> call = ServiceGenerator.getApiServiceWithToken().createCat(feedstationId, name,
@@ -557,6 +598,24 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
             }
             fleaTreatmentValueTextView.setText(day + "." + month + "." + year);
         });
+    }
+
+    @OnClick(R.id.pet_name_textView)
+    void changeCatName() {
+        if (currentMode == CatProfileScreenMode.EDIT_MODE) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            View dialogView = LayoutInflater.from(CatProfileActivity.this).inflate(R.layout.dialog_edittext, null, false);
+            ((TextView) dialogView.findViewById(R.id.dialogTextView)).setText("Enter cat's name");
+            EditText editText = dialogView.findViewById(R.id.dialogEditText);
+            editText.setHint("name");
+            editText.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
+            builder.setView(dialogView);
+            builder.setPositiveButton("OK", (dialogInterface, i) -> petNameTextView.setText(editText.getText().toString()));
+            builder.setNegativeButton("Cancel", (dialogInterface, i) -> {
+
+            });
+            builder.show();
+        }
     }
 
     @OnClick(R.id.expand_colors_button)

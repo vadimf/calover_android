@@ -12,10 +12,12 @@ import android.view.ViewGroup;
 import android.widget.ImageSwitcher;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.varteq.catslovers.Log;
 import com.varteq.catslovers.R;
+import com.varteq.catslovers.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +32,8 @@ public class IntroActivity extends AppCompatActivity {
     float initialX;
     private ImageSwitcher myImageSwitcher;
     private int counter = 0;
-    private int imageSwitcherImages[] = {R.drawable.cat1, R.drawable.cat2, R.drawable.cat3};
+    private int imageSwitcherImages[] = {R.drawable.illustration_onbording_1, R.drawable.illustration_onboarding_2, R.drawable.onboarding_illustration_3};
+    private int imageSwitcherTexts[] = {R.string.onboarding_text_1, R.string.onboarding_text_2, R.string.onboarding_text_3};
     private MyViewPagerAdapter myViewPagerAdapter;
     @BindView(R.id.view_pager)
     ViewPager viewPager;
@@ -38,6 +41,10 @@ public class IntroActivity extends AppCompatActivity {
     private TextView[] dots;
     @BindView(R.id.dots_layout)
     LinearLayout dotsLayout;
+    @BindView(R.id.go_to_login_button)
+    TextView goToLoginButton;
+    @BindView(R.id.start_button)
+    TextView startButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,20 +56,41 @@ public class IntroActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         for (int i = 0; i < imageSwitcherImages.length; i++) {
+            LinearLayout layout = new LinearLayout(getApplicationContext());
+            layout.setOrientation(LinearLayout.VERTICAL);
+            layout.setBackground(getResources().getDrawable(R.drawable.boarding_rounded));
+            int padding = Utils.convertDpToPx(12, this);
+            layout.setPadding(padding, padding, padding, padding);
+
             ImageView imageView = new ImageView(getApplicationContext());
-            imageView.setLayoutParams(new LinearLayout.LayoutParams(
-                    ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.MATCH_PARENT
-            ));
-            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            TableLayout.LayoutParams imageLayoutParams = new TableLayout.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.MATCH_PARENT, 1);
+            imageView.setLayoutParams(imageLayoutParams);
+            imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
             imageView.setImageResource(imageSwitcherImages[i]);
-            layouts.add(imageView);
+            layout.addView(imageView);
+
+            TextView textView = new TextView(getApplicationContext());
+            TableLayout.LayoutParams textLayoutParams = new TableLayout.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.MATCH_PARENT, 1);
+            textLayoutParams.topMargin = Utils.convertDpToPx(69, this);
+            textView.setLayoutParams(textLayoutParams);
+            textView.setText(imageSwitcherTexts[i]);
+            textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+            textView.setTextSize(30);
+            textView.setTextColor(getResources().getColor(R.color.colorPrimary));
+            layout.addView(textView);
+
+            layouts.add(layout);
         }
 
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutParams.rightMargin = Utils.convertDpToPx(23, this);
         dots = new TextView[imageSwitcherImages.length];
         for (int i = 0; i < imageSwitcherImages.length; i++) {
             dots[i] = new TextView(this);
+            if (i < imageSwitcherImages.length - 1)
+                dots[i].setLayoutParams(layoutParams);
             dots[i].setText(Html.fromHtml("&#8226;"));
-            dots[i].setTextSize(30);
+            dots[i].setTextSize(40);
             dotsLayout.addView(dots[i]);
         }
 
@@ -72,9 +100,12 @@ public class IntroActivity extends AppCompatActivity {
         viewPager.setAdapter(myViewPagerAdapter);
         viewPager.addOnPageChangeListener(viewPagerPageChangeListener);
         viewPager.setOffscreenPageLimit(2);
+        viewPager.setClipToPadding(false);
+        viewPager.setPadding(Utils.convertDpToPx(46, this), 0, Utils.convertDpToPx(46, this), 0);
+        viewPager.setPageMargin(Utils.convertDpToPx(16.5f, this));
     }
 
-    @OnClick(R.id.go_to_login_button)
+    @OnClick({R.id.go_to_login_button, R.id.start_button})
     void goToLogin() {
         Log.d(TAG, "goToLogin");
         startActivity(new Intent(this, LoginActivity.class));
@@ -82,7 +113,7 @@ public class IntroActivity extends AppCompatActivity {
 
     private void selectBottomDot(int currentPage) {
         for (int i = 0; i < imageSwitcherImages.length; i++) {
-            dots[i].setTextColor(getResources().getColor(R.color.colorPrimaryLight));
+            dots[i].setTextColor(getResources().getColor(R.color.colorPrimary));
         }
         dots[currentPage].setTextColor(getResources().getColor(R.color.white));
     }
@@ -92,6 +123,15 @@ public class IntroActivity extends AppCompatActivity {
         @Override
         public void onPageSelected(int position) {
             selectBottomDot(position);
+            if (position == imageSwitcherImages.length - 1) {
+                dotsLayout.setVisibility(View.INVISIBLE);
+                goToLoginButton.setVisibility(View.INVISIBLE);
+                startButton.setVisibility(View.VISIBLE);
+            } else {
+                dotsLayout.setVisibility(View.VISIBLE);
+                goToLoginButton.setVisibility(View.VISIBLE);
+                startButton.setVisibility(View.INVISIBLE);
+            }
         }
 
         @Override
