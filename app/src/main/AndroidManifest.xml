@@ -57,13 +57,17 @@
         -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
+            android:value="@string/google_maps_key"/>
 
         <activity
             android:name=".view.MainActivity"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBar"/>
-        <activity android:name=".view.MediaViewerActivity"
+        <activity
+            android:name=".view.MediaViewerActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity android:name=".view.FeedstationActivity"
                   android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>

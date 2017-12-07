@@ -1,5 +1,6 @@
 package com.varteq.catslovers.view.fragments;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -23,6 +24,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.varteq.catslovers.R;
+import com.varteq.catslovers.view.FeedstationActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -82,6 +84,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 .build();                   // Creates a CameraPosition from the builder
         this.googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
+        this.googleMap.setOnMarkerClickListener(marker -> {
+            Intent intent = new Intent(getContext(), FeedstationActivity.class);
+            startActivity(intent);
+            return false;
+        });
     }
 
     //method to integrate photo to marker

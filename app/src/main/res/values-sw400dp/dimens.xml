@@ -3,5 +3,6 @@
     <dimen name="small_text_size">16sp</dimen>
     <dimen name="normal_text_size">18sp</dimen>
     <dimen name="medium_text_size">22sp</dimen>
+    <dimen name="big_text_size">24sp</dimen>
     <dimen name="normal_button_size">40dp</dimen>
 </resources>

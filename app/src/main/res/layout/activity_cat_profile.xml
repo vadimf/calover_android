@@ -235,6 +235,8 @@
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
+                    app:riv_border_color="#19000000"
+                    app:riv_border_width="0dp"
                     app:riv_corner_radius="29dp"
                     app:riv_oval="true"/>
 
@@ -251,6 +253,8 @@
                     app:layout_constraintStart_toEndOf="@+id/color_one_roundedImageView"
                     app:layout_constraintTop_toTopOf="@+id/color_one_roundedImageView"
                     app:layout_constraintVertical_bias="0.0"
+                    app:riv_border_color="#19000000"
+                    app:riv_border_width="0dp"
                     app:riv_corner_radius="29dp"
                     app:riv_oval="true"/>
 
@@ -266,6 +270,8 @@
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toEndOf="@+id/color_two_roundedImageView"
                     app:layout_constraintTop_toTopOf="@+id/color_two_roundedImageView"
+                    app:riv_border_color="#19000000"
+                    app:riv_border_width="0dp"
                     app:riv_corner_radius="29dp"
                     app:riv_oval="true"/>
 
@@ -314,6 +320,8 @@
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/color_one_textView"
+                    app:riv_border_color="#19000000"
+                    app:riv_border_width="0dp"
                     app:riv_corner_radius="29dp"
                     app:riv_oval="true"/>
 
@@ -329,6 +337,8 @@
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toEndOf="@+id/color_four_roundedImageView"
                     app:layout_constraintTop_toTopOf="@+id/color_four_roundedImageView"
+                    app:riv_border_color="#19000000"
+                    app:riv_border_width="0dp"
                     app:riv_corner_radius="29dp"
                     app:riv_oval="true"/>
 
@@ -344,6 +354,8 @@
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toEndOf="@+id/color_five_roundedImageView"
                     app:layout_constraintTop_toTopOf="@+id/color_five_roundedImageView"
+                    app:riv_border_color="#19000000"
+                    app:riv_border_width="0dp"
                     app:riv_corner_radius="29dp"
                     app:riv_oval="true"/>
 
