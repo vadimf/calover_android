@@ -99,4 +99,6 @@
     <string name="dlg_retry">Retry</string>
 
     <string name="no_internet_connection">No internet connection</string>
+    <string name="network_error_message">Network error. Please try again</string>
+    <string name="retry">Retry</string>
 </resources>

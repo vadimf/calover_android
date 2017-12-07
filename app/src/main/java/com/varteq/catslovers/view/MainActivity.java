@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         //Profile.setUserPhone(this, "+380935772101");
-        //Profile.saveUser(this, "John", "j@t.com");
+        //Profile.saveUser(this, "Nata", "n@t.com");
         if (Profile.getUserPhone(this).isEmpty()) {
             return;
             //Profile.setUserPhone(this, "+380935772102");
@@ -156,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
         final QBUser qbUser = new QBUser(Profile.getUserPhone(this), AppController.USER_PASS);
         //qbUser.setExternalId(profile.getUserId());
         //qbUser.setWebsite(profile.getPicture());
-        qbUser.setFullName(Profile.getUserName(this));
+        //qbUser.setFullName(Profile.getUserName(this));
 
         ChatHelper.getInstance().login(qbUser, new QBEntityCallback<Void>() {
             @Override
@@ -168,18 +168,21 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onError(QBResponseException e) {
                 Log.e(TAG, e.getMessage());
-                ChatHelper.getInstance().singUp(qbUser, new QBEntityCallback<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid, Bundle bundle) {
-                        Log.i(TAG, "chat singUp success");
-                        showChat();
-                    }
+                //Log.e(TAG, String.valueOf(e.getHttpStatusCode()));
+                if (e.getHttpStatusCode() == 401) {
+                    ChatHelper.getInstance().singUp(qbUser, new QBEntityCallback<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid, Bundle bundle) {
+                            Log.i(TAG, "chat singUp success");
+                            showChat();
+                        }
 
-                    @Override
-                    public void onError(QBResponseException e) {
-                        Log.e(TAG, "chat singUp error");
-                    }
-                });
+                        @Override
+                        public void onError(QBResponseException e) {
+                            Log.e(TAG, "chat singUp error");
+                        }
+                    });
+                }
             }
         });
     }

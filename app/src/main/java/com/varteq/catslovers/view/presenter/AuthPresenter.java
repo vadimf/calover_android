@@ -1,6 +1,7 @@
 package com.varteq.catslovers.view.presenter;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Toast;
 
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoDevice;
@@ -21,6 +22,7 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.SignUpHan
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.VerificationHandler;
 import com.amazonaws.services.cognitoidentityprovider.model.CodeMismatchException;
 import com.amazonaws.services.cognitoidentityprovider.model.InvalidParameterException;
+import com.amazonaws.services.cognitoidentityprovider.model.LimitExceededException;
 import com.amazonaws.services.cognitoidentityprovider.model.NotAuthorizedException;
 import com.amazonaws.services.cognitoidentityprovider.model.UserNotFoundException;
 import com.quickblox.core.QBEntityCallback;
@@ -41,7 +43,6 @@ import com.varteq.catslovers.utils.ChatHelper;
 import com.varteq.catslovers.utils.Utils;
 import com.varteq.catslovers.view.ValidateNumberActivity;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -49,6 +50,8 @@ import java.util.Map;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import static com.varteq.catslovers.utils.NetworkUtils.isNetworkErr;
 
 public class AuthPresenter {
 
@@ -59,6 +62,10 @@ public class AuthPresenter {
     private NewPasswordContinuation newPasswordContinuation;
     private ValidateNumberActivity view;
     private CodeDialogClickListener listener;
+    private OneTimeOnClickListener errListener;
+    private String lastCode;
+    private long lastResendTime = System.currentTimeMillis();
+    private long RESEND_INTERVAL = 90 * 1000;
 
     public AuthPresenter(String username, ValidateNumberActivity view) {
         this.username = username;
@@ -66,6 +73,12 @@ public class AuthPresenter {
     }
 
     public void resetPassword() {
+        errListener = new OneTimeOnClickListener() {
+            @Override
+            protected void onClick() {
+                resetPassword();
+            }
+        };
         CognitoAuthHelper.getPool().getUser(username).forgotPasswordInBackground(forgotPasswordHandler);
     }
 
@@ -74,6 +87,12 @@ public class AuthPresenter {
         public void onSuccess() {
             //closeWaitDialog();
             //view.showDialogMessage("Password successfully changed!","");
+            errListener = new OneTimeOnClickListener() {
+                @Override
+                protected void onClick() {
+                    CognitoAuthHelper.getPool().getUser(username).getSessionInBackground(authenticationHandler);
+                }
+            };
             CognitoAuthHelper.getPool().getUser(username).getSessionInBackground(authenticationHandler);
         }
 
@@ -87,6 +106,8 @@ public class AuthPresenter {
         public void onFailure(Exception e) {
             //closeWaitDialog();
             view.showDialogMessage(null, CognitoAuthHelper.formatException(e));
+            if (checkNetworkErrAndShowSnackbar(e))
+                return;
             if (e instanceof UserNotFoundException) {
                 signUp();
             } else if (e instanceof CodeMismatchException) {
@@ -96,6 +117,9 @@ public class AuthPresenter {
             // Cannot reset password for the user as there is no registered/verified email or phone_number
             else if (e instanceof InvalidParameterException) {
                 confirmSignUp();
+            } else if (e instanceof LimitExceededException) {
+                String m = e.getLocalizedMessage();
+                view.showError(m.substring(0, m.indexOf("(")), null);
             }
         }
     };
@@ -111,7 +135,12 @@ public class AuthPresenter {
         //showWaitDialog("Signing up...");
 
         CognitoAuthHelper.getPool().signUpInBackground(username, password, userAttributes, null, signUpHandler);
-
+        errListener = new OneTimeOnClickListener() {
+            @Override
+            protected void onClick() {
+                signUp();
+            }
+        };
     }
 
     SignUpHandler signUpHandler = new SignUpHandler() {
@@ -129,6 +158,8 @@ public class AuthPresenter {
         @Override
         public void onFailure(Exception exception) {
             //closeWaitDialog();
+            if (checkNetworkErrAndShowSnackbar(exception))
+                return;
             if (exception instanceof InvalidParameterException)
                 view.onInvalidPhoneFormat(exception.getMessage());
             view.showDialogMessage("Sign up failed", CognitoAuthHelper.formatException(exception));
@@ -136,6 +167,12 @@ public class AuthPresenter {
     };
 
     private void confirmSignUp() {
+        errListener = new OneTimeOnClickListener() {
+            @Override
+            protected void onClick() {
+                confirmSignUp();
+            }
+        };
         listener = code -> CognitoAuthHelper.getPool().getUser(username).
                 confirmSignUpInBackground(code, true, confHandler);
     }
@@ -144,11 +181,19 @@ public class AuthPresenter {
         @Override
         public void onSuccess() {
             //view.showDialogMessage("Success!",userName+" has been confirmed!", true);
+            errListener = new OneTimeOnClickListener() {
+                @Override
+                protected void onClick() {
+                    CognitoAuthHelper.getPool().getUser(username).getSessionInBackground(authenticationHandler);
+                }
+            };
             CognitoAuthHelper.getPool().getUser(username).getSessionInBackground(authenticationHandler);
         }
 
         @Override
         public void onFailure(Exception exception) {
+            if (checkNetworkErrAndShowSnackbar(exception))
+                return;
             if (exception instanceof CodeMismatchException) {
                 view.onCodeValidate(false);
                 confirmSignUp();
@@ -158,6 +203,12 @@ public class AuthPresenter {
     };
 
     private void getAuthToken(String token) {
+        errListener = new OneTimeOnClickListener() {
+            @Override
+            protected void onClick() {
+                getAuthToken(token);
+            }
+        };
         Call<BaseResponse<AuthToken>> call = ServiceGenerator.getApiService().auth(token);
         call.enqueue(new Callback<BaseResponse<AuthToken>>() {
             @Override
@@ -179,6 +230,7 @@ public class AuthPresenter {
                         @Override
                         protected void onFail(ErrorResponse error) {
                             Log.d(TAG, error.getMessage() + error.getCode());
+                            view.showError(error.getMessage(), errListener);
                         }
                     };
                 }
@@ -186,16 +238,23 @@ public class AuthPresenter {
 
             @Override
             public void onFailure(Call<BaseResponse<AuthToken>> call, Throwable t) {
-                if (t instanceof IOException) {
+                /*if (t instanceof IOException) {
                     Toast.makeText(view, "this is an actual network failure :( inform the user and possibly retry", Toast.LENGTH_SHORT).show();
                     // logging probably not necessary
-                }
+                }*/
+                checkNetworkErrAndShowSnackbar(t.toString());
                 Log.e(TAG, "getApiService().auth onFailure " + t.getMessage());
             }
         });
     }
 
     private void loginToQB(String profile) {
+        errListener = new OneTimeOnClickListener() {
+            @Override
+            protected void onClick() {
+                loginToQB(null);
+            }
+        };
         final QBUser qbUser = new QBUser(username, AppController.USER_PASS);
         qbUser.setFullName(Profile.getUserName(view));
         //qbUser.setExternalId(profile.getUserId());
@@ -212,24 +271,46 @@ public class AuthPresenter {
             @Override
             public void onError(QBResponseException e) {
                 Log.e(TAG, e.getMessage());
-                ChatHelper.getInstance().singUp(qbUser, new QBEntityCallback<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid, Bundle bundle) {
-                        Log.i(TAG, "chat singUp success");
-                        getCats();
-                    }
+                if (checkNetworkErrAndShowSnackbar(e)) return;
+                if (e.getHttpStatusCode() == 401)
+                    signUpToQB(qbUser);
+                else view.showError(e.getLocalizedMessage(), errListener);
+            }
+        });
+    }
 
-                    @Override
-                    public void onError(QBResponseException e) {
-                        Log.e(TAG, "chat singUp error");
-                        getCats();
-                    }
-                });
+    private void signUpToQB(QBUser qbUser) {
+        errListener = new OneTimeOnClickListener() {
+            @Override
+            protected void onClick() {
+                signUpToQB(qbUser);
+            }
+        };
+
+        ChatHelper.getInstance().singUp(qbUser, new QBEntityCallback<Void>() {
+            @Override
+            public void onSuccess(Void aVoid, Bundle bundle) {
+                Log.i(TAG, "chat singUp success");
+                getCats();
+            }
+
+            @Override
+            public void onError(QBResponseException e) {
+                Log.e(TAG, "chat singUp error");
+                if (checkNetworkErrAndShowSnackbar(e)) return;
+                getCats();
             }
         });
     }
 
     private void getCats() {
+        errListener = new OneTimeOnClickListener() {
+            @Override
+            protected void onClick() {
+                getCats();
+            }
+        };
+
         Call<BaseResponse<List<Cat>>> call = ServiceGenerator.getApiServiceWithToken().getCats();
         call.enqueue(new Callback<BaseResponse<List<com.varteq.catslovers.api.entity.Cat>>>() {
 
@@ -241,6 +322,7 @@ public class AuthPresenter {
 
             @Override
             public void onFailure(Call<BaseResponse<List<Cat>>> call, Throwable t) {
+                if (checkNetworkErrAndShowSnackbar(t.toString())) return;
                 view.onSuccessSignIn();
             }
         });
@@ -275,6 +357,8 @@ public class AuthPresenter {
         @Override
         public void onFailure(Exception e) {
             //closeWaitDialog();
+            if (checkNetworkErrAndShowSnackbar(e))
+                return;
             if (e instanceof NotAuthorizedException) {
                 resetPassword();
                 Toast.makeText(view, "Verification code sent. Please confirm you number again", Toast.LENGTH_LONG).show();
@@ -334,6 +418,15 @@ public class AuthPresenter {
     }
 
     private void getForgotPasswordCode(ForgotPasswordContinuation continuation) {
+        errListener = new OneTimeOnClickListener() {
+            @Override
+            protected void onClick() {
+                getForgotPasswordCode(forgotPasswordContinuation);
+                forgotPasswordContinuation.setPassword(password);
+                forgotPasswordContinuation.setVerificationCode(lastCode);
+                forgotPasswordContinuation.continueTask();
+            }
+        };
         this.forgotPasswordContinuation = continuation;
 
         listener = code -> {
@@ -344,6 +437,9 @@ public class AuthPresenter {
     }
 
     public void resendCode() {
+        if (lastResendTime + RESEND_INTERVAL > System.currentTimeMillis()) return;
+        lastResendTime = System.currentTimeMillis();
+
         CognitoAuthHelper.getPool().getUser(username).resendConfirmationCodeInBackground(new VerificationHandler() {
             @Override
             public void onSuccess(CognitoUserCodeDeliveryDetails verificationCodeDeliveryMedium) {
@@ -362,9 +458,35 @@ public class AuthPresenter {
     }
 
     public void confirmCode(String code) {
+        lastCode = code;
         if (listener != null) {
             listener.onCodeConfirmed(code);
             listener = null;
         }
+    }
+
+    private boolean checkNetworkErrAndShowSnackbar(Exception exception) {
+        return checkNetworkErrAndShowSnackbar(exception.toString());
+    }
+
+    private boolean checkNetworkErrAndShowSnackbar(String exception) {
+        if (isNetworkErr(exception)) {
+            view.showNetworkError(errListener);
+            return true;
+        } else return false;
+    }
+
+    public abstract class OneTimeOnClickListener implements View.OnClickListener {
+
+        private boolean isExecuted;
+
+        @Override
+        public void onClick(View view) {
+            if (isExecuted) return;
+            isExecuted = true;
+            onClick();
+        }
+
+        protected abstract void onClick();
     }
 }
