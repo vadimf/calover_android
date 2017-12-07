@@ -1,20 +1,45 @@
 package com.varteq.catslovers;
 
 import android.app.Application;
+import android.content.Context;
 import android.support.v7.app.AppCompatDelegate;
 
+import com.quickblox.auth.session.QBSettings;
+import com.quickblox.core.StoringMechanism;
 import com.varteq.catslovers.api.ServiceGenerator;
 
-public class AppController extends Application {
+public class AppController extends Application {//extends MultiDexApplication {
 
     static {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
 
+    static final String APP_ID = "65691";
+    static final String AUTH_KEY = "hSnYYnZ9Y27YZyx";
+    static final String AUTH_SECRET = "L2dJuWtC8LDCKQ6";
+    static final String ACCOUNT_KEY = "GmQhUChypQHbecmradXr";
+    public static final String USER_PASS = "xfzMLA6YFn673sN9";
+    private static Context instance;
+
+    public static Context getInstance() {
+        return instance;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
+        instance = this;
         CognitoAuthHelper.init(getApplicationContext());
-        ServiceGenerator.setToken(Auth.getAuthToken(this));
+        ServiceGenerator.setToken(Profile.getAuthToken(this));
+
+        // Init Quick Block
+        QBSettings.getInstance().setStoringMehanism(StoringMechanism.UNSECURED);
+        QBSettings.getInstance().init(getApplicationContext(), APP_ID, AUTH_KEY, AUTH_SECRET);
+        QBSettings.getInstance().setAccountKey(ACCOUNT_KEY);
     }
+
+    /*protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
+    }*/
 }

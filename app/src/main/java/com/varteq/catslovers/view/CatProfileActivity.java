@@ -26,10 +26,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.makeramen.roundedimageview.RoundedImageView;
-import com.varteq.catslovers.Auth;
 import com.varteq.catslovers.Log;
+import com.varteq.catslovers.Profile;
 import com.varteq.catslovers.R;
-import com.varteq.catslovers.Utils;
 import com.varteq.catslovers.api.BaseParser;
 import com.varteq.catslovers.api.ServiceGenerator;
 import com.varteq.catslovers.api.entity.BaseResponse;
@@ -37,6 +36,7 @@ import com.varteq.catslovers.api.entity.Cat;
 import com.varteq.catslovers.api.entity.ErrorResponse;
 import com.varteq.catslovers.model.CatProfile;
 import com.varteq.catslovers.model.GroupPartner;
+import com.varteq.catslovers.utils.Utils;
 import com.varteq.catslovers.view.adapters.CatPhotosAdapter;
 import com.varteq.catslovers.view.adapters.GroupPartnersAdapter;
 import com.varteq.catslovers.view.adapters.ViewColorsAdapter;
@@ -199,7 +199,7 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
                 currentMode = (CatProfileScreenMode) mode;
         }
 
-        Uri avatarUri = Auth.getUserAvatar(this);
+        Uri avatarUri = Profile.getUserAvatar(this);
         if (avatarUri != null && !avatarUri.toString().isEmpty())
             avatarImageView.setImageURI(avatarUri);
         else
@@ -213,7 +213,7 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
             setupUIMode();
         });*/
 
-        nicknameTextView.setText(Auth.getUserName(this));
+        nicknameTextView.setText(Profile.getUserName(this));
 
         colorOneRoundedImageView.setOnClickListener(this);
         colorTwoRoundedImageView.setOnClickListener(this);

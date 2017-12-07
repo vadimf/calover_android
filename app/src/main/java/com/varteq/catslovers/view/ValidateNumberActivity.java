@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -18,9 +19,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.varteq.catslovers.Auth;
 import com.varteq.catslovers.Log;
+import com.varteq.catslovers.Profile;
 import com.varteq.catslovers.R;
+import com.varteq.catslovers.utils.Snackbarer;
 import com.varteq.catslovers.view.presenter.AuthPresenter;
 
 import java.util.ArrayList;
@@ -47,6 +49,8 @@ public class ValidateNumberActivity extends AppCompatActivity implements TextWat
     Button approveButton;
     @BindView(R.id.resend_button)
     Button resendButton;
+    @BindView(R.id.main_layout)
+    ConstraintLayout mainLayout;
     private AlertDialog userDialog;
 
     private List<EditText> editTextList = new ArrayList<>();
@@ -122,7 +126,7 @@ public class ValidateNumberActivity extends AppCompatActivity implements TextWat
         } catch (Exception e) {
         }
 
-        Auth.setUserLogin(this, true);
+        Profile.setUserLogin(this, true);
 
         showSuccessDialog();
     }
@@ -260,5 +264,13 @@ public class ValidateNumberActivity extends AppCompatActivity implements TextWat
     public void onInvalidPhoneFormat(String message) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
         onBackPressed();
+    }
+
+    public void showNetworkError(View.OnClickListener listener) {
+        Snackbarer.showNetworkSnackbar(mainLayout, listener);
+    }
+
+    public void showError(String message, View.OnClickListener listener) {
+        Snackbarer.showIndefiniteSnackbar(mainLayout, message, listener);
     }
 }

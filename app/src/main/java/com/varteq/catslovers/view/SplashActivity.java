@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import com.varteq.catslovers.Auth;
+import com.varteq.catslovers.Profile;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -12,7 +12,8 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (Auth.isUserLoggedIn(this))
+        //Profile.setUserLogin(this, true);
+        if (Profile.isUserLoggedIn(this))
             startActivity(new Intent(this, MainActivity.class));
         else
             startActivity(new Intent(this, IntroActivity.class));

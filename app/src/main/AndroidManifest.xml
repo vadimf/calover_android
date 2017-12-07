@@ -5,6 +5,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
@@ -70,6 +72,39 @@
         <activity android:name=".view.FeedstationActivity"
                   android:theme="@style/AppTheme.NoActionBar">
         </activity>
+
+
+        <activity
+            android:name=".view.qb.SelectUsersActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".view.qb.DialogsActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".view.qb.ChatActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+
+        <activity
+            android:name=".view.qb.ChatInfoActivity"
+            android:label="@string/chat_info"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".view.qb.AttachmentImageActivity"
+            android:screenOrientation="portrait" />
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
     </application>
 
 </manifest>
