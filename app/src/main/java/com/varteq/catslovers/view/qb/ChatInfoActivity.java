@@ -14,7 +14,7 @@ import com.varteq.catslovers.view.qb.adapter.UsersAdapter;
 
 import java.util.List;
 
-public class ChatInfoActivity extends BaseActivity {
+public class ChatInfoActivity extends QBBaseActivity {
     private static final String EXTRA_DIALOG = "dialog";
 
     private ListView usersListView;

@@ -4,28 +4,26 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.quickblox.core.QBEntityCallback;
-import com.quickblox.core.exception.QBResponseException;
-import com.quickblox.users.model.QBUser;
-import com.varteq.catslovers.AppController;
 import com.varteq.catslovers.Log;
-import com.varteq.catslovers.Profile;
 import com.varteq.catslovers.R;
-import com.varteq.catslovers.utils.ChatHelper;
 import com.varteq.catslovers.view.fragments.CatsFragment;
 import com.varteq.catslovers.view.fragments.FeedFragment;
 import com.varteq.catslovers.view.fragments.MapFragment;
 import com.varteq.catslovers.view.fragments.MessagesFragment;
+import com.varteq.catslovers.view.presenter.MainPresenter;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     private String TAG = MainActivity.class.getSimpleName();
     View view;
@@ -39,11 +37,14 @@ public class MainActivity extends AppCompatActivity {
     ImageButton catsSearchButton;
     ImageButton catsAddButton;
     RelativeLayout catsToolsRelativeLayout;
+    @BindView(R.id.frameLayout)
+    FrameLayout mainLayout;
 
     CatsFragment catsFragment;
     MapFragment mapFragment;
     FeedFragment feedFragment;
     MessagesFragment messagesFragment;
+    private MainPresenter presenter;
 
     final String STATE_NAVIGATION_SELECTED = "navigationSelected";
 
@@ -52,7 +53,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        ButterKnife.bind(this);
+
         Log.d(TAG, "onCreate");
+        presenter = new MainPresenter(this);
 
         mBottomNavigationView = findViewById(R.id.bottom_navigation);
         BottomNavigationViewHelper.disableShiftMode(mBottomNavigationView);
@@ -71,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
         initListeners();
 
         // TODO: 16.11.17 check is timer need or not
-        runDialogTimer();
+        //runDialogTimer();
         if (savedInstanceState != null)
             mBottomNavigationView.setSelectedItemId(savedInstanceState.getInt(STATE_NAVIGATION_SELECTED, 0));
         else
@@ -125,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case R.id.action_chat:
                     Log.d(TAG, "action_chat");
-                    checkQBLogin();
+                    presenter.checkQBLogin();
                     toolbarTitle.setText("Chat");
                     catsToolsRelativeLayout.setVisibility(View.VISIBLE);
                     break;
@@ -142,57 +146,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void checkQBLogin() {
-        //Map<String, String> settings = CognitoAuthHelper.getCurrUser().getAttributes().getAttributes();
-
-        //if (CognitoAuthHelper.getCurrUser()==null) return;
-        //if (!settings.containsKey("username")) return;
-        if (ChatHelper.getCurrentUser() != null) {
-            showChat();
-            return;
-        }
-        //Profile.setUserPhone(this, "+380935772101");
-        //Profile.saveUser(this, "Nata", "n@t.com");
-        if (Profile.getUserPhone(this).isEmpty()) {
-            return;
-            //Profile.setUserPhone(this, "+380935772102");
-        }
-
-        final QBUser qbUser = new QBUser(Profile.getUserPhone(this), AppController.USER_PASS);
-        //qbUser.setExternalId(profile.getUserId());
-        //qbUser.setWebsite(profile.getPicture());
-        //qbUser.setFullName(Profile.getUserName(this));
-
-        ChatHelper.getInstance().login(qbUser, new QBEntityCallback<Void>() {
-            @Override
-            public void onSuccess(Void aVoid, Bundle bundle) {
-                Log.i(TAG, "chat login success");
-                showChat();
-            }
-
-            @Override
-            public void onError(QBResponseException e) {
-                Log.e(TAG, e.getMessage());
-                //Log.e(TAG, String.valueOf(e.getHttpStatusCode()));
-                if (e.getHttpStatusCode() == 401) {
-                    ChatHelper.getInstance().singUp(qbUser, new QBEntityCallback<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid, Bundle bundle) {
-                            Log.i(TAG, "chat singUp success");
-                            showChat();
-                        }
-
-                        @Override
-                        public void onError(QBResponseException e) {
-                            Log.e(TAG, "chat singUp error");
-                        }
-                    });
-                }
-            }
-        });
-    }
-
-    private void showChat() {
+    public void showChat() {
         if (messagesFragment == null)
             messagesFragment = new MessagesFragment();
         setFragment(messagesFragment);
@@ -203,5 +157,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(STATE_NAVIGATION_SELECTED, mBottomNavigationView.getSelectedItemId());
+    }
+
+    @Override
+    protected View getSnackbarAnchorView() {
+        return mainLayout;
     }
 }

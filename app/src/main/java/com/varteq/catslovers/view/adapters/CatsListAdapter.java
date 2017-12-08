@@ -27,8 +27,7 @@ public class CatsListAdapter extends RecyclerView.Adapter<CatsListAdapter.CatsLi
     public CatsListAdapter(HashMap<String, List<CatProfile>> catsList, CatsListSameLetterAdapter.OnCatClickListener externalClickListener) {
         this.externalClickListener = externalClickListener;
         this.catsList = catsList;
-        keysList.addAll(catsList.keySet());
-        Collections.sort(keysList);
+        updateKeys();
     }
 
     @Override
@@ -38,6 +37,8 @@ public class CatsListAdapter extends RecyclerView.Adapter<CatsListAdapter.CatsLi
 
     @Override
     public void onBindViewHolder(CatsListViewHolder catsListViewHolder, int i) {
+        if (keysList.size() != catsList.size())
+            updateKeys();
         List<CatProfile> catsSameLetterList = catsList.get(keysList.get(i));
         CatsListSameLetterAdapter adapter = new CatsListSameLetterAdapter(catsSameLetterList, externalClickListener);
         catsListViewHolder.innerRecyclerView.setAdapter(adapter);
@@ -54,6 +55,12 @@ public class CatsListAdapter extends RecyclerView.Adapter<CatsListAdapter.CatsLi
                 inflate(R.layout.card_cats_list_main, viewGroup, false);
 
         return new CatsListViewHolder(itemView);
+    }
+
+    private void updateKeys() {
+        keysList.clear();
+        keysList.addAll(catsList.keySet());
+        Collections.sort(keysList);
     }
 
     public class CatsListViewHolder extends RecyclerView.ViewHolder {

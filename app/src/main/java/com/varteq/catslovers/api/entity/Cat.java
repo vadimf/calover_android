@@ -25,7 +25,7 @@ public class Cat extends ErrorData {
     private Object sex;
     @SerializedName("weight")
     @Expose
-    private Integer weight;
+    private Float weight;
     @SerializedName("castrated")
     @Expose
     private Boolean castrated;
@@ -87,11 +87,11 @@ public class Cat extends ErrorData {
         this.sex = sex;
     }
 
-    public Integer getWeight() {
+    public Float getWeight() {
         return weight;
     }
 
-    public void setWeight(Integer weight) {
+    public void setWeight(Float weight) {
         this.weight = weight;
     }
 

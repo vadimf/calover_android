@@ -50,7 +50,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public class ChatActivity extends BaseActivity implements OnImagePickedListener {
+public class ChatActivity extends QBBaseActivity implements OnImagePickedListener {
     private static final String TAG = ChatActivity.class.getSimpleName();
     private static final int REQUEST_CODE_ATTACHMENT = 721;
     private static final int REQUEST_CODE_SELECT_PEOPLE = 752;

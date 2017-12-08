@@ -5,9 +5,12 @@
                                              android:layout_width="match_parent"
                                              android:layout_height="match_parent"
                                              android:background="@color/white"
+    android:id="@+id/main_layout"
+    android:descendantFocusability="blocksDescendants"
                                              tools:context="com.varteq.catslovers.view.CatProfileActivity">
 
     <ScrollView
+        android:id="@+id/main_scrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -19,15 +22,12 @@
                 android:id="@+id/addPhotoButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
                 android:layout_marginStart="4dp"
-                android:layout_marginTop="44dp"
                 android:background="@color/transparent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.117"
+                app:layout_constraintBottom_toBottomOf="@+id/cat_profile_avatar_roundedImageView"
                 app:layout_constraintStart_toEndOf="@+id/cat_profile_avatar_roundedImageView"
                 app:layout_constraintTop_toTopOf="@+id/cat_profile_avatar_roundedImageView"
-                app:srcCompat="@drawable/ic_add_a_photo_primary_24dp"/>
+                app:srcCompat="@drawable/ic_add_a_photo_primary_24dp" />
 
             <FrameLayout
                 android:id="@+id/petLayout"
@@ -67,7 +67,7 @@
 
                 <TextView
                     android:id="@+id/animal_type_stray_textView"
-                    style="@style/PrimaryTextView"
+                    style="@style/SecondaryTextView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center"
@@ -111,7 +111,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Pet name"
+                tools:text="Pet name"
                 app:layout_constraintEnd_toEndOf="@+id/cat_profile_avatar_roundedImageView"
                 app:layout_constraintStart_toStartOf="@+id/cat_profile_avatar_roundedImageView"
                 app:layout_constraintTop_toBottomOf="@+id/cat_profile_avatar_roundedImageView"/>
@@ -122,7 +122,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Nick Name"
+                tools:text="Nick Name"
                 app:layout_constraintEnd_toEndOf="@+id/pet_name_textView"
                 app:layout_constraintStart_toStartOf="@+id/pet_name_textView"
                 app:layout_constraintTop_toBottomOf="@+id/pet_name_textView"/>
@@ -415,7 +415,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="509"
+                android:text="0"
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
                 app:layout_constraintTop_toBottomOf="@+id/pet_name_photos_textView"/>
 

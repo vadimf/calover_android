@@ -47,13 +47,14 @@ public class GroupPartnersAdapter extends RecyclerView.Adapter<GroupPartnersAdap
 
     public void switchToEditMode() {
         int lastPos = personList.size() - 1;
-        if (personList.get(lastPos) != addNewPartnerView) {
+        if (personList.size() < 1 || personList.get(lastPos) != addNewPartnerView) {
             personList.add(lastPos + 1, addNewPartnerView);
             notifyItemInserted(lastPos + 1);
         }
     }
 
     public void switchToViewMode() {
+        if (personList.size() < 1) return;
         int lastPos = personList.size() - 1;
         if (personList.get(lastPos) == addNewPartnerView) {
             personList.remove(lastPos);

@@ -17,7 +17,7 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.varteq.catslovers.R;
 
-public class AttachmentImageActivity extends BaseActivity {
+public class AttachmentImageActivity extends QBBaseActivity {
 
     private static final String EXTRA_URL = "url";
 

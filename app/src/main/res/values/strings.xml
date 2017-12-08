@@ -107,4 +107,7 @@
     <string name="onboarding_text_2">COMMUNAL\nTREATMENT\nFOR ALL FEEDING\nSTATIONS</string>
     <string name="onboarding_text_3">ALL YOUR CAT\nNEEDS IN ONE\nTOUCH</string>
     <string name="button_onboarding_start">OK, LET\'S START</string>
+
+    <!--Cat profile-->
+    <string name="menu_edit">Edit</string>
 </resources>

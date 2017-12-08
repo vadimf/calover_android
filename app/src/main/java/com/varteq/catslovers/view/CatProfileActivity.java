@@ -1,10 +1,11 @@
 package com.varteq.catslovers.view;
 
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,56 +18,54 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.varteq.catslovers.Log;
 import com.varteq.catslovers.Profile;
 import com.varteq.catslovers.R;
-import com.varteq.catslovers.api.BaseParser;
-import com.varteq.catslovers.api.ServiceGenerator;
-import com.varteq.catslovers.api.entity.BaseResponse;
-import com.varteq.catslovers.api.entity.Cat;
-import com.varteq.catslovers.api.entity.ErrorResponse;
 import com.varteq.catslovers.model.CatProfile;
 import com.varteq.catslovers.model.GroupPartner;
+import com.varteq.catslovers.utils.TimeUtils;
 import com.varteq.catslovers.utils.Utils;
 import com.varteq.catslovers.view.adapters.CatPhotosAdapter;
 import com.varteq.catslovers.view.adapters.GroupPartnersAdapter;
 import com.varteq.catslovers.view.adapters.ViewColorsAdapter;
 import com.varteq.catslovers.view.dialog.ColorPickerDialog;
 import com.varteq.catslovers.view.dialog.WrappedDatePickerDialog;
+import com.varteq.catslovers.view.presenter.CatProfilePresenter;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class CatProfileActivity extends PhotoPickerActivity implements View.OnClickListener {
 
     private String TAG = CatProfileActivity.class.getSimpleName();
     public static final String CAT_KEY = "cat_key";
     public static final String MODE_KEY = "mode_key";
-    public static final String IS_EDIT_MODE_KEY = "is_mode_key";
-    public static final int CAT_TYPE_PET = 0;
-    public static final int CAT_TYPE_STRAY = 1;
 
+    private String DEFAULT_VALUE = "setup";
+    private String PET_DEFAULT_NAME = "Pet Name";
+
+    @BindView(R.id.main_layout)
+    ConstraintLayout mainLayout;
+    @BindView(R.id.main_scrollView)
+    ScrollView scrollView;
     @BindView(R.id.petLayout)
     FrameLayout petLayout;
     @BindView(R.id.strayLayout)
@@ -117,7 +116,7 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
     TextView weightValueTextView;
 
     @BindView(R.id.no_checkBox)
-    CheckBox noCheckBox;
+    CheckBox castratedCheckBox;
 
     @BindView(R.id.flea_treatment_picker_button)
     Button fleaTreatmentPickerButton;
@@ -149,14 +148,18 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
 
     @BindView(R.id.upload_image_LinearLayout)
     LinearLayout uploadImageLinearLayout;
-    private Menu actionBarMenu;
-    private long petBirthdayMillis;
-    private long fleaTreatmentDateMilis;
-    private int catType;
+    private long petBirthdayMillis = 0;
+    private long fleaTreatmentDateMilis = 0;
+    private float weight = 0;
+    private CatProfile.Status catType;
+    private CatProfilePresenter presenter;
+    private MenuItem saveMenu;
+    private MenuItem editMenu;
 
     public enum CatProfileScreenMode {
         EDIT_MODE,
-        VIEW_MODE
+        VIEW_MODE,
+        CREATE_MODE
     }
 
     private CatProfileScreenMode currentMode = CatProfileScreenMode.EDIT_MODE;
@@ -174,6 +177,26 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
 
     private CatProfile catProfile;
 
+    public static void startInViewMode(Activity activity, CatProfile catProfile) {
+        Intent intent = new Intent(activity, CatProfileActivity.class);
+        intent.putExtra(MODE_KEY, CatProfileScreenMode.VIEW_MODE);
+        intent.putExtra(CatProfileActivity.CAT_KEY, catProfile);
+        activity.startActivity(intent);
+    }
+
+    public static void startInEditMode(Activity activity, CatProfile catProfile) {
+        Intent intent = new Intent(activity, CatProfileActivity.class);
+        intent.putExtra(MODE_KEY, CatProfileScreenMode.EDIT_MODE);
+        intent.putExtra(CatProfileActivity.CAT_KEY, catProfile);
+        activity.startActivity(intent);
+    }
+
+    public static void startInCreateMode(Activity activity) {
+        Intent intent = new Intent(activity, CatProfileActivity.class);
+        intent.putExtra(MODE_KEY, CatProfileScreenMode.CREATE_MODE);
+        activity.startActivity(intent);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -183,35 +206,20 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
 
         ButterKnife.bind(this);
 
-        if (getIntent() != null) {
-            if (getIntent().hasExtra(CAT_KEY)) {
-                catProfile = (CatProfile) getIntent().getSerializableExtra(CAT_KEY);
-                petNameTextView.setText(catProfile.getPetName());
-            }
-            if (getIntent().hasExtra(IS_EDIT_MODE_KEY) && !getIntent().getBooleanExtra(IS_EDIT_MODE_KEY, true))
-                currentMode = CatProfileScreenMode.VIEW_MODE;
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
+        presenter = new CatProfilePresenter(this);
 
         if (savedInstanceState != null) {
-            Serializable mode = savedInstanceState.getSerializable(MODE_KEY);
-            if (mode != null && mode instanceof CatProfileScreenMode)
-                currentMode = (CatProfileScreenMode) mode;
+            currentMode = (CatProfileScreenMode) savedInstanceState.getSerializable(MODE_KEY);
+            catProfile = (CatProfile) savedInstanceState.getSerializable(CAT_KEY);
+        } else if (getIntent() != null) {
+            if (getIntent().hasExtra(CAT_KEY))
+                catProfile = (CatProfile) getIntent().getSerializableExtra(CAT_KEY);
+
+            currentMode = (CatProfileScreenMode) getIntent().getSerializableExtra(MODE_KEY);
         }
 
-        Uri avatarUri = Profile.getUserAvatar(this);
-        if (avatarUri != null && !avatarUri.toString().isEmpty())
-            avatarImageView.setImageURI(avatarUri);
-        else
-            avatarImageView.setImageBitmap(Utils.getBitmapWithColor(getResources().getColor(R.color.transparent)));
-
-        /*avatarImageView.setOnClickListener(view -> {
-            if (currentMode.equals(CatProfileScreenMode.VIEW_MODE))
-                currentMode = CatProfileScreenMode.EDIT_MODE;
-            else currentMode = CatProfileScreenMode.VIEW_MODE;
-
-            setupUIMode();
-        });*/
+        if (!currentMode.equals(CatProfileScreenMode.CREATE_MODE))
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         nicknameTextView.setText(Profile.getUserName(this));
 
@@ -230,6 +238,55 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
                         colorFiveRoundedImageView,
                         colorSixRoundedImageView));
 
+        fillUI();
+        setupUIMode();
+    }
+
+    private void fillUI() {
+        if (catProfile != null) {
+            if (catProfile.getType() != null && catProfile.getType().equals(CatProfile.Status.STRAY))
+                selectAnimalTypeStray();
+            else selectAnimalTypePet();
+            petNameTextView.setText(catProfile.getPetName());
+            nicknameTextView.setText(catProfile.getNickname());
+
+            colorsList = catProfile.getColorsList() != null ? catProfile.getColorsList() : new ArrayList<>();
+            //colorsList.add(Color.GRAY);
+
+            if (catProfile.getBirthday() != null && catProfile.getBirthday().getTime() > 0) {
+                petBirthdayMillis = catProfile.getBirthday().getTime();
+                ageValueTextView.setText(presenter.getAgeInString(petBirthdayMillis));
+            }
+            setWeight(String.valueOf(catProfile.getWeight()));
+            castratedCheckBox.setChecked(catProfile.isCastrated());
+            if (catProfile.getFleaTreatmentDate() != null && catProfile.getFleaTreatmentDate().getTime() > 0) {
+                fleaTreatmentDateMilis = catProfile.getFleaTreatmentDate().getTime();
+                fleaTreatmentValueTextView.setText(TimeUtils.getDateAsDDMMYYYY(fleaTreatmentDateMilis));
+            }
+            descriptionEditText.setText(catProfile.getDescription());
+        } else {
+            colorsList = new ArrayList<>();
+        }
+        scrollView.setOnTouchListener((v, event) -> {
+            if (mainLayout.getDescendantFocusability() != ViewGroup.FOCUS_BLOCK_DESCENDANTS)
+                mainLayout.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
+            else if (descriptionEditText.isFocused()) {
+                descriptionEditText.clearFocus();
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                try {
+                    imm.hideSoftInputFromWindow(descriptionEditText.getWindowToken(), 0);
+                } catch (Exception e) {
+                }
+            }
+            return false;
+        });
+
+        Uri avatarUri = Profile.getUserAvatar(this);
+        if (avatarUri != null && !avatarUri.toString().isEmpty())
+            avatarImageView.setImageURI(avatarUri);
+        else
+            avatarImageView.setImageBitmap(Utils.getBitmapWithColor(getResources().getColor(R.color.transparent)));
+
         photoList = new ArrayList<>();
         photosAdapter = new CatPhotosAdapter(photoList, this::showImage);
         photosRecyclerView.setAdapter(photosAdapter);
@@ -238,8 +295,8 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
 
         groupPartnersList = new ArrayList<>();
         groupPartnersList.add(new GroupPartner(null, "Admin", true));
-        groupPartnersList.add(new GroupPartner(null, "User1", false));
-        groupPartnersAdapter = new GroupPartnersAdapter(groupPartnersList, currentMode.equals(CatProfileScreenMode.EDIT_MODE),
+        //groupPartnersList.add(new GroupPartner(null, "User1", false));
+        groupPartnersAdapter = new GroupPartnersAdapter(groupPartnersList, !currentMode.equals(CatProfileScreenMode.VIEW_MODE),
                 new GroupPartnersAdapter.OnPersonClickListener() {
 
                     @Override
@@ -250,33 +307,18 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
                     @Override
                     public void onAddPerson() {
                         Log.d(TAG, "onAddPerson");
-                        addGroupPartner();
+                        presenter.addGroupPartner(groupPartnersList, groupPartnersAdapter);
+                        groupPartnersRecyclerView.scrollToPosition(0);
                     }
                 });
         groupPartnersRecyclerView.setAdapter(groupPartnersAdapter);
         groupPartnersRecyclerView.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
-        colorsList = new ArrayList<>();
-        colorsList.add(Color.GRAY);
-        colorsList.add(Color.WHITE);
-
         viewColorsAdapter = new ViewColorsAdapter(colorsList);
         viewColorsRecyclerView.setAdapter(viewColorsAdapter);
         viewColorsRecyclerView.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-
-        setupUIMode();
-    }
-
-    private void compressColorsList() {
-        while (colorsList.contains(null))
-            colorsList.remove(null);
-    }
-
-    private void resizeColorsListWithEmptyValues() {
-        while (colorPickers.size() > colorsList.size())
-            colorsList.add(null);
     }
 
     private void setupColorPickersColors() {
@@ -289,27 +331,40 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
     }
 
     private void setupUIMode() {
-        if (currentMode.equals(CatProfileScreenMode.EDIT_MODE))
-            setupEditMode();
-        else
+        if (currentMode.equals(CatProfileScreenMode.VIEW_MODE))
             setupViewMode();
+        else
+            setupEditMode();
     }
 
     private void setupViewMode() {
         Log.d(TAG, "setupViewMode");
+
+        if (petNameTextView.getText().toString().isEmpty())
+            petNameTextView.setText(PET_DEFAULT_NAME);
+        if (ageValueTextView.getText().toString().equals(DEFAULT_VALUE))
+            ageValueTextView.setText("");
+        if (weightValueTextView.getText().toString().equals(DEFAULT_VALUE))
+            weightValueTextView.setText("");
+
         viewColorsAdapter.notifyDataSetChanged();
         currentMode = CatProfileScreenMode.VIEW_MODE;
 
         infoLinearLayout.setVisibility(View.VISIBLE);
         addPhotoButton.setVisibility(View.INVISIBLE);
 
+        petLayout.setEnabled(false);
+        strayLayout.setEnabled(false);
+
+        petNameTextView.setEnabled(false);
+
         // colorsList settings
-        compressColorsList();
+        presenter.compressColorsList(colorsList);
         viewColorsRecyclerView.setVisibility(View.VISIBLE);
         expandColorsButton.setVisibility(View.GONE);
         colorConstraintLayout.setVisibility(View.GONE);
 
-        noCheckBox.setEnabled(false);
+        castratedCheckBox.setEnabled(false);
 
         // flea treatment settings
         fleaTreatmentPickerButton.setVisibility(View.GONE);
@@ -320,27 +375,39 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
 
         groupPartnersAdapter.switchToViewMode();
 
-        if (actionBarMenu != null && actionBarMenu.findItem(R.id.app_bar_save) != null)
-            actionBarMenu.findItem(R.id.app_bar_save).setVisible(false);
+        if (saveMenu != null)
+            saveMenu.setVisible(false);
+        if (editMenu != null)
+            editMenu.setVisible(true);
 
         informationTextView.setVisibility(View.VISIBLE);
 
-        fleaTreatmentValueTextView.setText("45 days");
         ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) fleaTreatmentValueTextView.getLayoutParams();
         layoutParams.rightMargin = Utils.convertDpToPx(0, this);
 
         fleaTreatmentValueTextView.setLayoutParams(layoutParams);
 
-        ageValueTextView.setOnClickListener(null);
-        weightValueTextView.setOnClickListener(null);
+        ageValueTextView.setEnabled(false);
+        weightValueTextView.setEnabled(false);
     }
 
     private void setupEditMode() {
         Log.d(TAG, "setupEditMode");
-        currentMode = CatProfileScreenMode.EDIT_MODE;
+
+        if (petNameTextView.getText().toString().isEmpty())
+            petNameTextView.setText(PET_DEFAULT_NAME);
+        if (ageValueTextView.getText().toString().isEmpty())
+            ageValueTextView.setText(DEFAULT_VALUE);
+        if (weightValueTextView.getText().toString().isEmpty())
+            weightValueTextView.setText(DEFAULT_VALUE);
 
         infoLinearLayout.setVisibility(View.GONE);
         addPhotoButton.setVisibility(View.VISIBLE);
+
+        petLayout.setEnabled(true);
+        strayLayout.setEnabled(true);
+
+        petNameTextView.setEnabled(true);
 
         // colorsList settings
         viewColorsRecyclerView.setVisibility(View.GONE);
@@ -348,9 +415,9 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
         colorConstraintLayout.setVisibility(View.GONE);
         expandCollapseColors();
         setupColorPickersColors();
-        resizeColorsListWithEmptyValues();
+        presenter.resizeColorsListWithEmptyValues(colorsList, colorPickers.size());
 
-        noCheckBox.setEnabled(true);
+        castratedCheckBox.setEnabled(true);
 
         // flea treatment settings
         fleaTreatmentPickerButton.setVisibility(View.VISIBLE);
@@ -361,73 +428,19 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
 
         groupPartnersAdapter.switchToEditMode();
 
-        if (actionBarMenu != null && actionBarMenu.findItem(R.id.app_bar_save) != null)
-            actionBarMenu.findItem(R.id.app_bar_save).setVisible(true);
+        if (saveMenu != null)
+            saveMenu.setVisible(true);
+        if (editMenu != null)
+            editMenu.setVisible(false);
 
         informationTextView.setVisibility(View.GONE);
 
-        weightValueTextView.setOnClickListener(view -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(CatProfileActivity.this);
-            View dialogView = LayoutInflater.from(CatProfileActivity.this).inflate(R.layout.dialog_edittext, null, false);
-            ((TextView) dialogView.findViewById(R.id.dialogTextView)).setText("Enter cat's weight");
-            ((EditText) dialogView.findViewById(R.id.dialogEditText)).setHint("weight");
-            ((EditText) dialogView.findViewById(R.id.dialogEditText)).setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
-            builder.setView(dialogView);
-            builder.setPositiveButton("OK", (dialogInterface, i) -> weightValueTextView.setText(((EditText) dialogView.findViewById(R.id.dialogEditText)).getText() + " kg"));
-            builder.setNegativeButton("Cancel", (dialogInterface, i) -> {
-                    }
-            );
-            builder.show();
-        });
-
-        fleaTreatmentValueTextView.setText("10.08.2017");
         ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) fleaTreatmentValueTextView.getLayoutParams();
         layoutParams.rightMargin = fleaTreatmentPickerButton.getLayoutParams().width + Utils.convertDpToPx(8, this);
         fleaTreatmentValueTextView.setLayoutParams(layoutParams);
 
-
-        ageValueTextView.setOnClickListener(view -> new WrappedDatePickerDialog(CatProfileActivity.this, (datePicker, i, i1, i2) -> {
-            Calendar now = Calendar.getInstance();
-            Calendar birthday = Calendar.getInstance();
-            birthday.set(Calendar.YEAR, i);
-            birthday.set(Calendar.MONTH, i1);
-            birthday.set(Calendar.DAY_OF_MONTH, i2);
-            birthday.set(Calendar.MILLISECOND, 0);
-
-            petBirthdayMillis = birthday.getTimeInMillis();
-            long nowMillis = now.getTimeInMillis();
-            long timePassedMonthes = (TimeUnit.MILLISECONDS.toDays(nowMillis - petBirthdayMillis)) / 30;
-
-            int years = ((int) timePassedMonthes) / 12;
-            int month = ((int) timePassedMonthes) - (years * 12);
-
-            String age = null;
-            if (years > 0) {
-                if (month > 0) {
-                    age = years + " years, " + String.valueOf(month) + " months";
-                } else if (month == 0) {
-                    age = years + " years";
-                }
-            } else if (years == 0) {
-                if (month > 0) {
-                    age = String.valueOf(month) + " months";
-                } else if (month == 0) {
-                    age = "newborn";
-
-                }
-            }
-            if (age == null) {
-                age = "incorrect date";
-            }
-            ageValueTextView.setText(age);
-
-        }));
-    }
-
-    private void addGroupPartner() {
-        groupPartnersList.add(1, new GroupPartner(null, "User" + ((int) (Math.random() * 999999) + 111111), false));
-        groupPartnersAdapter.notifyItemInserted(1);
-        groupPartnersRecyclerView.scrollToPosition(0);
+        ageValueTextView.setEnabled(true);
+        weightValueTextView.setEnabled(true);
     }
 
     private void showImage(Uri imageUri) {
@@ -458,11 +471,19 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_edit_cat_profile_activity, menu);
-        if (currentMode.equals(CatProfileScreenMode.EDIT_MODE))
-            menu.findItem(R.id.app_bar_save).setVisible(true);
-        else
-            menu.findItem(R.id.app_bar_save).setVisible(false);
-        actionBarMenu = menu;
+
+        saveMenu = menu.findItem(R.id.app_bar_save);
+        editMenu = menu.findItem(R.id.app_bar_edit);
+
+        if (saveMenu != null && editMenu != null) {
+            if (currentMode.equals(CatProfileScreenMode.VIEW_MODE)) {
+                saveMenu.setVisible(false);
+                editMenu.setVisible(true);
+            } else {
+                saveMenu.setVisible(true);
+                editMenu.setVisible(false);
+            }
+        }
         return true;
     }
 
@@ -471,7 +492,14 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
         switch (item.getItemId()) {
             case R.id.app_bar_save:
                 Log.d(TAG, "app_bar_save");
-                saveCat();
+                if (currentMode.equals(CatProfileScreenMode.CREATE_MODE))
+                    presenter.saveCat(fillCatProfile());
+                else savedSuccessfully();
+                return true;
+            case R.id.app_bar_edit:
+                Log.d(TAG, "app_bar_edit");
+                currentMode = CatProfileScreenMode.EDIT_MODE;
+                setupUIMode();
                 return true;
             case android.R.id.home:
                 onBackPressed();
@@ -481,26 +509,67 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
         }
     }
 
+    private void setWeight(String weight) {
+        try {
+            float w = Float.parseFloat(weight);
+            if (w > 0) {
+                this.weight = w;
+                weightValueTextView.setText(weight + " kg");
+            }
+        } catch (Exception e) {
+        }
+    }
+
+    @OnClick(R.id.description_editText)
+    void onDescriptionClick() {
+        mainLayout.setDescendantFocusability(ViewGroup.FOCUS_AFTER_DESCENDANTS);
+        descriptionEditText.requestFocus();
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        try {
+            //if (!imm.isAcceptingText())
+            imm.showSoftInput(descriptionEditText, 0);
+        } catch (Exception e) {
+        }
+    }
+
+    @OnClick(R.id.age_value_textView)
+    void onAgeClick() {
+        new WrappedDatePickerDialog(CatProfileActivity.this, petBirthdayMillis, (datePicker, i, i1, i2) -> {
+            petBirthdayMillis = TimeUtils.getTimeInMillis(i, i1, i2);
+            ageValueTextView.setText(presenter.getAgeInString(petBirthdayMillis));
+        });
+    }
+
+    @OnClick(R.id.weight_value_textView)
+    void onWeightClick() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(CatProfileActivity.this);
+        View dialogView = LayoutInflater.from(CatProfileActivity.this).inflate(R.layout.dialog_edittext, null, false);
+        ((TextView) dialogView.findViewById(R.id.dialogTextView)).setText("Enter cat's weight");
+        ((EditText) dialogView.findViewById(R.id.dialogEditText)).setHint("weight");
+        ((EditText) dialogView.findViewById(R.id.dialogEditText)).setText(weight > 0 ? String.valueOf(weight) : null);
+        ((EditText) dialogView.findViewById(R.id.dialogEditText)).setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        builder.setView(dialogView);
+        builder.setPositiveButton("OK", (dialogInterface, i) -> setWeight(((EditText) dialogView.findViewById(R.id.dialogEditText)).getText().toString()));
+        builder.setNegativeButton("Cancel", null);
+        builder.show();
+    }
+
     @OnClick(R.id.petLayout)
     void selectAnimalTypePet() {
-        if (currentMode == CatProfileScreenMode.EDIT_MODE) {
-            petLayout.setBackgroundResource(R.drawable.cat_profile_animal_type_selected_shape);
-            strayLayout.setBackgroundResource(R.drawable.cat_profile_animal_type_unselected_shape);
-            animalTypePetTextView.setTextAppearance(this, R.style.PrimaryTextView);
-            animalTypeStrayTextView.setTextAppearance(this, R.style.SecondaryTextView);
-            catType = CAT_TYPE_PET;
-        }
+        petLayout.setBackgroundResource(R.drawable.cat_profile_animal_type_selected_shape);
+        strayLayout.setBackgroundResource(R.drawable.cat_profile_animal_type_unselected_shape);
+        animalTypePetTextView.setTextAppearance(this, R.style.PrimaryTextView);
+        animalTypeStrayTextView.setTextAppearance(this, R.style.SecondaryTextView);
+        catType = CatProfile.Status.PET;
     }
 
     @OnClick(R.id.strayLayout)
     void selectAnimalTypeStray() {
-        if (currentMode == CatProfileScreenMode.EDIT_MODE) {
-            petLayout.setBackgroundResource(R.drawable.cat_profile_animal_type_unselected_shape);
-            strayLayout.setBackgroundResource(R.drawable.cat_profile_animal_type_selected_shape);
-            animalTypePetTextView.setTextAppearance(this, R.style.SecondaryTextView);
-            animalTypeStrayTextView.setTextAppearance(this, R.style.PrimaryTextView);
-            catType = CAT_TYPE_STRAY;
-        }
+        petLayout.setBackgroundResource(R.drawable.cat_profile_animal_type_unselected_shape);
+        strayLayout.setBackgroundResource(R.drawable.cat_profile_animal_type_selected_shape);
+        animalTypePetTextView.setTextAppearance(this, R.style.SecondaryTextView);
+        animalTypeStrayTextView.setTextAppearance(this, R.style.PrimaryTextView);
+        catType = CatProfile.Status.STRAY;
     }
 
     @OnClick(R.id.upload_image_button)
@@ -511,111 +580,65 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
     @Override
     protected void onImageSelected(Uri uri) {
         super.onImageSelected(uri);
-        if (uri != null) {
-            Log.d(TAG, "onImageSelected " + uri);
-            photoList.add(0, uri);
-            photosAdapter.notifyItemInserted(0);
-            photosRecyclerView.scrollToPosition(0);
-        }
+        presenter.onPetImageSelected(uri, photoList, photosAdapter);
+        photosRecyclerView.scrollToPosition(0);
     }
 
-    private void saveCat() {
-        int feedstationId = 0;
-        String name = petNameTextView.getText().toString();
+    private CatProfile fillCatProfile() {
+        if (catProfile == null)
+            catProfile = new CatProfile();
+
+        presenter.compressColorsList(colorsList);
+
+        List c = new ArrayList<>();
+        c.addAll(colorsList);
+        catProfile.setColorsList(c);
+
+        presenter.resizeColorsListWithEmptyValues(colorsList, colorPickers.size());
+
+        String petName = petNameTextView.getText().toString();
+        if (petNameTextView.getText().toString().equals(PET_DEFAULT_NAME))
+            petName = "";
+
         String nickname = nicknameTextView.getText().toString();
-
-        compressColorsList();
-        String colors = "";
-        for (int color : colorsList)
-            colors += String.valueOf(color) + ",";
-        if (!colors.isEmpty())
-            colors = colors.substring(0, colors.length() - 1);
-        resizeColorsListWithEmptyValues();
-
-        int age = (int) (petBirthdayMillis / 1000L);
-        String sex = null;
-        String w = weightValueTextView.getText().toString();
-        float weight = Float.parseFloat(w.substring(0, w.length() - 3));
-        boolean castrated = noCheckBox.isChecked();
+        Date age = new Date(petBirthdayMillis);
+        boolean castrated = castratedCheckBox.isChecked();
         String description = descriptionEditText.getText().toString();
+        Date nextFleaTreatment = new Date(fleaTreatmentDateMilis);
 
-        String type = (catType == CAT_TYPE_PET) ? "pet" : "stray";
-        int nextFleaTreatment = (int) (fleaTreatmentDateMilis / 1000L);
+        catProfile.setPetName(petName);
+        catProfile.setNickname(nickname);
+        catProfile.setBirthday(age);
+        catProfile.setSex(null);
+        catProfile.setWeight(weight);
+        catProfile.setCastrated(castrated);
+        catProfile.setDescription(description);
+        catProfile.setType(catType);
+        catProfile.setFleaTreatmentDate(nextFleaTreatment);
 
-        Call<BaseResponse<Cat>> call = ServiceGenerator.getApiServiceWithToken().createCat(feedstationId, name,
-                nickname, colors, age, sex, weight, castrated, description, type, nextFleaTreatment);
-        call.enqueue(new Callback<BaseResponse<Cat>>() {
-            @Override
-            public void onResponse(Call<BaseResponse<Cat>> call, Response<BaseResponse<Cat>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    new BaseParser<Cat>(response) {
-
-                        @Override
-                        protected void onSuccess(Cat data) {
-                            /*if (data.getToken() != null) {
-                                Log.i(TAG, "getApiService().auth success");
-                                Log.i(TAG, data.getToken());
-
-                            }*/
-                            CatProfileActivity.this.finishAffinity();
-                            startActivity(new Intent(CatProfileActivity.this, MainActivity.class));
-                        }
-
-                        @Override
-                        protected void onFail(ErrorResponse error) {
-                            Log.d(TAG, error.getMessage() + error.getCode());
-                        }
-                    };
-                }
-            }
-
-            @Override
-            public void onFailure(Call<BaseResponse<Cat>> call, Throwable t) {
-                Log.e(TAG, "createCat onFailure " + t.getMessage());
-            }
-        });
+        return catProfile;
     }
 
     @OnClick(R.id.flea_treatment_picker_button)
     void showFleaTreatmentPicker() {
-        new WrappedDatePickerDialog(this, (datePicker, i, i1, i2) -> {
-            i1++;
-            Calendar calendar = Calendar.getInstance();
-            calendar.set(i, i1, i2);
-            fleaTreatmentDateMilis = calendar.getTimeInMillis();
-            String month;
-            String day;
-            String year = String.valueOf(i);
-            if (i2 < 10) {
-                day = "0" + String.valueOf(i2);
-            } else {
-                day = String.valueOf(i2);
-            }
-            if (i1 < 10) {
-                month = "0" + String.valueOf(i1);
-            } else {
-                month = String.valueOf(i1);
-            }
-            fleaTreatmentValueTextView.setText(day + "." + month + "." + year);
+        new WrappedDatePickerDialog(this, fleaTreatmentDateMilis, (datePicker, i, i1, i2) -> {
+            fleaTreatmentDateMilis = TimeUtils.getTimeInMillis(i, i1, i2);
+            fleaTreatmentValueTextView.setText(TimeUtils.getDateAsDDMMYYYY(fleaTreatmentDateMilis));
         });
     }
 
     @OnClick(R.id.pet_name_textView)
     void changeCatName() {
-        if (currentMode == CatProfileScreenMode.EDIT_MODE) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            View dialogView = LayoutInflater.from(CatProfileActivity.this).inflate(R.layout.dialog_edittext, null, false);
-            ((TextView) dialogView.findViewById(R.id.dialogTextView)).setText("Enter cat's name");
-            EditText editText = dialogView.findViewById(R.id.dialogEditText);
-            editText.setHint("name");
-            editText.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
-            builder.setView(dialogView);
-            builder.setPositiveButton("OK", (dialogInterface, i) -> petNameTextView.setText(editText.getText().toString()));
-            builder.setNegativeButton("Cancel", (dialogInterface, i) -> {
-
-            });
-            builder.show();
-        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = LayoutInflater.from(CatProfileActivity.this).inflate(R.layout.dialog_edittext, null, false);
+        ((TextView) dialogView.findViewById(R.id.dialogTextView)).setText("Enter cat's name");
+        EditText editText = dialogView.findViewById(R.id.dialogEditText);
+        editText.setHint("name");
+        editText.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        builder.setView(dialogView);
+        builder.setPositiveButton("OK", (dialogInterface, i) -> petNameTextView.setText(editText.getText().toString()));
+        builder.setNegativeButton("Cancel", null);
+        builder.show();
     }
 
     @OnClick(R.id.expand_colors_button)
@@ -640,18 +663,19 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
         }
     }
 
-
-    @OnCheckedChanged(R.id.no_checkBox)
-    void onNoChecked(boolean checked) {
-        if (checked) {
-        }
-    }
-
     @Override
     public void onClick(View view) {
         if (view instanceof RoundedImageView) {
             Log.d(TAG, "onClick RoundedImageView");
-            ColorPickerDialog colorPickerDialog = new ColorPickerDialog(this, Color.RED, color -> {
+
+            Integer initColor = null;
+            for (int i = 0; i < colorPickers.size(); i++)
+                if (colorPickers.get(i).getId() == view.getId()) {
+                    initColor = colorsList.get(i);
+                    break;
+                }
+
+            ColorPickerDialog colorPickerDialog = new ColorPickerDialog(this, initColor, color -> {
                 for (int i = 0; i < colorPickers.size(); i++)
                     if (colorPickers.get(i).getId() == clickedRoundViewId) {
                         colorPickers.get(i).setImageBitmap(Utils.getBitmapWithColor(color));
@@ -667,5 +691,16 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable(MODE_KEY, currentMode);
+        outState.putSerializable(CAT_KEY, fillCatProfile());
+    }
+
+    public void savedSuccessfully() {
+        if (currentMode.equals(CatProfileScreenMode.CREATE_MODE)) {
+            CatProfileActivity.this.finishAffinity();
+            startActivity(new Intent(CatProfileActivity.this, MainActivity.class));
+        } else {
+            currentMode = CatProfileScreenMode.VIEW_MODE;
+            setupUIMode();
+        }
     }
 }

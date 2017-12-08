@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
@@ -22,7 +21,6 @@ import android.widget.Toast;
 import com.varteq.catslovers.Log;
 import com.varteq.catslovers.Profile;
 import com.varteq.catslovers.R;
-import com.varteq.catslovers.utils.Snackbarer;
 import com.varteq.catslovers.view.presenter.AuthPresenter;
 
 import java.util.ArrayList;
@@ -32,7 +30,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class ValidateNumberActivity extends AppCompatActivity implements TextWatcher {
+public class ValidateNumberActivity extends BaseActivity implements TextWatcher {
 
     private String TAG = ValidateNumberActivity.class.getSimpleName();
     public static String PHONE_NUMBER_KEY = "phone_number";
@@ -142,7 +140,7 @@ public class ValidateNumberActivity extends AppCompatActivity implements TextWat
         okButton.setOnClickListener(v -> {
             dialog.dismiss();
             ValidateNumberActivity.this.finishAffinity();
-            startActivity(new Intent(getApplicationContext(), CatProfileActivity.class));
+            CatProfileActivity.startInCreateMode(this);
         });
 
         Button laterButton = dialog.findViewById(R.id.later_button);
@@ -266,11 +264,8 @@ public class ValidateNumberActivity extends AppCompatActivity implements TextWat
         onBackPressed();
     }
 
-    public void showNetworkError(View.OnClickListener listener) {
-        Snackbarer.showNetworkSnackbar(mainLayout, listener);
-    }
-
-    public void showError(String message, View.OnClickListener listener) {
-        Snackbarer.showIndefiniteSnackbar(mainLayout, message, listener);
+    @Override
+    protected View getSnackbarAnchorView() {
+        return mainLayout;
     }
 }

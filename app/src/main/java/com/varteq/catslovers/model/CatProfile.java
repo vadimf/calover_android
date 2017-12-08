@@ -13,6 +13,9 @@ public class CatProfile implements Serializable {
     private Uri avatarUri;
     private String petName;
     private String nickname;
+    private Date birthday;
+    private String sex;
+    private float weight;
     private String description;
     private boolean isCastrated;
     private Date fleaTreatmentDate;
@@ -20,6 +23,13 @@ public class CatProfile implements Serializable {
     private List<Uri> photoList;
     private List<GroupPartner> groupPartnersList;
     private List<Integer> colorsList;
+    private Status type;
+
+
+    public enum Status {
+        PET,
+        STRAY
+    }
 
     public CatProfile() {
     }
@@ -115,5 +125,37 @@ public class CatProfile implements Serializable {
 
     public boolean isNew() {
         return id == -1;
+    }
+
+    public Status getType() {
+        return type;
+    }
+
+    public void setType(Status type) {
+        this.type = type;
+    }
+
+    public Date getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
+    }
+
+    public String getSex() {
+        return sex;
+    }
+
+    public void setSex(String sex) {
+        this.sex = sex;
+    }
+
+    public float getWeight() {
+        return weight;
+    }
+
+    public void setWeight(float weight) {
+        this.weight = weight;
     }
 }

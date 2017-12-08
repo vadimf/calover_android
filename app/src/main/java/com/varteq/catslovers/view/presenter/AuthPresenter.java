@@ -106,6 +106,7 @@ public class AuthPresenter {
         public void onFailure(Exception e) {
             //closeWaitDialog();
             view.showDialogMessage(null, CognitoAuthHelper.formatException(e));
+            Log.e(TAG, "forgotPasswordHandler", e);
             if (checkNetworkErrAndShowSnackbar(e))
                 return;
             if (e instanceof UserNotFoundException) {
@@ -119,7 +120,7 @@ public class AuthPresenter {
                 confirmSignUp();
             } else if (e instanceof LimitExceededException) {
                 String m = e.getLocalizedMessage();
-                view.showError(m.substring(0, m.indexOf("(")), null);
+                view.showIndefiniteError(m.substring(0, m.indexOf("(")), null);
             }
         }
     };
@@ -158,6 +159,7 @@ public class AuthPresenter {
         @Override
         public void onFailure(Exception exception) {
             //closeWaitDialog();
+            Log.e(TAG, "signUpHandler", exception);
             if (checkNetworkErrAndShowSnackbar(exception))
                 return;
             if (exception instanceof InvalidParameterException)
@@ -192,6 +194,7 @@ public class AuthPresenter {
 
         @Override
         public void onFailure(Exception exception) {
+            Log.e(TAG, "confHandler", exception);
             if (checkNetworkErrAndShowSnackbar(exception))
                 return;
             if (exception instanceof CodeMismatchException) {
@@ -229,8 +232,8 @@ public class AuthPresenter {
 
                         @Override
                         protected void onFail(ErrorResponse error) {
-                            Log.d(TAG, error.getMessage() + error.getCode());
-                            view.showError(error.getMessage(), errListener);
+                            Log.e(TAG, error.getMessage() + error.getCode());
+                            view.showIndefiniteError(error.getMessage(), errListener);
                         }
                     };
                 }
@@ -270,11 +273,11 @@ public class AuthPresenter {
 
             @Override
             public void onError(QBResponseException e) {
-                Log.e(TAG, e.getMessage());
+                Log.e(TAG, "loginToQB", e);
                 if (checkNetworkErrAndShowSnackbar(e)) return;
                 if (e.getHttpStatusCode() == 401)
                     signUpToQB(qbUser);
-                else view.showError(e.getLocalizedMessage(), errListener);
+                else view.showIndefiniteError(e.getLocalizedMessage(), errListener);
             }
         });
     }
@@ -296,7 +299,7 @@ public class AuthPresenter {
 
             @Override
             public void onError(QBResponseException e) {
-                Log.e(TAG, "chat singUp error");
+                Log.e(TAG, "chat singUp error", e);
                 if (checkNetworkErrAndShowSnackbar(e)) return;
                 getCats();
             }
@@ -322,6 +325,7 @@ public class AuthPresenter {
 
             @Override
             public void onFailure(Call<BaseResponse<List<Cat>>> call, Throwable t) {
+                Log.e(TAG, "getCats() onFailure " + t.getMessage());
                 if (checkNetworkErrAndShowSnackbar(t.toString())) return;
                 view.onSuccessSignIn();
             }
@@ -334,7 +338,7 @@ public class AuthPresenter {
             //Log.e(TAG, "Profile Success");
             CognitoAuthHelper.setCurrSession(cognitoUserSession);
             CognitoAuthHelper.newDevice(device);
-            Log.i(TAG, cognitoUserSession.getAccessToken().getJWTToken());
+            Log.i(TAG, "cognitoUserSession.getAccessToken " + cognitoUserSession.getAccessToken().getJWTToken());
             //closeWaitDialog();
             Profile.setUserPhone(view, username);
             getAuthToken(cognitoUserSession.getAccessToken().getJWTToken());
@@ -372,6 +376,7 @@ public class AuthPresenter {
              * For Custom authentication challenge, implement your logic to present challenge to the
              * user and pass the user's responses to the continuation.
              */
+            Log.i(TAG, "authenticationChallenge");
             if ("NEW_PASSWORD_REQUIRED".equals(continuation.getChallengeName())) {
                 // This is the first sign-in attempt for an admin created user
                 newPasswordContinuation = (NewPasswordContinuation) continuation;
@@ -392,6 +397,7 @@ public class AuthPresenter {
     };
 
     private void continueWithFirstTimeSignIn() {
+        Log.i(TAG, "continueWithFirstTimeSignIn");
         newPasswordContinuation.setPassword(CognitoAuthHelper.getPasswordForFirstTimeLogin());
         Map<String, String> newAttributes = CognitoAuthHelper.getUserAttributesForFirstTimeLogin();
         if (newAttributes != null) {
@@ -471,7 +477,7 @@ public class AuthPresenter {
 
     private boolean checkNetworkErrAndShowSnackbar(String exception) {
         if (isNetworkErr(exception)) {
-            view.showNetworkError(errListener);
+            view.showIndefiniteNetworkError(errListener);
             return true;
         } else return false;
     }

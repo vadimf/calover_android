@@ -1,6 +1,5 @@
 package com.varteq.catslovers.view.fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,8 +10,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
 
+import com.varteq.catslovers.Log;
 import com.varteq.catslovers.R;
+import com.varteq.catslovers.api.BaseParser;
+import com.varteq.catslovers.api.ServiceGenerator;
+import com.varteq.catslovers.api.entity.BaseResponse;
+import com.varteq.catslovers.api.entity.Cat;
+import com.varteq.catslovers.api.entity.ErrorResponse;
 import com.varteq.catslovers.model.CatProfile;
+import com.varteq.catslovers.utils.TimeUtils;
 import com.varteq.catslovers.view.CatProfileActivity;
 import com.varteq.catslovers.view.adapters.CatsListAdapter;
 
@@ -22,8 +28,13 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class CatsFragment extends Fragment {
+
+    private String TAG = CatsFragment.class.getSimpleName();
 
     @BindView(R.id.cats_RecyclerView)
     RecyclerView catsRecyclerView;
@@ -67,15 +78,14 @@ public class CatsFragment extends Fragment {
         cList.add(new CatProfile(20, "CH Cat"));
 
         catsHashMap = new HashMap<>();
-        catsHashMap.put("A", aList);
+        /*catsHashMap.put("A", aList);
         catsHashMap.put("B", bList);
-        catsHashMap.put("C", cList);
+        catsHashMap.put("C", cList);*/
+
+        getCats();
 
         catsListAdapter = new CatsListAdapter(catsHashMap, catProfile -> {
-            Intent intent = new Intent(getActivity(), CatProfileActivity.class);
-            intent.putExtra(CatProfileActivity.IS_EDIT_MODE_KEY, false);
-            intent.putExtra(CatProfileActivity.CAT_KEY, catProfile);
-            startActivity(intent);
+            CatProfileActivity.startInViewMode(getActivity(), catProfile);
         });
         catsRecyclerView.setAdapter(catsListAdapter);
         catsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -95,5 +105,68 @@ public class CatsFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+    }
+
+    public void getCats() {
+        /*String colors = "";
+        for (int color : cat.getColorsList())
+            colors += String.valueOf(color) + ",";
+        if (!colors.isEmpty())
+            colors = colors.substring(0, colors.length() - 1);
+
+        String type = cat.getType().equals(CatProfile.Status.PET) ? "pet" : "stray";
+
+        int age = (int) (cat.getBirthday().getTime() / 1000L);
+        int nextFleaTreatment = (int) (cat.getFleaTreatmentDate().getTime() / 1000L);*/
+
+        Call<BaseResponse<List<Cat>>> call = ServiceGenerator.getApiServiceWithToken().getCats();
+        call.enqueue(new Callback<BaseResponse<List<Cat>>>() {
+            @Override
+            public void onResponse(Call<BaseResponse<List<Cat>>> call, Response<BaseResponse<List<Cat>>> response) {
+                new BaseParser<List<Cat>>(response) {
+
+                    @Override
+                    protected void onSuccess(List<Cat> data) {
+                        catsHashMap.put("A", getCatProfiles(data));
+                        catsListAdapter.notifyDataSetChanged();
+                        Log.i(TAG, String.valueOf(data.size()));
+                    }
+
+                    @Override
+                    protected void onFail(ErrorResponse error) {
+                        Log.d(TAG, error.getMessage() + error.getCode());
+                    }
+                };
+            }
+
+            @Override
+            public void onFailure(Call<BaseResponse<List<Cat>>> call, Throwable t) {
+                Log.e(TAG, "getCats onFailure " + t.getMessage());
+            }
+        });
+    }
+
+    private List<CatProfile> getCatProfiles(List<Cat> data) {
+        List<CatProfile> list = new ArrayList<>();
+        for (Cat cat : data) {
+            CatProfile catProfile = new CatProfile();
+            catProfile.setId(cat.getId());
+            catProfile.setPetName(cat.getName());
+            catProfile.setNickname(cat.getNickname());
+            catProfile.setBirthday(TimeUtils.getDateFromUTC(cat.getAge()));
+            catProfile.setSex(null);
+            catProfile.setWeight(cat.getWeight());
+            catProfile.setCastrated(cat.getCastrated());
+            catProfile.setDescription(cat.getDescription());
+            catProfile.setType(cat.getType().equals("pet") ? CatProfile.Status.PET : CatProfile.Status.STRAY);
+            catProfile.setFleaTreatmentDate(TimeUtils.getDateFromUTC(cat.getNextFleaTreatment()));
+
+            List<Integer> colors = new ArrayList<>();
+            for (String s : cat.getColor().split(","))
+                colors.add(Integer.parseInt(s));
+            catProfile.setColorsList(colors);
+            list.add(catProfile);
+        }
+        return list;
     }
 }

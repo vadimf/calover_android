@@ -44,7 +44,7 @@ import com.varteq.catslovers.view.qb.dialog.ProgressDialogFragment;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class DialogsActivity extends BaseActivity implements DialogsManager.ManagingDialogsCallbacks {
+public class DialogsActivity extends QBBaseActivity implements DialogsManager.ManagingDialogsCallbacks {
     private static final String TAG = DialogsActivity.class.getSimpleName();
     private static final int REQUEST_SELECT_PEOPLE = 174;
     private static final int REQUEST_DIALOG_ID_FOR_UPDATE = 165;

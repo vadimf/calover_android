@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class SelectUsersActivity extends BaseActivity {
+public class SelectUsersActivity extends QBBaseActivity {
     public static final String EXTRA_QB_USERS = "qb_users";
     public static final int MINIMUM_CHAT_OCCUPANTS_SIZE = 2;
     private static final long CLICK_DELAY = TimeUnit.SECONDS.toMillis(2);

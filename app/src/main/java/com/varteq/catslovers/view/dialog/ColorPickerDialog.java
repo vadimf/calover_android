@@ -27,13 +27,15 @@ public class ColorPickerDialog extends AlertDialog {
     Button okButton;
     @BindView(R.id.color_picker_cancel_button)
     Button cancelButton;
+    Integer initialColor;
 
     private final ColorPicker.OnColorSelectedListener onColorSelectedListener;
 
-    public ColorPickerDialog(Context context, int initialColor, ColorPicker.OnColorSelectedListener onColorSelectedListener) {
+    public ColorPickerDialog(Context context, Integer initialColor, ColorPicker.OnColorSelectedListener onColorSelectedListener) {
         super(context, R.style.PrimaryDialog);
 
         this.onColorSelectedListener = onColorSelectedListener;
+        this.initialColor = initialColor;
 
         /*RelativeLayout relativeLayout = new RelativeLayout(context);
         LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
@@ -56,10 +58,15 @@ public class ColorPickerDialog extends AlertDialog {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog_color_picker);
         ButterKnife.bind(this);
-        colorPickerView.setColor(Color.rgb(76, 47, 0));
-        colorPickerView.setOldCenterColor(Color.rgb(76, 47, 0));
+
+        int color;
+        if (initialColor != null)
+            color = initialColor;
+        else color = Color.rgb(76, 47, 0);
         colorPickerView.addOpacityBar(opacityBar);
         colorPickerView.addValueBar(valuebar);
+        colorPickerView.setColor(color);
+        colorPickerView.setOldCenterColor(color);
         okButton.setOnClickListener(view -> {
             int selectedColor = colorPickerView.getColor();
             onColorSelectedListener.onColorSelected(selectedColor);

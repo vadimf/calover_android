@@ -1,7 +1,9 @@
 package com.varteq.catslovers.view.qb;
 
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.annotation.StringRes;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
@@ -15,8 +17,22 @@ import com.varteq.catslovers.utils.ErrorUtils;
 
 import java.lang.reflect.Field;
 
-public class CoreBaseActivity extends AppCompatActivity {
+public abstract class QBBaseActivity extends AppCompatActivity {
     protected ActionBar actionBar;
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        outState.putInt("dummy_value", 0);
+        super.onSaveInstanceState(outState, outPersistentState);
+    }
+
+    protected abstract View getSnackbarAnchorView();
+
+    protected Snackbar showErrorSnackbar(@StringRes int resId, Exception e,
+                                         View.OnClickListener clickListener) {
+        return ErrorUtils.showSnackbar(getSnackbarAnchorView(), resId, e,
+                R.string.dlg_retry, clickListener);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

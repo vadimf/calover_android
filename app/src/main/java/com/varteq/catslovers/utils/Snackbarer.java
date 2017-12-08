@@ -35,7 +35,15 @@ public class Snackbarer {
         showSnackbar(view, message, null, clickListener, TSnackbar.LENGTH_INDEFINITE);
     }
 
-    public static void showNetworkSnackbar(View view, View.OnClickListener clickListener) {
-        showIndefiniteSnackbar(view, view.getContext().getString(R.string.network_error_message), view.getContext().getString(R.string.retry), clickListener);
+    public static void showIndefiniteNetworkSnackbar(View view, View.OnClickListener clickListener) {
+        showIndefiniteSnackbar(view, view.getContext().getString(R.string.network_error_message), null, clickListener);
+    }
+
+    public static void showLongNetworkSnackbar(View view, View.OnClickListener clickListener) {
+        showSnackbar(view, view.getContext().getString(R.string.network_error_message), null, clickListener, TSnackbar.LENGTH_LONG);
+    }
+
+    public static void showLongSnackbar(View view, String message, View.OnClickListener clickListener) {
+        showSnackbar(view, message, null, clickListener, TSnackbar.LENGTH_LONG);
     }
 }
