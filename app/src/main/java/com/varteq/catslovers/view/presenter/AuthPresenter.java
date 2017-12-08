@@ -80,6 +80,17 @@ public class AuthPresenter {
             }
         };
         CognitoAuthHelper.getPool().getUser(username).forgotPasswordInBackground(forgotPasswordHandler);
+        //fakeLogin();
+    }
+
+    private void fakeLogin() {
+        String token = "OorXZH_4_RkQFjcSFXsBg4GQKqruhXEf";
+        Profile.setAuthToken(view, token);
+        ServiceGenerator.setToken(token);
+        Profile.setUserPetCount(view, 0);
+        view.onSuccessSignIn();
+        Profile.setUserPhone(view, username);
+        Profile.setUserLogin(view, true);
     }
 
     ForgotPasswordHandler forgotPasswordHandler = new ForgotPasswordHandler() {

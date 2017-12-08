@@ -151,7 +151,7 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
     private long petBirthdayMillis = 0;
     private long fleaTreatmentDateMilis = 0;
     private float weight = 0;
-    private CatProfile.Status catType;
+    private CatProfile.Status catType = CatProfile.Status.PET;
     private CatProfilePresenter presenter;
     private MenuItem saveMenu;
     private MenuItem editMenu;

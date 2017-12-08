@@ -11,6 +11,7 @@ import com.varteq.catslovers.api.entity.Cat;
 import com.varteq.catslovers.api.entity.ErrorResponse;
 import com.varteq.catslovers.model.CatProfile;
 import com.varteq.catslovers.model.GroupPartner;
+import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.view.CatProfileActivity;
 
 import java.util.List;
@@ -115,6 +116,8 @@ public class CatProfilePresenter {
                         @Override
                         protected void onFail(ErrorResponse error) {
                             Log.d(TAG, error.getMessage() + error.getCode());
+                            if (error.getCode() == 422)
+                                Toaster.longToast("You should fill in fields from age to description");
                         }
                     };
                 }

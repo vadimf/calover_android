@@ -31,7 +31,7 @@ public class MainPresenter {
             view.showChat();
             return;
         }
-        Profile.setUserPhone(view, "+380935772101");
+        //Profile.setUserPhone(view, "+380935772101");
         //Profile.saveUser(view, "Nata", "n@t.com");
         if (Profile.getUserPhone(view).isEmpty()) {
             return;
@@ -57,6 +57,7 @@ public class MainPresenter {
                 if (e.toString().contains("Bad timestamp")) {
                     view.showLongError(e.getLocalizedMessage(), null);
                 } else if (e.getHttpStatusCode() == 401) {
+                    qbUser.setFullName(Profile.getUserName(view));
                     ChatHelper.getInstance().singUp(qbUser, new QBEntityCallback<Void>() {
                         @Override
                         public void onSuccess(Void aVoid, Bundle bundle) {
