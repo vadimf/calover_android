@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/toolsRelativeLayout"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+    >
+
+    <RelativeLayout
+        android:id="@+id/catsToolsRelativeLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/toolbar_title">
+
+        <ImageButton
+            android:id="@+id/menuButton"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginEnd="8dp"
+            android:background="@android:color/transparent"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/ic_more_vert_primary_24dp"/>
+
+        <ImageButton
+            android:id="@+id/notificationButton"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentTop="true"
+            android:layout_marginEnd="10dp"
+            android:layout_toStartOf="@+id/menuButton"
+            android:background="@android:color/transparent"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/ic_notifications_purple_24dp"/>
+
+    </RelativeLayout>
+
+    <ImageButton
+        android:id="@+id/backButton"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="16dp"
+        android:background="@android:color/transparent"
+        app:srcCompat="@drawable/ic_arrow_back_purple_24dp"/>
+
+    <TextView
+        android:id="@+id/toolbar_title"
+        style="@style/PrimaryTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toEndOf="@+id/backButton"
+        android:textSize="20sp"
+        android:textStyle="bold"/>
+
+
+</RelativeLayout>

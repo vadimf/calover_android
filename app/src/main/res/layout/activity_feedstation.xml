@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.varteq.catslovers.view.FeedstationActivity">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <ScrollView
+        android:id="@+id/scrollView2"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.constraint.Guideline
+                android:id="@+id/avatar_end_guideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.65"/>
+
+            <android.support.constraint.Guideline
+                android:id="@+id/avatar_start_guideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.35"/>
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/header_photo_viewPager"
+                android:layout_width="match_parent"
+                android:layout_height="202dp"
+                android:background="@color/very_light_purple"
+                app:layout_constraintDimensionRatio="w,1:1"
+                app:layout_constraintEnd_toStartOf="@+id/avatar_end_guideline"
+                app:layout_constraintStart_toStartOf="@+id/avatar_start_guideline"
+                app:layout_constraintTop_toTopOf="parent">
+
+            </android.support.v4.view.ViewPager>
+
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                app:layout_constraintBottom_toTopOf="@+id/station_name_textView"
+                app:layout_constraintStart_toEndOf="@id/start_guideline"
+                >
+
+                <ImageView
+                    android:id="@+id/imageView2"
+                    android:layout_width="51dp"
+                    android:layout_height="76dp"
+                    android:layout_gravity="center"
+                    app:srcCompat="@drawable/location_blue"/>
+
+                <com.makeramen.roundedimageview.RoundedImageView
+                    android:id="@+id/avatar_imageView"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="6dp"
+                    android:scaleType="centerCrop"
+                    android:src="@color/colorPrimary"
+                    app:riv_border_color="@color/white"
+                    app:riv_border_width="2dp"
+                    app:riv_corner_radius="29dp"
+                    app:riv_oval="true"/>
+            </FrameLayout>
+
+            <android.support.constraint.Guideline
+                android:id="@+id/start_guideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_begin="16dp"/>
+
+            <android.support.constraint.Guideline
+                android:id="@+id/end_guideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_end="16dp"/>
+
+
+            <LinearLayout
+                android:id="@+id/info_LinearLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:layout_constraintEnd_toStartOf="@+id/end_guideline"
+                app:layout_constraintTop_toBottomOf="@+id/header_photo_viewPager">
+
+                <TextView
+                    android:id="@+id/dialogTextView"
+                    style="@style/PrimaryTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Join Group"/>
+
+                <Button
+                    android:id="@+id/follow_button"
+                    style="@style/PrimaryBorderlessButton"
+                    android:layout_width="@dimen/normal_button_size"
+                    android:layout_height="@dimen/normal_button_size"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:background="@drawable/ic_add_24dp"/>
+
+                <Button
+                    android:id="@+id/reply_button"
+                    style="@style/PrimaryBorderlessButton"
+                    android:layout_width="@dimen/normal_button_size"
+                    android:layout_height="@dimen/normal_button_size"
+                    android:background="@drawable/ic_reply_24dp"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/station_name_textView"
+                style="@style/PrimaryBigTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Shylee's Babies"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@+id/start_guideline"
+                app:layout_constraintTop_toBottomOf="@+id/info_LinearLayout"/>
+
+            <TextView
+                android:id="@+id/address_textView"
+                style="@style/PrimaryTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:lines="2"
+                android:maxLines="2"
+                android:paddingBottom="8dp"
+                android:text="Golden Gate Bridge\nGolden Gate Bridge, San Francisco, CA, USA"
+                app:layout_constraintStart_toStartOf="@+id/start_guideline"
+                app:layout_constraintTop_toBottomOf="@+id/station_name_textView"/>
+
+            <TextView
+                android:id="@+id/cats_list_label_textView"
+                style="@style/PrimaryTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="27dp"
+                android:paddingBottom="22dp"
+                android:text="Cats list/No."
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@+id/start_guideline"
+                app:layout_constraintTop_toBottomOf="@+id/address_textView"/>
+
+            <TextView
+                android:id="@+id/cats_list_textView"
+                style="@style/SecondaryTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:paddingBottom="8dp"
+                android:text="1-4"
+                app:layout_constraintStart_toEndOf="@+id/cats_list_label_textView"
+                app:layout_constraintTop_toTopOf="@+id/cats_list_label_textView"/>
+
+            <RelativeLayout
+                android:id="@+id/time_relativeLayout"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginStart="20dp"
+                android:background="@drawable/time_feeding_round_shape"
+                app:layout_constraintTop_toBottomOf="@+id/cats_list_label_textView">
+
+            </RelativeLayout>
+
+            <View
+                android:id="@+id/description_background"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="#19607c9c"
+                app:layout_constraintBottom_toBottomOf="@+id/description_textView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/description_label_textView"/>
+
+            <TextView
+                android:id="@+id/description_label_textView"
+                style="@style/PrimaryTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:paddingTop="8dp"
+                android:text="More info..."
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@+id/start_guideline"
+                app:layout_constraintTop_toBottomOf="@+id/time_relativeLayout"/>
+
+
+            <Button
+                android:id="@+id/expand_description_button"
+                style="@style/PrimaryBorderlessButton"
+                android:layout_width="@dimen/normal_button_size"
+                android:layout_height="@dimen/normal_button_size"
+                android:background="@drawable/ic_expand_less_24dp"
+                app:layout_constraintBottom_toBottomOf="@+id/description_label_textView"
+                app:layout_constraintEnd_toStartOf="@+id/end_guideline"
+                app:layout_constraintTop_toTopOf="@+id/description_label_textView"/>
+
+            <TextView
+                android:id="@+id/description_textView"
+                style="@style/SecondarySmallTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:ems="10"
+                android:maxLines="3"
+                android:paddingBottom="16dp"
+                android:text="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore sit amet."
+                app:layout_constraintEnd_toStartOf="@+id/end_guideline"
+                app:layout_constraintStart_toStartOf="@+id/start_guideline"
+                app:layout_constraintTop_toBottomOf="@+id/description_label_textView"/>
+
+
+            <TextView
+                android:id="@+id/group_partners_textView"
+                style="@style/PrimaryTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Group Partners"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@+id/start_guideline"
+                app:layout_constraintTop_toBottomOf="@+id/description_textView"/>
+
+            <Button
+                android:id="@+id/expand_partners_button"
+                style="@style/PrimaryBorderlessButton"
+                android:layout_width="@dimen/normal_button_size"
+                android:layout_height="@dimen/normal_button_size"
+                android:background="@drawable/ic_expand_less_24dp"
+                app:layout_constraintBottom_toTopOf="@id/group_partners_RecyclerView"
+                app:layout_constraintEnd_toStartOf="@+id/end_guideline"
+                />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/group_partners_RecyclerView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="8dp"
+                app:layout_constraintEnd_toStartOf="@+id/end_guideline"
+                app:layout_constraintStart_toStartOf="@+id/start_guideline"
+                app:layout_constraintTop_toBottomOf="@+id/group_partners_textView"/>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="#19607c9c"
+                app:layout_constraintBottom_toBottomOf="@+id/photos_RecyclerView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/upload_image_LinearLayout"/>
+
+            <TextView
+                android:id="@+id/station_name_photos_textView"
+                style="@style/PrimaryTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Shylee's Babies"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@+id/upload_image_LinearLayout"
+                app:layout_constraintStart_toStartOf="@+id/start_guideline"
+                app:layout_constraintTop_toTopOf="@+id/upload_image_LinearLayout"/>
+
+            <TextView
+                android:id="@+id/photo_count_textView"
+                style="@style/SecondarySmallTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="509"
+                android:visibility="visible"
+                app:layout_constraintStart_toStartOf="@+id/start_guideline"
+                app:layout_constraintTop_toBottomOf="@+id/station_name_photos_textView"/>
+
+            <TextView
+                style="@style/SecondarySmallTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="photos"
+                app:layout_constraintBottom_toBottomOf="@+id/photo_count_textView"
+                app:layout_constraintStart_toEndOf="@+id/photo_count_textView"
+                app:layout_constraintTop_toTopOf="@+id/photo_count_textView"/>
+
+            <LinearLayout
+
+                android:id="@+id/upload_image_LinearLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginTop="16dp"
+                android:gravity="right"
+                app:layout_constraintEnd_toStartOf="@+id/end_guideline"
+                app:layout_constraintTop_toBottomOf="@+id/group_partners_RecyclerView">
+
+                <TextView
+                    style="@style/PrimaryTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="Upload pic"/>
+
+                <Button
+                    android:id="@+id/upload_image_button"
+                    style="@style/PrimaryBorderlessButton"
+                    android:layout_width="@dimen/normal_button_size"
+                    android:layout_height="@dimen/normal_button_size"
+                    android:background="@drawable/ic_add_24dp"/>
+
+            </LinearLayout>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/photos_RecyclerView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:paddingBottom="16dp"
+                app:layout_constraintEnd_toStartOf="@+id/end_guideline"
+                app:layout_constraintStart_toStartOf="@+id/start_guideline"
+                app:layout_constraintTop_toBottomOf="@+id/photo_count_textView"/>
+
+        </android.support.constraint.ConstraintLayout>
+
+    </ScrollView>
+
+
+</android.support.constraint.ConstraintLayout>

@@ -323,10 +323,14 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
 
     private void setupColorPickersColors() {
         for (int i = 0; i < colorPickers.size(); i++) {
-            if (i < colorsList.size())
+            if (i < colorsList.size()) {
                 colorPickers.get(i).setImageBitmap(Utils.getBitmapWithColor(colorsList.get(i)));
-            else
+                if (colorsList.get(i) == getResources().getColor(R.color.white))
+                    colorPickers.get(i).setBorderWidth((float) Utils.convertDpToPx(2, this));
+            } else {
                 colorPickers.get(i).setImageBitmap(Utils.getBitmapWithColor(getResources().getColor(R.color.transparent)));
+                colorPickers.get(i).setBorderWidth((float) Utils.convertDpToPx(2, this));
+            }
         }
     }
 
@@ -680,6 +684,10 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
                     if (colorPickers.get(i).getId() == clickedRoundViewId) {
                         colorPickers.get(i).setImageBitmap(Utils.getBitmapWithColor(color));
                         colorsList.set(i, color);
+                        if (color == 0)
+                            colorPickers.get(i).setBorderWidth((float) Utils.convertDpToPx(2, this));
+                        else
+                            colorPickers.get(i).setBorderWidth((float) Utils.convertDpToPx(0, this));
                     }
             });
             colorPickerDialog.show();
