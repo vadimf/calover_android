@@ -7,14 +7,19 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.Fragment;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -23,7 +28,9 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.makeramen.roundedimageview.RoundedImageView;
 import com.varteq.catslovers.R;
+import com.varteq.catslovers.utils.Utils;
 import com.varteq.catslovers.view.FeedstationActivity;
 
 import butterknife.BindView;
@@ -40,6 +47,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     SeekBar seekBar;
     final private int SEEKBAR_STEPS_COUNT = 7;
 
+    @BindView(R.id.avatar_imageView)
+    RoundedImageView avatarImageView;
+    @BindView(R.id.bottom_sheet_feedstation)
+    FrameLayout bottomSheetFeedstationFrameLayout;
+    BottomSheetBehavior bottomSheetBehaviorFeedstation;
+    @BindView(R.id.bottom_sheet_other_view)
+    View bottomSheetOtherView;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -50,12 +65,44 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
+        bottomSheetBehaviorFeedstation = BottomSheetBehavior.from(bottomSheetFeedstationFrameLayout);
+        bottomSheetBehaviorFeedstation.setState(BottomSheetBehavior.STATE_HIDDEN);
+        setBottomSheetDimensions();
+
+        bottomSheetBehaviorFeedstation.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                switch (newState) {
+                    case BottomSheetBehavior.STATE_EXPANDED:
+                        goToFeedStationActivity();
+                        break;
+                }
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+
+            }
+        });
+        bottomSheetFeedstationFrameLayout.setOnClickListener(view1 -> goToFeedStationActivity());
         // Obtain the SupportMapFragment and get notified when the googleMap is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         seekBar.setMax(SEEKBAR_STEPS_COUNT - 1);
+        Glide.with(this)
+                .load(getResources().getDrawable(R.drawable.cat2))
+                .into(avatarImageView);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        switch (bottomSheetBehaviorFeedstation.getState()) {
+            case BottomSheetBehavior.STATE_EXPANDED:
+                bottomSheetBehaviorFeedstation.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                break;
+        }
+    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -84,9 +131,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 .build();                   // Creates a CameraPosition from the builder
         this.googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
+        this.googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                bottomSheetBehaviorFeedstation.setState(BottomSheetBehavior.STATE_HIDDEN);
+            }
+        });
+
         this.googleMap.setOnMarkerClickListener(marker -> {
-            Intent intent = new Intent(getContext(), FeedstationActivity.class);
-            startActivity(intent);
+            bottomSheetBehaviorFeedstation.setState(BottomSheetBehavior.STATE_COLLAPSED);
             return false;
         });
     }
@@ -109,6 +162,30 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             drawable.draw(canvas);
         customMarkerView.draw(canvas);
         return returnedBitmap;
+    }
+
+    private void setBottomSheetDimensions() {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int screenHeight = displayMetrics.heightPixels;
+        int toolbarHeight = 0;
+        try {
+            toolbarHeight = getActivity().getActionBar().getHeight();
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+        int navigationBarHeight = Utils.convertDpToPx(56, getContext());
+        int feedStationHeaderHeight = Utils.convertDpToPx(202, getContext());
+        int bottomSheetHeight = Utils.convertDpToPx(190, getContext());
+        int bottomSheetOtherViewHeight = screenHeight - (toolbarHeight + feedStationHeaderHeight + bottomSheetHeight + navigationBarHeight);
+        ViewGroup.LayoutParams layoutParams = bottomSheetOtherView.getLayoutParams();
+        layoutParams.height = bottomSheetOtherViewHeight;
+        bottomSheetOtherView.setLayoutParams(layoutParams);
+    }
+
+    private void goToFeedStationActivity() {
+        Intent intent = new Intent(getContext(), FeedstationActivity.class);
+        startActivity(intent);
     }
 
 }
