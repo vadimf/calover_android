@@ -4,6 +4,8 @@ package com.varteq.catslovers;
 import android.os.Environment;
 import android.text.format.DateFormat;
 
+import com.crashlytics.android.Crashlytics;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -33,7 +35,7 @@ public class Log {
         }
         appendLogToFile("d", TAG, mess, LOG_FILE);
         if (!BuildConfig.DEBUG) {
-            // Crashlytics.log("D/" + TAG + ": " + mess);
+            //Crashlytics.log("D/" + TAG + ": " + mess);
         }
     }
 
@@ -47,7 +49,7 @@ public class Log {
         }
         appendLogToFile("w", TAG, mess, LOG_FILE);
         if (!BuildConfig.DEBUG) {
-            // Crashlytics.log("W/" + TAG + ": " + mess);
+            //Crashlytics.log("W/" + TAG + ": " + mess);
         }
     }
 
@@ -61,7 +63,7 @@ public class Log {
         }
         appendLogToFile("i", TAG, mess, LOG_FILE);
         if (!BuildConfig.DEBUG) {
-            // Crashlytics.log("I/" + TAG + ": " + mess);
+            //Crashlytics.log("I/" + TAG + ": " + mess);
         }
     }
 
@@ -93,7 +95,7 @@ public class Log {
         }
         appendLogToFile("e", TAG, mess, LOG_FILE);
         if (!BuildConfig.DEBUG) {
-            //Crashlytics.log("E/" + TAG + ": " + mess);
+            Crashlytics.log("E/" + TAG + ": " + mess);
         }
     }
 

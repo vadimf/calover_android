@@ -40,6 +40,7 @@ public class CatsFragment extends Fragment {
     RecyclerView catsRecyclerView;
     private HashMap<String, List<CatProfile>> catsHashMap;
     private CatsListAdapter catsListAdapter;
+    private boolean notFirstTime;
 
     final private int SEEKBAR_STEPS_COUNT = 7;
     @BindView(R.id.seekBar)
@@ -105,6 +106,19 @@ public class CatsFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        notFirstTime = true;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (notFirstTime)
+            getCats();
     }
 
     public void getCats() {

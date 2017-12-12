@@ -27,7 +27,7 @@ public class MainPresenter {
 
         //if (CognitoAuthHelper.getCurrUser()==null) return;
         //if (!settings.containsKey("username")) return;
-        if (ChatHelper.getCurrentUser() != null) {
+        if (ChatHelper.getInstance().isLogged()) {
             view.showChat();
             return;
         }
@@ -62,7 +62,19 @@ public class MainPresenter {
                         @Override
                         public void onSuccess(Void aVoid, Bundle bundle) {
                             Log.i(TAG, "chat singUp success");
-                            view.showChat();
+                            if (bundle != null) {
+                                ChatHelper.getInstance().login(qbUser, new QBEntityCallback<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid, Bundle bundle) {
+                                        view.showChat();
+                                    }
+
+                                    @Override
+                                    public void onError(QBResponseException e) {
+                                        Log.e(TAG, e.getMessage());
+                                    }
+                                });
+                            }
                         }
 
                         @Override

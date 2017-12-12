@@ -305,7 +305,8 @@ public class AuthPresenter {
             @Override
             public void onSuccess(Void aVoid, Bundle bundle) {
                 Log.i(TAG, "chat singUp success");
-                getCats();
+                if (bundle != null)
+                    getCats();
             }
 
             @Override

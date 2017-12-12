@@ -34,6 +34,9 @@ public interface ApiService {
                                       @Field("type") String type,
                                       @Field("next_flea_treatment") int nextFleaTreatment);
 
+    /*@PUT("cats/{id}")
+    Call<BaseResponse<Cat>> updateCat(@Path("id") int id, @Body Cat cat);*/
+
     @FormUrlEncoded
     @PUT("cats/{id}")
     Call<BaseResponse<Cat>> updateCat(@Path("id") int id,
