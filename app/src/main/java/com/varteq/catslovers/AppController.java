@@ -4,9 +4,12 @@ import android.app.Application;
 import android.content.Context;
 import android.support.v7.app.AppCompatDelegate;
 
+import com.crashlytics.android.Crashlytics;
 import com.quickblox.auth.session.QBSettings;
 import com.quickblox.core.StoringMechanism;
 import com.varteq.catslovers.api.ServiceGenerator;
+
+import io.fabric.sdk.android.Fabric;
 
 public class AppController extends Application {//extends MultiDexApplication {
 
@@ -31,6 +34,9 @@ public class AppController extends Application {//extends MultiDexApplication {
         instance = this;
         CognitoAuthHelper.init(getApplicationContext());
         ServiceGenerator.setToken(Profile.getAuthToken(this));
+
+        if (!BuildConfig.DEBUG)
+            Fabric.with(this, new Crashlytics());
 
         // Init Quick Block
         QBSettings.getInstance().setStoringMehanism(StoringMechanism.UNSECURED);

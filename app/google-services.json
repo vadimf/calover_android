@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "733817375962",
+    "firebase_url": "https://catslovers-f55e9.firebaseio.com",
+    "project_id": "catslovers-f55e9",
+    "storage_bucket": "catslovers-f55e9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:733817375962:android:41a93b8594b6ea21",
+        "android_client_info": {
+          "package_name": "com.varteq.catslovers"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "733817375962-9ptbunn98suliqf8sdavbsiufoe761fk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyALhpSaF35P7xYVYfAZ78TOCDYlAhhwtcs"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

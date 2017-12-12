@@ -117,7 +117,7 @@ public class CatProfilePresenter {
                         protected void onFail(ErrorResponse error) {
                             Log.d(TAG, error.getMessage() + error.getCode());
                             if (error.getCode() == 422)
-                                Toaster.longToast("You should fill in fields from age to description");
+                                Toaster.longToast("You should fill in PetName and fields from age to description");
                         }
                     };
                 }
@@ -126,6 +126,48 @@ public class CatProfilePresenter {
             @Override
             public void onFailure(Call<BaseResponse<Cat>> call, Throwable t) {
                 Log.e(TAG, "createCat onFailure " + t.getMessage());
+            }
+        });
+    }
+
+    public void updateCat(CatProfile cat) {
+        String colors = "";
+        for (int color : cat.getColorsList())
+            colors += String.valueOf(color) + ",";
+        if (!colors.isEmpty())
+            colors = colors.substring(0, colors.length() - 1);
+
+        String type = cat.getType().equals(CatProfile.Status.PET) ? "pet" : "stray";
+
+        int age = (int) (cat.getBirthday().getTime() / 1000L);
+        int nextFleaTreatment = (int) (cat.getFleaTreatmentDate().getTime() / 1000L);
+
+        Call<BaseResponse<Cat>> call = ServiceGenerator.getApiServiceWithToken().updateCat(cat.getId(), cat.getPetName(),
+                cat.getNickname(), colors, age, cat.getSex(), cat.getWeight(), cat.isCastrated(), cat.getDescription(), type, nextFleaTreatment);
+        call.enqueue(new Callback<BaseResponse<Cat>>() {
+            @Override
+            public void onResponse(Call<BaseResponse<Cat>> call, Response<BaseResponse<Cat>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    new BaseParser<Cat>(response) {
+
+                        @Override
+                        protected void onSuccess(Cat data) {
+                            view.savedSuccessfully();
+                        }
+
+                        @Override
+                        protected void onFail(ErrorResponse error) {
+                            Log.d(TAG, error.getMessage() + error.getCode());
+                            if (error.getCode() == 422)
+                                Toaster.longToast("You should fill in PetName and fields from age to description");
+                        }
+                    };
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseResponse<Cat>> call, Throwable t) {
+                Log.e(TAG, "updateCat onFailure " + t.getMessage());
             }
         });
     }

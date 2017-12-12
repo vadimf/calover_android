@@ -498,7 +498,8 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
                 Log.d(TAG, "app_bar_save");
                 if (currentMode.equals(CatProfileScreenMode.CREATE_MODE))
                     presenter.saveCat(fillCatProfile());
-                else savedSuccessfully();
+                else if (currentMode.equals(CatProfileScreenMode.EDIT_MODE))
+                    presenter.updateCat(fillCatProfile());
                 return true;
             case R.id.app_bar_edit:
                 Log.d(TAG, "app_bar_edit");
