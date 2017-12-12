@@ -41,6 +41,7 @@ import com.varteq.catslovers.utils.ChatHelper;
 import com.varteq.catslovers.utils.qb.QbChatDialogMessageListenerImp;
 import com.varteq.catslovers.utils.qb.QbDialogHolder;
 import com.varteq.catslovers.utils.qb.callback.QbEntityCallbackImpl;
+import com.varteq.catslovers.view.presenter.MessagesPresenter;
 import com.varteq.catslovers.view.qb.ChatActivity;
 import com.varteq.catslovers.view.qb.DialogsActivity;
 import com.varteq.catslovers.view.qb.SelectUsersActivity;
@@ -86,6 +87,7 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
     private DialogsManager dialogsManager;
     private QBUser currentUser;
 
+    private MessagesPresenter presenter;
 
     @Nullable
     @Override
@@ -105,12 +107,9 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
         //setActionBarTitle(getString(R.string.dialogs_logged_in_as, currentUser.getFullName()));
         //setActionBarTitle(getString(R.string.chat_menu));
 
-        registerQbChatListeners();
-        if (QbDialogHolder.getInstance().getDialogs().size() > 0) {
-            loadDialogsFromQb(true, true);
-        } else {
-            loadDialogsFromQb(false, true);
-        }
+        isProcessingResultInProgress = true;
+        progressBar.setVisibility(View.VISIBLE);
+        presenter.checkQBLogin();
     }
 
     @Override
@@ -127,6 +126,7 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
         dialogsManager = new DialogsManager();
 
         currentUser = ChatHelper.getCurrentUser();
+        presenter = new MessagesPresenter(this);
     }
 
     @Override
@@ -326,6 +326,15 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
         }
 
         dialogsManager.removeManagingDialogsCallbackListener(this);
+    }
+
+    public void registerQbChatListenersLoadDialogs() {
+        registerQbChatListeners();
+        if (QbDialogHolder.getInstance().getDialogs().size() > 0) {
+            loadDialogsFromQb(true, true);
+        } else {
+            loadDialogsFromQb(false, true);
+        }
     }
 
     private void createDialog(final ArrayList<QBUser> selectedUsers) {

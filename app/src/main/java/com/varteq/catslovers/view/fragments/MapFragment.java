@@ -168,12 +168,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int screenHeight = displayMetrics.heightPixels;
-        int toolbarHeight = 0;
-        try {
-            toolbarHeight = getActivity().getActionBar().getHeight();
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-        }
+        int toolbarHeight = Utils.convertDpToPx(56, getContext());
         int navigationBarHeight = Utils.convertDpToPx(56, getContext());
         int feedStationHeaderHeight = Utils.convertDpToPx(202, getContext());
         int bottomSheetHeight = Utils.convertDpToPx(190, getContext());

@@ -26,6 +26,11 @@
     <string name="select_cat_photo">Select cat photo</string>
     <string name="my_cats">My cats</string>
 
+    <!--Toolbar titles-->
+    <string name="toolbar_title_feedstations">Feedstation</string>
+    <string name="toolbar_title_feed">Feed</string>
+    <string name="toolbar_title_chat">Chat</string>
+    <string name="toolbar_title_cats">Cats</string>
 
     <!--QuickBlox-->
     <string name="menu_new_chat">New Chat</string>

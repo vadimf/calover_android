@@ -10,15 +10,16 @@ import com.varteq.catslovers.Log;
 import com.varteq.catslovers.Profile;
 import com.varteq.catslovers.utils.ChatHelper;
 import com.varteq.catslovers.view.MainActivity;
+import com.varteq.catslovers.view.fragments.MessagesFragment;
 
 
-public class MainPresenter {
+public class MessagesPresenter {
 
-    private MainActivity view;
+    private MessagesFragment view;
 
-    private String TAG = MainPresenter.class.getSimpleName();
+    private String TAG = MessagesPresenter.class.getSimpleName();
 
-    public MainPresenter(MainActivity view) {
+    public MessagesPresenter(MessagesFragment view) {
         this.view = view;
     }
 
@@ -28,17 +29,17 @@ public class MainPresenter {
         //if (CognitoAuthHelper.getCurrUser()==null) return;
         //if (!settings.containsKey("username")) return;
         if (ChatHelper.getInstance().isLogged()) {
-            view.showChat();
+            view.registerQbChatListenersLoadDialogs();
             return;
         }
-        //Profile.setUserPhone(view, "+380935772101");
+        Profile.setUserPhone(view.getContext(), "+380938315207");
         //Profile.saveUser(view, "Nata", "n@t.com");
-        if (Profile.getUserPhone(view).isEmpty()) {
+        if (Profile.getUserPhone(view.getContext()).isEmpty()) {
             return;
             //Profile.setUserPhone(view, "+380935772102");
         }
 
-        final QBUser qbUser = new QBUser(Profile.getUserPhone(view), AppController.USER_PASS);
+        final QBUser qbUser = new QBUser(Profile.getUserPhone(view.getContext()), AppController.USER_PASS);
         //qbUser.setExternalId(profile.getUserId());
         //qbUser.setWebsite(profile.getPicture());
         //qbUser.setFullName(Profile.getUserName(view));
@@ -47,7 +48,7 @@ public class MainPresenter {
             @Override
             public void onSuccess(Void aVoid, Bundle bundle) {
                 Log.i(TAG, "chat login success");
-                view.showChat();
+                view.registerQbChatListenersLoadDialogs();
             }
 
             @Override
@@ -55,9 +56,9 @@ public class MainPresenter {
                 Log.e(TAG, e.getMessage());
                 //Log.e(TAG, String.valueOf(e.getHttpStatusCode()));
                 if (e.toString().contains("Bad timestamp")) {
-                    view.showLongError(e.getLocalizedMessage(), null);
+                    ((MainActivity)view.getActivity()).showLongError(e.getLocalizedMessage(), null);
                 } else if (e.getHttpStatusCode() == 401) {
-                    qbUser.setFullName(Profile.getUserName(view));
+                    qbUser.setFullName(Profile.getUserName(view.getContext()));
                     ChatHelper.getInstance().singUp(qbUser, new QBEntityCallback<Void>() {
                         @Override
                         public void onSuccess(Void aVoid, Bundle bundle) {
@@ -66,7 +67,7 @@ public class MainPresenter {
                                 ChatHelper.getInstance().login(qbUser, new QBEntityCallback<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid, Bundle bundle) {
-                                        view.showChat();
+                                        view.registerQbChatListenersLoadDialogs();
                                     }
 
                                     @Override
