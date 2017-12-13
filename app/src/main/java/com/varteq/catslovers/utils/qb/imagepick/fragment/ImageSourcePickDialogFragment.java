@@ -1,8 +1,9 @@
 package com.varteq.catslovers.utils.qb.imagepick.fragment;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -14,14 +15,18 @@ import com.varteq.catslovers.R;
 import com.varteq.catslovers.utils.ImageUtils;
 import com.varteq.catslovers.utils.SystemPermissionHelper;
 
+import static com.varteq.catslovers.utils.SystemPermissionHelper.PERMISSIONS_FOR_SAVE_FILE_IMAGE_REQUEST;
+import static com.varteq.catslovers.utils.SystemPermissionHelper.PERMISSIONS_FOR_TAKE_PHOTO_REQUEST;
+
 public class ImageSourcePickDialogFragment extends DialogFragment {
 
     private static final int POSITION_GALLERY = 0;
     private static final int POSITION_CAMERA = 1;
 
-    private static SystemPermissionHelper systemPermissionHelper;
+    private SystemPermissionHelper systemPermissionHelper;
 
     private OnImageSourcePickedListener onImageSourcePickedListener;
+    private boolean permissionsResultReceived;
 
     public ImageSourcePickDialogFragment() {
         systemPermissionHelper = new SystemPermissionHelper(this);
@@ -29,6 +34,7 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
 
     public static void show(FragmentManager fm, OnImageSourcePickedListener onImageSourcePickedListener) {
         ImageSourcePickDialogFragment fragment = new ImageSourcePickDialogFragment();
+        fragment.setCancelable(false);
         fragment.setOnImageSourcePickedListener(onImageSourcePickedListener);
         fragment.show(fm, ImageSourcePickDialogFragment.class.getSimpleName());
     }
@@ -38,29 +44,53 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(R.string.dlg_choose_image_from);
-        builder.setItems(R.array.dlg_image_pick, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case POSITION_GALLERY:
-                        if (!systemPermissionHelper.isSaveImagePermissionGranted()) {
-                            systemPermissionHelper.requestPermissionsForSaveFileImage();
-                            return;
-                        }
-                        onImageSourcePickedListener.onImageSourcePicked(ImageSource.GALLERY);
-                        break;
-                    case POSITION_CAMERA:
-                        if (!systemPermissionHelper.isCameraPermissionGranted()) {
-                            systemPermissionHelper.requestPermissionsTakePhoto();
-                            return;
-                        }
-                        onImageSourcePickedListener.onImageSourcePicked(ImageSource.CAMERA);
-                        break;
-                }
+        builder.setItems(R.array.dlg_image_pick, null);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.getListView().setOnItemClickListener((adapterView, view, i, l) -> {
+            switch (i) {
+                case POSITION_GALLERY:
+                    if (!systemPermissionHelper.isSaveImagePermissionGranted()) {
+                        systemPermissionHelper.requestPermissionsForSaveFileImage();
+                        return;
+                    }
+                    onImageSourcePickedListener.onImageSourcePicked(ImageSource.GALLERY);
+                    dismiss();
+                    break;
+                case POSITION_CAMERA:
+                    if (!systemPermissionHelper.isCameraPermissionGranted()) {
+                        systemPermissionHelper.requestPermissionsTakePhoto();
+                        return;
+                    }
+                    onImageSourcePickedListener.onImageSourcePicked(ImageSource.CAMERA);
+                    dismiss();
+                    break;
             }
         });
+        return alertDialog;
+    }
 
-        return builder.create();
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (permissionsResultReceived)
+            dismiss();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == PERMISSIONS_FOR_SAVE_FILE_IMAGE_REQUEST) {
+            if (permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                onImageSourcePickedListener.onImageSourcePicked(ImageSource.GALLERY);
+            }
+        }
+        if (requestCode == PERMISSIONS_FOR_TAKE_PHOTO_REQUEST) {
+            if (permissions[0].equals(Manifest.permission.CAMERA)
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                onImageSourcePickedListener.onImageSourcePicked(ImageSource.CAMERA);
+            }
+        }
+        permissionsResultReceived = true;
     }
 
     public void setOnImageSourcePickedListener(OnImageSourcePickedListener onImageSourcePickedListener) {

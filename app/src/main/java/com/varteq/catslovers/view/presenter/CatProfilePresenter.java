@@ -1,5 +1,6 @@
 package com.varteq.catslovers.view.presenter;
 
+import android.location.Location;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 
@@ -83,7 +84,7 @@ public class CatProfilePresenter {
         }
     }
 
-    public void saveCat(CatProfile cat) {
+    public void saveCat(CatProfile cat, Location lastLocation) {
         String colors = "";
         for (int color : cat.getColorsList())
             colors += String.valueOf(color) + ",";
@@ -95,8 +96,13 @@ public class CatProfilePresenter {
         int age = (int) (cat.getBirthday().getTime() / 1000L);
         int nextFleaTreatment = (int) (cat.getFleaTreatmentDate().getTime() / 1000L);
 
+        lastLocation = new Location("dddd");
+        lastLocation.setLatitude(50.4437);
+        lastLocation.setLongitude(30.5008);
+
         Call<BaseResponse<Cat>> call = ServiceGenerator.getApiServiceWithToken().createCat(cat.getId(), cat.getPetName(),
-                cat.getNickname(), colors, age, cat.getSex(), cat.getWeight(), cat.isCastrated(), cat.getDescription(), type, nextFleaTreatment);
+                cat.getNickname(), colors, age, cat.getSex(), cat.getWeight(), cat.isCastrated(), cat.getDescription(), type, nextFleaTreatment,
+                lastLocation.getLatitude(), lastLocation.getLongitude());
         call.enqueue(new Callback<BaseResponse<Cat>>() {
             @Override
             public void onResponse(Call<BaseResponse<Cat>> call, Response<BaseResponse<Cat>> response) {

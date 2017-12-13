@@ -47,6 +47,7 @@ dependencies {
     compile 'com.larswerkman:HoloColorPicker:1.5'
     compile 'com.amazonaws:aws-android-sdk-cognitoidentityprovider:2.6.7'
     implementation 'com.google.android.gms:play-services-maps:11.4.2'
+    implementation 'com.google.android.gms:play-services-location:11.4.2'
     compile 'com.squareup.retrofit2:retrofit:2.3.0'
     compile 'com.squareup.retrofit2:converter-gson:2.3.0'
     compile 'com.squareup.okhttp3:logging-interceptor:3.8.0'
