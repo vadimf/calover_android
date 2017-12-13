@@ -1,5 +1,6 @@
 <resources>
-    <string name="app_name">CatsLovers</string>
+    <string name="app_name">Cats Lovers</string>
+    <string name="ComingSoon">Coming soon</string>
     <string name="title_activity_start">StartActivity</string>
     <string name="continue_button_title">Continue</string>
     <string name="confirm_phone_number">Please confirm your country code\n Enter your Mobile #</string>
@@ -12,6 +13,17 @@
     <string name="pick_a_color">Choose a color</string>
     <string name="new_cat_profile_screen_title">New Cat Profile</string>
     <string name="title_activity_main">Feedstation</string>
+
+    <!--SignIn Activity-->
+    <string name="Username">Username</string>
+    <string name="UsernameHint">Enter phone number</string>
+    <string name="UsernameIsEmpty">Username is empty!</string>
+    <string name="Password">Password</string>
+    <string name="PasswordHint">Enter password</string>
+    <string name="PasswordIsEmpty">Password is empty!</string>
+    <string name="btnSignIn">Sign In</string>
+    <string name="btnSignUp">Sign Up</string>
+    <string name="btnForgotPassword">Forgot Password</string>
 
     <!--Bottom menu-->
     <string name="map_menu">MAP</string>

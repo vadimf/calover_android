@@ -18,9 +18,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class LoginActivity extends PhotoPickerActivity {
+public class SignUpActivity extends PhotoPickerActivity {
 
-    private String TAG = LoginActivity.class.getSimpleName();
+    private String TAG = SignUpActivity.class.getSimpleName();
     @BindView(R.id.avatar)
     RoundedImageView avatar;
     @BindView(R.id.continue_button)
@@ -39,7 +39,7 @@ public class LoginActivity extends PhotoPickerActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_signup);
 
         Log.d(TAG, "onCreate");
 
@@ -61,7 +61,7 @@ public class LoginActivity extends PhotoPickerActivity {
                         Log.d(TAG, "continue_button OnClick");
                         Profile.saveUser(this, nameEditText.getText().toString(),
                                 emailEditText.getText().toString());
-                        startActivity(new Intent(LoginActivity.this, ConfirmNumberActivity.class));
+                        startActivity(new Intent(SignUpActivity.this, ConfirmNumberActivity.class));
                     }
                 });
     }

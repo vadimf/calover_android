@@ -220,7 +220,7 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
         /*ChatHelper.getInstance().destroy();
         SubscribeService.unSubscribeFromPushes(DialogsActivity.this);
         SharedPrefsHelper.getInstance().removeQbUser();
-        LoginActivity.start(DialogsActivity.this);
+        SignUpActivity.start(DialogsActivity.this);
         QbDialogHolder.getInstance().clear();
         ProgressDialogFragment.hide(getSupportFragmentManager());
         finish();*/
