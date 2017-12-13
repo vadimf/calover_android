@@ -32,7 +32,9 @@ public interface ApiService {
                                       @Field("castrated") boolean castrated,
                                       @Field("description") String description,
                                       @Field("type") String type,
-                                      @Field("next_flea_treatment") int nextFleaTreatment);
+                                      @Field("next_flea_treatment") int nextFleaTreatment,
+                                      @Field("lat") double lat,
+                                      @Field("lng") double lng);
 
     /*@PUT("cats/{id}")
     Call<BaseResponse<Cat>> updateCat(@Path("id") int id, @Body Cat cat);*/

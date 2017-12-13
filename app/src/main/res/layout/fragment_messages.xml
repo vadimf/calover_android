@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/layout_root"
     style="@style/MatchParent"
     tools:ignore="RtlHardcoded,RtlSymmetry">
@@ -46,5 +47,5 @@
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_dialogs_new_chat"
         style="@style/FabStyle"
-        android:src="@drawable/ic_action_start_chat" />
+        app:srcCompat="@drawable/ic_add_white_24dp" />
 </android.support.design.widget.CoordinatorLayout>
