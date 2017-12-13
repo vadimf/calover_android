@@ -39,9 +39,25 @@ public class Utils {
         return new String(password);
     }
 
-    public static int convertDpToPx(float dp, Context context){
+    public static int convertDpToPx(float dp, Context context) {
         float factor = context.getResources().getDisplayMetrics().density;
         return (int) (dp * factor);
+    }
+
+    public static boolean isStringNumeric(String str) {
+        try {
+            double d = Double.parseDouble(str);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean isStringNumericPositive(String str) {
+        if (isStringNumeric(str) && Float.parseFloat(str) > 0)
+            return true;
+        else
+            return false;
     }
 
 }

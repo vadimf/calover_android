@@ -1,7 +1,6 @@
 package com.varteq.catslovers.view;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -13,7 +12,6 @@ import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -36,11 +34,13 @@ import com.varteq.catslovers.model.GroupPartner;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.utils.TimeUtils;
+import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.utils.Utils;
 import com.varteq.catslovers.view.adapters.CatPhotosAdapter;
 import com.varteq.catslovers.view.adapters.GroupPartnersAdapter;
 import com.varteq.catslovers.view.adapters.ViewColorsAdapter;
 import com.varteq.catslovers.view.dialog.ColorPickerDialog;
+import com.varteq.catslovers.view.dialog.EditTextDialog;
 import com.varteq.catslovers.view.dialog.WrappedDatePickerDialog;
 import com.varteq.catslovers.view.presenter.CatProfilePresenter;
 
@@ -547,16 +547,28 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
 
     @OnClick(R.id.weight_value_textView)
     void onWeightClick() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(CatProfileActivity.this);
-        View dialogView = LayoutInflater.from(CatProfileActivity.this).inflate(R.layout.dialog_edittext, null, false);
-        ((TextView) dialogView.findViewById(R.id.dialogTextView)).setText("Enter cat's weight");
-        ((EditText) dialogView.findViewById(R.id.dialogEditText)).setHint("weight");
-        ((EditText) dialogView.findViewById(R.id.dialogEditText)).setText(weight > 0 ? String.valueOf(weight) : null);
-        ((EditText) dialogView.findViewById(R.id.dialogEditText)).setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        builder.setView(dialogView);
-        builder.setPositiveButton("OK", (dialogInterface, i) -> setWeight(((EditText) dialogView.findViewById(R.id.dialogEditText)).getText().toString()));
-        builder.setNegativeButton("Cancel", null);
-        builder.show();
+        EditTextDialog editTextDialog = new EditTextDialog(this, "Enter cat's weight", "kg", "OK", "Cancel",
+                new EditTextDialog.OnClickListener() {
+                    @Override
+                    public void onPositiveButtonClick() {
+                        String enteredValue = getEditTextDialog().getEditText().getText().toString();
+                        if (Utils.isStringNumericPositive(enteredValue)) {
+                            setWeight(enteredValue);
+                            dismiss();
+                        } else {
+                            Toaster.shortToast("Invalid weight");
+                        }
+                    }
+
+                    @Override
+                    public void onNegativeButtonClick() {
+                        dismiss();
+                    }
+                }
+        );
+        editTextDialog.setEditTextText(weight > 0 ? String.valueOf(weight) : null);
+        editTextDialog.setEditTextInputType(InputType.TYPE_CLASS_PHONE);
+        editTextDialog.show();
     }
 
     @OnClick(R.id.petLayout)
@@ -634,16 +646,29 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
 
     @OnClick(R.id.pet_name_textView)
     void changeCatName() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        View dialogView = LayoutInflater.from(CatProfileActivity.this).inflate(R.layout.dialog_edittext, null, false);
-        ((TextView) dialogView.findViewById(R.id.dialogTextView)).setText("Enter cat's name");
-        EditText editText = dialogView.findViewById(R.id.dialogEditText);
-        editText.setHint("name");
-        editText.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        builder.setView(dialogView);
-        builder.setPositiveButton("OK", (dialogInterface, i) -> petNameTextView.setText(editText.getText().toString()));
-        builder.setNegativeButton("Cancel", null);
-        builder.show();
+        EditTextDialog editTextDialog = new EditTextDialog(this, "Enter cat's name", "name", "OK", "Cancel",
+                new EditTextDialog.OnClickListener() {
+                    @Override
+                    public void onPositiveButtonClick() {
+                        String enteredValue = getEditTextDialog().getEditText().getText().toString();
+                        if (enteredValue.length() > 1) {
+                            petNameTextView.setText(enteredValue);
+                            dismiss();
+                        } else {
+                            Toaster.shortToast("Enter at least 2 symbols");
+                        }
+                    }
+
+                    @Override
+                    public void onNegativeButtonClick() {
+                        dismiss();
+                    }
+                }
+        );
+        String name = petNameTextView.getText().toString();
+        editTextDialog.setEditTextText(!name.isEmpty() ? name : null);
+        editTextDialog.setEditTextInputType(InputType.TYPE_CLASS_TEXT);
+        editTextDialog.show();
     }
 
     @OnClick(R.id.expand_colors_button)
