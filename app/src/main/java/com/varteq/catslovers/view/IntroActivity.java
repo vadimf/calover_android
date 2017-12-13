@@ -108,7 +108,8 @@ public class IntroActivity extends AppCompatActivity {
     @OnClick({R.id.go_to_login_button, R.id.start_button})
     void goToLogin() {
         Log.d(TAG, "goToLogin");
-        startActivity(new Intent(this, LoginActivity.class));
+        finish();
+        startActivity(new Intent(this, SignInActivity.class));
     }
 
     private void selectBottomDot(int currentPage) {
