@@ -126,7 +126,9 @@ public class ValidateNumberActivity extends BaseActivity implements TextWatcher 
 
         Profile.setUserLogin(this, true);
 
-        showSuccessDialog();
+        Intent intent = new Intent(this, SuccessLoginActivity.class);
+        startActivity(intent);
+        finishAffinity();
     }
 
     private void showSuccessDialog() {

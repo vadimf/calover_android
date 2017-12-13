@@ -356,6 +356,7 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
 
         infoLinearLayout.setVisibility(View.VISIBLE);
         addPhotoButton.setVisibility(View.INVISIBLE);
+        addPhotoButton.setOnClickListener(null);
 
         petLayout.setEnabled(false);
         strayLayout.setEnabled(false);
@@ -407,6 +408,7 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
 
         infoLinearLayout.setVisibility(View.GONE);
         addPhotoButton.setVisibility(View.VISIBLE);
+        addPhotoButton.setOnClickListener(view -> Toaster.shortToast("Coming soon"));
 
         petLayout.setEnabled(true);
         strayLayout.setEnabled(true);
