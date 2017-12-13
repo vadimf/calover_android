@@ -18,9 +18,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.varteq.catslovers.Log;
-import com.varteq.catslovers.Profile;
 import com.varteq.catslovers.R;
+import com.varteq.catslovers.utils.Log;
+import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.view.presenter.AuthPresenter;
 
 import java.util.ArrayList;

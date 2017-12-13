@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
 
-import com.varteq.catslovers.Log;
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.api.BaseParser;
 import com.varteq.catslovers.api.ServiceGenerator;
@@ -18,11 +17,13 @@ import com.varteq.catslovers.api.entity.BaseResponse;
 import com.varteq.catslovers.api.entity.Cat;
 import com.varteq.catslovers.api.entity.ErrorResponse;
 import com.varteq.catslovers.model.CatProfile;
+import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.TimeUtils;
 import com.varteq.catslovers.view.CatProfileActivity;
 import com.varteq.catslovers.view.adapters.CatsListAdapter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -122,16 +123,6 @@ public class CatsFragment extends Fragment {
     }
 
     public void getCats() {
-        /*String colors = "";
-        for (int color : cat.getColorsList())
-            colors += String.valueOf(color) + ",";
-        if (!colors.isEmpty())
-            colors = colors.substring(0, colors.length() - 1);
-
-        String type = cat.getType().equals(CatProfile.Status.PET) ? "pet" : "stray";
-
-        int age = (int) (cat.getBirthday().getTime() / 1000L);
-        int nextFleaTreatment = (int) (cat.getFleaTreatmentDate().getTime() / 1000L);*/
 
         Call<BaseResponse<List<Cat>>> call = ServiceGenerator.getApiServiceWithToken().getCats();
         call.enqueue(new Callback<BaseResponse<List<Cat>>>() {
@@ -141,9 +132,25 @@ public class CatsFragment extends Fragment {
 
                     @Override
                     protected void onSuccess(List<Cat> data) {
-                        catsHashMap.put("A", getCatProfiles(data));
-                        catsListAdapter.notifyDataSetChanged();
                         Log.i(TAG, String.valueOf(data.size()));
+                        if (data.size() < 1) return;
+                        List<CatProfile> catProfiles = getCatProfiles(data);
+                        Collections.sort(catProfiles, (catProfile, t1) -> catProfile.getPetName().compareTo(t1.getPetName()));
+
+                        char letter = data.get(0).getName().charAt(0);
+                        ArrayList<CatProfile> list = new ArrayList<>();
+                        for (CatProfile cat : catProfiles) {
+                            if (letter == cat.getPetName().charAt(0))
+                                list.add(cat);
+                            else {
+                                catsHashMap.put(String.valueOf(letter), list);
+                                letter = cat.getPetName().charAt(0);
+                                list = new ArrayList<>();
+                                list.add(cat);
+                            }
+
+                        }
+                        catsListAdapter.notifyDataSetChanged();
                     }
 
                     @Override

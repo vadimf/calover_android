@@ -1,4 +1,4 @@
-package com.varteq.catslovers;
+package com.varteq.catslovers.utils.qb;
 
 import android.content.Context;
 import android.graphics.Color;

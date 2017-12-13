@@ -1,4 +1,4 @@
-package com.varteq.catslovers;
+package com.varteq.catslovers.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;

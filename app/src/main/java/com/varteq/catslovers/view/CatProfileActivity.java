@@ -30,11 +30,11 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.makeramen.roundedimageview.RoundedImageView;
-import com.varteq.catslovers.Log;
-import com.varteq.catslovers.Profile;
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.model.CatProfile;
 import com.varteq.catslovers.model.GroupPartner;
+import com.varteq.catslovers.utils.Log;
+import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.utils.TimeUtils;
 import com.varteq.catslovers.utils.Utils;
 import com.varteq.catslovers.view.adapters.CatPhotosAdapter;

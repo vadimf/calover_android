@@ -20,9 +20,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.varteq.catslovers.Log;
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.model.GroupPartner;
+import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.view.adapters.CatPhotosAdapter;
 import com.varteq.catslovers.view.adapters.GroupPartnersAdapter;
 

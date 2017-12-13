@@ -15,8 +15,8 @@ import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
-import com.varteq.catslovers.Log;
 import com.varteq.catslovers.R;
+import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Utils;
 
 import java.util.ArrayList;

@@ -13,8 +13,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.varteq.catslovers.Log;
 import com.varteq.catslovers.R;
+import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Utils;
 import com.varteq.catslovers.view.fragments.CatsFragment;
 import com.varteq.catslovers.view.fragments.FeedFragment;
@@ -71,6 +71,12 @@ public class MainActivity extends BaseActivity {
         catsNotificationButton = findViewById(R.id.catsNotificationButton);
         catsSearchButton = findViewById(R.id.catsSearchButton);
         catsAddButton = findViewById(R.id.catsAddButton);
+        catsAddButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onPlusClick();
+            }
+        });
         setSupportActionBar(toolbar);
         catsToolsRelativeLayout = findViewById(R.id.catsToolsRelativeLayout);
 
@@ -100,6 +106,10 @@ public class MainActivity extends BaseActivity {
         }, 1000);
     }
 
+    //@OnClick(R.id.catsAddButton)
+    void onPlusClick() {
+        CatProfileActivity.startInCreateMode(this);
+    }
 
     private void setFragment(Fragment fragment) {
         if (fragment != null) {

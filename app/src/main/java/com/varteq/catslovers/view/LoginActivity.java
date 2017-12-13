@@ -10,9 +10,9 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import com.makeramen.roundedimageview.RoundedImageView;
-import com.varteq.catslovers.Log;
-import com.varteq.catslovers.Profile;
 import com.varteq.catslovers.R;
+import com.varteq.catslovers.utils.Log;
+import com.varteq.catslovers.utils.Profile;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

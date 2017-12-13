@@ -5,9 +5,12 @@ import android.content.Context;
 import android.support.v7.app.AppCompatDelegate;
 
 import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.core.CrashlyticsCore;
 import com.quickblox.auth.session.QBSettings;
 import com.quickblox.core.StoringMechanism;
 import com.varteq.catslovers.api.ServiceGenerator;
+import com.varteq.catslovers.utils.Profile;
+import com.varteq.catslovers.utils.qb.CognitoAuthHelper;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -35,13 +38,19 @@ public class AppController extends Application {//extends MultiDexApplication {
         CognitoAuthHelper.init(getApplicationContext());
         ServiceGenerator.setToken(Profile.getAuthToken(this));
 
-        if (!BuildConfig.DEBUG)
-            Fabric.with(this, new Crashlytics());
+        configureCrashReporting();
 
         // Init Quick Block
         QBSettings.getInstance().setStoringMehanism(StoringMechanism.UNSECURED);
         QBSettings.getInstance().init(getApplicationContext(), APP_ID, AUTH_KEY, AUTH_SECRET);
         QBSettings.getInstance().setAccountKey(ACCOUNT_KEY);
+    }
+
+    private void configureCrashReporting() {
+        CrashlyticsCore crashlyticsCore = new CrashlyticsCore.Builder()
+                .disabled(BuildConfig.DEBUG)
+                .build();
+        Fabric.with(this, new Crashlytics.Builder().core(crashlyticsCore).build());
     }
 
     /*protected void attachBaseContext(Context base) {

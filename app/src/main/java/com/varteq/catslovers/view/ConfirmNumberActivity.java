@@ -10,8 +10,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import com.hbb20.CountryCodePicker;
-import com.varteq.catslovers.Log;
 import com.varteq.catslovers.R;
+import com.varteq.catslovers.utils.Log;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

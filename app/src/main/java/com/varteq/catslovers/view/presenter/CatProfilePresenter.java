@@ -3,7 +3,6 @@ package com.varteq.catslovers.view.presenter;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 
-import com.varteq.catslovers.Log;
 import com.varteq.catslovers.api.BaseParser;
 import com.varteq.catslovers.api.ServiceGenerator;
 import com.varteq.catslovers.api.entity.BaseResponse;
@@ -11,6 +10,7 @@ import com.varteq.catslovers.api.entity.Cat;
 import com.varteq.catslovers.api.entity.ErrorResponse;
 import com.varteq.catslovers.model.CatProfile;
 import com.varteq.catslovers.model.GroupPartner;
+import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.view.CatProfileActivity;
 

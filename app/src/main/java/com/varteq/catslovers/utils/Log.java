@@ -1,10 +1,11 @@
-package com.varteq.catslovers;
+package com.varteq.catslovers.utils;
 
 
 import android.os.Environment;
 import android.text.format.DateFormat;
 
 import com.crashlytics.android.Crashlytics;
+import com.varteq.catslovers.BuildConfig;
 
 import java.io.BufferedWriter;
 import java.io.File;

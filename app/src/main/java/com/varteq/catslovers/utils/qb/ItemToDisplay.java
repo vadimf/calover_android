@@ -15,7 +15,7 @@
  *  limitations under the License.
  */
 
-package com.varteq.catslovers;
+package com.varteq.catslovers.utils.qb;
 
 public class ItemToDisplay {
     // Text for display

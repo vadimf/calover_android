@@ -6,9 +6,9 @@ import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.users.model.QBUser;
 import com.varteq.catslovers.AppController;
-import com.varteq.catslovers.Log;
-import com.varteq.catslovers.Profile;
 import com.varteq.catslovers.utils.ChatHelper;
+import com.varteq.catslovers.utils.Log;
+import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.view.MainActivity;
 import com.varteq.catslovers.view.fragments.MessagesFragment;
 
