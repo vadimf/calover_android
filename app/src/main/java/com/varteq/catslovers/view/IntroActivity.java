@@ -109,7 +109,8 @@ public class IntroActivity extends AppCompatActivity {
     void goToLogin() {
         Log.d(TAG, "goToLogin");
         finish();
-        startActivity(new Intent(this, SignInActivity.class));
+        // TODO complete auth and stitch to SignInActivity
+        startActivity(new Intent(this, SignUpActivity.class));
     }
 
     private void selectBottomDot(int currentPage) {

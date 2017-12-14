@@ -12,31 +12,29 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoDevice;
-import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUser;
-import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserAttributes;
-import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserCodeDeliveryDetails;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserSession;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.AuthenticationContinuation;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.AuthenticationDetails;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.ChallengeContinuation;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.MultiFactorAuthenticationContinuation;
-import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.NewPasswordContinuation;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.AuthenticationHandler;
-import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.SignUpHandler;
-import com.makeramen.roundedimageview.RoundedImageView;
 import com.varteq.catslovers.R;
+import com.varteq.catslovers.api.BaseParser;
+import com.varteq.catslovers.api.ServiceGenerator;
+import com.varteq.catslovers.api.entity.AuthToken;
+import com.varteq.catslovers.api.entity.BaseResponse;
+import com.varteq.catslovers.api.entity.ErrorResponse;
 import com.varteq.catslovers.utils.Log;
-import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.utils.qb.CognitoAuthHelper;
-import com.varteq.catslovers.view.presenter.AuthPresenter;
 
-import java.util.List;
-import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SignInActivity extends BaseActivity {
 
@@ -86,9 +84,7 @@ public class SignInActivity extends BaseActivity {
             Log.d(TAG, "AuthenticationHandler onSuccess");
             hideWaitDialog();
             CognitoAuthHelper.setCurrSession(cognitoUserSession);
-
-            //TODO call getToken and run MainActivity
-            Toaster.shortToast(R.string.ComingSoon);
+            getAPIToken(cognitoUserSession.getAccessToken().getJWTToken());
         }
 
         @Override
@@ -122,6 +118,41 @@ public class SignInActivity extends BaseActivity {
             Toaster.shortToast(CognitoAuthHelper.formatException(e));
         }
     };
+
+    private void getAPIToken(String token) {
+        Call<BaseResponse<AuthToken>> call = ServiceGenerator.getApiService().auth(token);
+        call.enqueue(new Callback<BaseResponse<AuthToken>>() {
+            @Override
+            public void onResponse(Call<BaseResponse<AuthToken>> call, Response<BaseResponse<AuthToken>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    new BaseParser<AuthToken>(response) {
+                        @Override
+                        protected void onSuccess(AuthToken data) {
+                            Log.d(TAG, "onSuccess");
+                            hideWaitDialog();
+                            // TODO data.getToken()
+                            // TODO run MainActivity
+                            Toaster.shortToast(R.string.ComingSoon);
+                        }
+
+                        @Override
+                        protected void onFail(ErrorResponse error) {
+                            Log.d(TAG, "onFailure");
+                            hideWaitDialog();
+                            Toaster.shortToast(error.getMessage());
+                        }
+                    };
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseResponse<AuthToken>> call, Throwable t) {
+                Log.d(TAG, "onFailure");
+                hideWaitDialog();
+                Toaster.shortToast(t.getMessage());
+            }
+        });
+    }
 
     @OnClick(R.id.btnSignUp)
     void btnSignUp() {
