@@ -87,8 +87,8 @@
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".view.FeedstationActivity"
-            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:label="@string/new_station_screen_title"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
 
         <activity
             android:name=".view.qb.SelectUsersActivity"

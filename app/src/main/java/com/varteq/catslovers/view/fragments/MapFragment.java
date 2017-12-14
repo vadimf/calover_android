@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -30,6 +31,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.varteq.catslovers.R;
+import com.varteq.catslovers.utils.ImageUtils;
+import com.varteq.catslovers.utils.Log;
+import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.utils.Utils;
 import com.varteq.catslovers.view.FeedstationActivity;
 
@@ -38,6 +42,7 @@ import butterknife.ButterKnife;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
+    private final String TAG = MapFragment.class.getSimpleName();
     private GoogleMap googleMap;
 
     final private float markerPositionX = 0.5f; // Anchors the marker on center vertical
@@ -108,15 +113,24 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
 
+        Location location = Profile.getLocation(getContext());
+        if (location == null) {
+            location = new Location("fused");
+            location.setLatitude(50.4437);
+            location.setLongitude(30.5008);
+            Profile.setLocation(getContext(), location);
+        }
+
         // Add a marker in Sydney and move the camera
+        LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
         LatLng sydney = new LatLng(-33.866915, 151.204631);
         LatLng sydney1 = new LatLng(-33.967, 151.996);
 
-        //fake markers
         this.googleMap.addMarker(new MarkerOptions()
-                .icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(R.drawable.ic_star))) // insert image from request
+                .icon(BitmapDescriptorFactory.fromBitmap(ImageUtils.getBitmapFromVectorDrawable(getActivity(), R.drawable.ic_place_24dp))) // insert image from request
+                //.icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(R.drawable.ic_star))) // insert image from request
                 .anchor(markerPositionX, markerPositionY)
-                .position(sydney));
+                .position(userLocation));
         /*this.googleMap.addMarker(new MarkerOptions()
                 .icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(R.drawable.ic_star))) // insert image from request
                 .anchor(markerPositionX, markerPositionY)
@@ -124,7 +138,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         //this.googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(sydney)      // Sets the center of the map to Mountain View
+                .target(userLocation)      // Sets the center of the map to Mountain View
                 .zoom(17)                   // Sets the zoom
                 .bearing(90)                // Sets the orientation of the camera to east
                 .tilt(30)                   // Sets the tilt of the camera to 30 degrees
@@ -141,6 +155,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         this.googleMap.setOnMarkerClickListener(marker -> {
             bottomSheetBehaviorFeedstation.setState(BottomSheetBehavior.STATE_COLLAPSED);
             return false;
+        });
+
+        googleMap.setOnMapLongClickListener(latLng -> {
+            /*Location selectedLocation = new Location("");
+            selectedLocation.setLatitude(latLng.latitude);
+            selectedLocation.setLongitude(latLng.longitude);*/
+            FeedstationActivity.startInCreateMode(getActivity(), latLng);
+            Log.d(TAG, "OnMapLongClick " + latLng.latitude + " / " + latLng.longitude + "]");
         });
     }
 

@@ -1,20 +1,18 @@
 package com.varteq.catslovers.view.presenter;
 
-import android.location.Location;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 
 import com.varteq.catslovers.api.BaseParser;
 import com.varteq.catslovers.api.ServiceGenerator;
 import com.varteq.catslovers.api.entity.BaseResponse;
-import com.varteq.catslovers.api.entity.Cat;
 import com.varteq.catslovers.api.entity.ErrorResponse;
-import com.varteq.catslovers.model.CatProfile;
+import com.varteq.catslovers.api.entity.RFeedstation;
+import com.varteq.catslovers.model.Feedstation;
 import com.varteq.catslovers.model.GroupPartner;
 import com.varteq.catslovers.utils.Log;
-import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.utils.Toaster;
-import com.varteq.catslovers.view.CatProfileActivity;
+import com.varteq.catslovers.view.FeedstationActivity;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -23,13 +21,13 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class CatProfilePresenter {
+public class FeedstationPresenter {
 
-    private String TAG = CatProfilePresenter.class.getSimpleName();
+    private String TAG = FeedstationPresenter.class.getSimpleName();
 
-    private CatProfileActivity view;
+    private FeedstationActivity view;
 
-    public CatProfilePresenter(CatProfileActivity view) {
+    public FeedstationPresenter(FeedstationActivity view) {
         this.view = view;
     }
 
@@ -85,46 +83,61 @@ public class CatProfilePresenter {
         }
     }
 
-    public void saveCat(CatProfile cat, Location lastLocation) {
-        saveCat(cat, -1, lastLocation);
-    }
+    public void saveFeedstation(Feedstation feedstation) {
 
-    public void saveCat(CatProfile cat, int feedstationId, Location lastLocation) {
-        String colors = "";
-        for (int color : cat.getColorsList())
-            colors += String.valueOf(color) + ",";
-        if (!colors.isEmpty())
-            colors = colors.substring(0, colors.length() - 1);
+        Call<BaseResponse<RFeedstation>> call = ServiceGenerator.getApiServiceWithToken().createFeedstation(feedstation.getName(),
+                feedstation.getAddress(), feedstation.getDescription(), 0,
+                feedstation.getLocation().latitude, feedstation.getLocation().longitude);
 
-        String type = cat.getType().equals(CatProfile.Status.PET) ? "pet" : "stray";
 
-        int age = (int) (cat.getBirthday().getTime() / 1000L);
-        int nextFleaTreatment = (int) (cat.getFleaTreatmentDate().getTime() / 1000L);
-
-        // fake location
-        /*lastLocation = new Location("dddd");
-        lastLocation.setLatitude(50.4437);
-        lastLocation.setLongitude(30.5008);*/
-
-        Call<BaseResponse<Cat>> call;
-        if (feedstationId != -1) {
-            call = ServiceGenerator.getApiServiceWithToken().createCat(feedstationId, cat.getPetName(),
-                    cat.getNickname(), colors, age, cat.getSex(), cat.getWeight(), cat.isCastrated(), cat.getDescription(), type, nextFleaTreatment,
-                    lastLocation.getLatitude(), lastLocation.getLongitude());
-            Profile.setLocation(view, lastLocation);
-        }
-        else call = ServiceGenerator.getApiServiceWithToken().createPrivateCat(cat.getPetName(),
-                cat.getNickname(), colors, age, cat.getSex(), cat.getWeight(), cat.isCastrated(), cat.getDescription(), type, nextFleaTreatment,
-                lastLocation.getLatitude(), lastLocation.getLongitude());
-
-        call.enqueue(new Callback<BaseResponse<Cat>>() {
+        call.enqueue(new Callback<BaseResponse<RFeedstation>>() {
             @Override
-            public void onResponse(Call<BaseResponse<Cat>> call, Response<BaseResponse<Cat>> response) {
+            public void onResponse(Call<BaseResponse<RFeedstation>> call, Response<BaseResponse<RFeedstation>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    new BaseParser<Cat>(response) {
+                    new BaseParser<RFeedstation>(response) {
 
                         @Override
-                        protected void onSuccess(Cat data) {
+                        protected void onSuccess(RFeedstation data) {
+                            /*if (data.getToken() != null) {
+                                Log.i(TAG, "getApiService().auth success");
+                                Log.i(TAG, data.getToken());
+
+                            }*/
+                            view.savedSuccessfully();
+                        }
+
+                        @Override
+                        protected void onFail(ErrorResponse error) {
+                            Log.d(TAG, error.getMessage() + error.getCode());
+                            if (error.getCode() == 422)
+                                Toaster.longToast("You should fill station data");
+                        }
+                    };
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseResponse<RFeedstation>> call, Throwable t) {
+                Log.e(TAG, "createCat onFailure " + t.getMessage());
+            }
+        });
+    }
+
+    public void updateFeedstation(Feedstation feedstation) {
+
+        Call<BaseResponse<RFeedstation>> call = ServiceGenerator.getApiServiceWithToken().updateFeedstation(feedstation.getId(), feedstation.getName(),
+                feedstation.getAddress(), feedstation.getDescription(), 0,
+                feedstation.getLocation().latitude, feedstation.getLocation().longitude);
+
+
+        call.enqueue(new Callback<BaseResponse<RFeedstation>>() {
+            @Override
+            public void onResponse(Call<BaseResponse<RFeedstation>> call, Response<BaseResponse<RFeedstation>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    new BaseParser<RFeedstation>(response) {
+
+                        @Override
+                        protected void onSuccess(RFeedstation data) {
                             /*if (data.getToken() != null) {
                                 Log.i(TAG, "getApiService().auth success");
                                 Log.i(TAG, data.getToken());
@@ -144,50 +157,8 @@ public class CatProfilePresenter {
             }
 
             @Override
-            public void onFailure(Call<BaseResponse<Cat>> call, Throwable t) {
+            public void onFailure(Call<BaseResponse<RFeedstation>> call, Throwable t) {
                 Log.e(TAG, "createCat onFailure " + t.getMessage());
-            }
-        });
-    }
-
-    public void updateCat(CatProfile cat) {
-        String colors = "";
-        for (int color : cat.getColorsList())
-            colors += String.valueOf(color) + ",";
-        if (!colors.isEmpty())
-            colors = colors.substring(0, colors.length() - 1);
-
-        String type = cat.getType().equals(CatProfile.Status.PET) ? "pet" : "stray";
-
-        int age = (int) (cat.getBirthday().getTime() / 1000L);
-        int nextFleaTreatment = (int) (cat.getFleaTreatmentDate().getTime() / 1000L);
-
-        Call<BaseResponse<Cat>> call = ServiceGenerator.getApiServiceWithToken().updateCat(cat.getId(), cat.getPetName(),
-                cat.getNickname(), colors, age, cat.getSex(), cat.getWeight(), cat.isCastrated(), cat.getDescription(), type, nextFleaTreatment);
-        call.enqueue(new Callback<BaseResponse<Cat>>() {
-            @Override
-            public void onResponse(Call<BaseResponse<Cat>> call, Response<BaseResponse<Cat>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    new BaseParser<Cat>(response) {
-
-                        @Override
-                        protected void onSuccess(Cat data) {
-                            view.savedSuccessfully();
-                        }
-
-                        @Override
-                        protected void onFail(ErrorResponse error) {
-                            Log.d(TAG, error.getMessage() + error.getCode());
-                            if (error.getCode() == 422)
-                                Toaster.longToast("You should fill in PetName and fields from age to description");
-                        }
-                    };
-                }
-            }
-
-            @Override
-            public void onFailure(Call<BaseResponse<Cat>> call, Throwable t) {
-                Log.e(TAG, "updateFeedstation onFailure " + t.getMessage());
             }
         });
     }

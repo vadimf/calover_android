@@ -28,8 +28,7 @@ public class EditTextDialog {
     AlertDialog.Builder builder;
     AlertDialog dialog;
 
-    public EditTextDialog(Context context, String textViewText, String editTextHint, String positiveButtonText, String negativeButtonText,
-                          EditTextDialog.OnClickListener onClickListener) {
+    public EditTextDialog(Context context, String titleText, String inputHint, String inputText, Integer inputType, EditTextDialog.OnClickListener onClickListener) {
 
         onClickListener.setEditTextDialog(this);
 
@@ -37,10 +36,10 @@ public class EditTextDialog {
         ButterKnife.bind(this, dialogView);
 
 
-        setTextViewText(textViewText);
-        setEditTextHint(editTextHint);
-        positiveButton.setText(positiveButtonText);
-        negativeButton.setText(negativeButtonText);
+        setTitleText(titleText);
+        setEditTextHint(inputHint);
+        setEditTextText(inputText);
+        setEditTextInputType(inputType);
         positiveButton.setOnClickListener(view -> onClickListener.onPositiveButtonClick());
         negativeButton.setOnClickListener(view -> onClickListener.onNegativeButtonClick());
 
@@ -49,15 +48,20 @@ public class EditTextDialog {
 
     }
 
-    public void setEditTextInputType(int editTextInputType) {
-       editText.setInputType(editTextInputType);
+    public EditTextDialog(Context context, String titleText, String inputHint, EditTextDialog.OnClickListener onClickListener) {
+        this(context, titleText, inputHint, null, null, onClickListener);
+    }
+
+    public void setEditTextInputType(Integer editTextInputType) {
+        if (editTextInputType != null)
+            editText.setInputType(editTextInputType);
     }
 
     public void setEditTextHint(String editTextHint) {
       editText.setHint(editTextHint);
     }
 
-    public void setTextViewText(String textViewText) {
+    public void setTitleText(String textViewText) {
         textView.setText(textViewText);
     }
 
@@ -97,7 +101,9 @@ public class EditTextDialog {
 
         public abstract void onPositiveButtonClick();
 
-        public abstract void onNegativeButtonClick();
+        public void onNegativeButtonClick() {
+            dismiss();
+        }
 
         public void dismiss() {
             editTextDialog.dismiss();

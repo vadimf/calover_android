@@ -3,6 +3,7 @@ package com.varteq.catslovers.api;
 import com.varteq.catslovers.api.entity.AuthToken;
 import com.varteq.catslovers.api.entity.BaseResponse;
 import com.varteq.catslovers.api.entity.Cat;
+import com.varteq.catslovers.api.entity.RFeedstation;
 
 import java.util.List;
 
@@ -52,7 +53,7 @@ public interface ApiService {
                                              @Field("lng") double lng);
 
     /*@PUT("cats/{id}")
-    Call<BaseResponse<Cat>> updateCat(@Path("id") int id, @Body Cat cat);*/
+    Call<BaseResponse<Cat>> updateFeedstation(@Path("id") int id, @Body Cat cat);*/
 
     @FormUrlEncoded
     @PUT("cats/{id}")
@@ -70,5 +71,25 @@ public interface ApiService {
 
     @GET("cats")
     Call<BaseResponse<List<Cat>>> getCats();
+
+
+    @FormUrlEncoded
+    @POST("feedstations")
+    Call<BaseResponse<RFeedstation>> createFeedstation(@Field("name") String name,
+                                                       @Field("address") String address,
+                                                       @Field("description") String description,
+                                                       @Field("time_to_feed") int timeToFeed,
+                                                       @Field("lat") double lat,
+                                                       @Field("lng") double lng);
+
+    @FormUrlEncoded
+    @PUT("feedstations/{id}")
+    Call<BaseResponse<RFeedstation>> updateFeedstation(@Path("id") int id,
+                                                       @Field("name") String name,
+                                                       @Field("address") String address,
+                                                       @Field("description") String description,
+                                                       @Field("time_to_feed") int timeToFeed,
+                                                       @Field("lat") double lat,
+                                                       @Field("lng") double lng);
 
 }

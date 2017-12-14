@@ -127,4 +127,5 @@
 
     <!--Cat profile-->
     <string name="menu_edit">Edit</string>
+    <string name="new_station_screen_title">New station</string>
 </resources>

@@ -663,7 +663,7 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
 
     @OnClick(R.id.weight_value_textView)
     void onWeightClick() {
-        EditTextDialog editTextDialog = new EditTextDialog(this, "Enter cat's weight", "kg", "OK", "Cancel",
+        EditTextDialog editTextDialog = new EditTextDialog(this, "Enter cat's weight", "kg",
                 new EditTextDialog.OnClickListener() {
                     @Override
                     public void onPositiveButtonClick() {
@@ -762,7 +762,7 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
 
     @OnClick(R.id.pet_name_textView)
     void changeCatName() {
-        EditTextDialog editTextDialog = new EditTextDialog(this, "Enter cat's name", "name", "OK", "Cancel",
+        EditTextDialog editTextDialog = new EditTextDialog(this, "Enter cat's name", "name",
                 new EditTextDialog.OnClickListener() {
                     @Override
                     public void onPositiveButtonClick() {

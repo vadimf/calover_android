@@ -2,6 +2,7 @@ package com.varteq.catslovers.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.location.Location;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 
@@ -12,42 +13,43 @@ public class Profile {
     private static String USER_AVATAR_KEY = "user_avatar";
     private static String USER_PHONE = "user_phone";
 
+    private static String USER_LOCATION_PROVIDER = "user_location_provider";
+    private static String USER_LOCATION_LAT = "user_location_lat";
+    private static String USER_LOCATION_LNG = "user_location_lng";
+
     private static String USER_LOGGED_IN_KEY = "user_logged_in";
 
     private static String TOKEN_KEY = "token";
     private static String PET_COUNT_KEY = "pet_cnt";
 
+    public static SharedPreferences getDefaultSharedPreferences(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context);
+    }
+    
     public static void saveUser(Context context, String name, String email) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        preferences.edit().putString(USER_NAME_KEY, name)
+        getDefaultSharedPreferences(context).edit().putString(USER_NAME_KEY, name)
                 .putString(USER_EMAIL_KEY, email)
                 .apply();
     }
 
     public static void saveUserAvatar(Context context, Uri avatar) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        preferences.edit().putString(USER_AVATAR_KEY, avatar.toString())
-                .apply();
+        getDefaultSharedPreferences(context).edit().putString(USER_AVATAR_KEY, avatar.toString()).apply();
     }
 
     public static void setUserLogin(Context context, boolean isLoggedIn) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        preferences.edit().putBoolean(USER_LOGGED_IN_KEY, isLoggedIn).apply();
+        getDefaultSharedPreferences(context).edit().putBoolean(USER_LOGGED_IN_KEY, isLoggedIn).apply();
     }
 
     public static boolean isUserLoggedIn(Context context) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        return preferences.getBoolean(USER_LOGGED_IN_KEY, false);
+        return getDefaultSharedPreferences(context).getBoolean(USER_LOGGED_IN_KEY, false);
     }
 
     public static String getUserName(Context context) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        return preferences.getString(USER_NAME_KEY, "");
+        return getDefaultSharedPreferences(context).getString(USER_NAME_KEY, "");
     }
 
     public static String getEmail(Context context) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        return preferences.getString(USER_EMAIL_KEY, "");
+        return getDefaultSharedPreferences(context).getString(USER_EMAIL_KEY, "");
     }
 
     public static Uri getUserAvatar(Context context) {
@@ -56,32 +58,55 @@ public class Profile {
     }
 
     public static void setAuthToken(Context context, String token) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        preferences.edit().putString(TOKEN_KEY, token).apply();
+        getDefaultSharedPreferences(context).edit().putString(TOKEN_KEY, token).apply();
     }
 
     public static String getAuthToken(Context context) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        return preferences.getString(TOKEN_KEY, "");
+        return getDefaultSharedPreferences(context).getString(TOKEN_KEY, "");
     }
 
     public static void setUserPetCount(Context context, int petCnt) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        preferences.edit().putInt(PET_COUNT_KEY, petCnt).apply();
+        getDefaultSharedPreferences(context).edit().putInt(PET_COUNT_KEY, petCnt).apply();
     }
 
     public static int getUserPetCount(Context context) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        return preferences.getInt(PET_COUNT_KEY, 0);
+        return getDefaultSharedPreferences(context).getInt(PET_COUNT_KEY, 0);
     }
 
     public static void setUserPhone(Context context, String phone) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        preferences.edit().putString(USER_PHONE, phone).apply();
+        getDefaultSharedPreferences(context).edit().putString(USER_PHONE, phone).apply();
     }
 
     public static String getUserPhone(Context context) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        return preferences.getString(USER_PHONE, "");
+        return getDefaultSharedPreferences(context).getString(USER_PHONE, "");
+    }
+
+    public static void setLocation(Context context, Location location) {
+        if (getLocation(context) != null) return;
+        getDefaultSharedPreferences(context).edit().putString(USER_LOCATION_PROVIDER, location.getProvider()).apply();
+        putDouble(context, USER_LOCATION_LAT, location.getLatitude());
+        putDouble(context, USER_LOCATION_LNG, location.getLongitude());
+    }
+
+    public static Location getLocation(Context context) {
+        String provider = getDefaultSharedPreferences(context).getString(USER_LOCATION_PROVIDER, "");
+        double lat = getDouble(context, USER_LOCATION_LAT, 0);
+        double lng = getDouble(context, USER_LOCATION_LNG, 0);
+        if (provider.isEmpty())
+            return null;
+        else {
+            Location l = new Location(provider);
+            l.setLatitude(lat);
+            l.setLongitude(lng);
+            return l;
+        }
+    }
+
+    private static void putDouble(Context context, final String key, final double value) {
+        getDefaultSharedPreferences(context).edit().putLong(key, Double.doubleToRawLongBits(value)).apply();
+    }
+
+    private static double getDouble(Context context, final String key, final double defaultValue) {
+        return Double.longBitsToDouble(getDefaultSharedPreferences(context).getLong(key, Double.doubleToLongBits(defaultValue)));
     }
 }
