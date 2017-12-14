@@ -1,11 +1,13 @@
 package com.varteq.catslovers.view;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,7 +15,6 @@ import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -29,18 +30,26 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.model.CatProfile;
 import com.varteq.catslovers.model.GroupPartner;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
+import com.varteq.catslovers.utils.SystemPermissionHelper;
 import com.varteq.catslovers.utils.TimeUtils;
+import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.utils.Utils;
 import com.varteq.catslovers.view.adapters.CatPhotosAdapter;
 import com.varteq.catslovers.view.adapters.GroupPartnersAdapter;
 import com.varteq.catslovers.view.adapters.ViewColorsAdapter;
 import com.varteq.catslovers.view.dialog.ColorPickerDialog;
+import com.varteq.catslovers.view.dialog.EditTextDialog;
 import com.varteq.catslovers.view.dialog.WrappedDatePickerDialog;
 import com.varteq.catslovers.view.presenter.CatProfilePresenter;
 
@@ -52,6 +61,9 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+
+import static com.varteq.catslovers.utils.SystemPermissionHelper.PERMISSIONS_ACCESS_LOCATION_REQUEST;
+import static com.varteq.catslovers.utils.SystemPermissionHelper.REQUEST_CHECK_SETTINGS;
 
 public class CatProfileActivity extends PhotoPickerActivity implements View.OnClickListener {
 
@@ -155,6 +167,11 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
     private CatProfilePresenter presenter;
     private MenuItem saveMenu;
     private MenuItem editMenu;
+    private Location lastLocation;
+    private FusedLocationProviderClient mFusedLocationClient;
+    private SystemPermissionHelper permissionHelper;
+    private LocationRequest locationRequest;
+    private LocationCallback locationCallback;
 
     public enum CatProfileScreenMode {
         EDIT_MODE,
@@ -220,6 +237,10 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
 
         if (!currentMode.equals(CatProfileScreenMode.CREATE_MODE))
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        else {
+            permissionHelper = new SystemPermissionHelper(this);
+            initLocation();
+        }
 
         nicknameTextView.setText(Profile.getUserName(this));
 
@@ -240,6 +261,89 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
 
         fillUI();
         setupUIMode();
+    }
+
+    private void initLocation() {
+        locationRequest = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY)
+                .setInterval(30 * 1000)
+                .setFastestInterval(20 * 1000);
+        checkLocationAvailability();
+    }
+
+    @SuppressLint("MissingPermission")
+    public void checkLocationAvailability() {
+        if (!permissionHelper.isAccessLocationGranted()) {
+            permissionHelper.requestPermissionsAccessLocation();
+            return;
+        }
+        permissionHelper.checkLocationSettings(this, locationRequest, locationSettingsResponse -> {
+            getLastLocation();
+        });
+    }
+
+    @SuppressLint("MissingPermission")
+    public void getLastLocation() {
+        if (mFusedLocationClient == null)
+            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        mFusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, location -> {
+                    // Got last known location. In some rare situations this can be null.
+                    if (location != null)
+                        lastLocation = location;
+                    else getLocationUpdates();
+                });
+    }
+
+    @SuppressLint("MissingPermission")
+    public void getLocationUpdates() {
+        if (locationCallback != null) return;
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                super.onLocationResult(locationResult);
+                if (locationResult != null && locationResult.getLastLocation() != null) {
+                    lastLocation = locationResult.getLastLocation();
+                    stopLocationUpdates();
+                }
+            }
+        };
+        if (mFusedLocationClient != null)
+            mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
+    }
+
+    private void stopLocationUpdates() {
+        if (locationCallback != null && mFusedLocationClient != null)
+            mFusedLocationClient.removeLocationUpdates(locationCallback);
+        locationCallback = null;
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_CHECK_SETTINGS:
+                switch (resultCode) {
+                    case Activity.RESULT_OK:
+                        getLastLocation();
+                        break;
+                    case Activity.RESULT_CANCELED:
+                        //Toast.makeText(getApplicationContext(), "impossible to add photo without location", Toast.LENGTH_LONG).show();
+                        break;
+                    default:
+                        break;
+                }
+                break;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == PERMISSIONS_ACCESS_LOCATION_REQUEST) {
+            if (permissions[0].equals(Manifest.permission.ACCESS_FINE_LOCATION)
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                checkLocationAvailability();
+            }
+        }
     }
 
     private void fillUI() {
@@ -356,6 +460,7 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
 
         infoLinearLayout.setVisibility(View.VISIBLE);
         addPhotoButton.setVisibility(View.INVISIBLE);
+        addPhotoButton.setOnClickListener(null);
 
         petLayout.setEnabled(false);
         strayLayout.setEnabled(false);
@@ -407,6 +512,7 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
 
         infoLinearLayout.setVisibility(View.GONE);
         addPhotoButton.setVisibility(View.VISIBLE);
+        addPhotoButton.setOnClickListener(view -> Toaster.shortToast("Coming soon"));
 
         petLayout.setEnabled(true);
         strayLayout.setEnabled(true);
@@ -496,8 +602,10 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
         switch (item.getItemId()) {
             case R.id.app_bar_save:
                 Log.d(TAG, "app_bar_save");
+                if (!isProfileValid())
+                    return true;
                 if (currentMode.equals(CatProfileScreenMode.CREATE_MODE))
-                    presenter.saveCat(fillCatProfile());
+                    presenter.saveCat(fillCatProfile(), lastLocation);
                 else if (currentMode.equals(CatProfileScreenMode.EDIT_MODE))
                     presenter.updateCat(fillCatProfile());
                 return true;
@@ -512,6 +620,14 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private boolean isProfileValid() {
+        if (currentMode.equals(CatProfileScreenMode.CREATE_MODE) && lastLocation == null) {
+            Toaster.longToast("We need location to display your cat on the map");
+            checkLocationAvailability();
+            return false;
+        } else return true;
     }
 
     private void setWeight(String weight) {
@@ -547,16 +663,28 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
 
     @OnClick(R.id.weight_value_textView)
     void onWeightClick() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(CatProfileActivity.this);
-        View dialogView = LayoutInflater.from(CatProfileActivity.this).inflate(R.layout.dialog_edittext, null, false);
-        ((TextView) dialogView.findViewById(R.id.dialogTextView)).setText("Enter cat's weight");
-        ((EditText) dialogView.findViewById(R.id.dialogEditText)).setHint("weight");
-        ((EditText) dialogView.findViewById(R.id.dialogEditText)).setText(weight > 0 ? String.valueOf(weight) : null);
-        ((EditText) dialogView.findViewById(R.id.dialogEditText)).setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        builder.setView(dialogView);
-        builder.setPositiveButton("OK", (dialogInterface, i) -> setWeight(((EditText) dialogView.findViewById(R.id.dialogEditText)).getText().toString()));
-        builder.setNegativeButton("Cancel", null);
-        builder.show();
+        EditTextDialog editTextDialog = new EditTextDialog(this, "Enter cat's weight", "kg", "OK", "Cancel",
+                new EditTextDialog.OnClickListener() {
+                    @Override
+                    public void onPositiveButtonClick() {
+                        String enteredValue = getEditTextDialog().getEditText().getText().toString();
+                        if (Utils.isStringNumericPositive(enteredValue)) {
+                            setWeight(enteredValue);
+                            dismiss();
+                        } else {
+                            Toaster.shortToast("Invalid weight");
+                        }
+                    }
+
+                    @Override
+                    public void onNegativeButtonClick() {
+                        dismiss();
+                    }
+                }
+        );
+        editTextDialog.setEditTextText(weight > 0 ? String.valueOf(weight) : null);
+        editTextDialog.setEditTextInputType(InputType.TYPE_CLASS_PHONE);
+        editTextDialog.show();
     }
 
     @OnClick(R.id.petLayout)
@@ -634,16 +762,29 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
 
     @OnClick(R.id.pet_name_textView)
     void changeCatName() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        View dialogView = LayoutInflater.from(CatProfileActivity.this).inflate(R.layout.dialog_edittext, null, false);
-        ((TextView) dialogView.findViewById(R.id.dialogTextView)).setText("Enter cat's name");
-        EditText editText = dialogView.findViewById(R.id.dialogEditText);
-        editText.setHint("name");
-        editText.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        builder.setView(dialogView);
-        builder.setPositiveButton("OK", (dialogInterface, i) -> petNameTextView.setText(editText.getText().toString()));
-        builder.setNegativeButton("Cancel", null);
-        builder.show();
+        EditTextDialog editTextDialog = new EditTextDialog(this, "Enter cat's name", "name", "OK", "Cancel",
+                new EditTextDialog.OnClickListener() {
+                    @Override
+                    public void onPositiveButtonClick() {
+                        String enteredValue = getEditTextDialog().getEditText().getText().toString();
+                        if (enteredValue.length() > 1) {
+                            petNameTextView.setText(enteredValue);
+                            dismiss();
+                        } else {
+                            Toaster.shortToast("Enter at least 2 symbols");
+                        }
+                    }
+
+                    @Override
+                    public void onNegativeButtonClick() {
+                        dismiss();
+                    }
+                }
+        );
+        String name = petNameTextView.getText().toString();
+        editTextDialog.setEditTextText(!name.isEmpty() ? name : null);
+        editTextDialog.setEditTextInputType(InputType.TYPE_CLASS_TEXT);
+        editTextDialog.show();
     }
 
     @OnClick(R.id.expand_colors_button)

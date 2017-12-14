@@ -26,4 +26,23 @@
         android:inputType="textPersonName"
         android:layout_marginTop="4dp"
         />
+
+    <Button
+        android:id="@+id/dialog_ok_button"
+        style="@style/PrimaryBorderlessButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/dialogEditText"
+        android:text="@android:string/ok"/>
+
+    <Button
+        android:id="@+id/dialog_cancel_button"
+        style="@style/PrimaryBorderlessButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dialogEditText"
+        android:layout_toStartOf="@+id/dialog_ok_button"
+        android:text="@android:string/no"/>
+
 </RelativeLayout>

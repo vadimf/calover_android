@@ -30,6 +30,11 @@ public class CatsListAdapter extends RecyclerView.Adapter<CatsListAdapter.CatsLi
         updateKeys();
     }
 
+    public void onDataChanged() {
+        updateKeys();
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getItemCount() {
         return catsList.size();
@@ -37,8 +42,6 @@ public class CatsListAdapter extends RecyclerView.Adapter<CatsListAdapter.CatsLi
 
     @Override
     public void onBindViewHolder(CatsListViewHolder catsListViewHolder, int i) {
-        if (keysList.size() != catsList.size())
-            updateKeys();
         List<CatProfile> catsSameLetterList = catsList.get(keysList.get(i));
         CatsListSameLetterAdapter adapter = new CatsListSameLetterAdapter(catsSameLetterList, externalClickListener);
         catsListViewHolder.innerRecyclerView.setAdapter(adapter);
