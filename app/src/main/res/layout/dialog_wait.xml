@@ -6,7 +6,7 @@
     android:layout_height="fill_parent"
     android:background="#00000000">
 
-    <com.pnikosis.materialishprogress.ProgresWheel
+    <com.pnikosis.materialishprogress.ProgressWheel
         android:id="@+id/progress_wheel"
         android:layout_width="80dp"
         android:layout_height="80dp"

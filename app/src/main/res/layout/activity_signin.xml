@@ -83,7 +83,8 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="@string/PasswordHint"
-        android:inputType="textEmailAddress"
+        android:inputType="textPassword"
+        android:text="Durpa222_"
         app:layout_constraintEnd_toStartOf="@+id/guidelineEnd"
         app:layout_constraintStart_toStartOf="@+id/guidelineStart"
         app:layout_constraintTop_toBottomOf="@+id/passwordTextView" />
@@ -117,7 +118,8 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="@string/UsernameHint"
-        android:inputType="textPersonName"
+        android:inputType="phone"
+        android:text="+380931393062"
         app:layout_constraintEnd_toStartOf="@+id/guidelineEnd"
         app:layout_constraintStart_toStartOf="@+id/usernameTextView"
         app:layout_constraintTop_toBottomOf="@+id/usernameTextView">
