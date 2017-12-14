@@ -85,6 +85,10 @@ public class CatProfilePresenter {
     }
 
     public void saveCat(CatProfile cat, Location lastLocation) {
+        saveCat(cat, -1, lastLocation);
+    }
+
+    public void saveCat(CatProfile cat, int feedstationId, Location lastLocation) {
         String colors = "";
         for (int color : cat.getColorsList())
             colors += String.valueOf(color) + ",";
@@ -100,9 +104,15 @@ public class CatProfilePresenter {
         lastLocation.setLatitude(50.4437);
         lastLocation.setLongitude(30.5008);
 
-        Call<BaseResponse<Cat>> call = ServiceGenerator.getApiServiceWithToken().createCat(cat.getId(), cat.getPetName(),
+        Call<BaseResponse<Cat>> call;
+        if (feedstationId != -1)
+            call = ServiceGenerator.getApiServiceWithToken().createCat(feedstationId, cat.getPetName(),
+                    cat.getNickname(), colors, age, cat.getSex(), cat.getWeight(), cat.isCastrated(), cat.getDescription(), type, nextFleaTreatment,
+                    lastLocation.getLatitude(), lastLocation.getLongitude());
+        else call = ServiceGenerator.getApiServiceWithToken().createPrivateCat(cat.getPetName(),
                 cat.getNickname(), colors, age, cat.getSex(), cat.getWeight(), cat.isCastrated(), cat.getDescription(), type, nextFleaTreatment,
                 lastLocation.getLatitude(), lastLocation.getLongitude());
+
         call.enqueue(new Callback<BaseResponse<Cat>>() {
             @Override
             public void onResponse(Call<BaseResponse<Cat>> call, Response<BaseResponse<Cat>> response) {

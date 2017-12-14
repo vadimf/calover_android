@@ -41,7 +41,7 @@ public class CatsFragment extends Fragment {
     RecyclerView catsRecyclerView;
     private HashMap<String, List<CatProfile>> catsHashMap;
     private CatsListAdapter catsListAdapter;
-    private boolean notFirstTime;
+    private boolean listUpdated;
 
     final private int SEEKBAR_STEPS_COUNT = 7;
     @BindView(R.id.seekBar)
@@ -112,17 +112,18 @@ public class CatsFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        notFirstTime = true;
+        listUpdated = false;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if (notFirstTime)
+        if (!listUpdated)
             getCats();
     }
 
     public void getCats() {
+        listUpdated = true;
 
         Call<BaseResponse<List<Cat>>> call = ServiceGenerator.getApiServiceWithToken().getCats();
         call.enqueue(new Callback<BaseResponse<List<Cat>>>() {
@@ -134,23 +135,24 @@ public class CatsFragment extends Fragment {
                     protected void onSuccess(List<Cat> data) {
                         Log.i(TAG, String.valueOf(data.size()));
                         if (data.size() < 1) return;
+                        catsHashMap.clear();
                         List<CatProfile> catProfiles = getCatProfiles(data);
-                        Collections.sort(catProfiles, (catProfile, t1) -> catProfile.getPetName().compareTo(t1.getPetName()));
+                        Collections.sort(catProfiles, (catProfile, t1) -> catProfile.getPetName().toUpperCase().compareTo(t1.getPetName().toUpperCase()));
 
-                        char letter = data.get(0).getName().charAt(0);
+                        char letter = Character.toUpperCase(data.get(0).getName().charAt(0));
                         ArrayList<CatProfile> list = new ArrayList<>();
                         for (CatProfile cat : catProfiles) {
-                            if (letter == cat.getPetName().charAt(0))
+                            if (letter == Character.toUpperCase(cat.getPetName().charAt(0)))
                                 list.add(cat);
                             else {
                                 catsHashMap.put(String.valueOf(letter), list);
-                                letter = cat.getPetName().charAt(0);
+                                letter = Character.toUpperCase(cat.getPetName().charAt(0));
                                 list = new ArrayList<>();
                                 list.add(cat);
                             }
 
                         }
-                        catsListAdapter.notifyDataSetChanged();
+                        catsListAdapter.onDataChanged();
                     }
 
                     @Override

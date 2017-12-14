@@ -36,6 +36,21 @@ public interface ApiService {
                                       @Field("lat") double lat,
                                       @Field("lng") double lng);
 
+    @FormUrlEncoded
+    @POST("cats")
+    Call<BaseResponse<Cat>> createPrivateCat(@Field("name") String name,
+                                             @Field("nickname") String nickname,
+                                             @Field("color") String colors,
+                                             @Field("age") int age,
+                                             @Field("sex") String sex,
+                                             @Field("weight") float weight,
+                                             @Field("castrated") boolean castrated,
+                                             @Field("description") String description,
+                                             @Field("type") String type,
+                                             @Field("next_flea_treatment") int nextFleaTreatment,
+                                             @Field("lat") double lat,
+                                             @Field("lng") double lng);
+
     /*@PUT("cats/{id}")
     Call<BaseResponse<Cat>> updateCat(@Path("id") int id, @Body Cat cat);*/
 
