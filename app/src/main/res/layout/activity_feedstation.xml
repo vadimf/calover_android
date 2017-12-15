@@ -262,24 +262,26 @@
                 app:layout_constraintTop_toBottomOf="@+id/group_partners_textView"/>
 
             <View
+                android:layout_marginTop="8dp"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:background="#19607c9c"
+                android:id="@+id/photos_background"
                 app:layout_constraintBottom_toBottomOf="@+id/photos_RecyclerView"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/upload_image_LinearLayout"/>
+                app:layout_constraintTop_toBottomOf="@+id/group_partners_RecyclerView" />
 
             <TextView
                 android:id="@+id/station_name_photos_textView"
                 style="@style/PrimaryTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:text="Shylee's Babies"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="@+id/upload_image_LinearLayout"
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
-                app:layout_constraintTop_toTopOf="@+id/upload_image_LinearLayout"/>
+                app:layout_constraintTop_toTopOf="@+id/photos_background" />
 
             <TextView
                 android:id="@+id/photo_count_textView"
@@ -307,25 +309,23 @@
                 android:id="@+id/upload_image_LinearLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_marginTop="16dp"
                 android:gravity="right"
                 app:layout_constraintEnd_toStartOf="@+id/end_guideline"
-                app:layout_constraintTop_toBottomOf="@+id/group_partners_RecyclerView">
+                app:layout_constraintTop_toTopOf="@+id/station_name_photos_textView">
 
                 <TextView
                     style="@style/PrimaryTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
-                    android:text="Upload pic"/>
+                    android:text="Upload pic" />
 
                 <Button
                     android:id="@+id/upload_image_button"
                     style="@style/PrimaryBorderlessButton"
                     android:layout_width="@dimen/normal_button_size"
                     android:layout_height="@dimen/normal_button_size"
-                    android:background="@drawable/ic_add_24dp"/>
+                    android:background="@drawable/ic_add_24dp" />
 
             </LinearLayout>
 

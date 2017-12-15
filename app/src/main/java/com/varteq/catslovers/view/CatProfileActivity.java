@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -12,6 +13,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
@@ -38,6 +40,7 @@ import com.google.android.gms.location.LocationServices;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.model.CatProfile;
+import com.varteq.catslovers.model.Feedstation;
 import com.varteq.catslovers.model.GroupPartner;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
@@ -512,7 +515,7 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
 
         infoLinearLayout.setVisibility(View.GONE);
         addPhotoButton.setVisibility(View.VISIBLE);
-        addPhotoButton.setOnClickListener(view -> Toaster.shortToast("Coming soon"));
+        addPhotoButton.setOnClickListener(view -> Toaster.shortToast(R.string.coming_soon));
 
         petLayout.setEnabled(true);
         strayLayout.setEnabled(true);
@@ -627,6 +630,11 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
             Toaster.longToast("We need location to display your cat on the map");
             checkLocationAvailability();
             return false;
+        } else if (catType.equals(CatProfile.Status.STRAY) &&
+                (catProfile == null || catProfile.getFeedstationId() == null)) {
+            selectAnimalTypePet();
+            Toaster.shortToast(R.string.stray_cat_no_feedstation_error);
+            return false;
         } else return true;
     }
 
@@ -698,11 +706,16 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
 
     @OnClick(R.id.strayLayout)
     void selectAnimalTypeStray() {
+        if (catType.equals(CatProfile.Status.PET) && currentMode.equals(CatProfileScreenMode.EDIT_MODE)) {
+            Toaster.shortToast("Your cat can't be stray");
+            return;
+        }
         petLayout.setBackgroundResource(R.drawable.cat_profile_animal_type_unselected_shape);
         strayLayout.setBackgroundResource(R.drawable.cat_profile_animal_type_selected_shape);
         animalTypePetTextView.setTextAppearance(this, R.style.SecondaryTextView);
         animalTypeStrayTextView.setTextAppearance(this, R.style.PrimaryTextView);
         catType = CatProfile.Status.STRAY;
+        presenter.getStrayFeedstations();
     }
 
     @OnClick(R.id.upload_image_button)
@@ -852,5 +865,39 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
             currentMode = CatProfileScreenMode.VIEW_MODE;
             setupUIMode();
         }
+    }
+
+    public void feedstationsLoaded(List<Feedstation> feedstations) {
+        if (catType.equals(CatProfile.Status.PET)) return;
+        for (int i = 0; i < feedstations.size(); i++) {
+            if (!feedstations.get(i).getIsPublic())
+                feedstations.remove(i);
+        }
+        if (feedstations.size() < 1) {
+            selectAnimalTypePet();
+            Toaster.shortToast("You must be a member of public feedstation");
+            return;
+        }
+        String[] items = new String[feedstations.size()];
+        for (int i = 0; i < feedstations.size(); i++)
+            items[i] = feedstations.get(i).getName();
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Choose feedstation for cat");
+        builder.setItems(items, null);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.getListView().setOnItemClickListener((adapterView, view, i, l) -> {
+            if (catProfile == null)
+                catProfile = new CatProfile();
+            catProfile.setFeedstationId(feedstations.get(i).getId());
+            alertDialog.dismiss();
+        });
+        alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialogInterface) {
+                selectAnimalTypePet();
+                Toaster.shortToast(R.string.stray_cat_no_feedstation_error);
+            }
+        });
+        alertDialog.show();
     }
 }

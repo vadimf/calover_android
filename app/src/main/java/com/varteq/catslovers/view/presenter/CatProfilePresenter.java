@@ -4,18 +4,23 @@ import android.location.Location;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.varteq.catslovers.api.BaseParser;
 import com.varteq.catslovers.api.ServiceGenerator;
 import com.varteq.catslovers.api.entity.BaseResponse;
 import com.varteq.catslovers.api.entity.Cat;
 import com.varteq.catslovers.api.entity.ErrorResponse;
+import com.varteq.catslovers.api.entity.RFeedstation;
 import com.varteq.catslovers.model.CatProfile;
+import com.varteq.catslovers.model.Feedstation;
 import com.varteq.catslovers.model.GroupPartner;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
+import com.varteq.catslovers.utils.TimeUtils;
 import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.view.CatProfileActivity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -86,10 +91,6 @@ public class CatProfilePresenter {
     }
 
     public void saveCat(CatProfile cat, Location lastLocation) {
-        saveCat(cat, -1, lastLocation);
-    }
-
-    public void saveCat(CatProfile cat, int feedstationId, Location lastLocation) {
         String colors = "";
         for (int color : cat.getColorsList())
             colors += String.valueOf(color) + ",";
@@ -107,15 +108,16 @@ public class CatProfilePresenter {
         lastLocation.setLongitude(30.5008);*/
 
         Call<BaseResponse<Cat>> call;
-        if (feedstationId != -1) {
-            call = ServiceGenerator.getApiServiceWithToken().createCat(feedstationId, cat.getPetName(),
+        if (cat.getFeedstationId() != null)
+            call = ServiceGenerator.getApiServiceWithToken().createCat(cat.getFeedstationId(), cat.getPetName(),
+                    cat.getNickname(), colors, age, cat.getSex(), cat.getWeight(), cat.isCastrated(), cat.getDescription(), type, nextFleaTreatment,
+                    lastLocation.getLatitude(), lastLocation.getLongitude());
+        else {
+            call = ServiceGenerator.getApiServiceWithToken().createPrivateCat(cat.getPetName(),
                     cat.getNickname(), colors, age, cat.getSex(), cat.getWeight(), cat.isCastrated(), cat.getDescription(), type, nextFleaTreatment,
                     lastLocation.getLatitude(), lastLocation.getLongitude());
             Profile.setLocation(view, lastLocation);
         }
-        else call = ServiceGenerator.getApiServiceWithToken().createPrivateCat(cat.getPetName(),
-                cat.getNickname(), colors, age, cat.getSex(), cat.getWeight(), cat.isCastrated(), cat.getDescription(), type, nextFleaTreatment,
-                lastLocation.getLatitude(), lastLocation.getLongitude());
 
         call.enqueue(new Callback<BaseResponse<Cat>>() {
             @Override
@@ -125,11 +127,6 @@ public class CatProfilePresenter {
 
                         @Override
                         protected void onSuccess(Cat data) {
-                            /*if (data.getToken() != null) {
-                                Log.i(TAG, "getApiService().auth success");
-                                Log.i(TAG, data.getToken());
-
-                            }*/
                             view.savedSuccessfully();
                         }
 
@@ -187,8 +184,56 @@ public class CatProfilePresenter {
 
             @Override
             public void onFailure(Call<BaseResponse<Cat>> call, Throwable t) {
-                Log.e(TAG, "updateFeedstation onFailure " + t.getMessage());
+                Log.e(TAG, "updateCat onFailure " + t.getMessage());
             }
         });
+    }
+
+    public void getStrayFeedstations() {
+
+        Call<BaseResponse<List<RFeedstation>>> call = ServiceGenerator.getApiServiceWithToken().getFeedstations();
+        call.enqueue(new Callback<BaseResponse<List<RFeedstation>>>() {
+            @Override
+            public void onResponse(Call<BaseResponse<List<RFeedstation>>> call, Response<BaseResponse<List<RFeedstation>>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    new BaseParser<List<RFeedstation>>(response) {
+
+                        @Override
+                        protected void onSuccess(List<RFeedstation> data) {
+                            view.feedstationsLoaded(from(data));
+                        }
+
+                        @Override
+                        protected void onFail(ErrorResponse error) {
+                            Log.d(TAG, error.getMessage() + error.getCode());
+                        }
+                    };
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseResponse<List<RFeedstation>>> call, Throwable t) {
+                Log.e(TAG, "getFeedstations onFailure " + t.getMessage());
+            }
+        });
+    }
+
+    private List<Feedstation> from(List<RFeedstation> data) {
+        List<Feedstation> list = new ArrayList<>();
+        for (RFeedstation station : data) {
+            Feedstation feedstation = new Feedstation();
+            feedstation.setId(station.getId());
+            feedstation.setName(station.getName());
+            feedstation.setAddress(station.getAddress());
+            feedstation.setDescription(station.getDescription());
+            if (station.getIsPublic())
+                feedstation.setTimeToFeed(TimeUtils.getLocalDateFromUtc(station.getTimeToFeed()));
+            if (station.getLat() != null && station.getLng() != null)
+                feedstation.setLocation(new LatLng(station.getLat(), station.getLng()));
+            feedstation.setIsPublic(station.getIsPublic());
+
+            list.add(feedstation);
+        }
+        return list;
     }
 }

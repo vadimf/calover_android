@@ -1,6 +1,5 @@
 package com.varteq.catslovers.view.fragments;
 
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -19,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -28,14 +28,19 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.varteq.catslovers.R;
+import com.varteq.catslovers.model.Feedstation;
 import com.varteq.catslovers.utils.ImageUtils;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.utils.Utils;
 import com.varteq.catslovers.view.FeedstationActivity;
+import com.varteq.catslovers.view.presenter.MapPresenter;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -56,9 +61,23 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     RoundedImageView avatarImageView;
     @BindView(R.id.bottom_sheet_feedstation)
     FrameLayout bottomSheetFeedstationFrameLayout;
+    @BindView(R.id.station_name_textView)
+    TextView stationNameTextView;
+    @BindView(R.id.address_textView)
+    TextView addressTextView;
     BottomSheetBehavior bottomSheetBehaviorFeedstation;
     @BindView(R.id.bottom_sheet_other_view)
     View bottomSheetOtherView;
+
+    MapPresenter presenter;
+    private MarkerOptions userLocationMarkerOptions;
+    private boolean listUpdated;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        presenter = new MapPresenter(this);
+    }
 
     @Nullable
     @Override
@@ -79,7 +98,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
                 switch (newState) {
                     case BottomSheetBehavior.STATE_EXPANDED:
-                        goToFeedStationActivity();
+                        goToFeedStationActivity((Feedstation) bottomSheetFeedstationFrameLayout.getTag());
                         break;
                 }
             }
@@ -89,7 +108,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
             }
         });
-        bottomSheetFeedstationFrameLayout.setOnClickListener(view1 -> goToFeedStationActivity());
+        bottomSheetFeedstationFrameLayout.setOnClickListener(view1 ->
+                goToFeedStationActivity((Feedstation) bottomSheetFeedstationFrameLayout.getTag()));
         // Obtain the SupportMapFragment and get notified when the googleMap is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -107,53 +127,30 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 bottomSheetBehaviorFeedstation.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 break;
         }
+        if (!listUpdated && googleMap != null)
+            presenter.getFeedstations();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        listUpdated = false;
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
 
-        Location location = Profile.getLocation(getContext());
-        if (location == null) {
-            location = new Location("fused");
-            location.setLatitude(50.4437);
-            location.setLongitude(30.5008);
-            Profile.setLocation(getContext(), location);
-        }
+        setUserPosition();
 
-        // Add a marker in Sydney and move the camera
-        LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
-        LatLng sydney = new LatLng(-33.866915, 151.204631);
-        LatLng sydney1 = new LatLng(-33.967, 151.996);
-
-        this.googleMap.addMarker(new MarkerOptions()
-                .icon(BitmapDescriptorFactory.fromBitmap(ImageUtils.getBitmapFromVectorDrawable(getActivity(), R.drawable.ic_place_24dp))) // insert image from request
-                //.icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(R.drawable.ic_star))) // insert image from request
-                .anchor(markerPositionX, markerPositionY)
-                .position(userLocation));
-        /*this.googleMap.addMarker(new MarkerOptions()
-                .icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(R.drawable.ic_star))) // insert image from request
-                .anchor(markerPositionX, markerPositionY)
-                .position(sydney1));*/
-
-        //this.googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-        CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(userLocation)      // Sets the center of the map to Mountain View
-                .zoom(17)                   // Sets the zoom
-                .bearing(90)                // Sets the orientation of the camera to east
-                .tilt(30)                   // Sets the tilt of the camera to 30 degrees
-                .build();                   // Creates a CameraPosition from the builder
-        this.googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
-        this.googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng latLng) {
-                bottomSheetBehaviorFeedstation.setState(BottomSheetBehavior.STATE_HIDDEN);
-            }
-        });
+        this.googleMap.setOnMapClickListener(latLng -> bottomSheetBehaviorFeedstation.setState(BottomSheetBehavior.STATE_HIDDEN));
 
         this.googleMap.setOnMarkerClickListener(marker -> {
+            if (marker.getTag() == null) return false;
             bottomSheetBehaviorFeedstation.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            stationNameTextView.setText(((Feedstation) marker.getTag()).getName());
+            addressTextView.setText(((Feedstation) marker.getTag()).getAddress());
+            bottomSheetFeedstationFrameLayout.setTag(marker.getTag());
             return false;
         });
 
@@ -164,6 +161,40 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             FeedstationActivity.startInCreateMode(getActivity(), latLng);
             Log.d(TAG, "OnMapLongClick " + latLng.latitude + " / " + latLng.longitude + "]");
         });
+
+        if (!listUpdated)
+            presenter.getFeedstations();
+    }
+
+    private void setUserPosition() {
+        Location location = Profile.getLocation(getContext());
+        if (location == null) {
+            return;
+            /*location = new Location("fused");
+            location.setLatitude(50.4437);
+            location.setLongitude(30.5008);
+            Profile.setLocation(getContext(), location);*/
+        }
+
+        // Add a marker in Sydney and move the camera
+        LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
+        LatLng sydney = new LatLng(-33.866915, 151.204631);
+        LatLng sydney1 = new LatLng(-33.967, 151.996);
+
+        userLocationMarkerOptions = new MarkerOptions()
+                .icon(BitmapDescriptorFactory.fromBitmap(ImageUtils.getBitmapFromVectorDrawable(getActivity(), R.drawable.ic_place_24dp))) // insert image from request
+                //.icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(R.drawable.ic_star))) // insert image from request
+                .anchor(markerPositionX, markerPositionY)
+                .position(userLocation);
+        addUserLocationMarker();
+
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(userLocation)      // Sets the center of the map to Mountain View
+                .zoom(17)                   // Sets the zoom
+                .bearing(90)                // Sets the orientation of the camera to east
+                .tilt(30)                   // Sets the tilt of the camera to 30 degrees
+                .build();                   // Creates a CameraPosition from the builder
+        this.googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
     //method to integrate photo to marker
@@ -200,9 +231,29 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         bottomSheetOtherView.setLayoutParams(layoutParams);
     }
 
-    private void goToFeedStationActivity() {
-        Intent intent = new Intent(getContext(), FeedstationActivity.class);
-        startActivity(intent);
+    private void goToFeedStationActivity(Feedstation station) {
+        FeedstationActivity.startInViewMode(getActivity(), station);
     }
 
+    public void feedstationsLoaded(List<Feedstation> stations) {
+        listUpdated = true;
+        googleMap.clear();
+        for (Feedstation feedstation : stations) {
+            if (!feedstation.getIsPublic()) continue;
+            Marker marker = googleMap.addMarker(new MarkerOptions()
+                    .title(feedstation.getName())
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.location_blue)) // insert image from request
+                    //.icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(R.drawable.ic_star))) // insert image from request
+                    .anchor(markerPositionX, markerPositionY)
+                    .position(feedstation.getLocation()));
+            marker.setTag(feedstation);
+        }
+        addUserLocationMarker();
+    }
+
+    private void addUserLocationMarker() {
+        if (googleMap != null && userLocationMarkerOptions != null)
+            googleMap.addMarker(userLocationMarkerOptions);
+        else setUserPosition();
+    }
 }

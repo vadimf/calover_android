@@ -92,4 +92,6 @@ public interface ApiService {
                                                        @Field("lat") double lat,
                                                        @Field("lng") double lng);
 
+    @GET("feedstations")
+    Call<BaseResponse<List<RFeedstation>>> getFeedstations();
 }

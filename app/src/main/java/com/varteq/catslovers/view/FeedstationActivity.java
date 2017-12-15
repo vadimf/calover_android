@@ -122,10 +122,10 @@ public class FeedstationActivity extends PhotoPickerActivity {
 
         if (savedInstanceState != null) {
             currentMode = (FeedstationScreenMode) savedInstanceState.getSerializable(MODE_KEY);
-            feedstation = (Feedstation) savedInstanceState.getSerializable(FEEDSTATION_KEY);
+            feedstation = savedInstanceState.getParcelable(FEEDSTATION_KEY);
         } else if (getIntent() != null) {
             if (getIntent().hasExtra(FEEDSTATION_KEY))
-                feedstation = (Feedstation) getIntent().getSerializableExtra(FEEDSTATION_KEY);
+                feedstation = getIntent().getExtras().getParcelable(FEEDSTATION_KEY);
             else if (getIntent().hasExtra(LOCATION_KEY)) {
                 if (feedstation == null)
                     feedstation = new Feedstation();
@@ -511,6 +511,6 @@ public class FeedstationActivity extends PhotoPickerActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable(MODE_KEY, currentMode);
-        outState.putSerializable(FEEDSTATION_KEY, fillFeedstation());
+        outState.putParcelable(FEEDSTATION_KEY, fillFeedstation());
     }
 }

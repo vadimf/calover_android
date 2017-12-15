@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -53,7 +52,6 @@ import java.util.Collection;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -67,8 +65,8 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
     ListView dialogsListView;
     @BindView(R.id.progress_dialogs)
     ProgressBar progressBar;
-    @BindView(R.id.fab_dialogs_new_chat)
-    FloatingActionButton fab;
+    //@BindView(R.id.fab_dialogs_new_chat)
+    //FloatingActionButton fab;
     @BindView(R.id.swipy_refresh_layout)
     SwipyRefreshLayout setOnRefreshListener;
     private QBRequestGetBuilder requestBuilder;
@@ -231,10 +229,11 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
         loadDialogsFromQb(true, true);
     }
 
-    @OnClick(R.id.fab_dialogs_new_chat)
-    void onStartNewChatClick(View view) {
+    //@OnClick(R.id.fab_dialogs_new_chat)
+    public void onStartNewChatClick(View view) {
         //showChooseNumberDialog();
-        SelectUsersActivity.startForResult(getActivity(), this, REQUEST_SELECT_PEOPLE);
+        if (progressBar.getVisibility() != View.VISIBLE)
+            SelectUsersActivity.startForResult(getActivity(), this, REQUEST_SELECT_PEOPLE);
     }
 
     private void showChooseNumberDialog() {
@@ -410,7 +409,7 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
     private class DeleteActionModeCallback implements ActionMode.Callback {
 
         public DeleteActionModeCallback() {
-            fab.hide();
+            //fab.hide();
         }
 
         @Override
@@ -442,7 +441,7 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
         public void onDestroyActionMode(ActionMode mode) {
             currentActionMode = null;
             dialogsAdapter.clearSelection();
-            fab.show();
+            //fab.show();
         }
 
         private void deleteSelectedDialogs() {

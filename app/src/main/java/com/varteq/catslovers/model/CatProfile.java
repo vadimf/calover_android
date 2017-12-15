@@ -19,6 +19,7 @@ public class CatProfile implements Serializable {
     private String description;
     private boolean isCastrated;
     private Date fleaTreatmentDate;
+    private Integer feedstationId;
 
     private List<Uri> photoList;
     private List<GroupPartner> groupPartnersList;
@@ -157,5 +158,13 @@ public class CatProfile implements Serializable {
 
     public void setWeight(float weight) {
         this.weight = weight;
+    }
+
+    public Integer getFeedstationId() {
+        return feedstationId;
+    }
+
+    public void setFeedstationId(int feedstationId) {
+        this.feedstationId = feedstationId;
     }
 }

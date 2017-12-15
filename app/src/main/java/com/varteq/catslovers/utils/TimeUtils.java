@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class TimeUtils {
 
@@ -39,7 +40,12 @@ public class TimeUtils {
         return birthday.getTimeInMillis();
     }
 
-    public static Date getDateFromUTC(int sec) {
-        return new Date(sec * 1000L);
+    public static Date getLocalDateFromUtc(int seconds) {
+        long millis = ((long) seconds * 1000);
+        return new Date(millis + TimeZone.getDefault().getOffset(millis));
+    }
+
+    public static int getUtcFromLocal(long millis) {
+        return (int) ((millis - TimeZone.getDefault().getOffset(millis)) / 1000L);
     }
 }

@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.utils.Log;
+import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.utils.Utils;
 import com.varteq.catslovers.view.fragments.CatsFragment;
 import com.varteq.catslovers.view.fragments.FeedFragment;
@@ -38,6 +39,7 @@ public class MainActivity extends BaseActivity {
     ImageButton catsNotificationButton;
     ImageButton catsSearchButton;
     ImageButton catsAddButton;
+    ImageButton menuButton;
     RelativeLayout catsToolsRelativeLayout;
     @BindView(R.id.frameLayout)
     FrameLayout mainLayout;
@@ -68,14 +70,18 @@ public class MainActivity extends BaseActivity {
         toolbar = findViewById(R.id.mainToolbar);
         toolbarView = getLayoutInflater().inflate(R.layout.toolbar_main, toolbar);
         toolbarTitle = findViewById(R.id.toolbarTitle);
+        menuButton = findViewById(R.id.menu_imageButton);
+        menuButton.setOnClickListener(view -> Toaster.shortToast(R.string.coming_soon));
         catsNotificationButton = findViewById(R.id.catsNotificationButton);
+        catsNotificationButton.setOnClickListener(view -> Toaster.shortToast(R.string.coming_soon));
         catsSearchButton = findViewById(R.id.catsSearchButton);
+        catsSearchButton.setOnClickListener(view -> Toaster.shortToast(R.string.coming_soon));
         catsAddButton = findViewById(R.id.catsAddButton);
-        catsAddButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        catsAddButton.setOnClickListener(view -> {
+            if (navigationSelectedItemId == R.id.action_map)
                 onPlusClick();
-            }
+            else if (navigationSelectedItemId == R.id.action_chat && messagesFragment != null)
+                messagesFragment.onStartNewChatClick(null);
         });
         setSupportActionBar(toolbar);
         catsToolsRelativeLayout = findViewById(R.id.catsToolsRelativeLayout);
@@ -122,6 +128,7 @@ public class MainActivity extends BaseActivity {
     private void initListeners() {
         mBottomNavigationView.setOnNavigationItemSelectedListener(item -> {
             if (item.getItemId() != navigationSelectedItemId) {
+                showNotificationAndAndPlusIcons();
                 switch (item.getItemId()) {
                     case R.id.action_map:
                         Log.d(TAG, "action_map");
@@ -148,6 +155,7 @@ public class MainActivity extends BaseActivity {
                         catsToolsRelativeLayout.setVisibility(View.VISIBLE);
                         break;
                     case R.id.action_cats:
+                        hideNotificationAndPlusIcons();
                         Log.d(TAG, "action_cats");
                         if (catsFragment == null)
                             catsFragment = new CatsFragment();
@@ -160,6 +168,16 @@ public class MainActivity extends BaseActivity {
             navigationSelectedItemId = item.getItemId();
             return true;
         });
+    }
+
+    private void hideNotificationAndPlusIcons() {
+        catsNotificationButton.setVisibility(View.GONE);
+        catsAddButton.setVisibility(View.GONE);
+    }
+
+    private void showNotificationAndAndPlusIcons() {
+        catsNotificationButton.setVisibility(View.VISIBLE);
+        catsAddButton.setVisibility(View.VISIBLE);
     }
 
     public void showChat() {

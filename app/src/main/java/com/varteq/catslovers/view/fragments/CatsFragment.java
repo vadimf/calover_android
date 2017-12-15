@@ -176,13 +176,13 @@ public class CatsFragment extends Fragment {
             catProfile.setId(cat.getId());
             catProfile.setPetName(cat.getName());
             catProfile.setNickname(cat.getNickname());
-            catProfile.setBirthday(TimeUtils.getDateFromUTC(cat.getAge()));
+            catProfile.setBirthday(TimeUtils.getLocalDateFromUtc(cat.getAge()));
             catProfile.setSex(null);
             catProfile.setWeight(cat.getWeight());
             catProfile.setCastrated(cat.getCastrated());
             catProfile.setDescription(cat.getDescription());
             catProfile.setType(cat.getType().equals("pet") ? CatProfile.Status.PET : CatProfile.Status.STRAY);
-            catProfile.setFleaTreatmentDate(TimeUtils.getDateFromUTC(cat.getNextFleaTreatment()));
+            catProfile.setFleaTreatmentDate(TimeUtils.getLocalDateFromUtc(cat.getNextFleaTreatment()));
 
             List<Integer> colors = new ArrayList<>();
             for (String s : cat.getColor().split(","))

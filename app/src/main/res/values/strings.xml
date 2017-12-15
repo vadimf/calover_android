@@ -128,4 +128,6 @@
     <!--Cat profile-->
     <string name="menu_edit">Edit</string>
     <string name="new_station_screen_title">New station</string>
+    <string name="stray_cat_no_feedstation_error">For stray cat you should specify feedstation</string>
+    <string name="coming_soon">Coming soon</string>
 </resources>

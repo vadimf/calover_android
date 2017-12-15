@@ -45,6 +45,7 @@
         android:visibility="gone" />
 
     <android.support.design.widget.FloatingActionButton
+        android:visibility="gone"
         android:id="@+id/fab_dialogs_new_chat"
         style="@style/FabStyle"
         app:srcCompat="@drawable/ic_add_white_24dp" />

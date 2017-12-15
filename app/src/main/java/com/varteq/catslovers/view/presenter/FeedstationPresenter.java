@@ -15,7 +15,6 @@ import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.view.FeedstationActivity;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -31,48 +30,9 @@ public class FeedstationPresenter {
         this.view = view;
     }
 
-    public void compressColorsList(List colorsList) {
-        while (colorsList.contains(null))
-            colorsList.remove(null);
-    }
-
-    public void resizeColorsListWithEmptyValues(List colorsList, int cnt) {
-        while (cnt > colorsList.size())
-            colorsList.add(null);
-    }
-
     public void addGroupPartner(List groupPartnersList, RecyclerView.Adapter groupPartnersAdapter) {
         groupPartnersList.add(1, new GroupPartner(null, "User" + ((int) (Math.random() * 999999) + 111111), false));
         groupPartnersAdapter.notifyItemInserted(1);
-    }
-
-
-    public String getAgeInString(long petBirthdayMillis) {
-        long nowMillis = System.currentTimeMillis();
-        long timePassedMonthes = (TimeUnit.MILLISECONDS.toDays(nowMillis - petBirthdayMillis)) / 30;
-
-        int years = ((int) timePassedMonthes) / 12;
-        int month = ((int) timePassedMonthes) - (years * 12);
-
-        String age = null;
-        if (years > 0) {
-            if (month > 0) {
-                age = years + " years, " + String.valueOf(month) + " months";
-            } else if (month == 0) {
-                age = years + " years";
-            }
-        } else if (years == 0) {
-            if (month > 0) {
-                age = String.valueOf(month) + " months";
-            } else if (month == 0) {
-                age = "newborn";
-
-            }
-        }
-        if (age == null) {
-            age = "incorrect date";
-        }
-        return age;
     }
 
     public void onPetImageSelected(Uri uri, List photoList, RecyclerView.Adapter photosAdapter) {
@@ -98,11 +58,6 @@ public class FeedstationPresenter {
 
                         @Override
                         protected void onSuccess(RFeedstation data) {
-                            /*if (data.getToken() != null) {
-                                Log.i(TAG, "getApiService().auth success");
-                                Log.i(TAG, data.getToken());
-
-                            }*/
                             view.savedSuccessfully();
                         }
 
@@ -118,7 +73,7 @@ public class FeedstationPresenter {
 
             @Override
             public void onFailure(Call<BaseResponse<RFeedstation>> call, Throwable t) {
-                Log.e(TAG, "createCat onFailure " + t.getMessage());
+                Log.e(TAG, "createFeedstation onFailure " + t.getMessage());
             }
         });
     }
@@ -138,11 +93,6 @@ public class FeedstationPresenter {
 
                         @Override
                         protected void onSuccess(RFeedstation data) {
-                            /*if (data.getToken() != null) {
-                                Log.i(TAG, "getApiService().auth success");
-                                Log.i(TAG, data.getToken());
-
-                            }*/
                             view.savedSuccessfully();
                         }
 
@@ -150,7 +100,7 @@ public class FeedstationPresenter {
                         protected void onFail(ErrorResponse error) {
                             Log.d(TAG, error.getMessage() + error.getCode());
                             if (error.getCode() == 422)
-                                Toaster.longToast("You should fill in PetName and fields from age to description");
+                                Toaster.longToast("You should fill station data");
                         }
                     };
                 }
@@ -158,7 +108,7 @@ public class FeedstationPresenter {
 
             @Override
             public void onFailure(Call<BaseResponse<RFeedstation>> call, Throwable t) {
-                Log.e(TAG, "createCat onFailure " + t.getMessage());
+                Log.e(TAG, "updateFeedstation onFailure " + t.getMessage());
             }
         });
     }
