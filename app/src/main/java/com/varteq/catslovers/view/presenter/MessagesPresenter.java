@@ -32,7 +32,7 @@ public class MessagesPresenter {
             view.registerQbChatListenersLoadDialogs();
             return;
         }
-        Profile.setUserPhone(view.getContext(), "+380935772102");
+        //Profile.setUserPhone(view.getContext(), "+380935772102");
         //Profile.saveUser(view, "Nata", "n@t.com");
         if (Profile.getUserPhone(view.getContext()).isEmpty()) {
             return;
