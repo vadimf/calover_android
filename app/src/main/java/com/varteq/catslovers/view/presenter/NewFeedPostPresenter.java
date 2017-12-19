@@ -1,6 +1,8 @@
 package com.varteq.catslovers.view.presenter;
 
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
@@ -10,6 +12,8 @@ import com.varteq.catslovers.model.QBFeedPost;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.view.NewFeedPostActivity;
+
+import java.util.List;
 
 public class NewFeedPostPresenter {
 
@@ -21,8 +25,8 @@ public class NewFeedPostPresenter {
         this.view = view;
     }
 
-    public void createFeed(String message) {
-
+    public void createFeed(String message, Uri imageUri) {
+        //TODO create logic of image
         String id = Profile.getUserStation(view);
         if (id.isEmpty()) {
             return;
@@ -41,5 +45,12 @@ public class NewFeedPostPresenter {
                 Log.e(TAG, "createObject Feeds onError " + errors.getMessage());
             }
         });
+    }
+    public void onPetImageSelected(Uri uri, List photoList, RecyclerView.Adapter photosAdapter) {
+        if (uri != null) {
+            Log.d(TAG, "onImageSelected " + uri);
+            photoList.add(0, uri);
+            photosAdapter.notifyItemInserted(0);
+        }
     }
 }

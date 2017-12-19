@@ -129,7 +129,9 @@
         <activity
             android:name=".view.SuccessLoginActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".view.NewFeedPostActivity"></activity>
+        <activity
+            android:name=".view.NewFeedPostActivity"
+            android:label="New feed post" />
     </application>
 
 </manifest>

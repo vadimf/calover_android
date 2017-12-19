@@ -6,29 +6,34 @@
     android:layout_height="match_parent"
     tools:context="com.varteq.catslovers.view.NewFeedPostActivity">
 
+    <ImageView
+        android:id="@+id/feedImage"
+        android:layout_width="match_parent"
+        android:layout_height="220dp"
+        android:scaleType="centerCrop"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <EditText
         android:id="@+id/post_editText"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/bg_feed_edit_text"
         android:ems="10"
+        android:gravity="top"
+        android:hint="@string/your_text_here"
         android:inputType="textPersonName"
-        android:text="Name"
+        android:lines="5"
+        android:minHeight="100dp"
+        android:padding="7dp"
+        android:textColor="@color/colorPrimary"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/feedImage" />
 
-    <Button
-        android:id="@+id/create_post_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="Create post"
-        app:layout_constraintEnd_toEndOf="@+id/post_editText"
-        app:layout_constraintStart_toStartOf="@+id/post_editText"
-        app:layout_constraintTop_toBottomOf="@+id/post_editText" />
 </android.support.constraint.ConstraintLayout>
