@@ -129,15 +129,17 @@
                 style="@style/SecondaryTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginTop="32dp"
-                android:text="Just a lazy afternoon on the backyard deck"/>
+                android:text="Just a lazy afternoon on the backyard deck" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:layout_marginTop="31dp">
+                android:layout_marginTop="31dp"
+                android:visibility="gone">
 
                 <ImageButton
                     android:id="@+id/goIntoButton"
@@ -148,7 +150,7 @@
                     android:layout_marginRight="16dp"
                     android:background="@color/transparent"
                     android:scaleType="fitCenter"
-                    app:srcCompat="@drawable/ic_arrow_into"/>
+                    app:srcCompat="@drawable/ic_arrow_into" />
 
                 <TextView
                     android:id="@+id/likesTextView"
@@ -159,7 +161,7 @@
                     android:layout_marginStart="11dp"
                     android:layout_toEndOf="@+id/likeButton"
                     android:text="34k"
-                    android:textSize="12sp"/>
+                    android:textSize="12sp" />
 
                 <ImageButton
                     android:id="@+id/likeButton"
@@ -170,7 +172,7 @@
                     android:layout_marginStart="16dp"
                     android:background="@color/transparent"
                     android:scaleType="fitCenter"
-                    app:srcCompat="@drawable/ic_heart"/>
+                    app:srcCompat="@drawable/ic_heart" />
 
             </RelativeLayout>
 

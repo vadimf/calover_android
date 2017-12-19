@@ -34,12 +34,13 @@ public class MessagesPresenter {
         }
         //Profile.setUserPhone(view.getContext(), "+380935772102");
         //Profile.saveUser(view, "Nata", "n@t.com");
-        if (Profile.getUserPhone(view.getContext()).isEmpty()) {
-            return;
-            //Profile.setUserPhone(view, "+380935772102");
-        }
 
-        final QBUser qbUser = new QBUser(Profile.getUserPhone(view.getContext()), AppController.USER_PASS);
+        String id = Profile.getUserId(view.getContext());
+        if (id.isEmpty()) {
+            view.showError("Error. You should reSignIn to complete this action");
+            return;
+        }
+        final QBUser qbUser = new QBUser(id, AppController.USER_PASS);
         //qbUser.setExternalId(profile.getUserId());
         //qbUser.setWebsite(profile.getPicture());
         //qbUser.setFullName(Profile.getUserName(view));

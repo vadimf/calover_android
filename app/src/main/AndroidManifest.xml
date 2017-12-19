@@ -84,34 +84,29 @@
         <activity
             android:name=".view.MediaViewerActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".view.FeedstationActivity"
-            android:label="@string/new_station_screen_title"
-            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
-
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
+            android:label="@string/new_station_screen_title" />
         <activity
             android:name=".view.qb.SelectUsersActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".view.qb.DialogsActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".view.qb.ChatActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustResize" />
-
         <activity
             android:name=".view.qb.ChatInfoActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:label="@string/chat_info"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".view.qb.AttachmentImageActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
@@ -126,11 +121,15 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths" />
         </provider>
+
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="4297a273107d8d9d043a63c18f8140a4fa3d0194" />
-        <activity android:name=".view.SuccessLoginActivity"
-                  android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".view.SuccessLoginActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".view.NewFeedPostActivity"></activity>
     </application>
 
 </manifest>

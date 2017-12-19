@@ -1,5 +1,6 @@
 package com.varteq.catslovers.view;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.internal.BottomNavigationMenuView;
@@ -82,6 +83,8 @@ public class MainActivity extends BaseActivity {
                 onPlusClick();
             else if (navigationSelectedItemId == R.id.action_chat && messagesFragment != null)
                 messagesFragment.onStartNewChatClick(null);
+            else if (navigationSelectedItemId == R.id.action_feed)
+                startActivity(new Intent(this, NewFeedPostActivity.class));
         });
         setSupportActionBar(toolbar);
         catsToolsRelativeLayout = findViewById(R.id.catsToolsRelativeLayout);

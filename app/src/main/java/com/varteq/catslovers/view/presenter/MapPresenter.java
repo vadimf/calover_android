@@ -63,6 +63,7 @@ public class MapPresenter {
             Feedstation feedstation = new Feedstation();
             feedstation.setId(station.getId());
             feedstation.setName(station.getName());
+            feedstation.setCreatedUserId(station.getCreated());
             feedstation.setAddress(station.getAddress());
             feedstation.setDescription(station.getDescription());
             if (station.getIsPublic())
@@ -70,7 +71,9 @@ public class MapPresenter {
             if (station.getLat() != null && station.getLng() != null)
                 feedstation.setLocation(new LatLng(station.getLat(), station.getLng()));
             feedstation.setIsPublic(station.getIsPublic());
-
+/*if (!station.getIsPublic() && Profile.getUserId(view.getContext()).equals(station.getCreated())){
+    Profile.setUserStation(view.getContext(), String.valueOf(station.getId()));
+}*/
             list.add(feedstation);
         }
         return list;

@@ -16,6 +16,7 @@ public class Feedstation implements Parcelable {
     private String address;
     private Boolean isPublic;
     private Date timeToFeed;
+    private String createdUserId;
 
     public Integer getId() {
         return id;
@@ -73,6 +74,14 @@ public class Feedstation implements Parcelable {
         this.timeToFeed = timeToFeed;
     }
 
+    public void setCreatedUserId(String createdUserId) {
+        this.createdUserId = createdUserId;
+    }
+
+    public String getCreatedUserId() {
+        return createdUserId;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -87,6 +96,7 @@ public class Feedstation implements Parcelable {
         dest.writeString(this.address);
         dest.writeValue(this.isPublic);
         dest.writeLong(this.timeToFeed != null ? this.timeToFeed.getTime() : -1);
+        dest.writeString(this.createdUserId);
     }
 
     public Feedstation() {
@@ -101,6 +111,7 @@ public class Feedstation implements Parcelable {
         this.isPublic = (Boolean) in.readValue(Boolean.class.getClassLoader());
         long tmpTimeToFeed = in.readLong();
         this.timeToFeed = tmpTimeToFeed == -1 ? null : new Date(tmpTimeToFeed);
+        this.createdUserId = in.readString();
     }
 
     public static final Creator<Feedstation> CREATOR = new Creator<Feedstation>() {

@@ -14,12 +14,9 @@ import android.widget.VideoView;
 
 import com.bumptech.glide.Glide;
 import com.varteq.catslovers.R;
+import com.varteq.catslovers.model.FeedPost;
 
 public class MediaViewerActivity extends AppCompatActivity {
-
-    public static final int MEDIA_TYPE_NO_MEDIA = 0;
-    public static final int MEDIA_TYPE_PHOTO = 1;
-    public static final int MEDIA_TYPE_VIDEO = 2;
 
     ImageButton backButton;
     FrameLayout forwardButton;
@@ -42,10 +39,10 @@ public class MediaViewerActivity extends AppCompatActivity {
         backButton.setOnClickListener(view -> onBackPressed());
 
         Intent intent = getIntent();
-        int mediaType = intent.getIntExtra("mediaType", 0);
+        FeedPost.FeedPostType mediaType = (FeedPost.FeedPostType) intent.getSerializableExtra("mediaType");
         Uri mediaUri = Uri.parse(intent.getStringExtra("mediaUri"));
         switch (mediaType) {
-            case MEDIA_TYPE_PHOTO:
+            case PICTURE:
                 videoView.setVisibility(View.INVISIBLE);
                 imageView.setVisibility(View.VISIBLE);
 
@@ -53,7 +50,7 @@ public class MediaViewerActivity extends AppCompatActivity {
                         .load(mediaUri)
                         .into(imageView);
                 break;
-            case MEDIA_TYPE_VIDEO:
+            case VIDEO:
                 videoView.setVisibility(View.VISIBLE);
                 imageView.setVisibility(View.INVISIBLE);
 
@@ -64,6 +61,7 @@ public class MediaViewerActivity extends AppCompatActivity {
                 videoView.setVideoURI(mediaUri);
                 videoView.requestFocus();
                 videoView.start();
+                break;
         }
 
     }

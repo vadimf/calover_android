@@ -37,6 +37,7 @@ import com.quickblox.users.model.QBUser;
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.managers.DialogsManager;
 import com.varteq.catslovers.utils.ChatHelper;
+import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.utils.qb.QbChatDialogMessageListenerImp;
 import com.varteq.catslovers.utils.qb.QbDialogHolder;
 import com.varteq.catslovers.utils.qb.callback.QbEntityCallbackImpl;
@@ -404,6 +405,13 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
     @Override
     public void onNewDialogLoaded(QBChatDialog chatDialog) {
         updateDialogsAdapter();
+    }
+
+    public void showError(String message) {
+        Toaster.longToast(message);
+        isProcessingResultInProgress = false;
+        progressBar.setVisibility(View.GONE);
+        setOnRefreshListener.setRefreshing(false);
     }
 
     private class DeleteActionModeCallback implements ActionMode.Callback {

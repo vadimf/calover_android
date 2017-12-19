@@ -4,44 +4,54 @@ import android.net.Uri;
 
 import java.util.Date;
 
-public class Feed {
-    private int id;
+public class FeedPost {
+    private String id;
     private Date date;
     private Uri previewUri;
     private Uri mediaUri;
-    private int mediaType;
     private Uri avatarUri;
     private String name;
     private String message;
     private int likes;
+    private FeedPostType type;
 
-    public Feed(int id, Date date, int mediaType, Uri avatarUri, String name, String message, int likes) {
+    public enum FeedPostType {
+        TEXT,
+        PICTURE,
+        VIDEO
+    }
+
+    public FeedPost(String id, Date date, Uri avatarUri, String name, String message, FeedPostType type) {
         this.id = id;
         this.date = date;
-        this.mediaType = mediaType;
         this.avatarUri = avatarUri;
         this.name = name;
         this.message = message;
-        this.likes = likes;
+        this.type = type;
     }
 
-    public Feed(int id, Date date, int mediaType, Uri previewUri, Uri mediaUri, Uri avatarUri, String name, String message, int likes) {
+    public FeedPost(String id, Date date, Uri avatarUri, String userName, String message, Uri mediaUri, FeedPostType type) {
+        this(id, date, avatarUri, userName, message, type);
+        this.mediaUri = mediaUri;
+    }
+
+    public FeedPost(String id, Date date, Uri previewUri, Uri mediaUri, Uri avatarUri, String name, String message, int likes, FeedPostType type) {
         this.id = id;
         this.date = date;
-        this.mediaType = mediaType;
         this.previewUri = previewUri;
         this.mediaUri = mediaUri;
         this.avatarUri = avatarUri;
         this.name = name;
         this.message = message;
         this.likes = likes;
+        this.type = type;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -101,11 +111,11 @@ public class Feed {
         this.mediaUri = mediaUri;
     }
 
-    public int getMediaType() {
-        return mediaType;
+    public FeedPostType getType() {
+        return type;
     }
 
-    public void setMediaType(int mediaType) {
-        this.mediaType = mediaType;
+    public void setType(FeedPostType type) {
+        this.type = type;
     }
 }

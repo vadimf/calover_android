@@ -12,6 +12,8 @@ public class Profile {
     private static String USER_EMAIL_KEY = "user_email";
     private static String USER_AVATAR_KEY = "user_avatar";
     private static String USER_PHONE = "user_phone";
+    private static String USER_ID = "user_id";
+    private static String USER_STATION = "user_station";
 
     private static String USER_LOCATION_PROVIDER = "user_location_provider";
     private static String USER_LOCATION_LAT = "user_location_lat";
@@ -108,5 +110,21 @@ public class Profile {
 
     private static double getDouble(Context context, final String key, final double defaultValue) {
         return Double.longBitsToDouble(getDefaultSharedPreferences(context).getLong(key, Double.doubleToLongBits(defaultValue)));
+    }
+
+    public static void setUserId(Context context, String userId) {
+        getDefaultSharedPreferences(context).edit().putString(USER_ID, userId).apply();
+    }
+
+    public static String getUserId(Context context) {
+        return getDefaultSharedPreferences(context).getString(USER_ID, "");
+    }
+
+    public static void setUserStation(Context context, String stationId) {
+        getDefaultSharedPreferences(context).edit().putString(USER_STATION, stationId).apply();
+    }
+
+    public static String getUserStation(Context context) {
+        return getDefaultSharedPreferences(context).getString(USER_STATION, "");
     }
 }

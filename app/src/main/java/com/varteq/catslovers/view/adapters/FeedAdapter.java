@@ -16,7 +16,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.varteq.catslovers.R;
-import com.varteq.catslovers.model.Feed;
+import com.varteq.catslovers.model.FeedPost;
 import com.varteq.catslovers.utils.Utils;
 import com.varteq.catslovers.view.MediaViewerActivity;
 
@@ -24,11 +24,10 @@ import java.util.List;
 
 public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder> {
 
-
-    List<Feed> feedList;
+    List<FeedPost> feedList;
     Context context;
 
-    public FeedAdapter(List<Feed> feedList, Context context) {
+    public FeedAdapter(List<FeedPost> feedList, Context context) {
         this.feedList = feedList;
         this.context = context;
     }
@@ -43,10 +42,10 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
 
     @Override
     public void onBindViewHolder(FeedViewHolder holder, int position) {
-        Feed feed = feedList.get(position);
+        FeedPost feed = feedList.get(position);
 
         holder.nameTextView.setText(feed.getName());
-        holder.likesTextView.setText(String.valueOf(feed.getLikes()));
+        //holder.likesTextView.setText(String.valueOf(feed.getLikes()));
         holder.messageTextView.setText(feed.getMessage());
         Glide.with(context)
                 .load(feed.getAvatarUri())
@@ -54,7 +53,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
                 .into(holder.avatarImageView);
 
 
-        if (feed.getMediaType() == 2) {
+        if (feed.getType().equals(FeedPost.FeedPostType.VIDEO)) {
             // video
             Glide.with(context)
                     .load(feed.getPreviewUri())
@@ -63,7 +62,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             holder.timeTextView.setVisibility(View.VISIBLE);
             holder.timeUnderTextView.setVisibility(View.INVISIBLE);
             holder.playImageView.setVisibility(View.VISIBLE);
-        } else if (feed.getMediaType() == 1) {
+        } else if (feed.getType().equals(FeedPost.FeedPostType.PICTURE)) {
             // photo
             Glide.with(context)
                     .load(feed.getPreviewUri())
@@ -72,7 +71,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             holder.timeTextView.setVisibility(View.VISIBLE);
             holder.timeUnderTextView.setVisibility(View.INVISIBLE);
             holder.playImageView.setVisibility(View.INVISIBLE);
-        } else if (feed.getMediaType() == 0) {
+        } else if (feed.getType().equals(FeedPost.FeedPostType.TEXT)) {
             // no preview
             ViewGroup.LayoutParams imageViewLayoutParams = holder.imageView.getLayoutParams();
             imageViewLayoutParams.height = Utils.convertDpToPx(0, context);
@@ -145,9 +144,9 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
 
             imageView.setOnClickListener(view -> {
                 int position = getAdapterPosition();
-                Feed feed = feedList.get(position);
+                FeedPost feed = feedList.get(position);
                 Intent intent = new Intent(context, MediaViewerActivity.class);
-                intent.putExtra("mediaType", feed.getMediaType());
+                intent.putExtra("mediaType", feed.getType());
                 intent.putExtra("mediaUri", feed.getMediaUri().toString());
                 context.startActivity(intent);
             });

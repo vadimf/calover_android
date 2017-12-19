@@ -57,6 +57,7 @@ dependencies {
         transitive = true;
     }
 
+    compile "com.quickblox:quickblox-android-sdk-customobjects:3.4.1"
     compile 'com.quickblox:quickblox-android-sdk-chat:3.4.1'
     compile 'com.quickblox:quickblox-android-sdk-content:3.4.1'
     compile 'com.quickblox:quickblox-android-sdk-messages:3.4.1'

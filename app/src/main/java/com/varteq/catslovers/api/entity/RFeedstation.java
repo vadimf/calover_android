@@ -29,6 +29,9 @@ public class RFeedstation extends ErrorData {
     @SerializedName("time_to_feed")
     @Expose
     private Integer timeToFeed;
+    @SerializedName("created")
+    @Expose
+    private String created;
 
     public Integer getId() {
         return id;
@@ -94,4 +97,11 @@ public class RFeedstation extends ErrorData {
         this.timeToFeed = timeToFeed;
     }
 
+    public String getCreated() {
+        return created;
+    }
+
+    public void setCreated(String created) {
+        this.created = created;
+    }
 }

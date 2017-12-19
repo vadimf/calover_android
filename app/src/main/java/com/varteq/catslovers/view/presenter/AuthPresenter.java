@@ -91,6 +91,7 @@ public class AuthPresenter {
         view.onSuccessSignIn();
         Profile.setUserPhone(view, username);
         Profile.setUserLogin(view, true);
+        Profile.setUserId(view, String.valueOf(6));
     }
 
     ForgotPasswordHandler forgotPasswordHandler = new ForgotPasswordHandler() {
@@ -236,6 +237,7 @@ public class AuthPresenter {
                                 Log.i(TAG, "getApiService().auth success");
                                 Log.i(TAG, data.getToken());
                                 Profile.setAuthToken(view, data.getToken());
+                                Profile.setUserId(view, data.getUserId());
                                 ServiceGenerator.setToken(data.getToken());
                                 loginToQB(null);
                             }
@@ -269,7 +271,12 @@ public class AuthPresenter {
                 loginToQB(null);
             }
         };
-        final QBUser qbUser = new QBUser(username, AppController.USER_PASS);
+        String id = Profile.getUserId(view);
+        if (id.isEmpty()) {
+            getCats();
+            return;
+        }
+        final QBUser qbUser = new QBUser(id, AppController.USER_PASS);
         qbUser.setFullName(Profile.getUserName(view));
         //qbUser.setExternalId(profile.getUserId());
         //qbUser.setWebsite(profile.getPicture());
