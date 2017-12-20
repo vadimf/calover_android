@@ -69,12 +69,17 @@ public class NewFeedPostActivity extends PhotoPickerActivity {
                 return true;
             case R.id.app_bar_save:
                 Log.d(TAG, "app_bar_save");
-                presenter.createFeed(postEditText.getText().toString(), imageUri);
+                presenter.createFeed(this, postEditText.getText().toString(), imageUri);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
+
+    public void finishActivity(){
+        finish();
+    }
+
 
     @Override
     protected void onImageSelected(Uri uri) {
