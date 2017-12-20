@@ -41,6 +41,7 @@ public class NewFeedPostPresenter {
                     attachFile(createdObject, mediaFile, QBFeedPost.PICTURE_FIELD);
                 else if (type.equals(FeedPost.FeedPostType.VIDEO))
                     attachFile(createdObject, mediaFile, QBFeedPost.VIDEO_FIELD);
+                else view.createdSuccessfully();
                 Log.d(TAG, "createObject Feeds onSuccess ");
             }
 
@@ -57,6 +58,7 @@ public class NewFeedPostPresenter {
 
                                   @Override
                                   public void onSuccess(QBCustomObjectFileField uploadFileResult, Bundle params) {
+                                      view.createdSuccessfully();
                                       Log.d(TAG, "uploadFile Feeds onSuccess ");
                                   }
 

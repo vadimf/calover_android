@@ -114,4 +114,8 @@ public class NewFeedPostActivity extends BaseActivity implements OnImagePickedLi
     public void onImagePickClosed(int requestCode) {
 
     }
+
+    public void createdSuccessfully(){
+        finish();
+    }
 }
