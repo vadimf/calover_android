@@ -19,6 +19,11 @@ public class ImagePickHelper {
         showImageSourcePickerDialog(activity.getSupportFragmentManager(), imagePickHelperFragment);
     }
 
+    public void pickAnImageOrVideo(FragmentActivity activity, int requestCode) {
+        ImagePickHelperFragment imagePickHelperFragment = ImagePickHelperFragment.start(activity, requestCode);
+        ImageSourcePickDialogFragment.showImageAndVideoPicker(imagePickHelperFragment, activity.getSupportFragmentManager());
+    }
+
     private void showImageSourcePickerDialog(FragmentManager fm, ImagePickHelperFragment fragment) {
         ImageSourcePickDialogFragment.show(fm,
                 new ImageSourcePickDialogFragment.LoggableActivityImageSourcePickedListener(fragment));

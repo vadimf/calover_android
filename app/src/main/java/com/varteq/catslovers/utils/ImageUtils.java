@@ -33,6 +33,7 @@ import java.util.List;
 
 public class ImageUtils {
 
+    public static final int IMAGE_OR_VIDEO_REQUEST_CODE = 383;
     public static final int GALLERY_REQUEST_CODE = 183;
     public static final int CAMERA_REQUEST_CODE = 212;
 
@@ -82,6 +83,17 @@ public class ImageUtils {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType(MimeType.IMAGE_MIME);
         fragment.startActivityForResult(Intent.createChooser(intent, fragment.getString(R.string.dlg_choose_image_from)), GALLERY_REQUEST_CODE);
+    }
+
+    public static void startImageAndVideoPicker(Fragment fragment) {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType(MimeType.IMAGE_MIME);
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{MimeType.IMAGE_MIME, MimeType.VIDEO_MIME})
+                .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+                .addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
+                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        fragment.startActivityForResult(intent, IMAGE_OR_VIDEO_REQUEST_CODE);
     }
 
     public static void startCameraForResult(Activity activity) {

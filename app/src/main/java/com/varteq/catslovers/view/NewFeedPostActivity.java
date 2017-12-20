@@ -1,28 +1,32 @@
 package com.varteq.catslovers.view;
 
-import android.net.Uri;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.ThumbnailUtils;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.varteq.catslovers.R;
+import com.varteq.catslovers.model.FeedPost;
 import com.varteq.catslovers.utils.Log;
-import com.varteq.catslovers.utils.Profile;
-import com.varteq.catslovers.view.presenter.CatProfilePresenter;
+import com.varteq.catslovers.utils.qb.imagepick.ImagePickHelper;
+import com.varteq.catslovers.utils.qb.imagepick.OnImagePickedListener;
 import com.varteq.catslovers.view.presenter.NewFeedPostPresenter;
+
+import java.io.File;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
-public class NewFeedPostActivity extends PhotoPickerActivity {
+public class NewFeedPostActivity extends BaseActivity implements OnImagePickedListener {
 
+    private final int REQUEST_CODE_ATTACHMENT = 1;
     private String TAG = CatProfileActivity.class.getSimpleName();
 
     @BindView(R.id.post_editText)
@@ -31,7 +35,8 @@ public class NewFeedPostActivity extends PhotoPickerActivity {
     ImageView feedImage;
 
     private NewFeedPostPresenter presenter;
-    Uri imageUri;
+    File mediaFile;
+    private FeedPost.FeedPostType mediaType = FeedPost.FeedPostType.TEXT;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,16 +51,15 @@ public class NewFeedPostActivity extends PhotoPickerActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
-    private MenuItem addPhoto;
-    private MenuItem saveFeed;
+    @Override
+    protected View getSnackbarAnchorView() {
+        return (View) postEditText.getParent();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_add_new_feed, menu);
-
-        addPhoto = menu.findItem(R.id.app_bar_add_photo);
-        saveFeed = menu.findItem(R.id.app_bar_save);
 
         return true;
     }
@@ -65,11 +69,14 @@ public class NewFeedPostActivity extends PhotoPickerActivity {
         switch (item.getItemId()) {
             case R.id.app_bar_add_photo:
                 Log.d(TAG, "app_bar_add_photo");
-                pickPhotoWithPermission(getString(R.string.select_cat_photo));
+                new ImagePickHelper().pickAnImageOrVideo(this, REQUEST_CODE_ATTACHMENT);
                 return true;
             case R.id.app_bar_save:
                 Log.d(TAG, "app_bar_save");
-                presenter.createFeed(postEditText.getText().toString(), imageUri);
+                presenter.createFeed(postEditText.getText().toString(), mediaFile, mediaType);
+                return true;
+            case android.R.id.home:
+                onBackPressed();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -77,13 +84,34 @@ public class NewFeedPostActivity extends PhotoPickerActivity {
     }
 
     @Override
-    protected void onImageSelected(Uri uri) {
-        super.onImageSelected(uri);
-        if (null != uri) {
-            imageUri = uri;
-            feedImage.setImageURI(imageUri);
-            feedImage.setVisibility(View.VISIBLE);
+    public void onImagePicked(int requestCode, File file) {
+        switch (requestCode) {
+            case REQUEST_CODE_ATTACHMENT:
+                if (file != null) {
+                    mediaFile = file;
+
+                    Bitmap thumbnail = ThumbnailUtils.createVideoThumbnail(file.getPath(),
+                            MediaStore.Images.Thumbnails.MINI_KIND);
+                    mediaType = FeedPost.FeedPostType.VIDEO;
+                    if (thumbnail == null) {
+                        thumbnail = BitmapFactory.decodeFile(file.getPath());
+                        mediaType = FeedPost.FeedPostType.PICTURE;
+                    }
+
+                    feedImage.setImageBitmap(thumbnail);
+                    feedImage.setVisibility(View.VISIBLE);
+                }
+                break;
         }
     }
 
+    @Override
+    public void onImagePickError(int requestCode, Exception e) {
+
+    }
+
+    @Override
+    public void onImagePickClosed(int requestCode) {
+
+    }
 }
