@@ -14,13 +14,15 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:visibility="visible">
 
             <ImageView
                 android:id="@+id/imageView"
                 android:layout_width="match_parent"
                 android:layout_height="216dp"
-                app:srcCompat="@color/colorPrimaryLight"/>
+                android:visibility="visible"
+                app:srcCompat="@color/colorPrimaryLight" />
 
             <View
                 android:id="@+id/toolbarGradientView"

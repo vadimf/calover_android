@@ -2,9 +2,7 @@ package com.varteq.catslovers.view;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.ThumbnailUtils;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -35,7 +33,8 @@ public class NewFeedPostActivity extends BaseActivity implements OnImagePickedLi
     ImageView feedImage;
 
     private NewFeedPostPresenter presenter;
-    File mediaFile;
+    private File mediaFile;
+    private Bitmap preview;
     private FeedPost.FeedPostType mediaType = FeedPost.FeedPostType.TEXT;
 
     @Override
@@ -73,7 +72,7 @@ public class NewFeedPostActivity extends BaseActivity implements OnImagePickedLi
                 return true;
             case R.id.app_bar_save:
                 Log.d(TAG, "app_bar_save");
-                presenter.createFeed(postEditText.getText().toString(), mediaFile, mediaType);
+                presenter.createFeed(postEditText.getText().toString(), mediaFile, preview, mediaType);
                 return true;
             case android.R.id.home:
                 onBackPressed();
@@ -89,20 +88,24 @@ public class NewFeedPostActivity extends BaseActivity implements OnImagePickedLi
             case REQUEST_CODE_ATTACHMENT:
                 if (file != null) {
                     mediaFile = file;
+                    mediaType = FeedPost.FeedPostType.PICTURE;
 
-                    Bitmap thumbnail = ThumbnailUtils.createVideoThumbnail(file.getPath(),
-                            MediaStore.Images.Thumbnails.MINI_KIND);
-                    mediaType = FeedPost.FeedPostType.VIDEO;
-                    if (thumbnail == null) {
-                        thumbnail = BitmapFactory.decodeFile(file.getPath());
-                        mediaType = FeedPost.FeedPostType.PICTURE;
-                    }
-
-                    feedImage.setImageBitmap(thumbnail);
+                    feedImage.setImageBitmap(BitmapFactory.decodeFile(file.getPath()));
                     feedImage.setVisibility(View.VISIBLE);
                 }
                 break;
         }
+    }
+
+    @Override
+    public void onVideoPicked(int requestCode, File file, Bitmap preview) {
+        if (file == null) return;
+        mediaType = FeedPost.FeedPostType.VIDEO;
+        mediaFile = file;
+        this.preview = preview;
+
+        feedImage.setImageBitmap(preview);
+        feedImage.setVisibility(View.VISIBLE);
     }
 
     @Override

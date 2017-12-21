@@ -297,6 +297,7 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
                 loadDialogsFromQb(true, false);
             }
         });
+        setOnRefreshListener.setColorSchemeResources(R.color.colorPrimary);
     }
 
     private void registerQbChatListeners() {

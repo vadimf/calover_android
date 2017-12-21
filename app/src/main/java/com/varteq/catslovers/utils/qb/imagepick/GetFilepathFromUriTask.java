@@ -2,6 +2,8 @@ package com.varteq.catslovers.utils.qb.imagepick;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
@@ -77,7 +79,17 @@ public class GetFilepathFromUriTask extends BaseAsyncTask<Intent, Void, File> {
         hideProgress();
         Log.w(GetFilepathFromUriTask.class.getSimpleName(), "onResult listener = " + listener);
         if (listener != null) {
-            listener.onImagePicked(requestCode, file);
+            Bitmap thumb = ThumbnailUtils.createVideoThumbnail(file.getPath(),
+                    MediaStore.Images.Thumbnails.MINI_KIND);
+            if (thumb != null)
+                listener.onVideoPicked(requestCode, file, ThumbnailUtils.createVideoThumbnail(file.getPath(),
+                        MediaStore.Images.Thumbnails.MINI_KIND));
+            else listener.onImagePicked(requestCode, file);
+            /*if (file.getName().endsWith(ImageUtils.IMAGE_FILE_EXTENSION))
+                listener.onImagePicked(requestCode, file);
+            else if (file.getName().endsWith(ImageUtils.VIDEO_FILE_EXTENSION))
+                listener.onVideoPicked(requestCode, file, ThumbnailUtils.createVideoThumbnail(file.getPath(),
+                        MediaStore.Images.Thumbnails.MINI_KIND));*/
         }
     }
 

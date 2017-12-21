@@ -17,6 +17,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.model.FeedPost;
+import com.varteq.catslovers.utils.PostPreviewDownloader;
+import com.varteq.catslovers.utils.TimeUtils;
 import com.varteq.catslovers.utils.Utils;
 import com.varteq.catslovers.view.MediaViewerActivity;
 
@@ -46,7 +48,13 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
 
         holder.nameTextView.setText(feed.getName());
         //holder.likesTextView.setText(String.valueOf(feed.getLikes()));
-        holder.messageTextView.setText(feed.getMessage());
+        String message = feed.getMessage();
+        if (message != null && !message.equals("null"))
+            holder.messageTextView.setText(feed.getMessage());
+        else holder.messageTextView.setText(null);
+
+        cleanView(holder);
+
         Glide.with(context)
                 .load(feed.getAvatarUri())
                 .apply(new RequestOptions().centerCrop())
@@ -55,22 +63,25 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
 
         if (feed.getType().equals(FeedPost.FeedPostType.VIDEO)) {
             // video
-            Glide.with(context)
+            /*Glide.with(context)
                     .load(feed.getPreviewUri())
                     .apply(new RequestOptions().centerCrop())
-                    .into(holder.imageView);
-            holder.timeTextView.setVisibility(View.VISIBLE);
+                    .into(holder.imageView);*/
+            holder.imageDownloader = new PostPreviewDownloader(holder.imageView, feed);
             holder.timeUnderTextView.setVisibility(View.INVISIBLE);
-            holder.playImageView.setVisibility(View.VISIBLE);
+
+            holder.timeTextView.setText(TimeUtils.getDateAsMMMMddHHmm(feed.getDate()));
         } else if (feed.getType().equals(FeedPost.FeedPostType.PICTURE)) {
             // photo
-            Glide.with(context)
+            /*Glide.with(context)
                     .load(feed.getPreviewUri())
                     .apply(new RequestOptions().centerCrop())
-                    .into(holder.imageView);
-            holder.timeTextView.setVisibility(View.VISIBLE);
+                    .into(holder.imageView);*/
+            holder.imageDownloader = new PostPreviewDownloader(holder.imageView, feed);
             holder.timeUnderTextView.setVisibility(View.INVISIBLE);
             holder.playImageView.setVisibility(View.INVISIBLE);
+
+            holder.timeTextView.setText(TimeUtils.getDateAsMMMMddHHmm(feed.getDate()));
         } else if (feed.getType().equals(FeedPost.FeedPostType.TEXT)) {
             // no preview
             ViewGroup.LayoutParams imageViewLayoutParams = holder.imageView.getLayoutParams();
@@ -95,9 +106,39 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
 
             holder.toolbarGradientView.setVisibility(View.INVISIBLE);
             holder.timeTextView.setVisibility(View.INVISIBLE);
-            holder.timeUnderTextView.setVisibility(View.VISIBLE);
 
+            holder.timeUnderTextView.setText(TimeUtils.getDateAsMMMMddHHmm(feed.getDate()));
         }
+    }
+
+    private void cleanView(FeedViewHolder holder) {
+        if (holder.imageDownloader != null)
+            holder.imageDownloader.cancelLoading();
+
+        holder.toolbarGradientView.setVisibility(View.VISIBLE);
+        holder.timeTextView.setVisibility(View.VISIBLE);
+        holder.timeUnderTextView.setVisibility(View.VISIBLE);
+        holder.playImageView.setVisibility(View.VISIBLE);
+        holder.timeUnderTextView.setText("");
+        holder.timeTextView.setText("");
+
+        /*ViewGroup.LayoutParams imageViewLayoutParams = holder.imageView.getLayoutParams();
+        imageViewLayoutParams.height = Utils.convertDpToPx(216, context);
+        holder.imageView.setLayoutParams(imageViewLayoutParams);
+
+        ViewGroup.LayoutParams playLayoutParams = holder.playImageView.getLayoutParams();
+        playLayoutParams.height = Utils.convertDpToPx(75, context);
+        holder.playImageView.setLayoutParams(playLayoutParams);
+
+        RelativeLayout.LayoutParams headerLayoutParams = (RelativeLayout.LayoutParams) holder.headerRelativeLayout.getLayoutParams();
+        headerLayoutParams.topMargin = Utils.convertDpToPx(58, context);
+        holder.headerRelativeLayout.setLayoutParams(headerLayoutParams);
+
+        RelativeLayout.LayoutParams nameLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        holder.nameTextView.setLayoutParams(nameLayoutParams);
+
+        LinearLayout.LayoutParams messageLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        holder.messageTextView.setLayoutParams(messageLayoutParams);*/
     }
 
     @Override
@@ -123,6 +164,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         RelativeLayout headerRelativeLayout;
         TextView timeUnderTextView;
         ImageView playImageView;
+        PostPreviewDownloader imageDownloader;
 
         public FeedViewHolder(View itemView) {
             super(itemView);

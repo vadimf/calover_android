@@ -52,6 +52,7 @@ public class FeedPresenter {
 
             @Override
             public void onError(QBResponseException errors) {
+                view.onError();
                 Log.e(TAG, "get Feeds onError " + errors.getMessage());
             }
         });
@@ -88,6 +89,7 @@ public class FeedPresenter {
 
                         @Override
                         protected void onFail(ErrorResponse error) {
+                            view.onError();
                             Log.d(TAG, error.getMessage() + error.getCode());
                         }
                     };
@@ -96,6 +98,7 @@ public class FeedPresenter {
 
             @Override
             public void onFailure(Call<BaseResponse<List<RFeedstation>>> call, Throwable t) {
+                view.onError();
                 Log.e(TAG, "getFeedstationsIds onFailure " + t.getMessage());
             }
         });
