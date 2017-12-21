@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -36,8 +38,10 @@ import com.varteq.catslovers.view.adapters.GroupPartnersAdapter;
 import com.varteq.catslovers.view.dialog.EditTextDialog;
 import com.varteq.catslovers.view.presenter.FeedstationPresenter;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -97,6 +101,7 @@ public class FeedstationActivity extends PhotoPickerActivity {
     ViewPager viewPager;
     HeaderPhotosViewPagerAdapter pagerAdapter;
     private int[] headerPhotos = {R.drawable.cat2, R.drawable.cat3, R.drawable.cat1};
+    Geocoder geocoder;
 
     public static void startInViewMode(Activity activity, Feedstation feedstation) {
         Intent intent = new Intent(activity, FeedstationActivity.class);
@@ -130,6 +135,7 @@ public class FeedstationActivity extends PhotoPickerActivity {
                 if (feedstation == null)
                     feedstation = new Feedstation();
                 feedstation.setLocation(getIntent().getExtras().getParcelable(LOCATION_KEY));
+                setAdress(feedstation.getLocation());
             }
 
             currentMode = (FeedstationScreenMode) getIntent().getSerializableExtra(MODE_KEY);
@@ -176,6 +182,34 @@ public class FeedstationActivity extends PhotoPickerActivity {
         fillUI();
         setupUIMode();
     }
+
+    private void setAdress(LatLng location) {
+        List<Address> addresses = null;
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        try {
+            addresses = geocoder.getFromLocation(
+                    location.latitude,
+                    location.longitude,
+                    // In this sample, get just a single address.
+                    1);
+            //addressTextView.setText(addresses.get(0).getAddressLine(0));
+            feedstation.setAddress(addresses.get(0).getAddressLine(0));
+
+        } catch (IOException ioException) {
+            // Catch network or other I/O problems.
+            //errorMessage = getString(R.string.service_not_available);
+            //Log.e(TAG, errorMessage, ioException);
+        } catch (IllegalArgumentException illegalArgumentException) {
+            // Catch invalid latitude or longitude values.
+            //errorMessage = getString(R.string.invalid_lat_long_used);
+            Log.e(TAG, "Latitude = " + location.latitude +
+                    ", Longitude = " +
+                    location.longitude, illegalArgumentException);
+        }
+
+    }
+
+    ;
 
     private void fillUI() {
         if (feedstation != null) {
