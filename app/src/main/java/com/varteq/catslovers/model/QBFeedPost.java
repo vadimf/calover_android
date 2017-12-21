@@ -12,24 +12,28 @@ public class QBFeedPost extends QBCustomObject {
 
     public static final String CLASS_NAME = "Feed";
 
+    public static final String PICTURE_FIELD = "picture";
+    public static final String VIDEO_FIELD = "video";
+    public static final String STATION_ID_FIELD = "station_id";
+
     public QBFeedPost(String message, String id) {
         putString("description", message);
-        putString("station_id", id);
+        putString(STATION_ID_FIELD, id);
         setClassName(CLASS_NAME);
     }
 
     public static FeedPost toFeedPost(QBCustomObject object, Uri avatarUri, String userName) {
         FeedPost.FeedPostType type = FeedPost.FeedPostType.TEXT;
         Uri mediaUri = null;
-        if (!object.getString("video").equals("null")) {
-            mediaUri = Uri.parse(object.getString("video"));
+        /*if (!object.getString(VIDEO_FIELD).equals("null")) {
+            mediaUri = Uri.parse(object.getString(VIDEO_FIELD));
             type = FeedPost.FeedPostType.VIDEO;
-        } else if (!object.getString("picture").equals("null")) {
-            mediaUri = Uri.parse(object.getString("picture"));
+        } else if (!object.getString(PICTURE_FIELD).equals("null")) {
+            mediaUri = Uri.parse(object.getString(PICTURE_FIELD));
             type = FeedPost.FeedPostType.PICTURE;
-        }
+        }*/
 
-        object.getString("station_id");
+        object.getString(STATION_ID_FIELD);
         return new FeedPost(object.getCustomObjectId(), object.getCreatedAt(),
                 avatarUri,
                 userName,
@@ -38,8 +42,8 @@ public class QBFeedPost extends QBCustomObject {
 
     public static QBRequestGetBuilder getRequestBuilder(List<String> ids) {
         QBRequestGetBuilder requestBuilder = new QBRequestGetBuilder();
-        //requestBuilder.in("station_id", getFeedstationIds());
-        requestBuilder.addRule("station_id", "[in]", arrayToString(ids));
+        //requestBuilder.in(STATION_ID_FIELD, getFeedstationIds());
+        requestBuilder.addRule(STATION_ID_FIELD, "[in]", arrayToString(ids));
         requestBuilder.sortAsc("created_at");
         return requestBuilder;
     }

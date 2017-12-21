@@ -111,6 +111,7 @@ public class ImagePickHelperFragment extends Fragment {
     private boolean isResultFromImagePick(int requestCode, int resultCode, Intent data) {
         return resultCode == Activity.RESULT_OK
                 && ((requestCode == ImageUtils.CAMERA_REQUEST_CODE)
-                || (requestCode == ImageUtils.GALLERY_REQUEST_CODE && data != null));
+                || (requestCode == ImageUtils.GALLERY_REQUEST_CODE && data != null)
+                || (requestCode == ImageUtils.IMAGE_OR_VIDEO_REQUEST_CODE && data != null));
     }
 }

@@ -27,6 +27,8 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
 
     private OnImageSourcePickedListener onImageSourcePickedListener;
     private boolean permissionsResultReceived;
+    private boolean showImageAndVideoPickerWithoutChoose = false;
+    private Fragment fragment;
 
     public ImageSourcePickDialogFragment() {
         systemPermissionHelper = new SystemPermissionHelper(this);
@@ -39,34 +41,72 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
         fragment.show(fm, ImageSourcePickDialogFragment.class.getSimpleName());
     }
 
+    public static void showImageAndVideoPicker(Fragment resultFragment, FragmentManager fm) {
+        ImageSourcePickDialogFragment fragment = new ImageSourcePickDialogFragment();
+        fragment.setShowImageAndVideoPickerWithoutChoose(true);
+        fragment.setFragment(resultFragment);
+        fragment.setCancelable(false);
+        fragment.show(fm, ImageSourcePickDialogFragment.class.getSimpleName());
+    }
+
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(R.string.dlg_choose_image_from);
-        builder.setItems(R.array.dlg_image_pick, null);
-        AlertDialog alertDialog = builder.create();
-        alertDialog.getListView().setOnItemClickListener((adapterView, view, i, l) -> {
-            switch (i) {
-                case POSITION_GALLERY:
-                    if (!systemPermissionHelper.isSaveImagePermissionGranted()) {
-                        systemPermissionHelper.requestPermissionsForSaveFileImage();
-                        return;
-                    }
-                    onImageSourcePickedListener.onImageSourcePicked(ImageSource.GALLERY);
-                    dismiss();
-                    break;
-                case POSITION_CAMERA:
-                    if (!systemPermissionHelper.isCameraPermissionGranted()) {
-                        systemPermissionHelper.requestPermissionsTakePhoto();
-                        return;
-                    }
-                    onImageSourcePickedListener.onImageSourcePicked(ImageSource.CAMERA);
-                    dismiss();
-                    break;
+        if (!showImageAndVideoPickerWithoutChoose) {
+            builder.setTitle(R.string.dlg_choose_image_from);
+            builder.setItems(R.array.dlg_image_pick, null);
+            AlertDialog alertDialog = builder.create();
+            alertDialog.getListView().setOnItemClickListener((adapterView, view, i, l) -> {
+                switch (i) {
+                    case POSITION_GALLERY:
+                        if (!systemPermissionHelper.isSaveImagePermissionGranted()) {
+                            systemPermissionHelper.requestPermissionsForSaveFileImage();
+                            return;
+                        }
+                        onImageSourcePickedListener.onImageSourcePicked(ImageSource.GALLERY);
+                        dismiss();
+                        break;
+                    case POSITION_CAMERA:
+                        if (!systemPermissionHelper.isCameraPermissionGranted()) {
+                            systemPermissionHelper.requestPermissionsTakePhoto();
+                            return;
+                        }
+                        onImageSourcePickedListener.onImageSourcePicked(ImageSource.CAMERA);
+                        dismiss();
+                        break;
+                }
+            });
+            return alertDialog;
+        } else {
+            if (!systemPermissionHelper.isSaveImagePermissionGranted()) {
+                systemPermissionHelper.requestPermissionsForSaveFileImage();
+            } else {
+                ImageUtils.startImageAndVideoPicker(fragment);
+                dismiss();
             }
-        });
-        return alertDialog;
+            return builder.create();
+        }
+    }
+
+    /*@Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        if (showImageAndVideoPickerWithoutChoose) {
+            if (!systemPermissionHelper.isSaveImagePermissionGranted()) {
+                systemPermissionHelper.requestPermissionsForSaveFileImage();
+                return;
+            }
+            else ImageUtils.startImageAndVideoPicker(fragment);
+        }
+    }*/
+
+    public void setShowImageAndVideoPickerWithoutChoose(boolean showImageAndVideoPickerWithoutChoose) {
+        this.showImageAndVideoPickerWithoutChoose = showImageAndVideoPickerWithoutChoose;
+    }
+
+    public void setFragment(Fragment fragment) {
+        this.fragment = fragment;
     }
 
     @Override
@@ -81,7 +121,10 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
         if (requestCode == PERMISSIONS_FOR_SAVE_FILE_IMAGE_REQUEST) {
             if (permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                onImageSourcePickedListener.onImageSourcePicked(ImageSource.GALLERY);
+                if (showImageAndVideoPickerWithoutChoose) {
+                    ImageUtils.startImageAndVideoPicker(fragment);
+                    dismiss();
+                } else onImageSourcePickedListener.onImageSourcePicked(ImageSource.GALLERY);
             }
         }
         if (requestCode == PERMISSIONS_FOR_TAKE_PHOTO_REQUEST) {
