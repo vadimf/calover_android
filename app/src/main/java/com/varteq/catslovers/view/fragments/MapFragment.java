@@ -1,5 +1,7 @@
 package com.varteq.catslovers.view.fragments;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -21,6 +23,11 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -38,6 +45,7 @@ import com.varteq.catslovers.model.Feedstation;
 import com.varteq.catslovers.utils.ImageUtils;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
+import com.varteq.catslovers.utils.SystemPermissionHelper;
 import com.varteq.catslovers.utils.Utils;
 import com.varteq.catslovers.view.FeedstationActivity;
 import com.varteq.catslovers.view.presenter.MapPresenter;
@@ -50,6 +58,7 @@ import butterknife.ButterKnife;
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private final String TAG = MapFragment.class.getSimpleName();
+    private final int DEFAULT_ZOOM = 5;
     private GoogleMap googleMap;
 
     final private float markerPositionX = 0.5f; // Anchors the marker on center vertical
@@ -76,10 +85,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private boolean listUpdated;
     private LatLng userLocation;
 
+    private SystemPermissionHelper permissionHelper;
+    private LocationRequest locationRequest;
+    private FusedLocationProviderClient mFusedLocationClient;
+    private Location lastLocation;
+    private LocationCallback locationCallback;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         presenter = new MapPresenter(this);
+
+        permissionHelper = new SystemPermissionHelper(this);
     }
 
     @Nullable
@@ -95,6 +112,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         bottomSheetBehaviorFeedstation = BottomSheetBehavior.from(bottomSheetFeedstationFrameLayout);
         bottomSheetBehaviorFeedstation.setState(BottomSheetBehavior.STATE_HIDDEN);
         setBottomSheetDimensions();
+
+        initLocation();
 
         bottomSheetBehaviorFeedstation.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
@@ -140,20 +159,21 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     public void zoomMapForRadius(int radiusKm) {
-        double radiusM = radiusKm * 1000;
-        double zoomLevel;
+        if (userLocation != null) {
+            double radiusM = radiusKm * 1000;
+            double zoomLevel;
 
-        Circle circle = googleMap.addCircle(new CircleOptions()
-                .center(new LatLng(userLocation.latitude, userLocation.longitude))
-                .radius(radiusM)
-                .strokeWidth(0));
+            Circle circle = googleMap.addCircle(new CircleOptions()
+                    .center(new LatLng(userLocation.latitude, userLocation.longitude))
+                    .radius(radiusM)
+                    .strokeWidth(0));
 
-        double radius = circle.getRadius();
-        double scale = radius / 500;
-        zoomLevel = (16 - Math.log(scale) / Math.log(2));
-        zoomLevel = zoomLevel + 0.5f;
-        googleMap.animateCamera(CameraUpdateFactory.zoomTo((float) zoomLevel), null);
-
+            double radius = circle.getRadius();
+            double scale = radius / 500;
+            zoomLevel = (16 - Math.log(scale) / Math.log(2));
+            zoomLevel = zoomLevel + 0.5f;
+            googleMap.animateCamera(CameraUpdateFactory.zoomTo((float) zoomLevel), null);
+        }
     }
 
     @Override
@@ -293,4 +313,73 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             googleMap.addMarker(userLocationMarkerOptions);
         else setUserPosition();
     }
+
+    // Request current location
+    private void initLocation() {
+        locationRequest = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY)
+                .setInterval(30 * 1000)
+                .setFastestInterval(20 * 1000);
+        checkLocationAvailability();
+    }
+
+    @SuppressLint("MissingPermission")
+    public void checkLocationAvailability() {
+        if (!permissionHelper.isAccessLocationGranted()) {
+            permissionHelper.requestPermissionsAccessLocation();
+            return;
+        }
+        permissionHelper.checkLocationSettings(getActivity(), locationRequest, locationSettingsResponse -> {
+            getLastLocation();
+        });
+    }
+
+    @SuppressLint("MissingPermission")
+    public void getLastLocation() {
+        if (mFusedLocationClient == null)
+            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
+
+        mFusedLocationClient.getLastLocation()
+                .addOnSuccessListener(getActivity(), location -> {
+                    // Got last known location. In some rare situations this can be null.
+                    if (location != null) {
+                        lastLocation = location;
+                        setUserPosition(getActivity(), lastLocation, DEFAULT_ZOOM);
+                    } else getLocationUpdates();
+                });
+    }
+
+    private void setUserPosition(Activity activity, Location lastLocation, int radius) {
+        if (lastLocation != null) {
+            Profile.setLocation(activity, lastLocation);
+            setUserPosition();
+            zoomMapForRadius(radius);
+            userLocation = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    public void getLocationUpdates() {
+        if (locationCallback != null) return;
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                super.onLocationResult(locationResult);
+                if (locationResult != null && locationResult.getLastLocation() != null) {
+                    lastLocation = locationResult.getLastLocation();
+                    setUserPosition(getActivity(), lastLocation, DEFAULT_ZOOM);
+                    stopLocationUpdates();
+                }
+            }
+        };
+        if (mFusedLocationClient != null)
+            mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
+    }
+
+    private void stopLocationUpdates() {
+        if (locationCallback != null && mFusedLocationClient != null)
+            mFusedLocationClient.removeLocationUpdates(locationCallback);
+        locationCallback = null;
+    }
+
 }

@@ -13,6 +13,7 @@ import com.makeramen.roundedimageview.RoundedImageView;
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
+import com.varteq.catslovers.utils.Toaster;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -68,7 +69,16 @@ public class SignUpActivity extends PhotoPickerActivity {
 
     @OnClick(R.id.upload_photo_button)
     void uploadPhoto() {
-        pickPhotoWithPermission(getString(R.string.select_avatar));
+        //pickPhotoWithPermission(getString(R.string.select_avatar));
+        Toaster.shortToast(R.string.coming_soon);
+    }
+    @OnClick(R.id.facebook_linearLayout)
+    void facebookSignUp() {
+        Toaster.shortToast(R.string.coming_soon);
+    }
+    @OnClick(R.id.twitter_linearLayout)
+    void twitterSignUp() {
+        Toaster.shortToast(R.string.coming_soon);
     }
 
     private boolean isInputValid() {
