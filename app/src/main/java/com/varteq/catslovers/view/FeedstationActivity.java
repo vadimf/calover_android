@@ -301,10 +301,10 @@ public class FeedstationActivity extends PhotoPickerActivity {
     private void setupEditMode() {
         Log.d(TAG, "setupEditMode");
 
-        if (stationNameTextView.getText().toString().isEmpty())
-            stationNameTextView.setText(STATION_DEFAULT_NAME);
-        if (addressTextView.getText().toString().isEmpty())
-            addressTextView.setText(ADDRESS_DEFAULT_VALUE);
+//        if (stationNameTextView.getText().toString().isEmpty())
+//            stationNameTextView.setText(STATION_DEFAULT_NAME);
+//        if (addressTextView.getText().toString().isEmpty())
+//            addressTextView.setText(ADDRESS_DEFAULT_VALUE);
 
         /*addPhotoButton.setVisibility(View.VISIBLE);
         addPhotoButton.setOnClickListener(view -> Toaster.shortToast("Coming soon"));*/

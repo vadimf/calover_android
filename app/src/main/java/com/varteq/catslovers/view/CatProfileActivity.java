@@ -506,12 +506,12 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
     private void setupEditMode() {
         Log.d(TAG, "setupEditMode");
 
-        if (petNameTextView.getText().toString().isEmpty())
-            petNameTextView.setText(PET_DEFAULT_NAME);
-        if (ageValueTextView.getText().toString().isEmpty())
-            ageValueTextView.setText(DEFAULT_VALUE);
-        if (weightValueTextView.getText().toString().isEmpty())
-            weightValueTextView.setText(DEFAULT_VALUE);
+//        if (petNameTextView.getText().toString().isEmpty())
+//            petNameTextView.setText(PET_DEFAULT_NAME);
+//        if (ageValueTextView.getText().toString().isEmpty())
+//            ageValueTextView.setText(DEFAULT_VALUE);
+//        if (weightValueTextView.getText().toString().isEmpty())
+//            weightValueTextView.setText(DEFAULT_VALUE);
 
         infoLinearLayout.setVisibility(View.GONE);
         addPhotoButton.setVisibility(View.VISIBLE);

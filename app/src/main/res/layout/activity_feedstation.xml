@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -27,14 +26,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                app:layout_constraintGuide_percent="0.65"/>
+                app:layout_constraintGuide_percent="0.65" />
 
             <android.support.constraint.Guideline
                 android:id="@+id/avatar_start_guideline"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                app:layout_constraintGuide_percent="0.35"/>
+                app:layout_constraintGuide_percent="0.35" />
 
             <android.support.v4.view.ViewPager
                 android:id="@+id/header_photo_viewPager"
@@ -53,15 +52,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="4dp"
                 app:layout_constraintBottom_toTopOf="@+id/station_name_textView"
-                app:layout_constraintStart_toEndOf="@id/start_guideline"
-                >
+                app:layout_constraintStart_toEndOf="@id/start_guideline">
 
                 <ImageView
                     android:id="@+id/imageView2"
                     android:layout_width="51dp"
                     android:layout_height="76dp"
                     android:layout_gravity="center"
-                    app:srcCompat="@drawable/location_blue"/>
+                    app:srcCompat="@drawable/location_blue" />
 
                 <com.makeramen.roundedimageview.RoundedImageView
                     android:id="@+id/avatar_imageView"
@@ -74,7 +72,7 @@
                     app:riv_border_color="@color/white"
                     app:riv_border_width="2dp"
                     app:riv_corner_radius="29dp"
-                    app:riv_oval="true"/>
+                    app:riv_oval="true" />
             </FrameLayout>
 
             <android.support.constraint.Guideline
@@ -82,14 +80,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                app:layout_constraintGuide_begin="16dp"/>
+                app:layout_constraintGuide_begin="16dp" />
 
             <android.support.constraint.Guideline
                 android:id="@+id/end_guideline"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                app:layout_constraintGuide_end="16dp"/>
+                app:layout_constraintGuide_end="16dp" />
 
 
             <LinearLayout
@@ -105,7 +103,7 @@
                     style="@style/PrimaryTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Join Group"/>
+                    android:text="Join Group" />
 
                 <Button
                     android:id="@+id/follow_button"
@@ -114,14 +112,14 @@
                     android:layout_height="@dimen/normal_button_size"
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
-                    android:background="@drawable/ic_add_24dp"/>
+                    android:background="@drawable/ic_add_24dp" />
 
                 <Button
                     android:id="@+id/reply_button"
                     style="@style/PrimaryBorderlessButton"
                     android:layout_width="@dimen/normal_button_size"
                     android:layout_height="@dimen/normal_button_size"
-                    android:background="@drawable/ic_reply_24dp"/>
+                    android:background="@drawable/ic_reply_24dp" />
 
             </LinearLayout>
 
@@ -131,22 +129,24 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                tools:text="Shylee's Babies"
+                android:hint="Station name"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
-                app:layout_constraintTop_toBottomOf="@+id/info_LinearLayout"/>
+                app:layout_constraintTop_toBottomOf="@+id/info_LinearLayout"
+                tools:text="Shylee's Babies" />
 
             <TextView
                 android:id="@+id/address_textView"
                 style="@style/PrimaryTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:hint="station address"
                 android:lines="2"
                 android:maxLines="2"
                 android:paddingBottom="8dp"
-                tools:text="Golden Gate Bridge\nGolden Gate Bridge, San Francisco, CA, USA"
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
-                app:layout_constraintTop_toBottomOf="@+id/station_name_textView"/>
+                app:layout_constraintTop_toBottomOf="@+id/station_name_textView"
+                tools:text="Golden Gate Bridge\nGolden Gate Bridge, San Francisco, CA, USA" />
 
             <TextView
                 android:id="@+id/cats_list_label_textView"
@@ -158,7 +158,7 @@
                 android:text="Cats list/No."
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
-                app:layout_constraintTop_toBottomOf="@+id/address_textView"/>
+                app:layout_constraintTop_toBottomOf="@+id/address_textView" />
 
             <TextView
                 android:id="@+id/cats_list_textView"
@@ -169,7 +169,7 @@
                 android:paddingBottom="8dp"
                 android:text="1-4"
                 app:layout_constraintStart_toEndOf="@+id/cats_list_label_textView"
-                app:layout_constraintTop_toTopOf="@+id/cats_list_label_textView"/>
+                app:layout_constraintTop_toTopOf="@+id/cats_list_label_textView" />
 
             <RelativeLayout
                 android:id="@+id/time_relativeLayout"
@@ -190,7 +190,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/description_editText"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/description_label_textView"/>
+                app:layout_constraintTop_toTopOf="@+id/description_label_textView" />
 
             <TextView
                 android:id="@+id/description_label_textView"
@@ -202,7 +202,7 @@
                 android:text="More info..."
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
-                app:layout_constraintTop_toBottomOf="@+id/time_relativeLayout"/>
+                app:layout_constraintTop_toBottomOf="@+id/time_relativeLayout" />
 
 
             <Button
@@ -213,7 +213,7 @@
                 android:background="@drawable/ic_expand_less_24dp"
                 app:layout_constraintBottom_toBottomOf="@+id/description_label_textView"
                 app:layout_constraintEnd_toStartOf="@+id/end_guideline"
-                app:layout_constraintTop_toTopOf="@+id/description_label_textView"/>
+                app:layout_constraintTop_toTopOf="@+id/description_label_textView" />
 
             <EditText
                 android:id="@+id/description_editText"
@@ -224,10 +224,10 @@
                 android:ems="10"
                 android:maxLines="3"
                 android:paddingBottom="16dp"
-                tools:text="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore sit amet."
                 app:layout_constraintEnd_toStartOf="@+id/end_guideline"
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
-                app:layout_constraintTop_toBottomOf="@+id/description_label_textView"/>
+                app:layout_constraintTop_toBottomOf="@+id/description_label_textView"
+                tools:text="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore sit amet." />
 
 
             <TextView
@@ -248,8 +248,7 @@
                 android:layout_height="@dimen/normal_button_size"
                 android:background="@drawable/ic_expand_less_24dp"
                 app:layout_constraintBottom_toTopOf="@id/group_partners_RecyclerView"
-                app:layout_constraintEnd_toStartOf="@+id/end_guideline"
-                />
+                app:layout_constraintEnd_toStartOf="@+id/end_guideline" />
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/group_partners_RecyclerView"
@@ -259,14 +258,14 @@
                 android:layout_marginTop="8dp"
                 app:layout_constraintEnd_toStartOf="@+id/end_guideline"
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
-                app:layout_constraintTop_toBottomOf="@+id/group_partners_textView"/>
+                app:layout_constraintTop_toBottomOf="@+id/group_partners_textView" />
 
             <View
-                android:layout_marginTop="8dp"
+                android:id="@+id/photos_background"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
+                android:layout_marginTop="8dp"
                 android:background="#19607c9c"
-                android:id="@+id/photos_background"
                 app:layout_constraintBottom_toBottomOf="@+id/photos_RecyclerView"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -292,7 +291,7 @@
                 android:text="509"
                 android:visibility="visible"
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
-                app:layout_constraintTop_toBottomOf="@+id/station_name_photos_textView"/>
+                app:layout_constraintTop_toBottomOf="@+id/station_name_photos_textView" />
 
             <TextView
                 style="@style/SecondarySmallTextView"
@@ -302,7 +301,7 @@
                 android:text="photos"
                 app:layout_constraintBottom_toBottomOf="@+id/photo_count_textView"
                 app:layout_constraintStart_toEndOf="@+id/photo_count_textView"
-                app:layout_constraintTop_toTopOf="@+id/photo_count_textView"/>
+                app:layout_constraintTop_toTopOf="@+id/photo_count_textView" />
 
             <LinearLayout
 
@@ -337,7 +336,7 @@
                 android:paddingBottom="16dp"
                 app:layout_constraintEnd_toStartOf="@+id/end_guideline"
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
-                app:layout_constraintTop_toBottomOf="@+id/photo_count_textView"/>
+                app:layout_constraintTop_toBottomOf="@+id/photo_count_textView" />
 
         </android.support.constraint.ConstraintLayout>
 
