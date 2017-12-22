@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.utils.Log;
+import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.utils.Utils;
 import com.varteq.catslovers.view.fragments.CatsFragment;
@@ -83,8 +84,13 @@ public class MainActivity extends BaseActivity {
                 onPlusClick();
             else if (navigationSelectedItemId == R.id.action_chat && messagesFragment != null)
                 messagesFragment.onStartNewChatClick(null);
-            else if (navigationSelectedItemId == R.id.action_feed)
-                startActivity(new Intent(this, NewFeedPostActivity.class));
+            else if (navigationSelectedItemId == R.id.action_feed) {
+                String id = Profile.getUserStation(this);
+                if (id.isEmpty()) {
+                    Toaster.shortToast("You should create own cat");
+                } else
+                    startActivity(new Intent(this, NewFeedPostActivity.class));
+            }
         });
         setSupportActionBar(toolbar);
         catsToolsRelativeLayout = findViewById(R.id.catsToolsRelativeLayout);

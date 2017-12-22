@@ -95,6 +95,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             holder.imageDownloader.cancelLoading();
 
         //holder.toolbarGradientView.setVisibility(View.VISIBLE);
+        holder.imageView.setImageBitmap(null);
         holder.mediaLayout.setVisibility(View.VISIBLE);
         holder.emptyView.setVisibility(View.VISIBLE);
         holder.timeTextView.setVisibility(View.VISIBLE);

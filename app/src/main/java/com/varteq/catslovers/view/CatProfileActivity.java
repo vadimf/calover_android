@@ -354,6 +354,8 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
             if (catProfile.getType() != null && catProfile.getType().equals(CatProfile.Status.STRAY))
                 selectAnimalTypeStray();
             else selectAnimalTypePet();
+            if (catProfile.getPetName() != null && !catProfile.getPetName().isEmpty())
+                setTitle(catProfile.getPetName());
             petNameTextView.setText(catProfile.getPetName());
             nicknameTextView.setText(catProfile.getNickname());
 
