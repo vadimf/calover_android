@@ -45,7 +45,7 @@ public class QBFeedPost extends QBCustomObject {
         }
 
         object.getString(STATION_ID_FIELD);
-        return new FeedPost(object.getCustomObjectId(), object.getCreatedAt(),
+        return new FeedPost(object.getCustomObjectId(), object.getUserId(), object.getCreatedAt(),
                 avatarUri,
                 userName,
                 object.getString("description"), previewName, mediaName, type);
@@ -59,7 +59,7 @@ public class QBFeedPost extends QBCustomObject {
         return requestBuilder;
     }
 
-    protected static String arrayToString(List<String> values) {
+    public static String arrayToString(List<String> values) {
         StringBuilder arrayString = new StringBuilder();
         String delimiter = "";
 
