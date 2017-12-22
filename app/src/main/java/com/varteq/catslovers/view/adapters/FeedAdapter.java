@@ -1,7 +1,6 @@
 package com.varteq.catslovers.view.adapters;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -17,6 +16,7 @@ import com.varteq.catslovers.R;
 import com.varteq.catslovers.model.FeedPost;
 import com.varteq.catslovers.utils.PostPreviewDownloader;
 import com.varteq.catslovers.utils.TimeUtils;
+import com.varteq.catslovers.utils.UiUtils;
 import com.varteq.catslovers.view.MediaViewerActivity;
 
 import java.util.List;
@@ -45,6 +45,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
 
         holder.nameTextView.setText(feed.getName());
         //holder.likesTextView.setText(String.valueOf(feed.getLikes()));
+        holder.avatarImageView.setBackgroundDrawable(UiUtils.getColorCircleDrawable(feed.getUserId()));
         String message = feed.getMessage();
         if (message != null && !message.equals("null"))
             holder.messageTextView.setText(feed.getMessage());
@@ -154,10 +155,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             imageView.setOnClickListener(view -> {
                 int position = getAdapterPosition();
                 FeedPost feed = feedList.get(position);
-                Intent intent = new Intent(context, MediaViewerActivity.class);
-                intent.putExtra("mediaType", feed.getType());
-                intent.putExtra("mediaUri", feed.getMediaUri().toString());
-                context.startActivity(intent);
+                MediaViewerActivity.startActivity(context, feed);
             });
         }
 

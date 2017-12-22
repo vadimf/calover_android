@@ -3,10 +3,12 @@ package com.varteq.catslovers.model;
 import android.net.Uri;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.Date;
 
-public class FeedPost {
+public class FeedPost implements Serializable {
     private String id;
+    private Integer userId;
     private Date date;
     private Uri previewUri;
     private Uri mediaUri;
@@ -40,8 +42,9 @@ public class FeedPost {
         this.mediaUri = mediaUri;
     }
 
-    public FeedPost(String id, Date date, Uri avatarUri, String userName, String message, String previewName, String mediaName, FeedPostType type) {
+    public FeedPost(String id, Integer userId, Date date, Uri avatarUri, String userName, String message, String previewName, String mediaName, FeedPostType type) {
         this.id = id;
+        this.userId = userId;
         this.date = date;
         this.avatarUri = avatarUri;
         this.previewName = previewName;
@@ -153,5 +156,9 @@ public class FeedPost {
 
     public void setPreviewFile(File previewFile) {
         this.previewFile = previewFile;
+    }
+
+    public Integer getUserId() {
+        return userId;
     }
 }

@@ -90,6 +90,7 @@ public class AuthPresenter {
         Profile.setUserPetCount(view, 0);
         view.onSuccessSignIn();
         Profile.setUserPhone(view, username);
+        Profile.saveUser(view, "RObert", "r@r.com");
         Profile.setUserLogin(view, true);
         Profile.setUserId(view, String.valueOf(6));
         Profile.setUserStation(view, "38");

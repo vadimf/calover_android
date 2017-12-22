@@ -41,6 +41,7 @@ public class MessagesPresenter {
             return;
         }
         final QBUser qbUser = new QBUser(id, AppController.USER_PASS);
+        qbUser.setFullName(Profile.getUserName(view.getContext()));
         //qbUser.setExternalId(profile.getUserId());
         //qbUser.setWebsite(profile.getPicture());
         //qbUser.setFullName(Profile.getUserName(view));

@@ -50,10 +50,16 @@ public class ImageUtils {
         FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
 
         InputStream inputStream = new FileInputStream(fileDescriptor);
+
+        return saveStreamToFile(inputStream, parcelFileDescriptor, null).getAbsolutePath();
+    }
+
+    public static File saveStreamToFile(InputStream inputStream, ParcelFileDescriptor parcelFileDescriptor, String fileName) throws Exception {
         BufferedInputStream bis = new BufferedInputStream(inputStream);
 
         File parentDir = StorageUtils.getAppExternalDataDirectoryFile();
-        String fileName = String.valueOf(System.currentTimeMillis());
+        if (fileName == null)
+            fileName = String.valueOf(System.currentTimeMillis());
 
         /*if (isImageFile(uri.getPath()))
             fileName += IMAGE_FILE_EXTENSION;
@@ -73,12 +79,13 @@ public class ImageUtils {
         } catch (Exception e) {
             throw new IOException("Can\'t save Storage API bitmap to a file!", e);
         } finally {
-            parcelFileDescriptor.close();
+            if (parcelFileDescriptor != null)
+                parcelFileDescriptor.close();
             bis.close();
             bos.close();
         }
 
-        return resultFile.getAbsolutePath();
+        return resultFile;
     }
 
     public static File saveBitmapToFile(Bitmap bitmap, String fileName) throws Exception {

@@ -7,6 +7,8 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.customobjects.QBCustomObjects;
 import com.quickblox.customobjects.model.QBCustomObject;
+import com.quickblox.users.QBUsers;
+import com.quickblox.users.model.QBUser;
 import com.varteq.catslovers.api.BaseParser;
 import com.varteq.catslovers.api.ServiceGenerator;
 import com.varteq.catslovers.api.entity.BaseResponse;
@@ -18,7 +20,10 @@ import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.view.fragments.FeedFragment;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -47,7 +52,7 @@ public class FeedPresenter {
             public void onSuccess(ArrayList<QBCustomObject> customObjects, Bundle params) {
                 /*int skip = params.getInt(Consts.SKIP);
                 int limit = params.getInt(Consts.LIMIT);*/
-                view.feedsLoaded(from(customObjects));
+                loadUsers(customObjects);
             }
 
             @Override
@@ -58,13 +63,36 @@ public class FeedPresenter {
         });
     }
 
-    private List<FeedPost> from(ArrayList<QBCustomObject> customObjects) {
+    private List<FeedPost> from(ArrayList<QBCustomObject> customObjects, ArrayList<QBUser> qbUsers) {
+        HashMap<Integer, QBUser> users = new HashMap<>();
+        for (QBUser user : qbUsers)
+            users.put(user.getId(), user);
+
         List<FeedPost> feeds = new ArrayList<>();
         for (QBCustomObject object : customObjects) {
-            FeedPost feed = QBFeedPost.toFeedPost(object, null, null);
+            FeedPost feed = QBFeedPost.toFeedPost(object, null, users.get(object.getUserId()).getFullName());
             feeds.add(feed);
         }
         return feeds;
+    }
+
+    private void loadUsers(ArrayList<QBCustomObject> customObjects) {
+        Set<Integer> userIds = new HashSet<>();
+        for (QBCustomObject object : customObjects)
+            userIds.add(object.getUserId());
+        QBUsers.getUsersByIDs(userIds, null).performAsync(
+                new QBEntityCallback<ArrayList<QBUser>>() {
+                    @Override
+                    public void onSuccess(ArrayList<QBUser> result, Bundle params) {
+                        view.feedsLoaded(from(customObjects, result));
+                    }
+
+                    @Override
+                    public void onError(QBResponseException e) {
+                        view.onError();
+                        Log.e(TAG, "getUsersByFilter onError " + e.getMessage());
+                    }
+                });
     }
 
     public void getFeedstationIds() {

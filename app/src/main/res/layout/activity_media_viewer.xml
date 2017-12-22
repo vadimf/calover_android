@@ -66,6 +66,11 @@
         android:layout_below="@+id/frameLayout2"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="Picture captions...."/>
+        android:text="Picture captions...."
+        android:visibility="invisible" />
+
+    <ProgressBar
+        android:id="@+id/progress_activity_media"
+        style="@style/CenterProgressBarStyle" />
 
 </RelativeLayout>

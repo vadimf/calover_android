@@ -4,7 +4,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.widget.ImageView;
 
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
@@ -16,87 +15,85 @@ import com.varteq.catslovers.model.QBFeedPost;
 import java.io.File;
 import java.io.InputStream;
 
-public class PostPreviewDownloader {
+public class PostMediaDownloader {
     private final File parentDir;
-    private final String fileName;
     private Performer<InputStream> task = null;
-    private ImageView view;
-    private FeedPost post;
     private boolean isCanceled;
-    private AsyncTask<Void, Void, Bitmap> asyncTask;
+    private AsyncTask<Void, Void, File> asyncTask;
+    private String mediaName;
+    private FeedPost.FeedPostType mediaType;
+    private OnMediaLoaded listener;
 
-    public PostPreviewDownloader(ImageView view, FeedPost post) {
-        this.view = view;
-        this.post = post;
-
-        String fieldName = QBFeedPost.PICTURE_FIELD;
-        if (post.getType().equals(FeedPost.FeedPostType.VIDEO)) {
-            fileName = post.getPreviewName();
-            fieldName = QBFeedPost.PREVIEW_FIELD;
-        } else fileName = post.getMediaName();
+    public PostMediaDownloader(FeedPost post, OnMediaLoaded listener) {
+        this.listener = listener;
+        mediaType = post.getType();
+        mediaName = post.getMediaName();
+        String fieldName = null;
+        if (mediaType.equals(FeedPost.FeedPostType.PICTURE))
+            fieldName = QBFeedPost.PICTURE_FIELD;
+        else
+            fieldName = QBFeedPost.VIDEO_FIELD;
 
         parentDir = StorageUtils.getAppExternalDataDirectoryFile();
-        File imageFile = post.getPreviewFile();
-
-        if (setImage(imageFile)) return;
+        File mediaFile = null;
 
         for (File file : parentDir.listFiles()) {
-            if (file.getName().equals(fileName)) {
-                imageFile = file;
-                post.setPreviewFile(file);
+            if (file.getName().equals(mediaName)) {
+                mediaFile = file;
                 break;
             }
         }
 
         if (isCanceled) return;
 
-        if (setImage(imageFile)) return;
+        if (mediaType.equals(FeedPost.FeedPostType.PICTURE)) {
+            setImage(mediaFile);
+            return;
+        } else if (mediaFile != null) {
+            listener.onVideoLoaded(mediaFile);
+            return;
+        }
 
         task = QBCustomObjectsFiles.downloadFile(new QBFeedPost(post.getId()), fieldName);
         task.performAsync(new QBEntityCallback<InputStream>() {
             @Override
             public void onSuccess(InputStream inputStream, Bundle params) {
-                saveAndShowImage(inputStream, fileName);
+                saveAndShowImage(inputStream, mediaName);
             }
 
             @Override
             public void onError(QBResponseException errors) {
+                int i = 0;
             }
         });
     }
 
     private void saveAndShowImage(InputStream inputStream, String fileName) {
-        asyncTask = new AsyncTask<Void, Void, Bitmap>() {
+        asyncTask = new AsyncTask<Void, Void, File>() {
 
             @Override
-            protected Bitmap doInBackground(Void... voids) {
-                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+            protected File doInBackground(Void... voids) {
                 try {
-                    post.setPreviewFile(ImageUtils.saveBitmapToFile(bitmap, fileName));
+                    return ImageUtils.saveStreamToFile(inputStream, null, fileName);
                 } catch (Exception e) {
                 }
-                return bitmap;
+                return null;
             }
 
             @Override
-            protected void onPostExecute(Bitmap bitmap) {
-                setImage(bitmap);
+            protected void onPostExecute(File file) {
+                listener.onVideoLoaded(file);
             }
         };
         asyncTask.execute();
     }
 
     private boolean setImage(File imageFile) {
-        if (imageFile != null) {
+        if (imageFile != null && mediaType.equals(FeedPost.FeedPostType.PICTURE)) {
             Bitmap bitmap = BitmapFactory.decodeFile(imageFile.getPath());
-            setImage(bitmap);
+            listener.onImageLoaded(bitmap);
             return true;
         } else return false;
-    }
-
-    private void setImage(Bitmap bitmap) {
-        if (!isCanceled)
-            view.setImageBitmap(bitmap);
     }
 
     public void cancelLoading() {
@@ -110,11 +107,17 @@ public class PostPreviewDownloader {
             if (parentDir == null) return;
 
             for (File file : parentDir.listFiles()) {
-                if (file.getName().equals(fileName)) {
+                if (file.getName().equals(mediaName)) {
                     file.delete();
                     break;
                 }
             }
         }
+    }
+
+    public interface OnMediaLoaded {
+        void onImageLoaded(Bitmap bitmap);
+
+        void onVideoLoaded(File file);
     }
 }
