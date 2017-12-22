@@ -35,6 +35,7 @@ import com.varteq.catslovers.api.entity.AuthToken;
 import com.varteq.catslovers.api.entity.BaseResponse;
 import com.varteq.catslovers.api.entity.Cat;
 import com.varteq.catslovers.api.entity.ErrorResponse;
+import com.varteq.catslovers.api.entity.RFeedstation;
 import com.varteq.catslovers.utils.ChatHelper;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
@@ -341,12 +342,58 @@ public class AuthPresenter {
             @Override
             public void onResponse(Call<BaseResponse<List<Cat>>> call, Response<BaseResponse<List<Cat>>> response) {
                 Profile.setUserPetCount(view, 1);
-                view.onSuccessSignIn();
+                getPrivateFeedstation();
             }
 
             @Override
             public void onFailure(Call<BaseResponse<List<Cat>>> call, Throwable t) {
                 Log.e(TAG, "getCats() onFailure " + t.getMessage());
+                if (checkNetworkErrAndShowSnackbar(t.toString())) return;
+                view.onSuccessSignIn();
+            }
+        });
+    }
+
+    public void getPrivateFeedstation() {
+        errListener = new OneTimeOnClickListener() {
+            @Override
+            protected void onClick() {
+                getPrivateFeedstation();
+            }
+        };
+
+        Call<BaseResponse<List<RFeedstation>>> call = ServiceGenerator.getApiServiceWithToken().getFeedstations();
+        call.enqueue(new Callback<BaseResponse<List<RFeedstation>>>() {
+            @Override
+            public void onResponse(Call<BaseResponse<List<RFeedstation>>> call, Response<BaseResponse<List<RFeedstation>>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    new BaseParser<List<RFeedstation>>(response) {
+
+                        @Override
+                        protected void onSuccess(List<RFeedstation> data) {
+                            for (RFeedstation station : data) {
+                                if (station.getIsPublic() != null && !station.getIsPublic() &&
+                                        Profile.getUserId(view).equals(station.getCreated())) {
+                                    Profile.setUserStation(view, String.valueOf(station.getId()));
+                                    break;
+                                }
+                                view.onSuccessSignIn();
+                            }
+
+                        }
+
+                        @Override
+                        protected void onFail(ErrorResponse error) {
+                            Log.d(TAG, error.getMessage() + error.getCode());
+                            view.onSuccessSignIn();
+                        }
+                    };
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseResponse<List<RFeedstation>>> call, Throwable t) {
+                Log.e(TAG, "getPrivateFeedstation onFailure " + t.getMessage());
                 if (checkNetworkErrAndShowSnackbar(t.toString())) return;
                 view.onSuccessSignIn();
             }
