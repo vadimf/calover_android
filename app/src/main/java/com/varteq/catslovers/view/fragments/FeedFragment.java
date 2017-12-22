@@ -26,11 +26,12 @@ public class FeedFragment extends Fragment {
 
     RecyclerView feedRecyclerView;
     RecyclerView.Adapter adapter;
-    RecyclerView.LayoutManager layoutManager;
+    LinearLayoutManager layoutManager;
     List<FeedPost> feedList;
     FeedPresenter presenter;
     @BindView(R.id.feed_refresh_layout)
     SwipeRefreshLayout feedRefreshLayout;
+    private boolean listUpdated;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -54,6 +55,7 @@ public class FeedFragment extends Fragment {
 
         adapter = new FeedAdapter(feedList, getContext());
         layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+        layoutManager.setStackFromEnd(true);
         feedRecyclerView.setAdapter(adapter);
         feedRecyclerView.setLayoutManager(layoutManager);
         feedRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -88,14 +90,32 @@ public class FeedFragment extends Fragment {
 
         ));
         adapter.notifyDataSetChanged();*/
+        listUpdated = true;
         presenter.loadFeeds();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!listUpdated) {
+            feedRefreshLayout.setRefreshing(true);
+            presenter.loadFeeds();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        listUpdated = false;
+    }
+
     public void feedsLoaded(List<FeedPost> feeds) {
+        listUpdated = true;
         feedList.clear();
         feedList.addAll(feeds);
         adapter.notifyDataSetChanged();
         feedRefreshLayout.setRefreshing(false);
+        feedRecyclerView.scrollToPosition(feeds.size() - 1);
     }
 
     public void onError() {
