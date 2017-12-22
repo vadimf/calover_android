@@ -27,6 +27,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -55,7 +57,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     @BindView(R.id.seekBar)
     SeekBar seekBar;
-    final private int SEEKBAR_STEPS_COUNT = 7;
+    final private int SEEKBAR_STEPS_COUNT = 4;
 
     @BindView(R.id.avatar_imageView)
     RoundedImageView avatarImageView;
@@ -72,6 +74,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     MapPresenter presenter;
     private MarkerOptions userLocationMarkerOptions;
     private boolean listUpdated;
+    private LatLng userLocation;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -114,9 +117,43 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         seekBar.setMax(SEEKBAR_STEPS_COUNT - 1);
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                int radius = (i + 1) * (SEEKBAR_STEPS_COUNT + 1);
+                zoomMapForRadius(radius);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
         Glide.with(this)
                 .load(getResources().getDrawable(R.drawable.cat2))
                 .into(avatarImageView);
+    }
+
+    public void zoomMapForRadius(int radiusKm) {
+        double radiusM = radiusKm * 1000;
+        double zoomLevel;
+
+        Circle circle = googleMap.addCircle(new CircleOptions()
+                .center(new LatLng(userLocation.latitude, userLocation.longitude))
+                .radius(radiusM)
+                .strokeWidth(0));
+
+        double radius = circle.getRadius();
+        double scale = radius / 500;
+        zoomLevel = (16 - Math.log(scale) / Math.log(2));
+        zoomLevel = zoomLevel + 0.5f;
+        googleMap.animateCamera(CameraUpdateFactory.zoomTo((float) zoomLevel), null);
+
     }
 
     @Override
@@ -127,8 +164,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 bottomSheetBehaviorFeedstation.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 break;
         }
-        if (!listUpdated && googleMap != null)
-            presenter.getFeedstations();
+        if (!listUpdated && googleMap != null && userLocation != null)
+            presenter.getFeedstations(userLocation.latitude, userLocation.longitude, 20);
     }
 
     @Override
@@ -162,8 +199,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             Log.d(TAG, "OnMapLongClick " + latLng.latitude + " / " + latLng.longitude + "]");
         });
 
-        if (!listUpdated)
-            presenter.getFeedstations();
+        if (!listUpdated && userLocation != null)
+            presenter.getFeedstations(userLocation.latitude, userLocation.longitude, 20);
     }
 
     private void setUserPosition() {

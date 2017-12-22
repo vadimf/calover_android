@@ -28,9 +28,9 @@ public class MapPresenter {
         this.view = view;
     }
 
-    public void getFeedstations() {
+    public void getFeedstations(double lat, double lng, Integer distance) {
 
-        Call<BaseResponse<List<RFeedstation>>> call = ServiceGenerator.getApiServiceWithToken().getFeedstations();
+        Call<BaseResponse<List<RFeedstation>>> call = ServiceGenerator.getApiServiceWithToken().getGeoFeedstations(lat, lng, distance);
         call.enqueue(new Callback<BaseResponse<List<RFeedstation>>>() {
             @Override
             public void onResponse(Call<BaseResponse<List<RFeedstation>>> call, Response<BaseResponse<List<RFeedstation>>> response) {
@@ -66,11 +66,13 @@ public class MapPresenter {
             feedstation.setCreatedUserId(station.getCreated());
             feedstation.setAddress(station.getAddress());
             feedstation.setDescription(station.getDescription());
-            if (station.getIsPublic())
+            if (station.getIsPublic() != null && station.getIsPublic())
                 feedstation.setTimeToFeed(TimeUtils.getLocalDateFromUtc(station.getTimeToFeed()));
             if (station.getLat() != null && station.getLng() != null)
                 feedstation.setLocation(new LatLng(station.getLat(), station.getLng()));
-            feedstation.setIsPublic(station.getIsPublic());
+            if (station.getIsPublic() != null)
+                feedstation.setIsPublic(station.getIsPublic());
+            else feedstation.setIsPublic(true);
 /*if (!station.getIsPublic() && Profile.getUserId(view.getContext()).equals(station.getCreated())){
     Profile.setUserStation(view.getContext(), String.valueOf(station.getId()));
 }*/

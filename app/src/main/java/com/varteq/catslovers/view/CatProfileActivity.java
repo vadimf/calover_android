@@ -506,12 +506,12 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
     private void setupEditMode() {
         Log.d(TAG, "setupEditMode");
 
-//        if (petNameTextView.getText().toString().isEmpty())
-//            petNameTextView.setText(PET_DEFAULT_NAME);
-//        if (ageValueTextView.getText().toString().isEmpty())
-//            ageValueTextView.setText(DEFAULT_VALUE);
-//        if (weightValueTextView.getText().toString().isEmpty())
-//            weightValueTextView.setText(DEFAULT_VALUE);
+        if (petNameTextView.getText().toString().isEmpty())
+            petNameTextView.setText(PET_DEFAULT_NAME);
+        if (ageValueTextView.getText().toString().isEmpty())
+            ageValueTextView.setText(DEFAULT_VALUE);
+        if (weightValueTextView.getText().toString().isEmpty())
+            weightValueTextView.setText(DEFAULT_VALUE);
 
         infoLinearLayout.setVisibility(View.GONE);
         addPhotoButton.setVisibility(View.VISIBLE);
@@ -690,7 +690,7 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
                     }
                 }
         );
-        editTextDialog.setEditTextText(weight > 0 ? String.valueOf(weight) : null);
+        editTextDialog.setEditTextText((weight > 0 && !weightValueTextView.getText().toString().equals(DEFAULT_VALUE)) ? String.valueOf(weight) : null);
         editTextDialog.setEditTextInputType(InputType.TYPE_CLASS_PHONE);
         editTextDialog.show();
     }
@@ -795,7 +795,7 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
                 }
         );
         String name = petNameTextView.getText().toString();
-        editTextDialog.setEditTextText(!name.isEmpty() ? name : null);
+        editTextDialog.setEditTextText((!name.isEmpty() && !name.equals(PET_DEFAULT_NAME)) ? name : null);
         editTextDialog.setEditTextInputType(InputType.TYPE_CLASS_TEXT);
         editTextDialog.show();
     }

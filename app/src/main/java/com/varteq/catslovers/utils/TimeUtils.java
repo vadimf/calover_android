@@ -45,7 +45,9 @@ public class TimeUtils {
         return birthday.getTimeInMillis();
     }
 
-    public static Date getLocalDateFromUtc(int seconds) {
+    public static Date getLocalDateFromUtc(Integer seconds) {
+        if (seconds == null)
+            return null;
         long millis = ((long) seconds * 1000);
         return new Date(millis + TimeZone.getDefault().getOffset(millis));
     }

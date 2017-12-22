@@ -94,4 +94,11 @@ public interface ApiService {
 
     @GET("feedstations")
     Call<BaseResponse<List<RFeedstation>>> getFeedstations();
+
+    @FormUrlEncoded
+    @POST("geo/search")
+    Call<BaseResponse<List<RFeedstation>>> getGeoFeedstations(
+                                                       @Field("lat") double lat,
+                                                       @Field("lng") double lng,
+                                                       @Field("distance") Integer distance);
 }
