@@ -2,6 +2,7 @@ package com.varteq.catslovers.view.qb;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.design.widget.Snackbar;
@@ -241,6 +242,11 @@ public class ChatActivity extends QBBaseActivity implements OnImagePickedListene
                 attachmentPreviewAdapter.add(file);
                 break;
         }
+    }
+
+    @Override
+    public void onVideoPicked(int requestCode, File file, Bitmap preview) {
+
     }
 
     @Override

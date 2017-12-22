@@ -2,6 +2,7 @@ package com.varteq.catslovers.model;
 
 import android.net.Uri;
 
+import java.io.File;
 import java.util.Date;
 
 public class FeedPost {
@@ -10,6 +11,10 @@ public class FeedPost {
     private Uri previewUri;
     private Uri mediaUri;
     private Uri avatarUri;
+    private File previewFile;
+    private String previewName;
+    private String mediaName;
+    private String avatarName;
     private String name;
     private String message;
     private int likes;
@@ -33,6 +38,17 @@ public class FeedPost {
     public FeedPost(String id, Date date, Uri avatarUri, String userName, String message, Uri mediaUri, FeedPostType type) {
         this(id, date, avatarUri, userName, message, type);
         this.mediaUri = mediaUri;
+    }
+
+    public FeedPost(String id, Date date, Uri avatarUri, String userName, String message, String previewName, String mediaName, FeedPostType type) {
+        this.id = id;
+        this.date = date;
+        this.avatarUri = avatarUri;
+        this.previewName = previewName;
+        this.mediaName = mediaName;
+        this.name = userName;
+        this.message = message;
+        this.type = type;
     }
 
     public FeedPost(String id, Date date, Uri previewUri, Uri mediaUri, Uri avatarUri, String name, String message, int likes, FeedPostType type) {
@@ -117,5 +133,25 @@ public class FeedPost {
 
     public void setType(FeedPostType type) {
         this.type = type;
+    }
+
+    public String getPreviewName() {
+        return previewName;
+    }
+
+    public String getMediaName() {
+        return mediaName;
+    }
+
+    public String getAvatarName() {
+        return avatarName;
+    }
+
+    public File getPreviewFile() {
+        return previewFile;
+    }
+
+    public void setPreviewFile(File previewFile) {
+        this.previewFile = previewFile;
     }
 }

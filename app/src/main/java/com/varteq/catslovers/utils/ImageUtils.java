@@ -27,6 +27,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -38,6 +39,8 @@ public class ImageUtils {
     public static final int CAMERA_REQUEST_CODE = 212;
 
     private static final String CAMERA_FILE_NAME_PREFIX = "CAMERA_";
+    public static final String IMAGE_FILE_EXTENSION = ".jpg";
+    public static final String VIDEO_FILE_EXTENSION = "mp4";
 
     private ImageUtils() {
     }
@@ -50,7 +53,12 @@ public class ImageUtils {
         BufferedInputStream bis = new BufferedInputStream(inputStream);
 
         File parentDir = StorageUtils.getAppExternalDataDirectoryFile();
-        String fileName = String.valueOf(System.currentTimeMillis()) + ".jpg";
+        String fileName = String.valueOf(System.currentTimeMillis());
+
+        /*if (isImageFile(uri.getPath()))
+            fileName += IMAGE_FILE_EXTENSION;
+        if (isVideoFile(uri.getPath()))
+            fileName += VIDEO_FILE_EXTENSION;*/
         File resultFile = new File(parentDir, fileName);
 
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(resultFile));
@@ -71,6 +79,27 @@ public class ImageUtils {
         }
 
         return resultFile.getAbsolutePath();
+    }
+
+    public static File saveBitmapToFile(Bitmap bitmap, String fileName) throws Exception {
+
+        File parentDir = StorageUtils.getAppExternalDataDirectoryFile();
+        if (fileName == null)
+            fileName = String.valueOf(System.currentTimeMillis());
+
+        File resultFile = new File(parentDir, fileName);
+
+        FileOutputStream outputStream = new FileOutputStream(resultFile);
+
+        try {
+            bitmap.compress(Bitmap.CompressFormat.PNG, 85, outputStream);
+        } catch (Exception e) {
+        } finally {
+            outputStream.flush();
+            outputStream.close();
+        }
+
+        return resultFile;
     }
 
     public static void startImagePicker(Activity activity) {
@@ -175,5 +204,24 @@ public class ImageUtils {
         drawable.draw(canvas);
 
         return bitmap;
+    }
+
+    /*public static boolean isImageFile(File file) {
+        MimetypesFileTypeMap mimeTypesMap = new MimetypesFileTypeMap();
+
+        //String mimeType = mimeTypesMap.getContentType(fileName);
+
+        mimeType = mimeTypesMap.getContentType(file);
+        return true;
+    }*/
+
+    public static boolean isImageFile(String path) {
+        String mimeType = URLConnection.guessContentTypeFromName(path);
+        return mimeType != null && mimeType.startsWith("image");
+    }
+
+    public static boolean isVideoFile(String path) {
+        String mimeType = URLConnection.guessContentTypeFromName(path);
+        return mimeType != null && mimeType.startsWith("video");
     }
 }

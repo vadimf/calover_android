@@ -15,29 +15,40 @@ public class QBFeedPost extends QBCustomObject {
     public static final String PICTURE_FIELD = "picture";
     public static final String VIDEO_FIELD = "video";
     public static final String STATION_ID_FIELD = "station_id";
+    public static final String PREVIEW_FIELD = "preview";
 
-    public QBFeedPost(String message, String id) {
+    public QBFeedPost(String message, String stationId) {
         putString("description", message);
-        putString(STATION_ID_FIELD, id);
+        putString(STATION_ID_FIELD, stationId);
+        setClassName(CLASS_NAME);
+    }
+
+    public QBFeedPost(String id) {
+        setCustomObjectId(id);
         setClassName(CLASS_NAME);
     }
 
     public static FeedPost toFeedPost(QBCustomObject object, Uri avatarUri, String userName) {
         FeedPost.FeedPostType type = FeedPost.FeedPostType.TEXT;
         Uri mediaUri = null;
-        /*if (!object.getString(VIDEO_FIELD).equals("null")) {
-            mediaUri = Uri.parse(object.getString(VIDEO_FIELD));
+        String mediaName = null;
+        String previewName = null;
+        if (!object.getString(VIDEO_FIELD).equals("null")) {
+            //mediaUri = Uri.parse(object.getString(VIDEO_FIELD));
+            mediaName = object.getString(VIDEO_FIELD);
+            previewName = object.getString(PREVIEW_FIELD);
             type = FeedPost.FeedPostType.VIDEO;
         } else if (!object.getString(PICTURE_FIELD).equals("null")) {
-            mediaUri = Uri.parse(object.getString(PICTURE_FIELD));
+            //mediaUri = Uri.parse(object.getString(PICTURE_FIELD));
+            mediaName = object.getString(PICTURE_FIELD);
             type = FeedPost.FeedPostType.PICTURE;
-        }*/
+        }
 
         object.getString(STATION_ID_FIELD);
         return new FeedPost(object.getCustomObjectId(), object.getCreatedAt(),
                 avatarUri,
                 userName,
-                object.getString("description"), mediaUri, type);
+                object.getString("description"), previewName, mediaName, type);
     }
 
     public static QBRequestGetBuilder getRequestBuilder(List<String> ids) {

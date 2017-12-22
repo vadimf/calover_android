@@ -16,7 +16,7 @@ public class TimeUtils {
         return dateFormat.format(new Date(milliseconds));
     }
 
-    public static String getDate(long milliseconds) {
+    public static String getDateAsMMMMdd(long milliseconds) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM dd", Locale.getDefault());
         return dateFormat.format(new Date(milliseconds));
     }
@@ -29,6 +29,11 @@ public class TimeUtils {
     public static String getDateAsDDMMYYYY(long milliseconds) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
         return dateFormat.format(new Date(milliseconds));
+    }
+
+    public static String getDateAsMMMMddHHmm(Date date) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd HH:mm", Locale.getDefault());
+        return dateFormat.format(date);
     }
 
     public static long getTimeInMillis(int year, int month, int monthDay) {

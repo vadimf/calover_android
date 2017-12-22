@@ -92,6 +92,7 @@ public class AuthPresenter {
         Profile.setUserPhone(view, username);
         Profile.setUserLogin(view, true);
         Profile.setUserId(view, String.valueOf(6));
+        Profile.setUserStation(view, "38");
     }
 
     ForgotPasswordHandler forgotPasswordHandler = new ForgotPasswordHandler() {

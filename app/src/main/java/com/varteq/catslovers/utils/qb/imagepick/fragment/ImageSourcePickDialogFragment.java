@@ -123,7 +123,6 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 if (showImageAndVideoPickerWithoutChoose) {
                     ImageUtils.startImageAndVideoPicker(fragment);
-                    dismiss();
                 } else onImageSourcePickedListener.onImageSourcePicked(ImageSource.GALLERY);
             }
         }
