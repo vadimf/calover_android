@@ -16,6 +16,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.varteq.catslovers.R;
+import com.varteq.catslovers.api.BaseParser;
+import com.varteq.catslovers.api.ServiceGenerator;
+import com.varteq.catslovers.api.entity.BaseResponse;
+import com.varteq.catslovers.api.entity.ErrorResponse;
+import com.varteq.catslovers.api.entity.RFeedstation;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.utils.Toaster;
@@ -25,8 +30,13 @@ import com.varteq.catslovers.view.fragments.FeedFragment;
 import com.varteq.catslovers.view.fragments.MapFragment;
 import com.varteq.catslovers.view.fragments.MessagesFragment;
 
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static com.varteq.catslovers.utils.SystemPermissionHelper.REQUEST_CHECK_SETTINGS;
 
@@ -88,11 +98,7 @@ public class MainActivity extends BaseActivity {
             else if (navigationSelectedItemId == R.id.action_chat && messagesFragment != null)
                 messagesFragment.onStartNewChatClick(null);
             else if (navigationSelectedItemId == R.id.action_feed) {
-                String id = Profile.getUserStation(this);
-                if (id.isEmpty()) {
-                    Toaster.shortToast("You should create own cat");
-                } else
-                    startActivity(new Intent(this, NewFeedPostActivity.class));
+                checkFeedstation();
             }
         });
         setSupportActionBar(toolbar);
@@ -246,5 +252,48 @@ public class MainActivity extends BaseActivity {
                 }
                 break;
         }
+    }
+
+    public void checkFeedstation() {
+        String id = Profile.getUserStation(this);
+        if (!id.isEmpty()) {
+            showNewFeedPostActivity();
+            return;
+        }
+
+        Call<BaseResponse<List<RFeedstation>>> call = ServiceGenerator.getApiServiceWithToken().getFeedstations();
+        call.enqueue(new Callback<BaseResponse<List<RFeedstation>>>() {
+            @Override
+            public void onResponse(Call<BaseResponse<List<RFeedstation>>> call, Response<BaseResponse<List<RFeedstation>>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    new BaseParser<List<RFeedstation>>(response) {
+
+                        @Override
+                        protected void onSuccess(List<RFeedstation> data) {
+                            for (RFeedstation feedstation : data) {
+                                if (!feedstation.getIsPublic()) {
+                                    Profile.setUserStation(MainActivity.this, String.valueOf(feedstation.getId()));
+                                    showNewFeedPostActivity();
+                                    return;
+                                }
+                            }
+                            Toaster.shortToast("You should create own cat");
+                        }
+
+                        @Override
+                        protected void onFail(ErrorResponse error) {
+                        }
+                    };
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseResponse<List<RFeedstation>>> call, Throwable t) {
+            }
+        });
+    }
+
+    private void showNewFeedPostActivity() {
+        startActivity(new Intent(this, NewFeedPostActivity.class));
     }
 }

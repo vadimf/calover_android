@@ -44,7 +44,10 @@ public class FeedPresenter {
     }
 
     private void getFeeds(List<String> ids) {
-        if (ids == null || ids.isEmpty()) return;
+        if (ids == null || ids.isEmpty()) {
+            view.onError();
+            return;
+        }
         QBRequestGetBuilder requestBuilder = QBFeedPost.getRequestBuilder(ids);
 
         QBCustomObjects.getObjects(QBFeedPost.CLASS_NAME, requestBuilder).performAsync(new QBEntityCallback<ArrayList<QBCustomObject>>() {
