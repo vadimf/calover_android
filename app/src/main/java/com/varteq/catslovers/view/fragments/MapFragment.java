@@ -1,8 +1,9 @@
 package com.varteq.catslovers.view.fragments;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -56,7 +57,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.varteq.catslovers.utils.SystemPermissionHelper.REQUEST_CHECK_SETTINGS;
+import static com.varteq.catslovers.utils.SystemPermissionHelper.PERMISSIONS_ACCESS_LOCATION_REQUEST;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
@@ -391,18 +392,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         locationCallback = null;
     }
 
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case REQUEST_CHECK_SETTINGS:
-                switch (resultCode) {
-                    case Activity.RESULT_OK:
-                        getLastLocation();
-                        break;
-                    default:
-                        break;
-                }
-                break;
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == PERMISSIONS_ACCESS_LOCATION_REQUEST) {
+            if (permissions[0].equals(Manifest.permission.ACCESS_FINE_LOCATION)
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                checkLocationAvailability();
+            }
         }
     }
 
+    public void onLocationAvailable() {
+        getLastLocation();
+    }
 }

@@ -74,14 +74,19 @@ public class AuthPresenter {
     }
 
     public void resetPassword() {
+        startResetCall();
+        //fakeLogin();
+        //fakeLogin2();
+    }
+
+    private void startResetCall() {
         errListener = new OneTimeOnClickListener() {
             @Override
             protected void onClick() {
-                resetPassword();
+                startResetCall();
             }
         };
         CognitoAuthHelper.getPool().getUser(username).forgotPasswordInBackground(forgotPasswordHandler);
-        //fakeLogin();
     }
 
     private void fakeLogin() {
@@ -95,6 +100,11 @@ public class AuthPresenter {
         Profile.setUserLogin(view, true);
         Profile.setUserId(view, String.valueOf(6));
         Profile.setUserStation(view, "38");
+    }
+
+    private void fakeLogin2() {
+        password = "yTx6/Y1L9]45e79E";
+        CognitoAuthHelper.getPool().getUser(username).getSessionInBackground(authenticationHandler);
     }
 
     ForgotPasswordHandler forgotPasswordHandler = new ForgotPasswordHandler() {
@@ -242,7 +252,7 @@ public class AuthPresenter {
                                 Profile.setAuthToken(view, data.getToken());
                                 Profile.setUserId(view, data.getUserId());
                                 ServiceGenerator.setToken(data.getToken());
-                                loginToQB(null);
+                                loginToQB();
                             }
                         }
 
@@ -267,11 +277,11 @@ public class AuthPresenter {
         });
     }
 
-    private void loginToQB(String profile) {
+    private void loginToQB() {
         errListener = new OneTimeOnClickListener() {
             @Override
             protected void onClick() {
-                loginToQB(null);
+                loginToQB();
             }
         };
         String id = Profile.getUserId(view);
@@ -316,7 +326,7 @@ public class AuthPresenter {
             public void onSuccess(Void aVoid, Bundle bundle) {
                 Log.i(TAG, "chat singUp success");
                 if (bundle != null)
-                    getCats();
+                    loginToQB();
             }
 
             @Override
@@ -377,9 +387,8 @@ public class AuthPresenter {
                                     Profile.setUserStation(view, String.valueOf(station.getId()));
                                     break;
                                 }
-                                view.onSuccessSignIn();
                             }
-
+                            view.onSuccessSignIn();
                         }
 
                         @Override

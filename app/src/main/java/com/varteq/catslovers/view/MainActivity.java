@@ -1,5 +1,6 @@
 package com.varteq.catslovers.view;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -26,6 +27,8 @@ import com.varteq.catslovers.view.fragments.MessagesFragment;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.varteq.catslovers.utils.SystemPermissionHelper.REQUEST_CHECK_SETTINGS;
 
 
 public class MainActivity extends BaseActivity {
@@ -227,6 +230,21 @@ public class MainActivity extends BaseActivity {
                 layoutParams.width = Utils.convertDpToPx(50, this);
             }
             iconView.setLayoutParams(layoutParams);
+        }
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_CHECK_SETTINGS:
+                switch (resultCode) {
+                    case Activity.RESULT_OK:
+                        if (mapFragment != null)
+                            mapFragment.onLocationAvailable();
+                        break;
+                    default:
+                        break;
+                }
+                break;
         }
     }
 }
