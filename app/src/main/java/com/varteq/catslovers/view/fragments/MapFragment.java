@@ -2,6 +2,7 @@ package com.varteq.catslovers.view.fragments;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -55,6 +56,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.varteq.catslovers.utils.SystemPermissionHelper.REQUEST_CHECK_SETTINGS;
+
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private final String TAG = MapFragment.class.getSimpleName();
@@ -88,8 +91,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private SystemPermissionHelper permissionHelper;
     private LocationRequest locationRequest;
     private FusedLocationProviderClient mFusedLocationClient;
-    private Location lastLocation;
     private LocationCallback locationCallback;
+    private Marker userLocationMarker;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -159,12 +162,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     public void zoomMapForRadius(int radiusKm) {
-        if (userLocation != null) {
+        if (userLocation != null && googleMap != null)
+            googleMap.animateCamera(CameraUpdateFactory.zoomTo(getZoomMapForRadius(radiusKm)), null);
+    }
+
+    public float getZoomMapForRadius(int radiusKm) {
+        if (userLocation != null && googleMap != null) {
             double radiusM = radiusKm * 1000;
             double zoomLevel;
 
             Circle circle = googleMap.addCircle(new CircleOptions()
-                    .center(new LatLng(userLocation.latitude, userLocation.longitude))
+                    .center(userLocation)
                     .radius(radiusM)
                     .strokeWidth(0));
 
@@ -172,8 +180,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             double scale = radius / 500;
             zoomLevel = (16 - Math.log(scale) / Math.log(2));
             zoomLevel = zoomLevel + 0.5f;
-            googleMap.animateCamera(CameraUpdateFactory.zoomTo((float) zoomLevel), null);
+            return (float) zoomLevel;
         }
+        return 0;
     }
 
     @Override
@@ -184,8 +193,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 bottomSheetBehaviorFeedstation.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 break;
         }
-        if (!listUpdated && googleMap != null && userLocation != null)
+        if (!listUpdated && googleMap != null && userLocation != null) {
+            listUpdated = true;
             presenter.getFeedstations(userLocation.latitude, userLocation.longitude, 20);
+        }
     }
 
     @Override
@@ -219,8 +230,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             Log.d(TAG, "OnMapLongClick " + latLng.latitude + " / " + latLng.longitude + "]");
         });
 
-        if (!listUpdated && userLocation != null)
+        if (!listUpdated && userLocation != null) {
+            listUpdated = true;
             presenter.getFeedstations(userLocation.latitude, userLocation.longitude, 20);
+        }
     }
 
     private void setUserPosition() {
@@ -233,10 +246,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             Profile.setLocation(getContext(), location);*/
         }
 
-        // Add a marker in Sydney and move the camera
-        LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
-        LatLng sydney = new LatLng(-33.866915, 151.204631);
-        LatLng sydney1 = new LatLng(-33.967, 151.996);
+        userLocation = new LatLng(location.getLatitude(), location.getLongitude());
 
         userLocationMarkerOptions = new MarkerOptions()
                 .icon(BitmapDescriptorFactory.fromBitmap(ImageUtils.getBitmapFromVectorDrawable(getActivity(), R.drawable.ic_place_24dp))) // insert image from request
@@ -247,7 +257,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(userLocation)      // Sets the center of the map to Mountain View
-                .zoom(17)                   // Sets the zoom
+                .zoom(getZoomMapForRadius(DEFAULT_ZOOM))                   // Sets the zoom
                 .bearing(0)                // Sets the orientation of the camera to east
                 .tilt(30)                   // Sets the tilt of the camera to 30 degrees
                 .build();                   // Creates a CameraPosition from the builder
@@ -309,8 +319,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void addUserLocationMarker() {
-        if (googleMap != null && userLocationMarkerOptions != null)
-            googleMap.addMarker(userLocationMarkerOptions);
+        if (googleMap != null && userLocationMarkerOptions != null) {
+            if (userLocationMarker != null && userLocationMarker.isVisible())
+                userLocationMarker.remove();
+            userLocationMarker = googleMap.addMarker(userLocationMarkerOptions);
+        }
         else setUserPosition();
     }
 
@@ -343,18 +356,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 .addOnSuccessListener(getActivity(), location -> {
                     // Got last known location. In some rare situations this can be null.
                     if (location != null) {
-                        lastLocation = location;
-                        setUserPosition(getActivity(), lastLocation, DEFAULT_ZOOM);
+                        setUserPosition(getActivity(), location);
                     } else getLocationUpdates();
                 });
     }
 
-    private void setUserPosition(Activity activity, Location lastLocation, int radius) {
+    private void setUserPosition(Activity activity, Location lastLocation) {
         if (lastLocation != null) {
             Profile.setLocation(activity, lastLocation);
             setUserPosition();
-            zoomMapForRadius(radius);
-            userLocation = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
         }
     }
 
@@ -366,8 +376,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             public void onLocationResult(LocationResult locationResult) {
                 super.onLocationResult(locationResult);
                 if (locationResult != null && locationResult.getLastLocation() != null) {
-                    lastLocation = locationResult.getLastLocation();
-                    setUserPosition(getActivity(), lastLocation, DEFAULT_ZOOM);
+                    setUserPosition(getActivity(), locationResult.getLastLocation());
                     stopLocationUpdates();
                 }
             }
@@ -380,6 +389,20 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         if (locationCallback != null && mFusedLocationClient != null)
             mFusedLocationClient.removeLocationUpdates(locationCallback);
         locationCallback = null;
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_CHECK_SETTINGS:
+                switch (resultCode) {
+                    case Activity.RESULT_OK:
+                        getLastLocation();
+                        break;
+                    default:
+                        break;
+                }
+                break;
+        }
     }
 
 }

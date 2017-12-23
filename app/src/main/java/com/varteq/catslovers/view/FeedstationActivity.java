@@ -423,6 +423,8 @@ public class FeedstationActivity extends PhotoPickerActivity {
     @OnClick(R.id.station_name_textView)
     void changeStationName() {
         String name = stationNameTextView.getText().toString();
+        if (name.equals(STATION_DEFAULT_NAME))
+            name = "";
 
         EditTextDialog editTextDialog = new EditTextDialog(this, "Enter station name", "station name",
                 !name.isEmpty() ? name : null, InputType.TYPE_CLASS_TEXT,
