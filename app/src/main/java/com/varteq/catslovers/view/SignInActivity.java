@@ -1,15 +1,8 @@
 package com.varteq.catslovers.view;
 
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
-import android.util.Patterns;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoDevice;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserSession;
@@ -27,7 +20,6 @@ import com.varteq.catslovers.api.entity.ErrorResponse;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.utils.qb.CognitoAuthHelper;
-
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -139,7 +131,8 @@ public class SignInActivity extends BaseActivity {
                         protected void onFail(ErrorResponse error) {
                             Log.d(TAG, "onFailure");
                             hideWaitDialog();
-                            Toaster.shortToast(error.getMessage());
+                            if (error != null)
+                                Toaster.shortToast(error.getMessage());
                         }
                     };
                 }

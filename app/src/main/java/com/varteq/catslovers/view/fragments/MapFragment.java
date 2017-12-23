@@ -48,6 +48,7 @@ import com.varteq.catslovers.utils.ImageUtils;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.utils.SystemPermissionHelper;
+import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.utils.Utils;
 import com.varteq.catslovers.view.FeedstationActivity;
 import com.varteq.catslovers.view.presenter.MapPresenter;
@@ -136,6 +137,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         });
         bottomSheetFeedstationFrameLayout.setOnClickListener(view1 ->
                 goToFeedStationActivity((Feedstation) bottomSheetFeedstationFrameLayout.getTag()));
+        bottomSheetFeedstationFrameLayout.findViewById(R.id.follow_button).setOnClickListener(view12 -> Toaster.shortToast(getString(R.string.coming_soon)));
         // Obtain the SupportMapFragment and get notified when the googleMap is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);

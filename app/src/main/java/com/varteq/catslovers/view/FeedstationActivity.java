@@ -5,11 +5,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.database.Cursor;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -32,6 +34,7 @@ import com.varteq.catslovers.R;
 import com.varteq.catslovers.model.Feedstation;
 import com.varteq.catslovers.model.GroupPartner;
 import com.varteq.catslovers.utils.Log;
+import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.view.adapters.CatPhotosAdapter;
 import com.varteq.catslovers.view.adapters.GroupPartnersAdapter;
@@ -49,6 +52,7 @@ import butterknife.OnClick;
 
 public class FeedstationActivity extends PhotoPickerActivity {
 
+    private final int RESULT_PICK_CONTACT = 11;
     private final String STATION_DEFAULT_NAME = "Station name";
     private final String ADDRESS_DEFAULT_VALUE = "station address";
     private String TAG = FeedstationActivity.class.getSimpleName();
@@ -66,6 +70,8 @@ public class FeedstationActivity extends PhotoPickerActivity {
     TextView addressTextView;
     @BindView(R.id.description_background)
     View descriptionBackground;
+    @BindView(R.id.follow_button)
+    Button followButton;
 
     @BindView(R.id.photos_RecyclerView)
     RecyclerView photosRecyclerView;
@@ -151,34 +157,6 @@ public class FeedstationActivity extends PhotoPickerActivity {
         viewPager = findViewById(R.id.header_photo_viewPager);
         viewPager.setAdapter(pagerAdapter);
 
-        groupPartnersList = new ArrayList<>();
-        groupPartnersList.add(new GroupPartner(null, "Admin", true));
-        groupPartnersList.add(new GroupPartner(null, "User1", false));
-        groupPartnersAdapter = new GroupPartnersAdapter(groupPartnersList, true,
-                new GroupPartnersAdapter.OnPersonClickListener() {
-
-                    @Override
-                    public void onPersonClicked(Uri imageUri) {
-                        Log.d(TAG, "onPersonClicked " + imageUri);
-                    }
-
-                    @Override
-                    public void onAddPerson() {
-                        Log.d(TAG, "onAddPerson");
-                        presenter.addGroupPartner(groupPartnersList, groupPartnersAdapter);
-                        groupPartnersRecyclerView.scrollToPosition(0);
-                    }
-                });
-        groupPartnersRecyclerView.setAdapter(groupPartnersAdapter);
-        groupPartnersRecyclerView.setLayoutManager(
-                new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-
-        photoList = new ArrayList<>();
-        photosAdapter = new CatPhotosAdapter(photoList, this::showImage);
-        photosRecyclerView.setAdapter(photosAdapter);
-        photosRecyclerView.setLayoutManager(
-                new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-
         fillUI();
         setupUIMode();
     }
@@ -244,7 +222,7 @@ public class FeedstationActivity extends PhotoPickerActivity {
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
         groupPartnersList = new ArrayList<>();
-        groupPartnersList.add(new GroupPartner(null, "Admin", true));
+        groupPartnersList.add(new GroupPartner(null, "Admin", GroupPartner.Status.DEFAULT, true));
         //groupPartnersList.add(new GroupPartner(null, "User1", false));
         groupPartnersAdapter = new GroupPartnersAdapter(groupPartnersList, !currentMode.equals(FeedstationScreenMode.VIEW_MODE),
                 new GroupPartnersAdapter.OnPersonClickListener() {
@@ -257,11 +235,14 @@ public class FeedstationActivity extends PhotoPickerActivity {
                     @Override
                     public void onAddPerson() {
                         Log.d(TAG, "onAddPerson");
-                        presenter.addGroupPartner(groupPartnersList, groupPartnersAdapter);
-                        groupPartnersRecyclerView.scrollToPosition(0);
+                        pickContact();
                     }
                 });
         groupPartnersRecyclerView.setAdapter(groupPartnersAdapter);
+
+        if (!currentMode.equals(FeedstationScreenMode.CREATE_MODE))
+            presenter.getGroupPartners(feedstation.getId(), groupPartnersList, groupPartnersAdapter);
+
         groupPartnersRecyclerView.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
     }
@@ -355,6 +336,10 @@ public class FeedstationActivity extends PhotoPickerActivity {
                 return true;
             case R.id.app_bar_edit:
                 Log.d(TAG, "app_bar_edit");
+                if (!feedstation.getCreatedUserId().equals(Profile.getUserId(this))) {
+                    Toaster.longToast("Only admins can modify feedstations");
+                    return true;
+                }
                 currentMode = FeedstationScreenMode.EDIT_MODE;
                 setupUIMode();
                 return true;
@@ -548,5 +533,62 @@ public class FeedstationActivity extends PhotoPickerActivity {
         super.onSaveInstanceState(outState);
         outState.putSerializable(MODE_KEY, currentMode);
         outState.putParcelable(FEEDSTATION_KEY, fillFeedstation());
+    }
+
+    // Pick contact logic
+    public void pickContact() {
+        if (feedstation != null && feedstation.getId() != null && feedstation.getId() > 0) {
+            Intent contactPickerIntent = new Intent(Intent.ACTION_PICK,
+                    ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
+            startActivityForResult(contactPickerIntent, RESULT_PICK_CONTACT);
+        } else Toaster.shortToast("First you should save this station");
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // check whether the result is ok
+        if (resultCode == RESULT_OK) {
+            // Check for the request code, we might be usign multiple startActivityForReslut
+            switch (requestCode) {
+                case RESULT_PICK_CONTACT:
+                    contactPicked(data);
+                    break;
+            }
+        } else {
+            Log.e("MainActivity", "Failed to pick contact");
+        }
+    }
+
+    private String contactPicked(Intent data) {
+        Cursor cursor;
+        try {
+            String phoneNo;
+            String name = null;
+            // getData() method will have the Content Uri of the selected contact
+            Uri uri = data.getData();
+            //Query the content uri
+            cursor = getContentResolver().query(uri, null, null, null, null);
+            cursor.moveToFirst();
+            // column index of the phone number
+            int phoneIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+            // column index of the contact name
+            int nameIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
+            phoneNo = cursor.getString(phoneIndex);
+            name = cursor.getString(nameIndex);
+            // Set the value to the textviews
+
+            presenter.addGroupPartner(feedstation.getId(), name, phoneNo, groupPartnersList, groupPartnersAdapter);
+            groupPartnersRecyclerView.scrollToPosition(0);
+
+            return phoneNo;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @OnClick(R.id.follow_button)
+    void onFollowClick() {
+        Toaster.shortToast(getString(R.string.coming_soon));
     }
 }

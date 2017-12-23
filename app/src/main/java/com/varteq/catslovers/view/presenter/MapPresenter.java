@@ -30,7 +30,7 @@ public class MapPresenter {
 
     public void getFeedstations(double lat, double lng, Integer distance) {
 
-        Call<BaseResponse<List<RFeedstation>>> call = ServiceGenerator.getApiServiceWithToken().getGeoFeedstations(lat, lng, distance);
+        Call<BaseResponse<List<RFeedstation>>> call = ServiceGenerator.getApiServiceWithToken().getFeedstations();//getGeoFeedstations(lat, lng, distance);
         call.enqueue(new Callback<BaseResponse<List<RFeedstation>>>() {
             @Override
             public void onResponse(Call<BaseResponse<List<RFeedstation>>> call, Response<BaseResponse<List<RFeedstation>>> response) {
@@ -44,7 +44,8 @@ public class MapPresenter {
 
                         @Override
                         protected void onFail(ErrorResponse error) {
-                            Log.d(TAG, error.getMessage() + error.getCode());
+                            if (error != null)
+                                Log.d(TAG, error.getMessage() + error.getCode());
                         }
                     };
                 }

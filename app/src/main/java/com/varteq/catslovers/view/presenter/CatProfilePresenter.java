@@ -49,7 +49,7 @@ public class CatProfilePresenter {
     }
 
     public void addGroupPartner(List groupPartnersList, RecyclerView.Adapter groupPartnersAdapter) {
-        groupPartnersList.add(1, new GroupPartner(null, "User" + ((int) (Math.random() * 999999) + 111111), false));
+        groupPartnersList.add(1, new GroupPartner(null, "User" + ((int) (Math.random() * 999999) + 111111), GroupPartner.Status.DEFAULT, false));
         groupPartnersAdapter.notifyItemInserted(1);
     }
 
@@ -133,7 +133,7 @@ public class CatProfilePresenter {
                         @Override
                         protected void onFail(ErrorResponse error) {
                             Log.d(TAG, error.getMessage() + error.getCode());
-                            if (error.getCode() == 422)
+                            if (error != null && error.getCode() == 422)
                                 Toaster.longToast("You should fill in PetName and fields from age to description");
                         }
                     };
@@ -175,7 +175,7 @@ public class CatProfilePresenter {
                         @Override
                         protected void onFail(ErrorResponse error) {
                             Log.d(TAG, error.getMessage() + error.getCode());
-                            if (error.getCode() == 422)
+                            if (error != null && error.getCode() == 422)
                                 Toaster.longToast("You should fill in PetName and fields from age to description");
                         }
                     };
@@ -205,7 +205,8 @@ public class CatProfilePresenter {
 
                         @Override
                         protected void onFail(ErrorResponse error) {
-                            Log.d(TAG, error.getMessage() + error.getCode());
+                            if (error != null)
+                                Log.d(TAG, error.getMessage() + error.getCode());
                         }
                     };
                 }

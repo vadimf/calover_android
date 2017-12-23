@@ -95,7 +95,7 @@ public class AuthPresenter {
         ServiceGenerator.setToken(token);
         Profile.setUserPetCount(view, 0);
         view.onSuccessSignIn();
-        Profile.setUserPhone(view, username);
+        Profile.setUserPhone(view, "+380935772102");
         Profile.saveUser(view, "RObert", "r@r.com");
         Profile.setUserLogin(view, true);
         Profile.setUserId(view, String.valueOf(6));
@@ -258,8 +258,10 @@ public class AuthPresenter {
 
                         @Override
                         protected void onFail(ErrorResponse error) {
-                            Log.e(TAG, error.getMessage() + error.getCode());
-                            view.showIndefiniteError(error.getMessage(), errListener);
+                            if (error != null) {
+                                Log.e(TAG, error.getMessage() + error.getCode());
+                                view.showIndefiniteError(error.getMessage(), errListener);
+                            }
                         }
                     };
                 }
@@ -393,7 +395,8 @@ public class AuthPresenter {
 
                         @Override
                         protected void onFail(ErrorResponse error) {
-                            Log.d(TAG, error.getMessage() + error.getCode());
+                            if (error != null)
+                                Log.d(TAG, error.getMessage() + error.getCode());
                             view.onSuccessSignIn();
                         }
                     };

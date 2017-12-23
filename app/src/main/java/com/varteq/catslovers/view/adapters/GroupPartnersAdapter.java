@@ -22,7 +22,7 @@ public class GroupPartnersAdapter extends RecyclerView.Adapter<GroupPartnersAdap
     private OnPersonClickListener externalClickListener;
     private List<GroupPartner> personList;
     private Uri addNewPartnerUri = Uri.parse("addNewPartnerUri");
-    private final GroupPartner addNewPartnerView = new GroupPartner(addNewPartnerUri, "", false);
+    private final GroupPartner addNewPartnerView = new GroupPartner(addNewPartnerUri, "", GroupPartner.Status.DEFAULT, false);
     private View.OnClickListener internalClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
@@ -80,6 +80,13 @@ public class GroupPartnersAdapter extends RecyclerView.Adapter<GroupPartnersAdap
             viewHolder.partnerAvatarImageView.setImageResource(R.drawable.ic_add_group_partner);
         viewHolder.partnerNameTextView.setText(person.getName());
         viewHolder.isAdminImageView.setVisibility(person.isAdmin() ? View.VISIBLE : View.INVISIBLE);
+
+        if (person.getStatus().equals(GroupPartner.Status.PENDING))
+            viewHolder.partnerAvatarImageView.setBorderColor(
+                    viewHolder.itemView.getContext().getResources().getColor(R.color.colorPrimaryLight));
+        else
+            viewHolder.partnerAvatarImageView.setBorderColor(
+                    viewHolder.itemView.getContext().getResources().getColor(R.color.colorPrimary));
     }
 
     @Override

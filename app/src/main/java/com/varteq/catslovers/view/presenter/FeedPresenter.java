@@ -121,7 +121,8 @@ public class FeedPresenter {
                         @Override
                         protected void onFail(ErrorResponse error) {
                             view.onError();
-                            Log.d(TAG, error.getMessage() + error.getCode());
+                            if (error != null)
+                                Log.d(TAG, error.getMessage() + error.getCode());
                         }
                     };
                 }

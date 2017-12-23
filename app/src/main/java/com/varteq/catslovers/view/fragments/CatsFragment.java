@@ -157,7 +157,8 @@ public class CatsFragment extends Fragment {
 
                     @Override
                     protected void onFail(ErrorResponse error) {
-                        Log.d(TAG, error.getMessage() + error.getCode());
+                        if (error != null)
+                            Log.d(TAG, error.getMessage() + error.getCode());
                     }
                 };
             }

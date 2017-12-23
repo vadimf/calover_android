@@ -403,7 +403,7 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
         groupPartnersList = new ArrayList<>();
-        groupPartnersList.add(new GroupPartner(null, "Admin", true));
+        groupPartnersList.add(new GroupPartner(null, "Admin", GroupPartner.Status.DEFAULT, true));
         //groupPartnersList.add(new GroupPartner(null, "User1", false));
         groupPartnersAdapter = new GroupPartnersAdapter(groupPartnersList, !currentMode.equals(CatProfileScreenMode.VIEW_MODE),
                 new GroupPartnersAdapter.OnPersonClickListener() {
@@ -901,5 +901,10 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
             }
         });
         alertDialog.show();
+    }
+
+    @OnClick(R.id.follow_button)
+    void onFollowClick() {
+        Toaster.shortToast(getString(R.string.coming_soon));
     }
 }

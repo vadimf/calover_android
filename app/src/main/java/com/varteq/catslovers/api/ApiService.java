@@ -4,6 +4,7 @@ import com.varteq.catslovers.api.entity.AuthToken;
 import com.varteq.catslovers.api.entity.BaseResponse;
 import com.varteq.catslovers.api.entity.Cat;
 import com.varteq.catslovers.api.entity.RFeedstation;
+import com.varteq.catslovers.api.entity.RUser;
 
 import java.util.List;
 
@@ -101,4 +102,12 @@ public interface ApiService {
                                                        @Field("lat") double lat,
                                                        @Field("lng") double lng,
                                                        @Field("distance") Integer distance);
+
+    @FormUrlEncoded
+    @POST("feedstations/{id}/users")
+    Call<BaseResponse<RUser>> inviteUserToFeedstation(@Path("id") int feedstationId,
+                                                      @Field("phone") String phone);
+
+    @GET("feedstations/{id}/users")
+    Call<BaseResponse<List<RUser>>> getFeedstationUsers(@Path("id") int feedstationId);
 }
