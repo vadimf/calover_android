@@ -60,7 +60,8 @@ public class ImageUtils {
         File parentDir = StorageUtils.getAppExternalDataDirectoryFile();
         if (fileName == null)
             fileName = String.valueOf(System.currentTimeMillis());
-
+        if (parcelFileDescriptor != null)
+            fileName += IMAGE_FILE_EXTENSION;
         /*if (isImageFile(uri.getPath()))
             fileName += IMAGE_FILE_EXTENSION;
         if (isVideoFile(uri.getPath()))

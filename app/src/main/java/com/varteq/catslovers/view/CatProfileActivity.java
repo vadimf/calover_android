@@ -323,6 +323,7 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case REQUEST_CHECK_SETTINGS:
                 switch (resultCode) {
