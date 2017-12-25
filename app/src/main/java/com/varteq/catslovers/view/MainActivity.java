@@ -252,6 +252,8 @@ public class MainActivity extends BaseActivity {
                 }
                 break;
         }
+        if (messagesFragment != null)
+            messagesFragment.onUsersSelescted(requestCode, resultCode, data);
     }
 
     public void checkFeedstation() {

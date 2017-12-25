@@ -20,10 +20,10 @@ public class AppController extends Application {//extends MultiDexApplication {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
 
-    static final String APP_ID = "65691";
-    static final String AUTH_KEY = "hSnYYnZ9Y27YZyx";
-    static final String AUTH_SECRET = "L2dJuWtC8LDCKQ6";
-    static final String ACCOUNT_KEY = "GmQhUChypQHbecmradXr";
+    static final String APP_ID = "66489";//"65691";
+    static final String AUTH_KEY = "XsVALhPAEAC3k7n";//"hSnYYnZ9Y27YZyx";
+    static final String AUTH_SECRET = "eBQa5HzyyWZA9Hx";//"L2dJuWtC8LDCKQ6";
+    static final String ACCOUNT_KEY = "QUhvHK4RN_Hzz4iEnS9k";//"GmQhUChypQHbecmradXr";
     public static final String USER_PASS = "xfzMLA6YFn673sN9";
     private static Context instance;
 

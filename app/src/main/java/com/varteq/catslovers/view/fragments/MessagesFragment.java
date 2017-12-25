@@ -149,9 +149,7 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
         unregisterQbChatListeners();
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    public void onUsersSelescted(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             isProcessingResultInProgress = true;
             if (requestCode == REQUEST_SELECT_PEOPLE) {
@@ -162,7 +160,7 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
                     selectedUsers.remove(ChatHelper.getCurrentUser());
                     QBChatDialog existingPrivateDialog = QbDialogHolder.getInstance().getPrivateDialogWithUser(selectedUsers.get(0));
                     isProcessingResultInProgress = false;
-                    ChatActivity.startForResult(getActivity(), MessagesFragment.this, REQUEST_DIALOG_ID_FOR_UPDATE, existingPrivateDialog);
+                    ChatActivity.startForResult(getActivity(), REQUEST_DIALOG_ID_FOR_UPDATE, existingPrivateDialog);
                 } else {
                     ProgressDialogFragment.show(getActivity().getSupportFragmentManager(), R.string.create_chat);
                     createDialog(selectedUsers);
@@ -179,6 +177,12 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
         } else {
             updateDialogsAdapter();
         }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        onUsersSelescted(requestCode, resultCode, data);
     }
 
     private boolean isPrivateDialogExist(ArrayList<QBUser> allSelectedUsers) {
@@ -234,7 +238,7 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
     public void onStartNewChatClick(View view) {
         //showChooseNumberDialog();
         if (progressBar.getVisibility() != View.VISIBLE)
-            SelectUsersActivity.startForResult(getActivity(), this, REQUEST_SELECT_PEOPLE);
+            SelectUsersActivity.startForResult(getActivity(), REQUEST_SELECT_PEOPLE);
     }
 
     private void showChooseNumberDialog() {
@@ -247,7 +251,7 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
             String number = ((EditText) dialog.findViewById(R.id.code_EditText)).getText().toString();
             if (number.length() > 10) {
                 dialog.dismiss();
-                SelectUsersActivity.startForResultWithNumber(getActivity(), this, REQUEST_SELECT_PEOPLE, number);
+                SelectUsersActivity.startForResultWithNumber(getActivity(), REQUEST_SELECT_PEOPLE, number);
             } else {
                 ((EditText) dialog.findViewById(R.id.code_EditText)).setError("Incorrect number");
             }
@@ -273,7 +277,7 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 QBChatDialog selectedDialog = (QBChatDialog) parent.getItemAtPosition(position);
                 if (currentActionMode == null) {
-                    ChatActivity.startForResult(getActivity(), MessagesFragment.this, REQUEST_DIALOG_ID_FOR_UPDATE, selectedDialog);
+                    ChatActivity.startForResult(getActivity(), REQUEST_DIALOG_ID_FOR_UPDATE, selectedDialog);
                 } else {
                     dialogsAdapter.toggleSelection(selectedDialog);
                 }
@@ -345,7 +349,7 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
                     public void onSuccess(QBChatDialog dialog, Bundle args) {
                         isProcessingResultInProgress = false;
                         dialogsManager.sendSystemMessageAboutCreatingDialog(systemMessagesManager, dialog);
-                        ChatActivity.startForResult(getActivity(), MessagesFragment.this, REQUEST_DIALOG_ID_FOR_UPDATE, dialog);
+                        ChatActivity.startForResult(getActivity(), REQUEST_DIALOG_ID_FOR_UPDATE, dialog);
                         ProgressDialogFragment.hide(getActivity().getSupportFragmentManager());
                     }
 
