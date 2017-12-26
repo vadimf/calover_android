@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_marginTop="@dimen/card_cats_list_main_margin"
+    android:layout_marginBottom="@dimen/card_cats_list_main_margin"
     android:orientation="vertical">
 
     <TextView
@@ -11,10 +13,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="4dp"
-        android:text="A" />
+        android:layout_marginLeft="@dimen/card_cats_list_main_margin"
+        android:layout_marginRight="@dimen/card_cats_list_main_margin"
+        tools:text="A" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/single_letter_RecyclerView"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 </LinearLayout>

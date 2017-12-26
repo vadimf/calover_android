@@ -35,12 +35,14 @@ import retrofit2.Response;
 
 public class CatsFragment extends Fragment {
 
+    public static final String MY_CATS_KEY = "my_cats";
     private String TAG = CatsFragment.class.getSimpleName();
 
     @BindView(R.id.cats_RecyclerView)
     RecyclerView catsRecyclerView;
     private HashMap<String, List<CatProfile>> catsHashMap;
     private CatsListAdapter catsListAdapter;
+    private List<CatProfile> myCatsList = new ArrayList<>();
     private boolean listUpdated;
 
     final private int SEEKBAR_STEPS_COUNT = 7;
@@ -86,13 +88,15 @@ public class CatsFragment extends Fragment {
 
         getCats();
 
-        catsListAdapter = new CatsListAdapter(catsHashMap, catProfile -> {
-            CatProfileActivity.startInViewMode(getActivity(), catProfile);
-        });
+        catsListAdapter = new CatsListAdapter(catsHashMap, this::onCatClicked);
         catsRecyclerView.setAdapter(catsListAdapter);
         catsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         return view;
+    }
+
+    private void onCatClicked(CatProfile catProfile) {
+        CatProfileActivity.startInViewMode(getActivity(), catProfile);
     }
 
     @Override
@@ -136,13 +140,16 @@ public class CatsFragment extends Fragment {
                         Log.i(TAG, String.valueOf(data.size()));
                         if (data.size() < 1) return;
                         catsHashMap.clear();
+                        myCatsList.clear();
                         List<CatProfile> catProfiles = getCatProfiles(data);
                         Collections.sort(catProfiles, (catProfile, t1) -> catProfile.getPetName().toUpperCase().compareTo(t1.getPetName().toUpperCase()));
 
                         char letter = Character.toUpperCase(data.get(0).getName().charAt(0));
                         ArrayList<CatProfile> list = new ArrayList<>();
                         for (CatProfile cat : catProfiles) {
-                            if (letter == Character.toUpperCase(cat.getPetName().charAt(0)))
+                            if (cat.getId() % 5 == 2) {
+                                myCatsList.add(cat);
+                            } else if (letter == Character.toUpperCase(cat.getPetName().charAt(0)))
                                 list.add(cat);
                             else {
                                 catsHashMap.put(String.valueOf(letter), list);
@@ -152,6 +159,8 @@ public class CatsFragment extends Fragment {
                             }
 
                         }
+                        if (myCatsList.size() > 0)
+                            catsHashMap.put(MY_CATS_KEY, myCatsList);
                         catsListAdapter.onDataChanged();
                     }
 

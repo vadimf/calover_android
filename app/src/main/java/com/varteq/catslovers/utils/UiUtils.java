@@ -1,9 +1,11 @@
 package com.varteq.catslovers.utils;
 
+import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.IntRange;
+import android.util.DisplayMetrics;
 
 import com.varteq.catslovers.AppController;
 import com.varteq.catslovers.R;
@@ -61,5 +63,12 @@ public class UiUtils {
                 .getIdentifier(colorIdName, "color", AppController.getInstance().getPackageName());
 
         return ResourceUtils.getColor(colorId);
+    }
+
+    public static int calculateNumberOfColumns(Context context, int viewWidth, int layoutMargins) {
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        //float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+        //return (int) (dpWidth / viewWidth);
+        return (displayMetrics.widthPixels - layoutMargins) / viewWidth;
     }
 }

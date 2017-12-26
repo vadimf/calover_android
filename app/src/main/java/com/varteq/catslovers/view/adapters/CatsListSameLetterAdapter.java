@@ -1,9 +1,11 @@
 package com.varteq.catslovers.view.adapters;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.makeramen.roundedimageview.RoundedImageView;
@@ -19,6 +21,7 @@ public class CatsListSameLetterAdapter extends RecyclerView.Adapter<CatsListSame
 
     private OnCatClickListener externalClickListener;
     private List<CatProfile> personList;
+    private boolean isMyCats;
 
     private View.OnClickListener internalClickListener = new View.OnClickListener() {
         @Override
@@ -41,15 +44,27 @@ public class CatsListSameLetterAdapter extends RecyclerView.Adapter<CatsListSame
         return personList.size();
     }
 
+    public void setMyCats(boolean myCats) {
+        isMyCats = myCats;
+    }
+
     @Override
     public void onBindViewHolder(CatProfileViewHolder viewHolder, int i) {
         CatProfile catProfile = personList.get(i);
+        Context context = viewHolder.itemView.getContext();
         if (catProfile.getAvatarUri() != null)
             viewHolder.catAvatarImageView.setImageURI(catProfile.getAvatarUri());
         else
             viewHolder.catAvatarImageView.setImageResource(R.drawable.ic_person);
 
         viewHolder.catNameTextView.setText(catProfile.getPetName());
+        if (isMyCats) {
+            viewHolder.catAvatarImageView.setBorderColor(context.getResources().getColor(R.color.colorPrimary));
+            viewHolder.starImageView.setVisibility(View.VISIBLE);
+        } else {
+            viewHolder.catAvatarImageView.setBorderColor(context.getResources().getColor(R.color.transparent));
+            viewHolder.starImageView.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -62,12 +77,18 @@ public class CatsListSameLetterAdapter extends RecyclerView.Adapter<CatsListSame
         return new CatProfileViewHolder(itemView);
     }
 
+    public List<CatProfile> getPersonList() {
+        return personList;
+    }
+
     public class CatProfileViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.cat_avatar_RoundedImageView)
         RoundedImageView catAvatarImageView;
         @BindView(R.id.cat_name_TextView)
         TextView catNameTextView;
+        @BindView(R.id.star_ImageView)
+        ImageView starImageView;
 
         public CatProfileViewHolder(View v) {
             super(v);

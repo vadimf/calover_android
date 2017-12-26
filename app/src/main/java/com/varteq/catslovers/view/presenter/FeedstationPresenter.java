@@ -133,7 +133,7 @@ public class FeedstationPresenter {
                                 if (user.getPhone().equals(Profile.getUserPhone(view)))
                                     continue;
 
-                                groupPartnersList.add(1, new GroupPartner(null, user.getPhone(), status, false));
+                                groupPartnersList.add(1, new GroupPartner(null, user.getName(), status, false));
                                 groupPartnersAdapter.notifyItemInserted(1);
                             }
                         }
