@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import com.varteq.catslovers.api.BaseParser;
 import com.varteq.catslovers.api.ServiceGenerator;
 import com.varteq.catslovers.api.entity.BaseResponse;
+import com.varteq.catslovers.api.entity.ErrorData;
 import com.varteq.catslovers.api.entity.ErrorResponse;
 import com.varteq.catslovers.api.entity.RFeedstation;
 import com.varteq.catslovers.api.entity.RUser;
@@ -16,6 +17,7 @@ import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.view.FeedstationActivity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -75,27 +77,22 @@ public class FeedstationPresenter {
         });
     }
 
-    public void addGroupPartner(Integer feedstationId, String name, String phone, List groupPartnersList, RecyclerView.Adapter groupPartnersAdapter) {
+    public void addGroupPartner(Integer feedstationId, String phone) {
         phone = phone.replace(" ", "");
         phone = phone.replace("(", "");
         phone = phone.replace(")", "");
 
-        Call<BaseResponse<RUser>> call = ServiceGenerator.getApiServiceWithToken().inviteUserToFeedstation(feedstationId, phone);
+        Call<BaseResponse<ErrorData>> call = ServiceGenerator.getApiServiceWithToken().inviteUserToFeedstation(feedstationId, phone);
 
-        call.enqueue(new Callback<BaseResponse<RUser>>() {
+        call.enqueue(new Callback<BaseResponse<ErrorData>>() {
             @Override
-            public void onResponse(Call<BaseResponse<RUser>> call, Response<BaseResponse<RUser>> response) {
+            public void onResponse(Call<BaseResponse<ErrorData>> call, Response<BaseResponse<ErrorData>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    new BaseParser<RUser>(response) {
+                    new BaseParser<ErrorData>(response) {
 
                         @Override
-                        protected void onSuccess(RUser data) {
-                            GroupPartner.Status status = GroupPartner.Status.DEFAULT;
-                            if (data.getStatus() != null && data.getStatus().equals("invited"))
-                                status = GroupPartner.Status.PENDING;
-
-                            groupPartnersList.add(1, new GroupPartner(null, name, status, false));
-                            groupPartnersAdapter.notifyItemInserted(1);
+                        protected void onSuccess(ErrorData data) {
+                            getGroupPartners(feedstationId);
                         }
 
                         @Override
@@ -108,13 +105,14 @@ public class FeedstationPresenter {
             }
 
             @Override
-            public void onFailure(Call<BaseResponse<RUser>> call, Throwable t) {
+            public void onFailure(Call<BaseResponse<ErrorData>> call, Throwable t) {
                 Log.e(TAG, "inviteUser onFailure " + t.getMessage());
             }
         });
     }
 
-    public void getGroupPartners(Integer feedstationId, List groupPartnersList, RecyclerView.Adapter groupPartnersAdapter) {
+    public void getGroupPartners(Integer feedstationId) {
+        if (feedstationId == null) return;
 
         Call<BaseResponse<List<RUser>>> call = ServiceGenerator.getApiServiceWithToken().getFeedstationUsers(feedstationId);
 
@@ -126,16 +124,13 @@ public class FeedstationPresenter {
 
                         @Override
                         protected void onSuccess(List<RUser> data) {
+                            List<GroupPartner> partners = new ArrayList<>();
                             for (RUser user : data) {
-                                GroupPartner.Status status = GroupPartner.Status.DEFAULT;
-                                if (user.getStatus() != null && user.getStatus().equals("invited"))
-                                    status = GroupPartner.Status.PENDING;
-                                if (user.getPhone().equals(Profile.getUserPhone(view)))
-                                    continue;
-
-                                groupPartnersList.add(1, new GroupPartner(null, user.getName(), status, false));
-                                groupPartnersAdapter.notifyItemInserted(1);
+                                partners.add(from(user, feedstationId));
+                                /*if (!from(user, feedstationId).isAdmin() )//&& from(user, feedstationId).getUserId() == 6)
+                                    deleteGroupPartner(feedstationId, from(user, feedstationId).getUserId());*/
                             }
+                            view.refreshGroupPartners(partners);
                         }
 
                         @Override
@@ -152,6 +147,30 @@ public class FeedstationPresenter {
                 Log.e(TAG, "getGroupPartners onFailure " + t.getMessage());
             }
         });
+    }
+
+    private GroupPartner from(RUser user, Integer feedstationId) {
+        GroupPartner.Status status = GroupPartner.Status.INVITED;
+        if (user.getStatus() != null) {
+            if (user.getStatus().equals("joined"))
+                status = GroupPartner.Status.JOINED;
+            else if (user.getStatus().equals("invited"))
+                status = GroupPartner.Status.INVITED;
+            else if (user.getStatus().equals("requested"))
+                status = GroupPartner.Status.REQUESTED;
+        }
+
+        boolean isAdmin = false;
+        if (user.getRole().equals("admin"))
+            isAdmin = true;
+
+        String name = user.getUserInfo().getName();
+        if (user.getUserId().equals(Integer.parseInt(Profile.getUserId(view)))) {
+            name = "You";
+            /*if (status.equals(GroupPartner.Status.INVITED))
+                joinFeedstation(feedstationId);*/
+        }
+        return new GroupPartner(null, user.getUserId(), name, user.getUserInfo().getPhone(), status, isAdmin);
     }
 
     public void updateFeedstation(Feedstation feedstation) {
@@ -185,6 +204,70 @@ public class FeedstationPresenter {
             @Override
             public void onFailure(Call<BaseResponse<RFeedstation>> call, Throwable t) {
                 Log.e(TAG, "updateFeedstation onFailure " + t.getMessage());
+            }
+        });
+    }
+
+    public void followFeedstation(Integer feedstationId) {
+
+        if (feedstationId == null) return;
+
+        Call<BaseResponse<ErrorData>> call = ServiceGenerator.getApiServiceWithToken().followFeedstation(feedstationId);
+        call.enqueue(new Callback<BaseResponse<ErrorData>>() {
+            @Override
+            public void onResponse(Call<BaseResponse<ErrorData>> call, Response<BaseResponse<ErrorData>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    new BaseParser<ErrorData>(response) {
+
+                        @Override
+                        protected void onSuccess(ErrorData data) {
+                            view.onSuccessFollow();
+                        }
+
+                        @Override
+                        protected void onFail(ErrorResponse error) {
+                            if (error != null)
+                                Log.d(TAG, error.getMessage() + error.getCode());
+                        }
+                    };
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseResponse<ErrorData>> call, Throwable t) {
+                Log.e(TAG, "getFeedstations onFailure " + t.getMessage());
+            }
+        });
+    }
+
+    public void deleteGroupPartner(Integer feedstationId, int userId) {
+
+        if (feedstationId == null) return;
+
+        Call<BaseResponse<ErrorData>> call = ServiceGenerator.getApiServiceWithToken().deleteUserFromFeedstation(feedstationId, userId);
+        call.enqueue(new Callback<BaseResponse<ErrorData>>() {
+            @Override
+            public void onResponse(Call<BaseResponse<ErrorData>> call, Response<BaseResponse<ErrorData>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    new BaseParser<ErrorData>(response) {
+
+                        @Override
+                        protected void onSuccess(ErrorData data) {
+                            getGroupPartners(feedstationId);
+                        }
+
+                        @Override
+                        protected void onFail(ErrorResponse error) {
+                            if (error != null)
+                                Log.d(TAG, error.getMessage() + error.getCode());
+                        }
+                    };
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseResponse<ErrorData>> call, Throwable t) {
+                Log.e(TAG, "joinFeedstation onFailure " + t.getMessage());
             }
         });
     }

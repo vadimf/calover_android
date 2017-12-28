@@ -9,6 +9,11 @@ import java.util.Date;
 
 public class Feedstation implements Parcelable {
 
+    public enum UserRole {
+        ADMIN,
+        USER
+    }
+
     private Integer id;
     private String name;
     private String description;
@@ -17,6 +22,7 @@ public class Feedstation implements Parcelable {
     private Boolean isPublic;
     private Date timeToFeed;
     private String createdUserId;
+    private UserRole userRole;
 
     public Integer getId() {
         return id;
@@ -82,6 +88,15 @@ public class Feedstation implements Parcelable {
         return createdUserId;
     }
 
+    public UserRole getUserRole() {
+        return userRole;
+    }
+
+    public void setUserRole(UserRole userRole) {
+        this.userRole = userRole;
+    }
+
+
     @Override
     public int describeContents() {
         return 0;
@@ -97,6 +112,7 @@ public class Feedstation implements Parcelable {
         dest.writeValue(this.isPublic);
         dest.writeLong(this.timeToFeed != null ? this.timeToFeed.getTime() : -1);
         dest.writeString(this.createdUserId);
+        dest.writeInt(this.userRole == null ? -1 : this.userRole.ordinal());
     }
 
     public Feedstation() {
@@ -112,6 +128,8 @@ public class Feedstation implements Parcelable {
         long tmpTimeToFeed = in.readLong();
         this.timeToFeed = tmpTimeToFeed == -1 ? null : new Date(tmpTimeToFeed);
         this.createdUserId = in.readString();
+        int tmpUserRole = in.readInt();
+        this.userRole = tmpUserRole == -1 ? null : UserRole.values()[tmpUserRole];
     }
 
     public static final Creator<Feedstation> CREATOR = new Creator<Feedstation>() {

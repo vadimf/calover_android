@@ -4,7 +4,6 @@ import android.location.Location;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.varteq.catslovers.api.BaseParser;
 import com.varteq.catslovers.api.ServiceGenerator;
 import com.varteq.catslovers.api.entity.BaseResponse;
@@ -12,15 +11,12 @@ import com.varteq.catslovers.api.entity.Cat;
 import com.varteq.catslovers.api.entity.ErrorResponse;
 import com.varteq.catslovers.api.entity.RFeedstation;
 import com.varteq.catslovers.model.CatProfile;
-import com.varteq.catslovers.model.Feedstation;
 import com.varteq.catslovers.model.GroupPartner;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
-import com.varteq.catslovers.utils.TimeUtils;
 import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.view.CatProfileActivity;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -49,7 +45,7 @@ public class CatProfilePresenter {
     }
 
     public void addGroupPartner(List groupPartnersList, RecyclerView.Adapter groupPartnersAdapter) {
-        groupPartnersList.add(1, new GroupPartner(null, "User" + ((int) (Math.random() * 999999) + 111111), GroupPartner.Status.DEFAULT, false));
+        groupPartnersList.add(1, new GroupPartner(null, "User" + ((int) (Math.random() * 999999) + 111111), GroupPartner.Status.JOINED, false));
         groupPartnersAdapter.notifyItemInserted(1);
     }
 
@@ -200,7 +196,7 @@ public class CatProfilePresenter {
 
                         @Override
                         protected void onSuccess(List<RFeedstation> data) {
-                            view.feedstationsLoaded(from(data));
+                            view.feedstationsLoaded(MapPresenter.from(data));
                         }
 
                         @Override
@@ -217,24 +213,5 @@ public class CatProfilePresenter {
                 Log.e(TAG, "getFeedstations onFailure " + t.getMessage());
             }
         });
-    }
-
-    private List<Feedstation> from(List<RFeedstation> data) {
-        List<Feedstation> list = new ArrayList<>();
-        for (RFeedstation station : data) {
-            Feedstation feedstation = new Feedstation();
-            feedstation.setId(station.getId());
-            feedstation.setName(station.getName());
-            feedstation.setAddress(station.getAddress());
-            feedstation.setDescription(station.getDescription());
-            if (station.getIsPublic())
-                feedstation.setTimeToFeed(TimeUtils.getLocalDateFromUtc(station.getTimeToFeed()));
-            if (station.getLat() != null && station.getLng() != null)
-                feedstation.setLocation(new LatLng(station.getLat(), station.getLng()));
-            feedstation.setIsPublic(station.getIsPublic());
-
-            list.add(feedstation);
-        }
-        return list;
     }
 }

@@ -5,12 +5,15 @@ import android.net.Uri;
 public class GroupPartner {
 
     public enum Status {
-        DEFAULT,
-        PENDING
+        JOINED,
+        INVITED,
+        REQUESTED
     }
 
     private Uri avatarUri;
+    private Integer userId;
     private String name;
+    private String phone;
     private Status status;
     private boolean isAdmin;
 
@@ -21,12 +24,26 @@ public class GroupPartner {
         this.isAdmin = isAdmin;
     }
 
+    public GroupPartner(Uri avatarUri, Integer userId, String name, String phone, Status status, boolean isAdmin) {
+        this(avatarUri, name, status, isAdmin);
+        this.userId = userId;
+        this.phone = phone;
+    }
+
     public Uri getAvatarUri() {
         return avatarUri;
     }
 
     public void setAvatarUri(Uri avatarUri) {
         this.avatarUri = avatarUri;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 
     public String getName() {
@@ -51,5 +68,13 @@ public class GroupPartner {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 }

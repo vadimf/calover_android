@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
@@ -34,7 +35,6 @@ import com.varteq.catslovers.R;
 import com.varteq.catslovers.model.Feedstation;
 import com.varteq.catslovers.model.GroupPartner;
 import com.varteq.catslovers.utils.Log;
-import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.view.adapters.CatPhotosAdapter;
 import com.varteq.catslovers.view.adapters.GroupPartnersAdapter;
@@ -97,7 +97,8 @@ public class FeedstationActivity extends PhotoPickerActivity {
 
     private FeedstationScreenMode currentMode = FeedstationScreenMode.EDIT_MODE;
     private List<Uri> photoList;
-    private List<GroupPartner> groupPartnersList;
+    private List<GroupPartner> groupPartnersList = new ArrayList<>();
+    ;
 
     private CatPhotosAdapter photosAdapter;
     private GroupPartnersAdapter groupPartnersAdapter;
@@ -221,15 +222,29 @@ public class FeedstationActivity extends PhotoPickerActivity {
         photosRecyclerView.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
-        groupPartnersList = new ArrayList<>();
-        groupPartnersList.add(new GroupPartner(null, "Admin", GroupPartner.Status.DEFAULT, true));
+        //groupPartnersList.add(new GroupPartner(null, "Admin", GroupPartner.Status.JOINED, true));
         //groupPartnersList.add(new GroupPartner(null, "User1", false));
         groupPartnersAdapter = new GroupPartnersAdapter(groupPartnersList, !currentMode.equals(FeedstationScreenMode.VIEW_MODE),
                 new GroupPartnersAdapter.OnPersonClickListener() {
 
                     @Override
-                    public void onPersonClicked(Uri imageUri) {
-                        Log.d(TAG, "onPersonClicked " + imageUri);
+                    public void onPersonClicked(GroupPartner groupPartner) {
+                        if (feedstation.getUserRole() != null && feedstation.getUserRole().equals(Feedstation.UserRole.ADMIN)) {
+                            Log.d(TAG, "onPersonClicked " + groupPartner.getName());
+                            if (groupPartner.getStatus().equals(GroupPartner.Status.INVITED))
+                                Toaster.shortToast("user invited");
+                            else if (groupPartner.getStatus().equals(GroupPartner.Status.REQUESTED)) {
+                                new AlertDialog.Builder(FeedstationActivity.this)
+                                        .setTitle("Allow the user to become a member")
+                                        .setNeutralButton(android.R.string.cancel, null)
+                                        .setNegativeButton(R.string.no, (dialogInterface, i) ->
+                                                presenter.deleteGroupPartner(feedstation.getId(), groupPartner.getUserId()))
+                                        .setPositiveButton(android.R.string.ok, (dialogInterface, i) ->
+                                                presenter.addGroupPartner(feedstation.getId(), groupPartner.getPhone()))
+                                        .create()
+                                        .show();
+                            }
+                        }
                     }
 
                     @Override
@@ -241,7 +256,7 @@ public class FeedstationActivity extends PhotoPickerActivity {
         groupPartnersRecyclerView.setAdapter(groupPartnersAdapter);
 
         if (!currentMode.equals(FeedstationScreenMode.CREATE_MODE))
-            presenter.getGroupPartners(feedstation.getId(), groupPartnersList, groupPartnersAdapter);
+            presenter.getGroupPartners(feedstation.getId());
 
         groupPartnersRecyclerView.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -261,6 +276,9 @@ public class FeedstationActivity extends PhotoPickerActivity {
             stationNameTextView.setText(STATION_DEFAULT_NAME);
         if (addressTextView.getText().toString().equals(ADDRESS_DEFAULT_VALUE))
             addressTextView.setText("");
+
+        stationNameTextView.setEnabled(false);
+        addressTextView.setEnabled(false);
 
         currentMode = FeedstationScreenMode.VIEW_MODE;
 
@@ -286,6 +304,9 @@ public class FeedstationActivity extends PhotoPickerActivity {
             stationNameTextView.setText(STATION_DEFAULT_NAME);
         if (addressTextView.getText().toString().isEmpty())
             addressTextView.setText(ADDRESS_DEFAULT_VALUE);
+
+        stationNameTextView.setEnabled(true);
+        addressTextView.setEnabled(true);
 
         /*addPhotoButton.setVisibility(View.VISIBLE);
         addPhotoButton.setOnClickListener(view -> Toaster.shortToast("Coming soon"));*/
@@ -327,6 +348,10 @@ public class FeedstationActivity extends PhotoPickerActivity {
         switch (item.getItemId()) {
             case R.id.app_bar_save:
                 Log.d(TAG, "app_bar_save");
+                if (!feedstation.getIsPublic()) {
+                    savedSuccessfully();
+                    return true;
+                }
                 if (!isProfileValid())
                     return true;
                 if (currentMode.equals(FeedstationScreenMode.CREATE_MODE))
@@ -336,7 +361,8 @@ public class FeedstationActivity extends PhotoPickerActivity {
                 return true;
             case R.id.app_bar_edit:
                 Log.d(TAG, "app_bar_edit");
-                if (!feedstation.getCreatedUserId().equals(Profile.getUserId(this))) {
+                //if (!feedstation.getCreatedUserId().equals(Profile.getUserId(this))) {
+                if (feedstation.getUserRole() != null && !feedstation.getUserRole().equals(Feedstation.UserRole.ADMIN)) {
                     Toaster.longToast("Only admins can modify feedstations");
                     return true;
                 }
@@ -577,8 +603,7 @@ public class FeedstationActivity extends PhotoPickerActivity {
             name = cursor.getString(nameIndex);
             // Set the value to the textviews
 
-            presenter.addGroupPartner(feedstation.getId(), name, phoneNo, groupPartnersList, groupPartnersAdapter);
-            groupPartnersRecyclerView.scrollToPosition(0);
+            presenter.addGroupPartner(feedstation.getId(), phoneNo);
 
             return phoneNo;
         } catch (Exception e) {
@@ -589,6 +614,42 @@ public class FeedstationActivity extends PhotoPickerActivity {
 
     @OnClick(R.id.follow_button)
     void onFollowClick() {
-        Toaster.shortToast(getString(R.string.coming_soon));
+        presenter.followFeedstation(feedstation.getId());
+    }
+
+    public void onSuccessFollow() {
+        Toaster.shortToast("Follow request sent");
+    }
+
+    public void onSuccessJoin() {
+        Toaster.shortToast("You have successfully joined");
+    }
+
+    public void refreshGroupPartners(List<GroupPartner> partners) {
+        if (partners == null || partners.isEmpty() || groupPartnersRecyclerView == null) return;
+        groupPartnersList.clear();
+        for (GroupPartner user : partners) {
+            if (user.isAdmin())
+                groupPartnersList.add(0, user);
+            else
+                groupPartnersList.add(user);
+        }
+        groupPartnersAdapter.notifyDataSetChanged();
+        groupPartnersRecyclerView.scrollToPosition(0);
+    }
+
+    public void updateGroupPartnersItem(GroupPartner partner) {
+        if (partner == null || groupPartnersRecyclerView == null) return;
+
+        for (int i = 0; i < groupPartnersList.size(); i++) {
+            if (groupPartnersList.get(i).getUserId().equals(partner.getUserId())) {
+                groupPartnersList.set(i, partner);
+                groupPartnersAdapter.notifyItemChanged(i);
+                return;
+            }
+        }
+        groupPartnersList.add(1, partner);
+        groupPartnersAdapter.notifyItemInserted(1);
+        groupPartnersRecyclerView.scrollToPosition(0);
     }
 }

@@ -404,14 +404,14 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
         groupPartnersList = new ArrayList<>();
-        groupPartnersList.add(new GroupPartner(null, "Admin", GroupPartner.Status.DEFAULT, true));
+        groupPartnersList.add(new GroupPartner(null, "Admin", GroupPartner.Status.JOINED, true));
         //groupPartnersList.add(new GroupPartner(null, "User1", false));
         groupPartnersAdapter = new GroupPartnersAdapter(groupPartnersList, !currentMode.equals(CatProfileScreenMode.VIEW_MODE),
                 new GroupPartnersAdapter.OnPersonClickListener() {
 
                     @Override
-                    public void onPersonClicked(Uri imageUri) {
-                        Log.d(TAG, "onPersonClicked " + imageUri);
+                    public void onPersonClicked(GroupPartner groupPartner) {
+                        Log.d(TAG, "onPersonClicked " + groupPartner.getName());
                     }
 
                     @Override

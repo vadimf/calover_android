@@ -22,7 +22,7 @@ public class GroupPartnersAdapter extends RecyclerView.Adapter<GroupPartnersAdap
     private OnPersonClickListener externalClickListener;
     private List<GroupPartner> personList;
     private Uri addNewPartnerUri = Uri.parse("addNewPartnerUri");
-    private final GroupPartner addNewPartnerView = new GroupPartner(addNewPartnerUri, "", GroupPartner.Status.DEFAULT, false);
+    private final GroupPartner addNewPartnerView = new GroupPartner(addNewPartnerUri, "", GroupPartner.Status.JOINED, false);
     private View.OnClickListener internalClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
@@ -30,7 +30,7 @@ public class GroupPartnersAdapter extends RecyclerView.Adapter<GroupPartnersAdap
             int itemPosition = lp.getViewLayoutPosition();
             if (externalClickListener != null) {
                 if (personList.get(itemPosition).getAvatarUri() != addNewPartnerUri)
-                    externalClickListener.onPersonClicked(personList.get(itemPosition).getAvatarUri());
+                    externalClickListener.onPersonClicked(personList.get(itemPosition));
                 else
                     externalClickListener.onAddPerson();
             }
@@ -81,12 +81,12 @@ public class GroupPartnersAdapter extends RecyclerView.Adapter<GroupPartnersAdap
         viewHolder.partnerNameTextView.setText(person.getName());
         viewHolder.isAdminImageView.setVisibility(person.isAdmin() ? View.VISIBLE : View.INVISIBLE);
 
-        if (person.getStatus().equals(GroupPartner.Status.PENDING))
-            viewHolder.partnerAvatarImageView.setBorderColor(
-                    viewHolder.itemView.getContext().getResources().getColor(R.color.colorPrimaryLight));
-        else
+        if (person.getStatus().equals(GroupPartner.Status.JOINED))
             viewHolder.partnerAvatarImageView.setBorderColor(
                     viewHolder.itemView.getContext().getResources().getColor(R.color.colorPrimary));
+        else
+            viewHolder.partnerAvatarImageView.setBorderColor(
+                    viewHolder.itemView.getContext().getResources().getColor(R.color.colorPrimaryLight));
     }
 
     @Override
@@ -115,7 +115,7 @@ public class GroupPartnersAdapter extends RecyclerView.Adapter<GroupPartnersAdap
     }
 
     public interface OnPersonClickListener {
-        void onPersonClicked(Uri imageUri);
+        void onPersonClicked(GroupPartner groupPartner);
         void onAddPerson();
     }
 }

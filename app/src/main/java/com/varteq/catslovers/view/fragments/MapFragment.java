@@ -137,7 +137,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         });
         bottomSheetFeedstationFrameLayout.setOnClickListener(view1 ->
                 goToFeedStationActivity((Feedstation) bottomSheetFeedstationFrameLayout.getTag()));
-        bottomSheetFeedstationFrameLayout.findViewById(R.id.follow_button).setOnClickListener(view12 -> Toaster.shortToast(getString(R.string.coming_soon)));
+        bottomSheetFeedstationFrameLayout.findViewById(R.id.follow_button).setOnClickListener(view12 ->
+                presenter.followFeedstation(((Feedstation) bottomSheetFeedstationFrameLayout.getTag()).getId()));
         // Obtain the SupportMapFragment and get notified when the googleMap is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -196,6 +197,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 bottomSheetBehaviorFeedstation.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 break;
         }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
         if (!listUpdated && googleMap != null && userLocation != null) {
             listUpdated = true;
             presenter.getFeedstations(userLocation.latitude, userLocation.longitude, 20);
@@ -271,7 +277,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private Bitmap getMarkerBitmapFromView(int resId) {
         android.view.LayoutInflater inflater = getLayoutInflater();
         View customMarkerView = inflater.inflate(R.layout.view_custom_marker, null);
-        ImageView markerImageView = (ImageView) customMarkerView.findViewById(R.id.profile_image);
+        ImageView markerImageView = customMarkerView.findViewById(R.id.profile_image);
         markerImageView.setBackgroundResource(resId);
         customMarkerView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
         customMarkerView.layout(0, 0, customMarkerView.getMeasuredWidth(), customMarkerView.getMeasuredHeight());
@@ -309,10 +315,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         listUpdated = true;
         googleMap.clear();
         for (Feedstation feedstation : stations) {
-            if (!feedstation.getIsPublic()) continue;
+            if (feedstation.getLocation() == null) continue;
+            int resourceId = R.drawable.location_blue;
+            if (feedstation.getUserRole() != null &&
+                    feedstation.getUserRole().equals(Feedstation.UserRole.ADMIN)) {
+                if (feedstation.getIsPublic())
+                    resourceId = R.drawable.location_orange;
+                else
+                    resourceId = R.drawable.location_red;
+            }
             Marker marker = googleMap.addMarker(new MarkerOptions()
                     .title(feedstation.getName())
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.location_blue)) // insert image from request
+                    .icon(BitmapDescriptorFactory.fromResource(resourceId)) // insert image from request
                     //.icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(R.drawable.ic_star))) // insert image from request
                     .anchor(markerPositionX, markerPositionY)
                     .position(feedstation.getLocation()));
@@ -406,5 +420,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     public void onLocationAvailable() {
         getLastLocation();
+    }
+
+    public void onSuccessFollow() {
+        Toaster.shortToast("Follow request sent");
+    }
+
+    public void onSuccessJoin() {
+        Toaster.shortToast("You have successfully joined");
     }
 }

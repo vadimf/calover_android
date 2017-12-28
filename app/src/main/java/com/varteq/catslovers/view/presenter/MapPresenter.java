@@ -4,6 +4,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.varteq.catslovers.api.BaseParser;
 import com.varteq.catslovers.api.ServiceGenerator;
 import com.varteq.catslovers.api.entity.BaseResponse;
+import com.varteq.catslovers.api.entity.ErrorData;
 import com.varteq.catslovers.api.entity.ErrorResponse;
 import com.varteq.catslovers.api.entity.RFeedstation;
 import com.varteq.catslovers.model.Feedstation;
@@ -30,7 +31,7 @@ public class MapPresenter {
 
     public void getFeedstations(double lat, double lng, Integer distance) {
 
-        Call<BaseResponse<List<RFeedstation>>> call = ServiceGenerator.getApiServiceWithToken().getFeedstations();//getGeoFeedstations(lat, lng, distance);
+        Call<BaseResponse<List<RFeedstation>>> call = ServiceGenerator.getApiServiceWithToken().getGeoFeedstations(lat, lng, distance);
         call.enqueue(new Callback<BaseResponse<List<RFeedstation>>>() {
             @Override
             public void onResponse(Call<BaseResponse<List<RFeedstation>>> call, Response<BaseResponse<List<RFeedstation>>> response) {
@@ -58,9 +59,43 @@ public class MapPresenter {
         });
     }
 
-    private List<Feedstation> from(List<RFeedstation> data) {
+    public void followFeedstation(Integer feedstationId) {
+
+        if (feedstationId == null) return;
+
+        Call<BaseResponse<ErrorData>> call = ServiceGenerator.getApiServiceWithToken().followFeedstation(feedstationId);
+        call.enqueue(new Callback<BaseResponse<ErrorData>>() {
+            @Override
+            public void onResponse(Call<BaseResponse<ErrorData>> call, Response<BaseResponse<ErrorData>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    new BaseParser<ErrorData>(response) {
+
+                        @Override
+                        protected void onSuccess(ErrorData data) {
+                            view.onSuccessFollow();
+                        }
+
+                        @Override
+                        protected void onFail(ErrorResponse error) {
+                            if (error != null)
+                                Log.d(TAG, error.getMessage() + error.getCode());
+                        }
+                    };
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseResponse<ErrorData>> call, Throwable t) {
+                Log.e(TAG, "followFeedstation onFailure " + t.getMessage());
+            }
+        });
+    }
+
+    public static List<Feedstation> from(List<RFeedstation> data) {
         List<Feedstation> list = new ArrayList<>();
         for (RFeedstation station : data) {
+            if (station.getType() != null && !station.getType().equals("Feedstation"))
+                continue;
             Feedstation feedstation = new Feedstation();
             feedstation.setId(station.getId());
             feedstation.setName(station.getName());
@@ -74,6 +109,13 @@ public class MapPresenter {
             if (station.getIsPublic() != null)
                 feedstation.setIsPublic(station.getIsPublic());
             else feedstation.setIsPublic(true);
+
+            if (station.getPermissions() != null && station.getPermissions().getRole() != null) {
+                if (station.getPermissions().getRole().equals("admin"))
+                    feedstation.setUserRole(Feedstation.UserRole.ADMIN);
+                else if (station.getPermissions().getRole().equals("user"))
+                    feedstation.setUserRole(Feedstation.UserRole.USER);
+            }
 /*if (!station.getIsPublic() && Profile.getUserId(view.getContext()).equals(station.getCreated())){
     Profile.setUserStation(view.getContext(), String.valueOf(station.getId()));
 }*/

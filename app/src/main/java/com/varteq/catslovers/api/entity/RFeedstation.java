@@ -32,6 +32,15 @@ public class RFeedstation extends ErrorData {
     @SerializedName("created")
     @Expose
     private String created;
+    @SerializedName("distance")
+    @Expose
+    private Double distance;
+    @SerializedName("type")
+    @Expose
+    private String type;
+    @SerializedName("permission")
+    @Expose
+    private RFeedstationPermissions permissions;
 
     public Integer getId() {
         return id;
@@ -103,5 +112,29 @@ public class RFeedstation extends ErrorData {
 
     public void setCreated(String created) {
         this.created = created;
+    }
+
+    public RFeedstationPermissions getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(RFeedstationPermissions permissions) {
+        this.permissions = permissions;
+    }
+
+    public Double getDistance() {
+        return distance;
+    }
+
+    public void setDistance(Double distance) {
+        this.distance = distance;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }
