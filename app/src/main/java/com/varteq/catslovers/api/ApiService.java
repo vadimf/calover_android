@@ -110,8 +110,8 @@ public interface ApiService {
 
     @FormUrlEncoded
     @POST("feedstations/{id}/users")
-    Call<BaseResponse<ErrorData>> inviteUserToFeedstation(@Path("id") int feedstationId,
-                                                          @Field("phone") String phone);
+    Call<BaseResponse<RUser>> inviteUserToFeedstation(@Path("id") int feedstationId,
+                                                      @Field("phone") String phone);
 
     @POST("feedstations/{id}/follow")
     Call<BaseResponse<ErrorData>> followFeedstation(@Path("id") int feedstationId);

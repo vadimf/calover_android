@@ -24,6 +24,7 @@ import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 import com.varteq.catslovers.R;
+import com.varteq.catslovers.model.QBChatInfo;
 import com.varteq.catslovers.utils.qb.QbDialogHolder;
 import com.varteq.catslovers.utils.qb.QbDialogUtils;
 import com.varteq.catslovers.utils.qb.QbUsersHolder;
@@ -49,6 +50,7 @@ public class ChatHelper {
     public static final int DIALOG_ITEMS_PER_PAGE = 100;
     public static final int CHAT_HISTORY_ITEMS_PER_PAGE = 50;
     private static final String CHAT_HISTORY_ITEMS_SORT_FIELD = "date_sent";
+    private static final String FEEDSTATION_ID_FIELD = "feedstation_id";
 
     private static ChatHelper instance;
 
@@ -158,6 +160,98 @@ public class ChatHelper {
                         super.onSuccess(dialog, args);
                     }
                 });
+    }
+
+    public void createPublicDialogWithUsers(int feedstationId, String name, final List<QBUser> users,
+                                            final QBEntityCallback<QBChatDialog> callback) {
+
+        QBChatDialog dialog = QbDialogUtils.createPublicDialog(name, users);
+        dialog.setCustomData(new QBChatInfo(feedstationId));
+
+        QBRestChatService.createChatDialog(dialog).performAsync(
+                new QbEntityCallbackWrapper<QBChatDialog>(callback) {
+                    @Override
+                    public void onSuccess(QBChatDialog dialog, Bundle args) {
+                        QbDialogHolder.getInstance().addDialog(dialog);
+                        QbUsersHolder.getInstance().putUsers(users);
+                        super.onSuccess(dialog, args);
+                    }
+                });
+    }
+
+    public void createEmptyPublicDialog(int feedstationId, String name,
+                                        final QBEntityCallback<QBChatDialog> callback) {
+
+        QBChatDialog dialog = QbDialogUtils.createPublicDialog(name, new ArrayList<>());
+        dialog.setCustomData(new QBChatInfo(feedstationId));
+
+        QBRestChatService.createChatDialog(dialog).performAsync(
+                new QbEntityCallbackWrapper<QBChatDialog>(callback) {
+                    @Override
+                    public void onSuccess(QBChatDialog dialog, Bundle args) {
+                        QbDialogHolder.getInstance().addDialog(dialog);
+                        super.onSuccess(dialog, args);
+                    }
+                });
+    }
+
+    public void addUserToDialog(QBChatDialog qbDialog,
+                                String userId,
+                                QBEntityCallback<QBChatDialog> callback) {
+
+        ArrayList<String> username = new ArrayList<>();
+        username.add(userId);
+        QBUsers.getUsersByLogins(username, null).performAsync(
+                new QBEntityCallback<ArrayList<QBUser>>() {
+                    @Override
+                    public void onSuccess(ArrayList<QBUser> result, Bundle params) {
+                        if (result == null || result.isEmpty()) {
+                            callback.onError(new QBResponseException("User not found"));
+                            return;
+                        }
+
+                        QBDialogRequestBuilder qbRequestBuilder = new QBDialogRequestBuilder();
+                        qbRequestBuilder.addUsers(result.get(0));
+
+                        QBRestChatService.updateGroupChatDialog(qbDialog, qbRequestBuilder).performAsync(
+                                new QbEntityCallbackWrapper<QBChatDialog>(callback) {
+                                    @Override
+                                    public void onSuccess(QBChatDialog qbDialog, Bundle bundle) {
+                                        QbUsersHolder.getInstance().putUsers(result);
+                                        QbDialogUtils.logDialogUsers(qbDialog);
+                                        super.onSuccess(qbDialog, bundle);
+                                    }
+                                });
+                    }
+
+                    @Override
+                    public void onError(QBResponseException e) {
+                        callback.onError(e);
+                    }
+                });
+    }
+
+    public void addInvitedUserToDialog(QBChatDialog qbDialog,
+                                       String userId,
+                                       QBEntityCallback<QBChatDialog> callback) {
+
+        QBDialogRequestBuilder qbRequestBuilder = QBChatInfo.getDialogRequestForAddInvitedUser(userId);
+
+        QBRestChatService.updateGroupChatDialog(qbDialog, qbRequestBuilder).performAsync(callback);
+    }
+
+    public void removeInvitedUserFromDialog(QBChatDialog qbDialog,
+                                            Integer userId,
+                                            QBEntityCallback<QBChatDialog> callback) {
+
+        QBDialogRequestBuilder qbRequestBuilder = QBChatInfo.getDialogRequestForRemoveInvitedUser(userId);
+
+        QBRestChatService.updateGroupChatDialog(qbDialog, qbRequestBuilder).performAsync(callback);
+    }
+
+    public void getDialogForFeedstation(int feedstationId, final QBEntityCallback<ArrayList<QBChatDialog>> callback) {
+        QBRequestGetBuilder builder = QBChatInfo.getRequestBuilder(feedstationId);
+        getDialogs(builder, callback);
     }
 
     public void deleteDialogs(Collection<QBChatDialog> dialogs, final QBEntityCallback<ArrayList<String>> callback) {

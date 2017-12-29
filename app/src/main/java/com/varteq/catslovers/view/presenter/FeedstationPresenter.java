@@ -1,8 +1,12 @@
 package com.varteq.catslovers.view.presenter;
 
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 
+import com.quickblox.chat.model.QBChatDialog;
+import com.quickblox.core.QBEntityCallback;
+import com.quickblox.core.exception.QBResponseException;
 import com.varteq.catslovers.api.BaseParser;
 import com.varteq.catslovers.api.ServiceGenerator;
 import com.varteq.catslovers.api.entity.BaseResponse;
@@ -12,6 +16,8 @@ import com.varteq.catslovers.api.entity.RFeedstation;
 import com.varteq.catslovers.api.entity.RUser;
 import com.varteq.catslovers.model.Feedstation;
 import com.varteq.catslovers.model.GroupPartner;
+import com.varteq.catslovers.model.QBChatInfo;
+import com.varteq.catslovers.utils.ChatHelper;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.utils.Toaster;
@@ -58,6 +64,7 @@ public class FeedstationPresenter {
                         @Override
                         protected void onSuccess(RFeedstation data) {
                             view.savedSuccessfully();
+                            checkChat(data.getId(), data.getName());
                         }
 
                         @Override
@@ -82,17 +89,22 @@ public class FeedstationPresenter {
         phone = phone.replace("(", "");
         phone = phone.replace(")", "");
 
-        Call<BaseResponse<ErrorData>> call = ServiceGenerator.getApiServiceWithToken().inviteUserToFeedstation(feedstationId, phone);
+        Call<BaseResponse<RUser>> call = ServiceGenerator.getApiServiceWithToken().inviteUserToFeedstation(feedstationId, phone);
 
-        call.enqueue(new Callback<BaseResponse<ErrorData>>() {
+        call.enqueue(new Callback<BaseResponse<RUser>>() {
             @Override
-            public void onResponse(Call<BaseResponse<ErrorData>> call, Response<BaseResponse<ErrorData>> response) {
+            public void onResponse(Call<BaseResponse<RUser>> call, Response<BaseResponse<RUser>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    new BaseParser<ErrorData>(response) {
+                    new BaseParser<RUser>(response) {
 
                         @Override
-                        protected void onSuccess(ErrorData data) {
+                        protected void onSuccess(RUser data) {
                             getGroupPartners(feedstationId);
+                            GroupPartner partner = from(data, feedstationId);
+                            if (partner != null && partner.getStatus() != null &&
+                                    partner.getStatus().equals(GroupPartner.Status.JOINED))
+                                addUserToChat(partner.getUserId(), feedstationId);
+                            //else addInvitedUserToChat(phone, feedstationId);
                         }
 
                         @Override
@@ -105,8 +117,133 @@ public class FeedstationPresenter {
             }
 
             @Override
-            public void onFailure(Call<BaseResponse<ErrorData>> call, Throwable t) {
+            public void onFailure(Call<BaseResponse<RUser>> call, Throwable t) {
                 Log.e(TAG, "inviteUser onFailure " + t.getMessage());
+            }
+        });
+    }
+
+    private void checkChat(Integer feedstationId, String name) {
+        ChatHelper.getInstance().getDialogForFeedstation(feedstationId, new QBEntityCallback<ArrayList<QBChatDialog>>() {
+            @Override
+            public void onSuccess(ArrayList<QBChatDialog> qbChatDialogs, Bundle bundle) {
+                if (qbChatDialogs.size() < 1)
+                    createChat(feedstationId, name);
+            }
+
+            @Override
+            public void onError(QBResponseException e) {
+                int i = 0;
+            }
+        });
+    }
+
+    public void addUserToChat(Integer userId, Integer feedstationId) {
+        ChatHelper.getInstance().getDialogForFeedstation(feedstationId, new QBEntityCallback<ArrayList<QBChatDialog>>() {
+            @Override
+            public void onSuccess(ArrayList<QBChatDialog> qbChatDialogs, Bundle bundle) {
+                if (qbChatDialogs.size() > 0)
+                    ChatHelper.getInstance().addUserToDialog(qbChatDialogs.get(0), String.valueOf(userId), new QBEntityCallback<QBChatDialog>() {
+                        @Override
+                        public void onSuccess(QBChatDialog qbChatDialogs, Bundle bundle) {
+                            int i = 0;
+                        }
+
+                        @Override
+                        public void onError(QBResponseException e) {
+                            int i = 0;
+                        }
+                    });
+            }
+
+            @Override
+            public void onError(QBResponseException e) {
+                int i = 0;
+            }
+        });
+    }
+
+    private void addInvitedUserToChat(String phone, Integer feedstationId) {
+        ChatHelper.getInstance().getDialogForFeedstation(feedstationId, new QBEntityCallback<ArrayList<QBChatDialog>>() {
+            @Override
+            public void onSuccess(ArrayList<QBChatDialog> qbChatDialogs, Bundle bundle) {
+                if (qbChatDialogs.size() > 0 && !QBChatInfo.containsInvitedUser(qbChatDialogs.get(0).getCustomData(), phone))
+                    ChatHelper.getInstance().addInvitedUserToDialog(qbChatDialogs.get(0), phone, new QBEntityCallback<QBChatDialog>() {
+                        @Override
+                        public void onSuccess(QBChatDialog qbChatDialogs, Bundle bundle) {
+                            int i = 0;
+                        }
+
+                        @Override
+                        public void onError(QBResponseException e) {
+                            int i = 0;
+                        }
+                    });
+            }
+
+            @Override
+            public void onError(QBResponseException e) {
+                int i = 0;
+            }
+        });
+    }
+
+    /*public void checkInvitedUsers(List<GroupPartner> users, Feedstation feedstationId){
+        if (users==null || users.isEmpty()) return;
+
+        ChatHelper.getInstance().getDialogForFeedstation(feedstationId, new QBEntityCallback<ArrayList<QBChatDialog>>() {
+            @Override
+            public void onSuccess(ArrayList<QBChatDialog> qbChatDialogs, Bundle bundle) {
+                if (qbChatDialogs.size() < 1) return;
+
+                List<String> invitedList = QBChatInfo.getInvitedUsers(qbChatDialogs.get(0).getCustomData());
+                if (invitedList==null) return;
+
+                List<GroupPartner> usersToAdd = new ArrayList<>();
+
+                for (String phone : invitedList) {
+                    for (int i = users.size()-1; i>-1; i--){
+                        if (users.get(i).getPhone().equals(phone) && users.get(i).getStatus().equals(GroupPartner.Status.JOINED)){
+                            usersToAdd.add(users.get(i));
+                            break;
+                        }
+                    }
+                }
+
+
+
+
+
+                    ChatHelper.getInstance().addInvitedUserToDialog(qbChatDialogs.get(0), phone, new QBEntityCallback<QBChatDialog>() {
+                        @Override
+                        public void onSuccess(QBChatDialog qbChatDialogs, Bundle bundle) {
+                            int i = 0;
+                        }
+
+                        @Override
+                        public void onError(QBResponseException e) {
+                            int i = 0;
+                        }
+                    });
+            }
+
+            @Override
+            public void onError(QBResponseException e) {
+                int i = 0;
+            }
+        });
+    }*/
+
+    private void createChat(Integer id, String name) {
+        ChatHelper.getInstance().createEmptyPublicDialog(id, name, new QBEntityCallback<QBChatDialog>() {
+            @Override
+            public void onSuccess(QBChatDialog qbChatDialog, Bundle bundle) {
+                int i = 0;
+            }
+
+            @Override
+            public void onError(QBResponseException e) {
+                int i = 0;
             }
         });
     }
@@ -131,6 +268,9 @@ public class FeedstationPresenter {
                                     deleteGroupPartner(feedstationId, from(user, feedstationId).getUserId());*/
                             }
                             view.refreshGroupPartners(partners);
+                            /*if (feedstation.getIsPublic() && feedstation.getUserRole() != null &&
+                                    feedstation.getUserRole().equals(Feedstation.UserRole.ADMIN))
+                                checkInvitedUsers(partners, feedstation);*/
                         }
 
                         @Override
@@ -158,7 +298,7 @@ public class FeedstationPresenter {
                 status = GroupPartner.Status.INVITED;
             else if (user.getStatus().equals("requested"))
                 status = GroupPartner.Status.REQUESTED;
-        }
+        } else return null;
 
         boolean isAdmin = false;
         if (user.getRole().equals("admin"))

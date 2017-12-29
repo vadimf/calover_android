@@ -188,8 +188,6 @@ public class FeedstationActivity extends PhotoPickerActivity {
 
     }
 
-    ;
-
     private void fillUI() {
         if (feedstation != null) {
             stationNameTextView.setText(feedstation.getName());
@@ -362,12 +360,12 @@ public class FeedstationActivity extends PhotoPickerActivity {
             case R.id.app_bar_edit:
                 Log.d(TAG, "app_bar_edit");
                 //if (!feedstation.getCreatedUserId().equals(Profile.getUserId(this))) {
-                if (feedstation.getUserRole() != null && !feedstation.getUserRole().equals(Feedstation.UserRole.ADMIN)) {
-                    Toaster.longToast("Only admins can modify feedstations");
+                if (feedstation.getUserRole() != null && feedstation.getUserRole().equals(Feedstation.UserRole.ADMIN)) {
+                    currentMode = FeedstationScreenMode.EDIT_MODE;
+                    setupUIMode();
                     return true;
                 }
-                currentMode = FeedstationScreenMode.EDIT_MODE;
-                setupUIMode();
+                Toaster.longToast("Only admins can modify feedstations");
                 return true;
             case android.R.id.home:
                 onBackPressed();

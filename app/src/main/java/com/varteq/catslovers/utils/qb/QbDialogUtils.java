@@ -24,6 +24,13 @@ public class QbDialogUtils {
         return DialogUtils.buildDialog(users.toArray(new QBUser[users.size()]));
     }
 
+    public static QBChatDialog createPublicDialog(String name, List<QBUser> users) {
+        QBUser currentUser = ChatHelper.getCurrentUser();
+        users.remove(currentUser);
+
+        return DialogUtils.buildDialog(name, QBDialogType.GROUP, DialogUtils.getUserIds(users));
+    }
+
     public static List<QBUser> getAddedUsers(QBChatDialog dialog, List<QBUser> currentUsers) {
         return getAddedUsers(getQbUsersFromQbDialog(dialog), currentUsers);
     }
