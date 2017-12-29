@@ -8,6 +8,7 @@ import com.varteq.catslovers.api.entity.ErrorData;
 import com.varteq.catslovers.api.entity.ErrorResponse;
 import com.varteq.catslovers.api.entity.RFeedstation;
 import com.varteq.catslovers.model.Feedstation;
+import com.varteq.catslovers.model.GroupPartner;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.TimeUtils;
 import com.varteq.catslovers.view.fragments.MapFragment;
@@ -110,11 +111,23 @@ public class MapPresenter {
                 feedstation.setIsPublic(station.getIsPublic());
             else feedstation.setIsPublic(true);
 
-            if (station.getPermissions() != null && station.getPermissions().getRole() != null) {
-                if (station.getPermissions().getRole().equals("admin"))
-                    feedstation.setUserRole(Feedstation.UserRole.ADMIN);
-                else if (station.getPermissions().getRole().equals("user"))
-                    feedstation.setUserRole(Feedstation.UserRole.USER);
+            if (station.getPermissions() != null) {
+                if (station.getPermissions().getRole() != null) {
+                    if (station.getPermissions().getRole().equals("admin"))
+                        feedstation.setUserRole(Feedstation.UserRole.ADMIN);
+                    else if (station.getPermissions().getRole().equals("user"))
+                        feedstation.setUserRole(Feedstation.UserRole.USER);
+                }
+                if (station.getPermissions().getStatus() != null) {
+                    GroupPartner.Status status = null;
+                    if (station.getPermissions().getStatus().equals("joined"))
+                        status = GroupPartner.Status.JOINED;
+                    else if (station.getPermissions().getStatus().equals("invited"))
+                        status = GroupPartner.Status.INVITED;
+                    else if (station.getPermissions().getStatus().equals("requested"))
+                        status = GroupPartner.Status.REQUESTED;
+                    feedstation.setStatus(status);
+                }
             }
 /*if (!station.getIsPublic() && Profile.getUserId(view.getContext()).equals(station.getCreated())){
     Profile.setUserStation(view.getContext(), String.valueOf(station.getId()));

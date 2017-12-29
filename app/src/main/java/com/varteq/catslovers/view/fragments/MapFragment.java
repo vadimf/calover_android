@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -44,6 +45,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.model.Feedstation;
+import com.varteq.catslovers.model.GroupPartner;
 import com.varteq.catslovers.utils.ImageUtils;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
@@ -293,6 +295,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         return returnedBitmap;
     }
 
+    private Bitmap resizeMarkerIcon(int resId) {
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), resId);
+        float scale = 0.6f;
+        int inWidth = (int) (bitmap.getWidth() * scale);
+        int inHeight = (int) (bitmap.getHeight() * scale);
+        return Bitmap.createScaledBitmap(bitmap, inWidth, inHeight, false);
+    }
+
     private void setBottomSheetDimensions() {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
@@ -317,16 +327,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         for (Feedstation feedstation : stations) {
             if (feedstation.getLocation() == null) continue;
             int resourceId = R.drawable.location_blue;
-            if (feedstation.getUserRole() != null &&
-                    feedstation.getUserRole().equals(Feedstation.UserRole.ADMIN)) {
-                if (feedstation.getIsPublic())
-                    resourceId = R.drawable.location_orange;
-                else
+            if (feedstation.getUserRole() != null) {
+                if (feedstation.getUserRole().equals(Feedstation.UserRole.ADMIN) && !feedstation.getIsPublic())
                     resourceId = R.drawable.location_red;
+                else if (feedstation.getIsPublic() && feedstation.getStatus().equals(GroupPartner.Status.JOINED))
+                    resourceId = R.drawable.location_orange;
             }
             Marker marker = googleMap.addMarker(new MarkerOptions()
                     .title(feedstation.getName())
-                    .icon(BitmapDescriptorFactory.fromResource(resourceId)) // insert image from request
+                    //.icon(BitmapDescriptorFactory.fromResource(resourceId)) // insert image from request
+                    .icon(BitmapDescriptorFactory.fromBitmap(resizeMarkerIcon(resourceId))) // insert image from request
                     //.icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(R.drawable.ic_star))) // insert image from request
                     .anchor(markerPositionX, markerPositionY)
                     .position(feedstation.getLocation()));
@@ -382,6 +392,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         if (lastLocation != null) {
             Profile.setLocation(activity, lastLocation);
             setUserPosition();
+            if (!listUpdated && userLocation != null) {
+                listUpdated = true;
+                presenter.getFeedstations(userLocation.latitude, userLocation.longitude, 20);
+            }
         }
     }
 

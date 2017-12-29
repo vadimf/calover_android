@@ -8,23 +8,23 @@
         android:layout_width="match_parent"
         android:layout_height="56dp">
 
-        <RelativeLayout
+        <LinearLayout
             android:id="@+id/catsToolsRelativeLayout"
+            android:gravity="right"
             android:layout_width="96dp"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignTop="@+id/toolbarTitle">
 
             <ImageButton
-                android:id="@+id/catsSearchButton"
+                android:id="@+id/catsNotificationButton"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentTop="true"
                 android:layout_marginRight="8dp"
+                android:layout_toLeftOf="@id/catsAddButton"
                 android:background="@android:color/transparent"
                 android:scaleType="fitCenter"
-                app:srcCompat="@drawable/ic_search_purple_24dp"/>
+                app:srcCompat="@drawable/ic_notifications_purple_24dp" />
 
             <ImageButton
                 android:id="@+id/catsAddButton"
@@ -37,16 +37,18 @@
                 app:srcCompat="@drawable/ic_add_purple_24dp"/>
 
             <ImageButton
-                android:id="@+id/catsNotificationButton"
+                android:id="@+id/catsSearchButton"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
                 android:layout_marginRight="8dp"
-                android:layout_toLeftOf="@id/catsAddButton"
                 android:background="@android:color/transparent"
                 android:scaleType="fitCenter"
-                app:srcCompat="@drawable/ic_notifications_purple_24dp"/>
+                android:visibility="gone"
+                app:srcCompat="@drawable/ic_search_purple_24dp" />
 
-        </RelativeLayout>
+        </LinearLayout>
 
         <ImageButton
             android:id="@+id/menu_imageButton"

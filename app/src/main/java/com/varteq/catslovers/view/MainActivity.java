@@ -13,7 +13,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.varteq.catslovers.R;
@@ -49,7 +49,7 @@ public class MainActivity extends BaseActivity {
     ImageButton catsSearchButton;
     ImageButton catsAddButton;
     ImageButton menuButton;
-    RelativeLayout catsToolsRelativeLayout;
+    LinearLayout catsToolsRelativeLayout;
     @BindView(R.id.frameLayout)
     FrameLayout mainLayout;
 

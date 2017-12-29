@@ -23,6 +23,7 @@ public class Feedstation implements Parcelable {
     private Date timeToFeed;
     private String createdUserId;
     private UserRole userRole;
+    private GroupPartner.Status status;
 
     public Integer getId() {
         return id;
@@ -96,6 +97,13 @@ public class Feedstation implements Parcelable {
         this.userRole = userRole;
     }
 
+    public GroupPartner.Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(GroupPartner.Status status) {
+        this.status = status;
+    }
 
     @Override
     public int describeContents() {
@@ -113,6 +121,7 @@ public class Feedstation implements Parcelable {
         dest.writeLong(this.timeToFeed != null ? this.timeToFeed.getTime() : -1);
         dest.writeString(this.createdUserId);
         dest.writeInt(this.userRole == null ? -1 : this.userRole.ordinal());
+        dest.writeInt(this.status == null ? -1 : this.status.ordinal());
     }
 
     public Feedstation() {
@@ -130,6 +139,8 @@ public class Feedstation implements Parcelable {
         this.createdUserId = in.readString();
         int tmpUserRole = in.readInt();
         this.userRole = tmpUserRole == -1 ? null : UserRole.values()[tmpUserRole];
+        int tmpStatus = in.readInt();
+        this.status = tmpStatus == -1 ? null : GroupPartner.Status.values()[tmpStatus];
     }
 
     public static final Creator<Feedstation> CREATOR = new Creator<Feedstation>() {

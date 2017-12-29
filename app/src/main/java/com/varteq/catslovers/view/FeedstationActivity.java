@@ -141,6 +141,7 @@ public class FeedstationActivity extends PhotoPickerActivity {
             else if (getIntent().hasExtra(LOCATION_KEY)) {
                 if (feedstation == null)
                     feedstation = new Feedstation();
+                feedstation.setIsPublic(true);
                 feedstation.setLocation(getIntent().getExtras().getParcelable(LOCATION_KEY));
                 setAdress(feedstation.getLocation());
             }

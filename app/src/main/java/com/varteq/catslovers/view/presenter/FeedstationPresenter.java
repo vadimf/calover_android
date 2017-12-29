@@ -64,7 +64,7 @@ public class FeedstationPresenter {
                         @Override
                         protected void onSuccess(RFeedstation data) {
                             view.savedSuccessfully();
-                            checkChat(data.getId(), data.getName());
+                            //checkChat(data.getId(), data.getName());
                         }
 
                         @Override
@@ -101,9 +101,9 @@ public class FeedstationPresenter {
                         protected void onSuccess(RUser data) {
                             getGroupPartners(feedstationId);
                             GroupPartner partner = from(data, feedstationId);
-                            if (partner != null && partner.getStatus() != null &&
+                            /*if (partner != null && partner.getStatus() != null &&
                                     partner.getStatus().equals(GroupPartner.Status.JOINED))
-                                addUserToChat(partner.getUserId(), feedstationId);
+                                addUserToChat(partner.getUserId(), feedstationId);*/
                             //else addInvitedUserToChat(phone, feedstationId);
                         }
 
@@ -266,6 +266,9 @@ public class FeedstationPresenter {
                                 partners.add(from(user, feedstationId));
                                 /*if (!from(user, feedstationId).isAdmin() )//&& from(user, feedstationId).getUserId() == 6)
                                     deleteGroupPartner(feedstationId, from(user, feedstationId).getUserId());*/
+                                /*GroupPartner partner = from(user, feedstationId);
+                                if (partner.getStatus().equals(GroupPartner.Status.JOINED) && !partner.isAdmin())
+                                    addUserToChat(partner.getUserId(), feedstationId);*/
                             }
                             view.refreshGroupPartners(partners);
                             /*if (feedstation.getIsPublic() && feedstation.getUserRole() != null &&
