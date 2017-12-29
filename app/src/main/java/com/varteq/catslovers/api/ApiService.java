@@ -36,9 +36,7 @@ public interface ApiService {
                                       @Field("castrated") boolean castrated,
                                       @Field("description") String description,
                                       @Field("type") String type,
-                                      @Field("next_flea_treatment") int nextFleaTreatment,
-                                      @Field("lat") double lat,
-                                      @Field("lng") double lng);
+                                      @Field("next_flea_treatment") int nextFleaTreatment);
 
     @FormUrlEncoded
     @POST("cats")
@@ -75,6 +73,11 @@ public interface ApiService {
     @GET("cats")
     Call<BaseResponse<List<Cat>>> getCats();
 
+    @FormUrlEncoded
+    @POST("geo/search/cats")
+    Call<BaseResponse<List<Cat>>> getCatsInRadius(@Field("lat") double lat,
+                                                  @Field("lng") double lng,
+                                                  @Field("distance") Integer distance);
 
     @FormUrlEncoded
     @POST("feedstations")
@@ -127,4 +130,7 @@ public interface ApiService {
 
     @GET("feedstations/{id}/users")
     Call<BaseResponse<List<RUser>>> getFeedstationUsers(@Path("id") int feedstationId);
+
+    @GET("feedstations/users/joined")
+    Call<BaseResponse<List<RUser>>> getAllowedUsers();
 }

@@ -106,8 +106,7 @@ public class CatProfilePresenter {
         Call<BaseResponse<Cat>> call;
         if (cat.getFeedstationId() != null)
             call = ServiceGenerator.getApiServiceWithToken().createCat(cat.getFeedstationId(), cat.getPetName(),
-                    cat.getNickname(), colors, age, cat.getSex(), cat.getWeight(), cat.isCastrated(), cat.getDescription(), type, nextFleaTreatment,
-                    lastLocation.getLatitude(), lastLocation.getLongitude());
+                    cat.getNickname(), colors, age, cat.getSex(), cat.getWeight(), cat.isCastrated(), cat.getDescription(), type, nextFleaTreatment);
         else {
             call = ServiceGenerator.getApiServiceWithToken().createPrivateCat(cat.getPetName(),
                     cat.getNickname(), colors, age, cat.getSex(), cat.getWeight(), cat.isCastrated(), cat.getDescription(), type, nextFleaTreatment,

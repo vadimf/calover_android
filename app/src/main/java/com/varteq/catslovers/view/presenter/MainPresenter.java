@@ -7,6 +7,7 @@ import com.varteq.catslovers.api.entity.ErrorData;
 import com.varteq.catslovers.api.entity.ErrorResponse;
 import com.varteq.catslovers.api.entity.RFeedstation;
 import com.varteq.catslovers.api.entity.RUser;
+import com.varteq.catslovers.utils.ChatHelper;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.view.MainActivity;
@@ -107,6 +108,8 @@ public class MainPresenter {
                         @Override
                         protected void onSuccess(RUser data) {
                             view.onSuccessJoin();
+                            //FeedstationPresenter.addUserToChat(data.getUserId(), feedstationId);
+                            ChatHelper.getInstance().updateFeedstations();
                             checkInvitations();
                         }
 

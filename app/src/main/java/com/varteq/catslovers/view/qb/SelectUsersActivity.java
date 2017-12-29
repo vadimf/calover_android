@@ -20,12 +20,21 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 import com.varteq.catslovers.R;
+import com.varteq.catslovers.api.BaseParser;
+import com.varteq.catslovers.api.ServiceGenerator;
+import com.varteq.catslovers.api.entity.BaseResponse;
+import com.varteq.catslovers.api.entity.ErrorResponse;
+import com.varteq.catslovers.api.entity.RUser;
 import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.view.qb.adapter.CheckboxUsersAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SelectUsersActivity extends QBBaseActivity {
     public static final String EXTRA_QB_USERS = "qb_users";
@@ -34,6 +43,7 @@ public class SelectUsersActivity extends QBBaseActivity {
 
     private static final String EXTRA_QB_DIALOG = "qb_dialog";
     private static final String EXTRA_QB_PHONE_NUMBER = "phone_number";
+    private static final String TAG = SelectUsersActivity.class.getSimpleName();
 
     private ListView usersListView;
     private ProgressBar progressBar;
@@ -107,7 +117,8 @@ public class SelectUsersActivity extends QBBaseActivity {
         }
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        loadUsersFromQb();
+        getAllowedUsers();
+        //loadUsersFromQb();
     }
 
     @Override
@@ -153,7 +164,7 @@ public class SelectUsersActivity extends QBBaseActivity {
         finish();
     }
 
-    private void loadUsersFromQb() {
+    private void loadUsersFromQb(List<String> usersLogins) {
         /*List<String> tags = new ArrayList<>();
         if (getIntent()!=null && getIntent().hasExtra(EXTRA_QB_PHONE_NUMBER))
             tags.add(getIntent().getStringExtra(EXTRA_QB_PHONE_NUMBER));*/
@@ -161,10 +172,10 @@ public class SelectUsersActivity extends QBBaseActivity {
         //tags.add(AppController.getSampleConfigs().getUsersTag());
 
         progressBar.setVisibility(View.VISIBLE);
-        ArrayList<String> userId = new ArrayList();
-        userId.add("0");
-        QBUsers.getUsersByFilter(userId, "number id gt ", null).performAsync(
-        /*QBUsers.getUsersByLogins(tags, null).performAsync(*/new QBEntityCallback<ArrayList<QBUser>>() {
+        //ArrayList<String> userId = new ArrayList();
+        //userId.add("0");
+        //QBUsers.getUsersByFilter(usersLogins, "number id gt ", null).performAsync(
+        QBUsers.getUsersByLogins(usersLogins, null).performAsync(new QBEntityCallback<ArrayList<QBUser>>() {
                     @Override
                     public void onSuccess(ArrayList<QBUser> result, Bundle params) {
                         QBChatDialog dialog = (QBChatDialog) getIntent().getSerializableExtra(EXTRA_QB_DIALOG);
@@ -184,7 +195,7 @@ public class SelectUsersActivity extends QBBaseActivity {
                                 new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        loadUsersFromQb();
+                                        loadUsersFromQb(usersLogins);
                                     }
                                 });
                         progressBar.setVisibility(View.GONE);
@@ -194,5 +205,38 @@ public class SelectUsersActivity extends QBBaseActivity {
 
     private boolean isEditingChat() {
         return getIntent().getSerializableExtra(EXTRA_QB_DIALOG) != null;
+    }
+
+    private void getAllowedUsers() {
+
+        Call<BaseResponse<List<RUser>>> call = ServiceGenerator.getApiServiceWithToken().getAllowedUsers();
+        call.enqueue(new Callback<BaseResponse<List<RUser>>>() {
+            @Override
+            public void onResponse(Call<BaseResponse<List<RUser>>> call, Response<BaseResponse<List<RUser>>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    new BaseParser<List<RUser>>(response) {
+
+                        @Override
+                        protected void onSuccess(List<RUser> data) {
+                            List<String> usersLogins = new ArrayList<>();
+                            for (RUser user : data)
+                                usersLogins.add(String.valueOf(user.getUserId()));
+                            loadUsersFromQb(usersLogins);
+                        }
+
+                        @Override
+                        protected void onFail(ErrorResponse error) {
+                            if (error != null)
+                                com.varteq.catslovers.utils.Log.d(TAG, error.getMessage() + error.getCode());
+                        }
+                    };
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseResponse<List<RUser>>> call, Throwable t) {
+                com.varteq.catslovers.utils.Log.e(TAG, "getAllowedUsers onFailure " + t.getMessage());
+            }
+        });
     }
 }

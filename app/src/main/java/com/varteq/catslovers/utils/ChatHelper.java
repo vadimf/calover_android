@@ -24,12 +24,20 @@ import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 import com.varteq.catslovers.R;
+import com.varteq.catslovers.api.BaseParser;
+import com.varteq.catslovers.api.ServiceGenerator;
+import com.varteq.catslovers.api.entity.BaseResponse;
+import com.varteq.catslovers.api.entity.ErrorResponse;
+import com.varteq.catslovers.api.entity.RFeedstation;
+import com.varteq.catslovers.model.Feedstation;
+import com.varteq.catslovers.model.GroupPartner;
 import com.varteq.catslovers.model.QBChatInfo;
 import com.varteq.catslovers.utils.qb.QbDialogHolder;
 import com.varteq.catslovers.utils.qb.QbDialogUtils;
 import com.varteq.catslovers.utils.qb.QbUsersHolder;
 import com.varteq.catslovers.utils.qb.callback.QbEntityCallbackTwoTypeWrapper;
 import com.varteq.catslovers.utils.qb.callback.QbEntityCallbackWrapper;
+import com.varteq.catslovers.view.presenter.MapPresenter;
 
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.SmackException;
@@ -44,17 +52,21 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class ChatHelper {
     private static final String TAG = ChatHelper.class.getSimpleName();
 
     public static final int DIALOG_ITEMS_PER_PAGE = 100;
     public static final int CHAT_HISTORY_ITEMS_PER_PAGE = 50;
     private static final String CHAT_HISTORY_ITEMS_SORT_FIELD = "date_sent";
-    private static final String FEEDSTATION_ID_FIELD = "feedstation_id";
 
     private static ChatHelper instance;
 
     private QBChatService qbChatService;
+    private List<Feedstation> myFeedstations;
 
     public static synchronized ChatHelper getInstance() {
         if (instance == null) {
@@ -77,6 +89,7 @@ public class ChatHelper {
     private ChatHelper() {
         qbChatService = QBChatService.getInstance();
         qbChatService.setUseStreamManagement(true);
+        updateMyFeedstations();
     }
 
     private static QBChatService.ConfigurationBuilder buildChatConfigs() {
@@ -356,7 +369,9 @@ public class ChatHelper {
                         while (dialogIterator.hasNext()) {
                             QBChatDialog dialog = dialogIterator.next();
                             if (dialog.getType() == QBDialogType.PUBLIC_GROUP) {
-                                dialogIterator.remove();
+                                Integer feedstationId = QBChatInfo.getFeedstationId(dialog.getCustomData());
+                                if (!containsId(feedstationId))
+                                    dialogIterator.remove();
                             }
                         }
 
@@ -365,6 +380,16 @@ public class ChatHelper {
                         // we want to load chat users before triggering callback
                     }
                 });
+    }
+
+    private boolean containsId(Integer feedstationId) {
+        if (myFeedstations != null && feedstationId != null) {
+            for (Feedstation feedstation : myFeedstations) {
+                if (feedstation.getStatus().equals(GroupPartner.Status.JOINED) && feedstation.getId().equals(feedstationId))
+                    return true;
+            }
+        }
+        return false;
     }
 
     public void getDialogById(String dialogId, final QBEntityCallback<QBChatDialog> callback) {
@@ -448,5 +473,39 @@ public class ChatHelper {
                         callback.onSuccess(messages, params);
                     }
                 });
+    }
+
+    public void updateFeedstations() {
+        updateMyFeedstations();
+    }
+
+    private void updateMyFeedstations() {
+
+        Call<BaseResponse<List<RFeedstation>>> call = ServiceGenerator.getApiServiceWithToken().getFeedstations();
+        call.enqueue(new Callback<BaseResponse<List<RFeedstation>>>() {
+            @Override
+            public void onResponse(Call<BaseResponse<List<RFeedstation>>> call, Response<BaseResponse<List<RFeedstation>>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    new BaseParser<List<RFeedstation>>(response) {
+
+                        @Override
+                        protected void onSuccess(List<RFeedstation> data) {
+                            myFeedstations = MapPresenter.from(data);
+                        }
+
+                        @Override
+                        protected void onFail(ErrorResponse error) {
+                            if (error != null)
+                                com.varteq.catslovers.utils.Log.d(TAG, error.getMessage() + error.getCode());
+                        }
+                    };
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseResponse<List<RFeedstation>>> call, Throwable t) {
+                com.varteq.catslovers.utils.Log.e(TAG, "updateMyFeedstations onFailure " + t.getMessage());
+            }
+        });
     }
 }

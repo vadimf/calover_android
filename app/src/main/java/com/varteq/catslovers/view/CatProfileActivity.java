@@ -873,7 +873,7 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
     public void feedstationsLoaded(List<Feedstation> feedstations) {
         if (catType.equals(CatProfile.Status.PET)) return;
         for (int i = 0; i < feedstations.size(); i++) {
-            if (!feedstations.get(i).getIsPublic())
+            if (!feedstations.get(i).getIsPublic() || (feedstations.get(i).getStatus() != null && !feedstations.get(i).getStatus().equals(GroupPartner.Status.JOINED)))
                 feedstations.remove(i);
         }
         if (feedstations.size() < 1) {

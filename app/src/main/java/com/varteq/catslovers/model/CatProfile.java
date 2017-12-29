@@ -25,7 +25,8 @@ public class CatProfile implements Serializable {
     private List<GroupPartner> groupPartnersList;
     private List<Integer> colorsList;
     private Status type;
-
+    private Feedstation.UserRole userRole;
+    private GroupPartner.Status status;
 
     public enum Status {
         PET,
@@ -166,5 +167,21 @@ public class CatProfile implements Serializable {
 
     public void setFeedstationId(int feedstationId) {
         this.feedstationId = feedstationId;
+    }
+
+    public Feedstation.UserRole getUserRole() {
+        return userRole;
+    }
+
+    public void setUserRole(Feedstation.UserRole userRole) {
+        this.userRole = userRole;
+    }
+
+    public GroupPartner.Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(GroupPartner.Status status) {
+        this.status = status;
     }
 }

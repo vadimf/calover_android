@@ -39,6 +39,12 @@ public class QBChatInfo extends QBDialogCustomData {
         return qbRequestBuilder;
     }
 
+    public static Integer getFeedstationId(QBDialogCustomData data) {
+        if (data != null) {
+            return data.getInteger(FEEDSTATION_ID_FIELD);
+        } else return null;
+    }
+
     public static boolean containsInvitedUser(QBDialogCustomData data, String userId) {
         List<String> list = getInvitedUsers(data);
         if (data != null && userId != null) {

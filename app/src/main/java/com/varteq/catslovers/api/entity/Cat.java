@@ -38,6 +38,9 @@ public class Cat extends ErrorData {
     @SerializedName("next_flea_treatment")
     @Expose
     private Integer nextFleaTreatment;
+    @SerializedName("permission")
+    @Expose
+    private RFeedstationPermissions permissions;
 
     public Integer getId() {
         return id;
@@ -127,4 +130,11 @@ public class Cat extends ErrorData {
         this.nextFleaTreatment = nextFleaTreatment;
     }
 
+    public RFeedstationPermissions getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(RFeedstationPermissions permissions) {
+        this.permissions = permissions;
+    }
 }

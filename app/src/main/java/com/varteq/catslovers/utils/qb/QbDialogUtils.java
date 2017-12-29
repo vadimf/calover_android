@@ -28,7 +28,7 @@ public class QbDialogUtils {
         QBUser currentUser = ChatHelper.getCurrentUser();
         users.remove(currentUser);
 
-        return DialogUtils.buildDialog(name, QBDialogType.GROUP, DialogUtils.getUserIds(users));
+        return DialogUtils.buildDialog(name, QBDialogType.PUBLIC_GROUP, DialogUtils.getUserIds(users));
     }
 
     public static List<QBUser> getAddedUsers(QBChatDialog dialog, List<QBUser> currentUsers) {

@@ -11,27 +11,18 @@ import android.view.ViewGroup;
 import android.widget.SeekBar;
 
 import com.varteq.catslovers.R;
-import com.varteq.catslovers.api.BaseParser;
-import com.varteq.catslovers.api.ServiceGenerator;
-import com.varteq.catslovers.api.entity.BaseResponse;
-import com.varteq.catslovers.api.entity.Cat;
-import com.varteq.catslovers.api.entity.ErrorResponse;
 import com.varteq.catslovers.model.CatProfile;
-import com.varteq.catslovers.utils.Log;
-import com.varteq.catslovers.utils.TimeUtils;
+import com.varteq.catslovers.model.Feedstation;
 import com.varteq.catslovers.view.CatProfileActivity;
 import com.varteq.catslovers.view.adapters.CatsListAdapter;
+import com.varteq.catslovers.view.presenter.CatsPresenter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class CatsFragment extends Fragment {
 
@@ -44,8 +35,9 @@ public class CatsFragment extends Fragment {
     private CatsListAdapter catsListAdapter;
     private List<CatProfile> myCatsList = new ArrayList<>();
     private boolean listUpdated;
+    private CatsPresenter presenter;
 
-    final private int SEEKBAR_STEPS_COUNT = 7;
+    final private int SEEKBAR_STEPS_COUNT = 1;
     @BindView(R.id.seekBar)
     SeekBar seekBar;
 
@@ -86,7 +78,8 @@ public class CatsFragment extends Fragment {
         catsHashMap.put("B", bList);
         catsHashMap.put("C", cList);*/
 
-        getCats();
+        presenter.getCats(false);
+        listUpdated = true;
 
         catsListAdapter = new CatsListAdapter(catsHashMap, this::onCatClicked);
         catsRecyclerView.setAdapter(catsListAdapter);
@@ -104,13 +97,32 @@ public class CatsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
-        seekBar.setMax(SEEKBAR_STEPS_COUNT - 1);
+        seekBar.setMax(SEEKBAR_STEPS_COUNT);
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                if (i == 0)
+                    presenter.getCats(false);
+                else
+                    presenter.getCats(true);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        presenter = new CatsPresenter(this);
     }
 
     @Override
@@ -122,84 +134,39 @@ public class CatsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (!listUpdated)
-            getCats();
-    }
-
-    public void getCats() {
-        listUpdated = true;
-
-        Call<BaseResponse<List<Cat>>> call = ServiceGenerator.getApiServiceWithToken().getCats();
-        call.enqueue(new Callback<BaseResponse<List<Cat>>>() {
-            @Override
-            public void onResponse(Call<BaseResponse<List<Cat>>> call, Response<BaseResponse<List<Cat>>> response) {
-                new BaseParser<List<Cat>>(response) {
-
-                    @Override
-                    protected void onSuccess(List<Cat> data) {
-                        Log.i(TAG, String.valueOf(data.size()));
-                        if (data.size() < 1) return;
-                        catsHashMap.clear();
-                        myCatsList.clear();
-                        List<CatProfile> catProfiles = getCatProfiles(data);
-                        Collections.sort(catProfiles, (catProfile, t1) -> catProfile.getPetName().toUpperCase().compareTo(t1.getPetName().toUpperCase()));
-
-                        char letter = Character.toUpperCase(data.get(0).getName().charAt(0));
-                        ArrayList<CatProfile> list = new ArrayList<>();
-                        for (CatProfile cat : catProfiles) {
-                            if (cat.getId() % 5 == 2) {
-                                myCatsList.add(cat);
-                            } else if (letter == Character.toUpperCase(cat.getPetName().charAt(0)))
-                                list.add(cat);
-                            else {
-                                catsHashMap.put(String.valueOf(letter), list);
-                                letter = Character.toUpperCase(cat.getPetName().charAt(0));
-                                list = new ArrayList<>();
-                                list.add(cat);
-                            }
-
-                        }
-                        if (myCatsList.size() > 0)
-                            catsHashMap.put(MY_CATS_KEY, myCatsList);
-                        catsListAdapter.onDataChanged();
-                    }
-
-                    @Override
-                    protected void onFail(ErrorResponse error) {
-                        if (error != null)
-                            Log.d(TAG, error.getMessage() + error.getCode());
-                    }
-                };
-            }
-
-            @Override
-            public void onFailure(Call<BaseResponse<List<Cat>>> call, Throwable t) {
-                Log.e(TAG, "getCats onFailure " + t.getMessage());
-            }
-        });
-    }
-
-    private List<CatProfile> getCatProfiles(List<Cat> data) {
-        List<CatProfile> list = new ArrayList<>();
-        for (Cat cat : data) {
-            CatProfile catProfile = new CatProfile();
-            catProfile.setId(cat.getId());
-            catProfile.setPetName(cat.getName());
-            catProfile.setNickname(cat.getNickname());
-            catProfile.setBirthday(TimeUtils.getLocalDateFromUtc(cat.getAge()));
-            catProfile.setSex(null);
-            catProfile.setWeight(cat.getWeight());
-            catProfile.setCastrated(cat.getCastrated());
-            catProfile.setDescription(cat.getDescription());
-            catProfile.setType(cat.getType().equals("pet") ? CatProfile.Status.PET : CatProfile.Status.STRAY);
-            catProfile.setFleaTreatmentDate(TimeUtils.getLocalDateFromUtc(cat.getNextFleaTreatment()));
-
-            List<Integer> colors = new ArrayList<>();
-            for (String s : cat.getColor().split(","))
-                colors.add(Integer.parseInt(s));
-            catProfile.setColorsList(colors);
-            list.add(catProfile);
+        if (!listUpdated) {
+            presenter.getCats(false);
+            listUpdated = true;
         }
-        return list;
+    }
+
+    public void catsLoaded(List<CatProfile> catProfiles) {
+
+        listUpdated = true;
+        catsHashMap.clear();
+        myCatsList.clear();
+
+        char letter = Character.toUpperCase(catProfiles.get(0).getPetName().charAt(0));
+        ArrayList<CatProfile> list = new ArrayList<>();
+        for (CatProfile cat : catProfiles) {
+            if (cat.getType() != null && cat.getUserRole() != null &&
+                    cat.getType().equals(CatProfile.Status.PET) && cat.getUserRole().equals(Feedstation.UserRole.ADMIN)) {
+                myCatsList.add(cat);
+            } else if (letter == Character.toUpperCase(cat.getPetName().charAt(0)))
+                list.add(cat);
+            else {
+                if (!list.isEmpty())
+                    catsHashMap.put(String.valueOf(letter), list);
+                letter = Character.toUpperCase(cat.getPetName().charAt(0));
+                list = new ArrayList<>();
+                list.add(cat);
+            }
+        }
+        if (!list.isEmpty())
+            catsHashMap.put(String.valueOf(letter), list);
+
+        if (myCatsList.size() > 0)
+            catsHashMap.put(MY_CATS_KEY, myCatsList);
+        catsListAdapter.onDataChanged();
     }
 }

@@ -16,7 +16,6 @@ import com.varteq.catslovers.api.entity.RFeedstation;
 import com.varteq.catslovers.api.entity.RUser;
 import com.varteq.catslovers.model.Feedstation;
 import com.varteq.catslovers.model.GroupPartner;
-import com.varteq.catslovers.model.QBChatInfo;
 import com.varteq.catslovers.utils.ChatHelper;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
@@ -65,6 +64,7 @@ public class FeedstationPresenter {
                         protected void onSuccess(RFeedstation data) {
                             view.savedSuccessfully();
                             //checkChat(data.getId(), data.getName());
+                            createChat(data.getId(), data.getName());
                         }
 
                         @Override
@@ -100,8 +100,8 @@ public class FeedstationPresenter {
                         @Override
                         protected void onSuccess(RUser data) {
                             getGroupPartners(feedstationId);
-                            GroupPartner partner = from(data, feedstationId);
-                            /*if (partner != null && partner.getStatus() != null &&
+                            /*GroupPartner partner = from(data, feedstationId);
+                            if (partner != null && partner.getStatus() != null &&
                                     partner.getStatus().equals(GroupPartner.Status.JOINED))
                                 addUserToChat(partner.getUserId(), feedstationId);*/
                             //else addInvitedUserToChat(phone, feedstationId);
@@ -138,7 +138,7 @@ public class FeedstationPresenter {
         });
     }
 
-    public void addUserToChat(Integer userId, Integer feedstationId) {
+    public static void addUserToChat(Integer userId, Integer feedstationId) {
         ChatHelper.getInstance().getDialogForFeedstation(feedstationId, new QBEntityCallback<ArrayList<QBChatDialog>>() {
             @Override
             public void onSuccess(ArrayList<QBChatDialog> qbChatDialogs, Bundle bundle) {
@@ -163,7 +163,7 @@ public class FeedstationPresenter {
         });
     }
 
-    private void addInvitedUserToChat(String phone, Integer feedstationId) {
+    /*private void addInvitedUserToChat(String phone, Integer feedstationId) {
         ChatHelper.getInstance().getDialogForFeedstation(feedstationId, new QBEntityCallback<ArrayList<QBChatDialog>>() {
             @Override
             public void onSuccess(ArrayList<QBChatDialog> qbChatDialogs, Bundle bundle) {
@@ -186,7 +186,7 @@ public class FeedstationPresenter {
                 int i = 0;
             }
         });
-    }
+    }*/
 
     /*public void checkInvitedUsers(List<GroupPartner> users, Feedstation feedstationId){
         if (users==null || users.isEmpty()) return;
