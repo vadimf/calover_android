@@ -274,6 +274,10 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
         checkLocationAvailability();
     }
 
+    public void setToolbarTitle(String title) {
+        getSupportActionBar().setTitle(title);
+    }
+
     @SuppressLint("MissingPermission")
     public void checkLocationAvailability() {
         if (!permissionHelper.isAccessLocationGranted()) {
@@ -353,7 +357,7 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
     private void fillUI() {
         if (catProfile != null) {
             if (catProfile.getType() != null && catProfile.getType().equals(CatProfile.Status.STRAY))
-                selectAnimalTypeStray();
+                setupAnimalType(CatProfile.Status.STRAY);
             else selectAnimalTypePet();
             if (catProfile.getPetName() != null && !catProfile.getPetName().isEmpty())
                 setTitle(catProfile.getPetName());
@@ -617,8 +621,12 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
                 return true;
             case R.id.app_bar_edit:
                 Log.d(TAG, "app_bar_edit");
-                currentMode = CatProfileScreenMode.EDIT_MODE;
-                setupUIMode();
+                if (catProfile.getUserRole() != null && catProfile.getUserRole().equals(Feedstation.UserRole.ADMIN)) {
+                    currentMode = CatProfileScreenMode.EDIT_MODE;
+                    setupUIMode();
+                    return true;
+                }
+                Toaster.longToast("Only admins can modify cats");
                 return true;
             case android.R.id.home:
                 onBackPressed();
@@ -700,25 +708,36 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
 
     @OnClick(R.id.petLayout)
     void selectAnimalTypePet() {
-        petLayout.setBackgroundResource(R.drawable.cat_profile_animal_type_selected_shape);
-        strayLayout.setBackgroundResource(R.drawable.cat_profile_animal_type_unselected_shape);
-        animalTypePetTextView.setTextAppearance(this, R.style.PrimaryTextView);
-        animalTypeStrayTextView.setTextAppearance(this, R.style.SecondaryTextView);
-        catType = CatProfile.Status.PET;
+        setupAnimalType(CatProfile.Status.PET);
     }
 
     @OnClick(R.id.strayLayout)
     void selectAnimalTypeStray() {
-        if (catType.equals(CatProfile.Status.PET) && currentMode.equals(CatProfileScreenMode.EDIT_MODE)) {
+        if (catType.equals(CatProfile.Status.PET) && catProfile.getType().equals(CatProfile.Status.PET) && currentMode.equals(CatProfileScreenMode.EDIT_MODE)) {
             Toaster.shortToast("Your cat can't be stray");
             return;
         }
-        petLayout.setBackgroundResource(R.drawable.cat_profile_animal_type_unselected_shape);
-        strayLayout.setBackgroundResource(R.drawable.cat_profile_animal_type_selected_shape);
-        animalTypePetTextView.setTextAppearance(this, R.style.SecondaryTextView);
-        animalTypeStrayTextView.setTextAppearance(this, R.style.PrimaryTextView);
-        catType = CatProfile.Status.STRAY;
+        setupAnimalType(CatProfile.Status.STRAY);
         presenter.getStrayFeedstations();
+    }
+
+    private void setupAnimalType(CatProfile.Status catType) {
+        switch (catType) {
+            case PET:
+                petLayout.setBackgroundResource(R.drawable.cat_profile_animal_type_selected_shape);
+                strayLayout.setBackgroundResource(R.drawable.cat_profile_animal_type_unselected_shape);
+                animalTypePetTextView.setTextAppearance(this, R.style.PrimaryTextView);
+                animalTypeStrayTextView.setTextAppearance(this, R.style.SecondaryTextView);
+                this.catType = CatProfile.Status.PET;
+                break;
+            case STRAY:
+                petLayout.setBackgroundResource(R.drawable.cat_profile_animal_type_unselected_shape);
+                strayLayout.setBackgroundResource(R.drawable.cat_profile_animal_type_selected_shape);
+                animalTypePetTextView.setTextAppearance(this, R.style.SecondaryTextView);
+                animalTypeStrayTextView.setTextAppearance(this, R.style.PrimaryTextView);
+                this.catType = CatProfile.Status.STRAY;
+                break;
+        }
     }
 
     @OnClick(R.id.upload_image_button)
@@ -884,6 +903,7 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
         String[] items = new String[feedstations.size()];
         for (int i = 0; i < feedstations.size(); i++)
             items[i] = feedstations.get(i).getName();
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Choose feedstation for cat");
         builder.setItems(items, null);

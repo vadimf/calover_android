@@ -317,7 +317,7 @@ public class FeedstationPresenter {
     }
 
     public void updateFeedstation(Feedstation feedstation) {
-
+        view.setToolbarTitle(feedstation.getName());
         Call<BaseResponse<RFeedstation>> call = ServiceGenerator.getApiServiceWithToken().updateFeedstation(feedstation.getId(), feedstation.getName(),
                 feedstation.getAddress(), feedstation.getDescription(), 0,
                 feedstation.getLocation().latitude, feedstation.getLocation().longitude);

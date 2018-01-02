@@ -143,6 +143,7 @@ public class CatProfilePresenter {
     }
 
     public void updateCat(CatProfile cat) {
+        view.setToolbarTitle(cat.getPetName());
         String colors = "";
         for (int color : cat.getColorsList())
             colors += String.valueOf(color) + ",";

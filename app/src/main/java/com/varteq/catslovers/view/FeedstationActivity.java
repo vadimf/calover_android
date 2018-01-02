@@ -98,7 +98,6 @@ public class FeedstationActivity extends PhotoPickerActivity {
     private FeedstationScreenMode currentMode = FeedstationScreenMode.EDIT_MODE;
     private List<Uri> photoList;
     private List<GroupPartner> groupPartnersList = new ArrayList<>();
-    ;
 
     private CatPhotosAdapter photosAdapter;
     private GroupPartnersAdapter groupPartnersAdapter;
@@ -275,6 +274,7 @@ public class FeedstationActivity extends PhotoPickerActivity {
             stationNameTextView.setText(STATION_DEFAULT_NAME);
         if (addressTextView.getText().toString().equals(ADDRESS_DEFAULT_VALUE))
             addressTextView.setText("");
+        setToolbarTitle(stationNameTextView.getText().toString());
 
         stationNameTextView.setEnabled(false);
         addressTextView.setEnabled(false);
@@ -320,6 +320,10 @@ public class FeedstationActivity extends PhotoPickerActivity {
             saveMenu.setVisible(true);
         if (editMenu != null)
             editMenu.setVisible(false);
+    }
+
+    public void setToolbarTitle(String title) {
+        getSupportActionBar().setTitle(title);
     }
 
     @Override
