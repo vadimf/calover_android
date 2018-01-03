@@ -60,6 +60,44 @@ public class MapPresenter {
         });
     }
 
+    public void onGroupActionButtonClicked(Feedstation feedstation) {
+        if (feedstation.getStatus() != null && feedstation.getStatus() == GroupPartner.Status.JOINED)
+            leaveFeedstation(feedstation.getId());
+        else
+            followFeedstation(feedstation.getId());
+    }
+
+    public void leaveFeedstation(Integer feedstationId) {
+        if (feedstationId == null) return;
+
+        Call<BaseResponse<ErrorData>> call = ServiceGenerator.getApiServiceWithToken().leaveFeedstation(feedstationId);
+        call.enqueue(new Callback<BaseResponse<ErrorData>>() {
+            @Override
+            public void onResponse(Call<BaseResponse<ErrorData>> call, Response<BaseResponse<ErrorData>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    new BaseParser<ErrorData>(response) {
+
+                        @Override
+                        protected void onSuccess(ErrorData data) {
+                            view.onSuccessLeave();
+                        }
+
+                        @Override
+                        protected void onFail(ErrorResponse error) {
+                            if (error != null)
+                                Log.d(TAG, error.getMessage() + error.getCode());
+                        }
+                    };
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseResponse<ErrorData>> call, Throwable t) {
+                Log.e(TAG, "followFeedstation onFailure " + t.getMessage());
+            }
+        });
+    }
+
     public void followFeedstation(Integer feedstationId) {
 
         if (feedstationId == null) return;

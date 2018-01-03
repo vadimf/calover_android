@@ -20,6 +20,7 @@ import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -86,6 +87,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     BottomSheetBehavior bottomSheetBehaviorFeedstation;
     @BindView(R.id.bottom_sheet_other_view)
     View bottomSheetOtherView;
+    Button followButton;
+    TextView dialogTextView;
 
     MapPresenter presenter;
     private MarkerOptions userLocationMarkerOptions;
@@ -116,52 +119,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
+        followButton = bottomSheetFeedstationFrameLayout.findViewById(R.id.follow_button);
+        dialogTextView = bottomSheetFeedstationFrameLayout.findViewById(R.id.dialogTextView);
         bottomSheetBehaviorFeedstation = BottomSheetBehavior.from(bottomSheetFeedstationFrameLayout);
         bottomSheetBehaviorFeedstation.setState(BottomSheetBehavior.STATE_HIDDEN);
         setBottomSheetDimensions();
 
         initLocation();
+        initListeners();
 
-        bottomSheetBehaviorFeedstation.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
-            @Override
-            public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                switch (newState) {
-                    case BottomSheetBehavior.STATE_EXPANDED:
-                        goToFeedStationActivity((Feedstation) bottomSheetFeedstationFrameLayout.getTag());
-                        break;
-                }
-            }
-
-            @Override
-            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-
-            }
-        });
-        bottomSheetFeedstationFrameLayout.setOnClickListener(view1 ->
-                goToFeedStationActivity((Feedstation) bottomSheetFeedstationFrameLayout.getTag()));
-        bottomSheetFeedstationFrameLayout.findViewById(R.id.follow_button).setOnClickListener(view12 ->
-                presenter.followFeedstation(((Feedstation) bottomSheetFeedstationFrameLayout.getTag()).getId()));
         // Obtain the SupportMapFragment and get notified when the googleMap is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        seekBar.setMax(SEEKBAR_STEPS_COUNT - 1);
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                int radius = (i + 1) * (SEEKBAR_STEPS_COUNT + 1);
-                zoomMapForRadius(radius);
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
         Glide.with(this)
                 .load(getResources().getDrawable(R.drawable.cat2))
                 .into(avatarImageView);
@@ -191,6 +160,45 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         return 0;
     }
 
+    private void initListeners() {
+        bottomSheetBehaviorFeedstation.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                switch (newState) {
+                    case BottomSheetBehavior.STATE_EXPANDED:
+                        goToFeedStationActivity((Feedstation) bottomSheetFeedstationFrameLayout.getTag());
+                        break;
+                }
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+
+            }
+        });
+        bottomSheetFeedstationFrameLayout.setOnClickListener(view1 ->
+                goToFeedStationActivity((Feedstation) bottomSheetFeedstationFrameLayout.getTag()));
+        followButton.setOnClickListener(view12 -> presenter.onGroupActionButtonClicked((Feedstation) bottomSheetFeedstationFrameLayout.getTag()));
+        seekBar.setMax(SEEKBAR_STEPS_COUNT - 1);
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                int radius = (i + 1) * (SEEKBAR_STEPS_COUNT + 1);
+                zoomMapForRadius(radius);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -198,6 +206,41 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             case BottomSheetBehavior.STATE_EXPANDED:
                 bottomSheetBehaviorFeedstation.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 break;
+        }
+        initStationAction((Feedstation) bottomSheetFeedstationFrameLayout.getTag());
+    }
+
+    private void initStationAction(Feedstation feedstation) {
+        if (feedstation != null) {
+            if (feedstation.getUserRole() != Feedstation.UserRole.ADMIN) {
+                if (feedstation.getStatus() != null) {
+                    switch (feedstation.getStatus()) {
+                        case JOINED:
+                            setStationActionName(getString(R.string.leave_group));
+                            followButton.setBackground(getResources().getDrawable(R.drawable.ic_close_24dp));
+                            followButton.setVisibility(View.VISIBLE);
+                            break;
+                        case REQUESTED:
+                            setStationActionName(getString(R.string.group_join_request_sent));
+                            followButton.setVisibility(View.GONE);
+                            break;
+                        case INVITED:
+                            setStationActionName(getString(R.string.group_join_invited));
+                            followButton.setVisibility(View.VISIBLE);
+                            break;
+                        default:
+                            setStationActionName(getString(R.string.join_group));
+                            followButton.setVisibility(View.VISIBLE);
+                            break;
+                    }
+                } else {
+                    setStationActionName(getString(R.string.join_group));
+                    followButton.setVisibility(View.VISIBLE);
+                }
+            } else {
+                setStationActionName(getString(R.string.group_admin));
+                followButton.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -230,6 +273,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             stationNameTextView.setText(((Feedstation) marker.getTag()).getName());
             addressTextView.setText(((Feedstation) marker.getTag()).getAddress());
             bottomSheetFeedstationFrameLayout.setTag(marker.getTag());
+
+            initStationAction((Feedstation) marker.getTag());
             return false;
         });
 
@@ -246,6 +291,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             presenter.getFeedstations(userLocation.latitude, userLocation.longitude, 20);
         }
     }
+
+    private void setStationActionName(String name) {
+        dialogTextView.setText(name);
+    }
+
 
     private void setUserPosition() {
         Location location = Profile.getLocation(getContext());
@@ -341,6 +391,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     .anchor(markerPositionX, markerPositionY)
                     .position(feedstation.getLocation()));
             marker.setTag(feedstation);
+
+            if (bottomSheetBehaviorFeedstation.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
+                if (feedstation.getId().equals(((Feedstation) bottomSheetFeedstationFrameLayout.getTag()).getId()))
+                    initStationAction(feedstation);
+            }
+
         }
         addUserLocationMarker();
     }
@@ -350,8 +406,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             if (userLocationMarker != null && userLocationMarker.isVisible())
                 userLocationMarker.remove();
             userLocationMarker = googleMap.addMarker(userLocationMarkerOptions);
-        }
-        else setUserPosition();
+        } else setUserPosition();
     }
 
     // Request current location
@@ -438,6 +493,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     public void onSuccessFollow() {
         Toaster.shortToast("Follow request sent");
+        setStationActionName(getString(R.string.group_join_request_sent));
+        followButton.setVisibility(View.GONE);
+        ((Feedstation) bottomSheetFeedstationFrameLayout.getTag()).setStatus(GroupPartner.Status.REQUESTED);
+    }
+
+    public void onSuccessLeave() {
+        Toaster.shortToast("You have been leaved the group");
+        setStationActionName(getString(R.string.join_group));
+        followButton.setVisibility(View.VISIBLE);
+        ((Feedstation) bottomSheetFeedstationFrameLayout.getTag()).setStatus(null);
     }
 
     public void onSuccessJoin() {

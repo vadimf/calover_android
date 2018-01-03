@@ -72,6 +72,8 @@ public class FeedstationActivity extends PhotoPickerActivity {
     View descriptionBackground;
     @BindView(R.id.follow_button)
     Button followButton;
+    @BindView(R.id.dialogTextView)
+    TextView dialogTextView;
 
     @BindView(R.id.photos_RecyclerView)
     RecyclerView photosRecyclerView;
@@ -193,7 +195,8 @@ public class FeedstationActivity extends PhotoPickerActivity {
             stationNameTextView.setText(feedstation.getName());
             addressTextView.setText(feedstation.getAddress());
             descriptionEditText.setText(feedstation.getDescription());
-        } 
+            initStationAction();
+        }
         /*scrollView.setOnTouchListener((v, event) -> {
             if (mainLayout.getDescendantFocusability() != ViewGroup.FOCUS_BLOCK_DESCENDANTS)
                 mainLayout.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
@@ -258,6 +261,10 @@ public class FeedstationActivity extends PhotoPickerActivity {
 
         groupPartnersRecyclerView.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+    }
+
+    public void setStationActionName(String name) {
+        dialogTextView.setText(name);
     }
 
     private void setupUIMode() {
@@ -409,6 +416,41 @@ public class FeedstationActivity extends PhotoPickerActivity {
         presenter.onPetImageSelected(uri, photoList, photosAdapter);
         photosRecyclerView.scrollToPosition(0);
     }
+
+    private void initStationAction() {
+        if (feedstation != null) {
+            if (feedstation.getUserRole() != Feedstation.UserRole.ADMIN) {
+                if (feedstation.getStatus() != null) {
+                    switch (feedstation.getStatus()) {
+                        case JOINED:
+                            setStationActionName(getString(R.string.leave_group));
+                            followButton.setBackground(getResources().getDrawable(R.drawable.ic_close_24dp));
+                            followButton.setVisibility(View.VISIBLE);
+                            break;
+                        case REQUESTED:
+                            setStationActionName(getString(R.string.group_join_request_sent));
+                            followButton.setVisibility(View.GONE);
+                            break;
+                        case INVITED:
+                            setStationActionName(getString(R.string.group_join_invited));
+                            followButton.setVisibility(View.VISIBLE);
+                            break;
+                        default:
+                            setStationActionName(getString(R.string.join_group));
+                            followButton.setVisibility(View.VISIBLE);
+                            break;
+                    }
+                } else {
+                    setStationActionName(getString(R.string.join_group));
+                    followButton.setVisibility(View.VISIBLE);
+                }
+            } else {
+                setStationActionName(getString(R.string.group_admin));
+                followButton.setVisibility(View.GONE);
+            }
+        }
+    }
+
 
     private void showImage(Uri imageUri) {
         if (imageUri == null) return;
@@ -617,11 +659,21 @@ public class FeedstationActivity extends PhotoPickerActivity {
 
     @OnClick(R.id.follow_button)
     void onFollowClick() {
-        presenter.followFeedstation(feedstation.getId());
+        presenter.onGroupActionButtonClicked(feedstation);
     }
 
     public void onSuccessFollow() {
         Toaster.shortToast("Follow request sent");
+        setStationActionName(getString(R.string.group_join_request_sent));
+        followButton.setVisibility(View.GONE);
+        feedstation.setStatus(GroupPartner.Status.REQUESTED);
+    }
+
+    public void onSuccessLeave() {
+        Toaster.shortToast("You have been leaved the group");
+        setStationActionName(getString(R.string.join_group));
+        followButton.setVisibility(View.VISIBLE);
+        feedstation.setStatus(null);
     }
 
     public void onSuccessJoin() {

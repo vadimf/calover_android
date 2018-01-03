@@ -131,6 +131,13 @@
     <string name="stray_cat_no_feedstation_error">For stray cat you should specify feedstation</string>
     <string name="coming_soon">Coming soon</string>
 
+    <!--Feedstation-->
+    <string name="join_group">Join group</string>
+    <string name="leave_group">Leave group</string>
+    <string name="group_join_request_sent">Request to join group sent</string>
+    <string name="group_join_invited">You invited to this group. Join</string>
+    <string name="group_admin">You are admin of group</string>
+
     <!--New feed-->
     <string name="add_photo">Add photo</string>
     <string name="your_text_here">Your text here...</string>

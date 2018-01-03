@@ -111,7 +111,6 @@
                     android:layout_width="@dimen/normal_button_size"
                     android:layout_height="@dimen/normal_button_size"
                     android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
                     android:background="@drawable/ic_add_24dp"/>
 
                 <Button
@@ -119,6 +118,7 @@
                     style="@style/PrimaryBorderlessButton"
                     android:layout_width="@dimen/normal_button_size"
                     android:layout_height="@dimen/normal_button_size"
+                    android:layout_marginLeft="8dp"
                     android:background="@drawable/ic_reply_24dp"/>
 
             </LinearLayout>

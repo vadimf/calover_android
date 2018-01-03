@@ -713,7 +713,7 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
 
     @OnClick(R.id.strayLayout)
     void selectAnimalTypeStray() {
-        if (catType.equals(CatProfile.Status.PET) && catProfile.getType().equals(CatProfile.Status.PET) && currentMode.equals(CatProfileScreenMode.EDIT_MODE)) {
+        if (catType.equals(CatProfile.Status.PET) && currentMode.equals(CatProfileScreenMode.EDIT_MODE) && catProfile.getType().equals(CatProfile.Status.PET)) {
             Toaster.shortToast("Your cat can't be stray");
             return;
         }
