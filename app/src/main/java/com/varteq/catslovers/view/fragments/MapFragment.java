@@ -400,8 +400,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 marker.setTag(feedstation);
 
                 if (bottomSheetBehaviorFeedstation.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
-                    if (feedstation.getId().equals(((Feedstation) bottomSheetFeedstationFrameLayout.getTag()).getId()))
+                    if (feedstation.getId().equals(((Feedstation) bottomSheetFeedstationFrameLayout.getTag()).getId())) {
+                        bottomSheetFeedstationFrameLayout.setTag(marker.getTag());
                         initStationAction(feedstation);
+                    }
                 }
 
             }

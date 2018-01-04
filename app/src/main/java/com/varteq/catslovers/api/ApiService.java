@@ -131,6 +131,9 @@ public interface ApiService {
     @GET("feedstations/{id}/users")
     Call<BaseResponse<List<RUser>>> getFeedstationUsers(@Path("id") int feedstationId);
 
+    @GET("cats/{id}/users")
+    Call<BaseResponse<List<RUser>>> getCatUsers(@Path("id") int catId);
+
     @GET("feedstations/users/joined")
     Call<BaseResponse<List<RUser>>> getAllowedUsers();
 }

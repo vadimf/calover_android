@@ -425,7 +425,6 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
         groupPartnersList = new ArrayList<>();
-        groupPartnersList.add(new GroupPartner(null, "Admin", GroupPartner.Status.JOINED, true));
         //groupPartnersList.add(new GroupPartner(null, "User1", false));
         groupPartnersAdapter = new GroupPartnersAdapter(groupPartnersList, !currentMode.equals(CatProfileScreenMode.VIEW_MODE),
                 new GroupPartnersAdapter.OnPersonClickListener() {
@@ -443,6 +442,10 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
                     }
                 });
         groupPartnersRecyclerView.setAdapter(groupPartnersAdapter);
+
+        if (!currentMode.equals(CatProfileScreenMode.CREATE_MODE))
+            presenter.getGroupPartners(catProfile.getId());
+
         groupPartnersRecyclerView.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
@@ -451,6 +454,21 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
         viewColorsRecyclerView.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
     }
+
+
+    public void refreshGroupPartners(List<GroupPartner> partners) {
+        if (partners == null || partners.isEmpty() || groupPartnersRecyclerView == null) return;
+        groupPartnersList.clear();
+        for (GroupPartner user : partners) {
+            if (user.isAdmin())
+                groupPartnersList.add(0, user);
+            else
+                groupPartnersList.add(user);
+        }
+        groupPartnersAdapter.notifyDataSetChanged();
+        groupPartnersRecyclerView.scrollToPosition(0);
+    }
+
 
     private void setupColorPickersColors() {
         for (int i = 0; i < colorPickers.size(); i++) {
@@ -509,8 +527,6 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
 
         descriptionEditText.setEnabled(false);
 
-        groupPartnersAdapter.switchToViewMode();
-
         if (saveMenu != null)
             saveMenu.setVisible(false);
         if (editMenu != null)
@@ -562,8 +578,6 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
         uploadImageLinearLayout.setVisibility(View.VISIBLE);
 
         descriptionEditText.setEnabled(true);
-
-        groupPartnersAdapter.switchToEditMode();
 
         if (saveMenu != null)
             saveMenu.setVisible(true);

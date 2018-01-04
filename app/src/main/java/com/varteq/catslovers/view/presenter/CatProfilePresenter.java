@@ -12,6 +12,7 @@ import com.varteq.catslovers.api.entity.BaseResponse;
 import com.varteq.catslovers.api.entity.Cat;
 import com.varteq.catslovers.api.entity.ErrorResponse;
 import com.varteq.catslovers.api.entity.RFeedstation;
+import com.varteq.catslovers.api.entity.RUser;
 import com.varteq.catslovers.model.CatProfile;
 import com.varteq.catslovers.model.GroupPartner;
 import com.varteq.catslovers.utils.GenericOf;
@@ -31,6 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -65,6 +67,63 @@ public class CatProfilePresenter {
         groupPartnersAdapter.notifyItemInserted(1);
     }
 
+    public void getGroupPartners(Integer catId) {
+        if (catId == null) return;
+
+        Call<BaseResponse<List<RUser>>> call = ServiceGenerator.getApiServiceWithToken().getCatUsers(catId);
+
+        call.enqueue(new Callback<BaseResponse<List<RUser>>>() {
+            @Override
+            public void onResponse(Call<BaseResponse<List<RUser>>> call, Response<BaseResponse<List<RUser>>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    new BaseParser<List<RUser>>(response) {
+
+                        @Override
+                        protected void onSuccess(List<RUser> data) {
+                            List<GroupPartner> partners = new ArrayList<>();
+                            for (RUser user : data) {
+                                partners.add(from(user));
+                            }
+                            view.refreshGroupPartners(partners);
+                        }
+
+                        @Override
+                        protected void onFail(ErrorResponse error) {
+                            if (error != null)
+                                Log.d(TAG, error.getMessage() + error.getCode());
+                        }
+                    };
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseResponse<List<RUser>>> call, Throwable t) {
+                Log.e(TAG, "getGroupPartners onFailure " + t.getMessage());
+            }
+        });
+    }
+
+    private GroupPartner from(RUser user) {
+        GroupPartner.Status status = GroupPartner.Status.INVITED;
+        if (user.getStatus() != null) {
+            if (user.getStatus().equals("joined"))
+                status = GroupPartner.Status.JOINED;
+            else if (user.getStatus().equals("invited"))
+                status = GroupPartner.Status.INVITED;
+            else if (user.getStatus().equals("requested"))
+                status = GroupPartner.Status.REQUESTED;
+        } else return null;
+
+        boolean isAdmin = false;
+        if (user.getRole().equals("admin"))
+            isAdmin = true;
+
+        String name = user.getUserInfo().getName();
+        if (user.getUserId().equals(Integer.parseInt(Profile.getUserId(view)))) {
+            name = "You";
+        }
+        return new GroupPartner(null, user.getUserId(), name, user.getUserInfo().getPhone(), status, isAdmin);
+    }
 
     public String getAgeInString(long petBirthdayMillis) {
         long nowMillis = System.currentTimeMillis();
