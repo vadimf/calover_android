@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
@@ -42,12 +43,15 @@ import com.varteq.catslovers.R;
 import com.varteq.catslovers.model.CatProfile;
 import com.varteq.catslovers.model.Feedstation;
 import com.varteq.catslovers.model.GroupPartner;
+import com.varteq.catslovers.model.PhotoWithPreview;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.utils.SystemPermissionHelper;
 import com.varteq.catslovers.utils.TimeUtils;
 import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.utils.Utils;
+import com.varteq.catslovers.utils.qb.imagepick.ImagePickHelper;
+import com.varteq.catslovers.utils.qb.imagepick.OnImagePickedListener;
 import com.varteq.catslovers.view.adapters.CatPhotosAdapter;
 import com.varteq.catslovers.view.adapters.GroupPartnersAdapter;
 import com.varteq.catslovers.view.adapters.ViewColorsAdapter;
@@ -56,6 +60,7 @@ import com.varteq.catslovers.view.dialog.EditTextDialog;
 import com.varteq.catslovers.view.dialog.WrappedDatePickerDialog;
 import com.varteq.catslovers.view.presenter.CatProfilePresenter;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -68,7 +73,7 @@ import butterknife.OnClick;
 import static com.varteq.catslovers.utils.SystemPermissionHelper.PERMISSIONS_ACCESS_LOCATION_REQUEST;
 import static com.varteq.catslovers.utils.SystemPermissionHelper.REQUEST_CHECK_SETTINGS;
 
-public class CatProfileActivity extends PhotoPickerActivity implements View.OnClickListener {
+public class CatProfileActivity extends BaseActivity implements View.OnClickListener, OnImagePickedListener {
 
     private String TAG = CatProfileActivity.class.getSimpleName();
     public static final String CAT_KEY = "cat_key";
@@ -76,6 +81,7 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
 
     private String DEFAULT_VALUE = "setup";
     private String PET_DEFAULT_NAME = "Pet Name";
+    private final int REQUEST_CODE_GET_IMAGE = 1;
 
     @BindView(R.id.main_layout)
     ConstraintLayout mainLayout;
@@ -186,7 +192,7 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
 
     private int clickedRoundViewId;
     private List<RoundedImageView> colorPickers;
-    private List<Uri> photoList;
+    private List<PhotoWithPreview> photoList;
     private CatPhotosAdapter photosAdapter;
 
     private List<GroupPartner> groupPartnersList;
@@ -266,6 +272,11 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
         setupUIMode();
     }
 
+    @Override
+    protected View getSnackbarAnchorView() {
+        return null;
+    }
+
     private void initLocation() {
         locationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY)
@@ -335,7 +346,7 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
                         getLastLocation();
                         break;
                     case Activity.RESULT_CANCELED:
-                        //Toast.makeText(getApplicationContext(), "impossible to add photo without location", Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getApplicationContext(), "impossible to add photoFiles without location", Toast.LENGTH_LONG).show();
                         break;
                     default:
                         break;
@@ -378,6 +389,7 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
                 fleaTreatmentValueTextView.setText(TimeUtils.getDateAsDDMMYYYY(fleaTreatmentDateMilis));
             }
             descriptionEditText.setText(catProfile.getDescription());
+            photoList = catProfile.getPhotos();
         } else {
             colorsList = new ArrayList<>();
         }
@@ -401,8 +413,13 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
         else
             avatarImageView.setImageBitmap(Utils.getBitmapWithColor(getResources().getColor(R.color.transparent)));
 
-        photoList = new ArrayList<>();
-        photosAdapter = new CatPhotosAdapter(photoList, this::showImage);
+        if (photoList == null)
+            photoList = new ArrayList<>();
+
+        photoCountTextView.setText(String.valueOf(photoList.size()));
+
+        photosAdapter = new CatPhotosAdapter(photoList, null);
+        //photosAdapter = new CatPhotosAdapter(photoList, this::showImage);
         photosRecyclerView.setAdapter(photosAdapter);
         photosRecyclerView.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -614,10 +631,11 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
                 Log.d(TAG, "app_bar_save");
                 if (!isProfileValid())
                     return true;
-                if (currentMode.equals(CatProfileScreenMode.CREATE_MODE))
+                presenter.uploadCatWithPhotos(fillCatProfile(), lastLocation);
+                /*if (currentMode.equals(CatProfileScreenMode.CREATE_MODE))
                     presenter.saveCat(fillCatProfile(), lastLocation);
                 else if (currentMode.equals(CatProfileScreenMode.EDIT_MODE))
-                    presenter.updateCat(fillCatProfile());
+                    presenter.updateCat(fillCatProfile());*/
                 return true;
             case R.id.app_bar_edit:
                 Log.d(TAG, "app_bar_edit");
@@ -637,7 +655,7 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
     }
 
     private boolean isProfileValid() {
-        if (currentMode.equals(CatProfileScreenMode.CREATE_MODE) && lastLocation == null) {
+        if (currentMode.equals(CatProfileScreenMode.CREATE_MODE) && catType.equals(CatProfile.Status.PET) && lastLocation == null) {
             Toaster.longToast("We need location to display your cat on the map");
             checkLocationAvailability();
             return false;
@@ -742,14 +760,8 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
 
     @OnClick(R.id.upload_image_button)
     void uploadCatImage() {
-        pickPhotoWithPermission(getString(R.string.select_cat_photo));
-    }
-
-    @Override
-    protected void onImageSelected(Uri uri) {
-        super.onImageSelected(uri);
-        presenter.onPetImageSelected(uri, photoList, photosAdapter);
-        photosRecyclerView.scrollToPosition(0);
+        //pickPhotoWithPermission(getString(R.string.select_cat_photo));
+        new ImagePickHelper().pickAnImage(this, REQUEST_CODE_GET_IMAGE);
     }
 
     private CatProfile fillCatProfile() {
@@ -783,6 +795,7 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
         catProfile.setDescription(description);
         catProfile.setType(catType);
         catProfile.setFleaTreatmentDate(nextFleaTreatment);
+        catProfile.setPhotos(photoList);
 
         return catProfile;
     }
@@ -927,5 +940,30 @@ public class CatProfileActivity extends PhotoPickerActivity implements View.OnCl
     @OnClick(R.id.follow_button)
     void onFollowClick() {
         Toaster.shortToast(getString(R.string.coming_soon));
+    }
+
+    @Override
+    public void onImagePicked(int requestCode, File file) {
+        if (REQUEST_CODE_GET_IMAGE == requestCode && file != null) {
+            photoList.add(0, new PhotoWithPreview(file.getPath(), file.getPath()));
+            photosAdapter.notifyItemInserted(0);
+            photosRecyclerView.scrollToPosition(0);
+            photoCountTextView.setText(String.valueOf(photoList.size()));
+        }
+    }
+
+    @Override
+    public void onVideoPicked(int requestCode, File file, Bitmap preview) {
+
+    }
+
+    @Override
+    public void onImagePickError(int requestCode, Exception e) {
+
+    }
+
+    @Override
+    public void onImagePickClosed(int requestCode) {
+
     }
 }

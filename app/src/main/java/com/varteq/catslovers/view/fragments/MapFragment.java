@@ -380,7 +380,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             if (feedstation.getUserRole() != null) {
                 if (feedstation.getUserRole().equals(Feedstation.UserRole.ADMIN) && !feedstation.getIsPublic())
                     resourceId = R.drawable.location_red;
-                else if (feedstation.getIsPublic() && feedstation.getStatus() != null && feedstation.getStatus().equals(GroupPartner.Status.JOINED))
+                else if (feedstation.getStatus() != null && feedstation.getStatus().equals(GroupPartner.Status.JOINED))
                     resourceId = R.drawable.location_orange;
             }
             Marker marker = googleMap.addMarker(new MarkerOptions()

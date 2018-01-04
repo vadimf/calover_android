@@ -8,7 +8,7 @@ import java.util.List;
 
 public class CatProfile implements Serializable {
 
-    private int id = -1;
+    private Integer id;
 
     private Uri avatarUri;
     private String petName;
@@ -21,12 +21,12 @@ public class CatProfile implements Serializable {
     private Date fleaTreatmentDate;
     private Integer feedstationId;
 
-    private List<Uri> photoList;
     private List<GroupPartner> groupPartnersList;
     private List<Integer> colorsList;
     private Status type;
     private Feedstation.UserRole userRole;
     private GroupPartner.Status status;
+    private List<PhotoWithPreview> photos = null;
 
     public enum Status {
         PET,
@@ -45,11 +45,11 @@ public class CatProfile implements Serializable {
         this.petName = petName;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -99,14 +99,6 @@ public class CatProfile implements Serializable {
 
     public void setFleaTreatmentDate(Date fleaTreatmentDate) {
         this.fleaTreatmentDate = fleaTreatmentDate;
-    }
-
-    public List<Uri> getPhotoList() {
-        return photoList;
-    }
-
-    public void setPhotoList(List<Uri> photoList) {
-        this.photoList = photoList;
     }
 
     public List<GroupPartner> getGroupPartnersList() {
@@ -183,5 +175,13 @@ public class CatProfile implements Serializable {
 
     public void setStatus(GroupPartner.Status status) {
         this.status = status;
+    }
+
+    public List<PhotoWithPreview> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(List<PhotoWithPreview> photos) {
+        this.photos = photos;
     }
 }

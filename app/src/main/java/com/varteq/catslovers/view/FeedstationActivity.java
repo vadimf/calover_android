@@ -218,7 +218,7 @@ public class FeedstationActivity extends PhotoPickerActivity {
             avatarImageView.setImageBitmap(Utils.getBitmapWithColor(getResources().getColor(R.color.transparent)));*/
 
         photoList = new ArrayList<>();
-        photosAdapter = new CatPhotosAdapter(photoList, this::showImage);
+        //photosAdapter = new CatPhotosAdapter(photoList, this::showImage);
         photosRecyclerView.setAdapter(photosAdapter);
         photosRecyclerView.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));

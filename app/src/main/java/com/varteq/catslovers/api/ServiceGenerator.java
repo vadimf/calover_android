@@ -25,7 +25,7 @@ public class ServiceGenerator {
         CLIENT.setReadTimeout(TIMEOUT, TimeUnit.SECONDS);
     }*/
 
-    private static String apiBaseUrl = "http://catslovers.clients.in.ua/";
+    public static String apiBaseUrl = "http://catslovers.clients.in.ua/";
 
     private static Retrofit.Builder builder =
             new Retrofit.Builder()
@@ -36,7 +36,7 @@ public class ServiceGenerator {
     private static Retrofit retrofit = builder.build();
     private static ApiService apiService = retrofit.create(ApiService.class);
     private static ApiService apiServiceWithToken;
-    private static String token;
+    public static String token;
 
     private static Interceptor tokenInterceptor =
             chain -> {
