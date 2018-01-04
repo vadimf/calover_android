@@ -1,5 +1,7 @@
 package com.varteq.catslovers.view.presenter;
 
+import android.os.Handler;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.varteq.catslovers.api.BaseParser;
 import com.varteq.catslovers.api.ServiceGenerator;
@@ -26,8 +28,14 @@ public class MapPresenter {
 
     private MapFragment view;
 
+    private boolean isWaitingUpdateFeedstations;
+    Runnable updateFeedstationsWithDelayRunnable;
+    Handler updateFeedstationsWithDelayHandler;
+
     public MapPresenter(MapFragment view) {
         this.view = view;
+
+        updateFeedstationsWithDelayHandler = new Handler();
     }
 
     public void getFeedstations(double lat, double lng, Integer distance) {
@@ -58,6 +66,29 @@ public class MapPresenter {
                 Log.e(TAG, "getFeedstations onFailure " + t.getMessage());
             }
         });
+    }
+
+    public void onCameraMoved(double lat, double lng) {
+        if (isWaitingUpdateFeedstations)
+            stopUpdateFeedstationWithDelay();
+        startUpdateFeedstationWithDelay(lat, lng, 20);
+    }
+
+    public void onViewPaused() {
+        stopUpdateFeedstationWithDelay();
+    }
+
+    private void startUpdateFeedstationWithDelay(double lat, double lng, Integer distance) {
+        isWaitingUpdateFeedstations = true;
+        updateFeedstationsWithDelayRunnable = () -> {
+            isWaitingUpdateFeedstations = false;
+            getFeedstations(lat, lng, distance);
+        };
+        updateFeedstationsWithDelayHandler.postDelayed(updateFeedstationsWithDelayRunnable, 500);
+    }
+
+    private void stopUpdateFeedstationWithDelay() {
+        updateFeedstationsWithDelayHandler.removeCallbacks(updateFeedstationsWithDelayRunnable);
     }
 
     public void onGroupActionButtonClicked(Feedstation feedstation) {
