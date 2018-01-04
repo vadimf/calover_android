@@ -238,7 +238,7 @@ public class FeedstationPresenter {
         ChatHelper.getInstance().createEmptyPublicDialog(id, name, new QBEntityCallback<QBChatDialog>() {
             @Override
             public void onSuccess(QBChatDialog qbChatDialog, Bundle bundle) {
-                int i = 0;
+                ChatHelper.getInstance().updateFeedstations();
             }
 
             @Override

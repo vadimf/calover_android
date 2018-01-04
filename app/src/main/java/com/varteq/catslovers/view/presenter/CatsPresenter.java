@@ -7,9 +7,11 @@ import com.varteq.catslovers.api.ServiceGenerator;
 import com.varteq.catslovers.api.entity.BaseResponse;
 import com.varteq.catslovers.api.entity.Cat;
 import com.varteq.catslovers.api.entity.ErrorResponse;
+import com.varteq.catslovers.api.entity.RPhoto;
 import com.varteq.catslovers.model.CatProfile;
 import com.varteq.catslovers.model.Feedstation;
 import com.varteq.catslovers.model.GroupPartner;
+import com.varteq.catslovers.model.PhotoWithPreview;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.utils.TimeUtils;
@@ -107,8 +109,19 @@ public class CatsPresenter {
 
             List<Integer> colors = new ArrayList<>();
             for (String s : cat.getColor().split(","))
-                colors.add(Integer.parseInt(s));
+                try {
+                    colors.add(Integer.parseInt(s));
+                } catch (Exception e) {
+                }
             catProfile.setColorsList(colors);
+
+            if (cat.getPhotos() != null && !cat.getPhotos().isEmpty()) {
+                List<PhotoWithPreview> photos = new ArrayList<>();
+                for (RPhoto photo : cat.getPhotos())
+                    photos.add(new PhotoWithPreview(photo.getId(), photo.getPhoto(), photo.getThumbnail()));
+                catProfile.setPhotos(photos);
+            }
+
             list.add(catProfile);
         }
         return list;

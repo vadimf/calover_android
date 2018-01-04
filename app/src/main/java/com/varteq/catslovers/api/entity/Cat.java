@@ -3,6 +3,8 @@ package com.varteq.catslovers.api.entity;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 public class Cat extends ErrorData {
 
     @SerializedName("id")
@@ -41,6 +43,17 @@ public class Cat extends ErrorData {
     @SerializedName("permission")
     @Expose
     private RFeedstationPermissions permissions;
+    @SerializedName("photos")
+    @Expose
+    private List<RPhoto> photos = null;
+
+    public List<RPhoto> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(List<RPhoto> photos) {
+        this.photos = photos;
+    }
 
     public Integer getId() {
         return id;

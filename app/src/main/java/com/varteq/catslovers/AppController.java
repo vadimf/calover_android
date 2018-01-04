@@ -9,10 +9,22 @@ import com.crashlytics.android.core.CrashlyticsCore;
 import com.quickblox.auth.session.QBSettings;
 import com.quickblox.core.StoringMechanism;
 import com.varteq.catslovers.api.ServiceGenerator;
+import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.utils.qb.CognitoAuthHelper;
 
+import net.gotev.uploadservice.Logger;
+import net.gotev.uploadservice.UploadService;
+import net.gotev.uploadservice.okhttp.OkHttpStack;
+
+import java.io.IOException;
+
 import io.fabric.sdk.android.Fabric;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.logging.HttpLoggingInterceptor;
 
 public class AppController extends Application {//extends MultiDexApplication {
 
@@ -44,6 +56,34 @@ public class AppController extends Application {//extends MultiDexApplication {
         QBSettings.getInstance().setStoringMehanism(StoringMechanism.UNSECURED);
         QBSettings.getInstance().init(getApplicationContext(), APP_ID, AUTH_KEY, AUTH_SECRET);
         QBSettings.getInstance().setAccountKey(ACCOUNT_KEY);
+
+        UploadService.NAMESPACE = BuildConfig.APPLICATION_ID;
+        UploadService.HTTP_STACK = new OkHttpStack(getOkHttpClient());
+
+        String TAG = "MultipartLogger";
+        /*Logger.setLoggerDelegate(new Logger.LoggerDelegate() {
+
+            @Override
+            public void error(String tag, String message) {
+                Log.e(TAG, message);
+            }
+
+            @Override
+            public void error(String tag, String message, Throwable exception) {
+                Log.e(TAG, message);
+            }
+
+            @Override
+            public void debug(String tag, String message) {
+                Log.d(TAG, message);
+            }
+
+            @Override
+            public void info(String tag, String message) {
+                Log.i(TAG, message);
+            }
+        });*/
+        Logger.setLogLevel(Logger.LogLevel.DEBUG);
     }
 
     private void configureCrashReporting() {
@@ -51,6 +91,46 @@ public class AppController extends Application {//extends MultiDexApplication {
                 .disabled(BuildConfig.DEBUG)
                 .build();
         Fabric.with(this, new Crashlytics.Builder().core(crashlyticsCore).build());
+    }
+
+    private OkHttpClient getOkHttpClient() {
+        return new OkHttpClient.Builder()
+                .followRedirects(true)
+                .followSslRedirects(true)
+                .retryOnConnectionFailure(true)
+                //.connectTimeout(15, TimeUnit.SECONDS)
+                //.writeTimeout(30, TimeUnit.SECONDS)
+                //.readTimeout(30, TimeUnit.SECONDS)
+
+                // you can add your own request interceptors to add authorization headers.
+                // do not modify the body or the http method here, as they are set and managed
+                // internally by Upload Service, and tinkering with them will result in strange,
+                // erroneous and unpredicted behaviors
+                .addNetworkInterceptor(new Interceptor() {
+                    @Override
+                    public Response intercept(Chain chain) throws IOException {
+                        Request.Builder request = chain.request().newBuilder()
+                                .addHeader("Authorization", "Bearer " + ServiceGenerator.token);
+
+                        return chain.proceed(request.build());
+                    }
+                })
+
+                // open up your Chrome and go to: chrome://inspect
+                //.addNetworkInterceptor(new StethoInterceptor())
+
+                // if you use HttpLoggingInterceptor, be sure to put it always as the last interceptor
+                // in the chain and to not use BODY level logging, otherwise you will get all your
+                // file contents in the log. Logging body is suitable only for small requests.
+                .addInterceptor(new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
+                    @Override
+                    public void log(String message) {
+                        Log.d("OkHttp multipart", message);
+                    }
+                }).setLevel(HttpLoggingInterceptor.Level.BODY))
+
+                .cache(null)
+                .build();
     }
 
     /*protected void attachBaseContext(Context base) {

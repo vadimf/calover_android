@@ -1,9 +1,11 @@
 package com.varteq.catslovers.view.presenter;
 
+import android.content.Context;
 import android.location.Location;
-import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 
+import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
 import com.varteq.catslovers.api.BaseParser;
 import com.varteq.catslovers.api.ServiceGenerator;
 import com.varteq.catslovers.api.entity.BaseResponse;
@@ -12,11 +14,23 @@ import com.varteq.catslovers.api.entity.ErrorResponse;
 import com.varteq.catslovers.api.entity.RFeedstation;
 import com.varteq.catslovers.model.CatProfile;
 import com.varteq.catslovers.model.GroupPartner;
+import com.varteq.catslovers.utils.GenericOf;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.view.CatProfileActivity;
 
+import net.gotev.uploadservice.MultipartUploadRequest;
+import net.gotev.uploadservice.ServerResponse;
+import net.gotev.uploadservice.UploadInfo;
+import net.gotev.uploadservice.UploadNotificationConfig;
+import net.gotev.uploadservice.UploadStatusDelegate;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -29,6 +43,8 @@ public class CatProfilePresenter {
     private String TAG = CatProfilePresenter.class.getSimpleName();
 
     private CatProfileActivity view;
+    private MultipartUploadRequest uploadCatRequest;
+    private boolean isCatUploading;
 
     public CatProfilePresenter(CatProfileActivity view) {
         this.view = view;
@@ -76,14 +92,6 @@ public class CatProfilePresenter {
             age = "incorrect date";
         }
         return age;
-    }
-
-    public void onPetImageSelected(Uri uri, List photoList, RecyclerView.Adapter photosAdapter) {
-        if (uri != null) {
-            Log.d(TAG, "onImageSelected " + uri);
-            photoList.add(0, uri);
-            photosAdapter.notifyItemInserted(0);
-        }
     }
 
     public void saveCat(CatProfile cat, Location lastLocation) {
@@ -140,6 +148,129 @@ public class CatProfilePresenter {
                 Log.e(TAG, "createCat onFailure " + t.getMessage());
             }
         });
+    }
+
+    public void uploadCatWithPhotos(CatProfile cat, Location lastLocation) {
+        if (isCatUploading) return;
+        isCatUploading = true;
+        view.showWaitDialog();
+
+        String colors = "";
+        for (int color : cat.getColorsList())
+            colors += String.valueOf(color) + ",";
+        if (!colors.isEmpty())
+            colors = colors.substring(0, colors.length() - 1);
+
+        String type = cat.getType().equals(CatProfile.Status.PET) ? "pet" : "stray";
+
+        int age = (int) (cat.getBirthday().getTime() / 1000L);
+        int nextFleaTreatment = (int) (cat.getFleaTreatmentDate().getTime() / 1000L);
+
+        try {
+            UploadNotificationConfig config = new UploadNotificationConfig();
+            config.setRingToneEnabled(false)
+                    .setClearOnActionForAllStatuses(true)
+                    .setTitleForAllStatuses("Uploading cat");
+
+            // update cat
+            if (cat.getId() != null) {
+                uploadCatRequest = new MultipartUploadRequest(view, ServiceGenerator.apiBaseUrl + "cats/" + cat.getId())
+                        .setMethod("PUT");
+            }
+            // create cat
+            else
+                uploadCatRequest = new MultipartUploadRequest(view, ServiceGenerator.apiBaseUrl + "cats");
+
+            if (cat.getFeedstationId() != null)
+                uploadCatRequest.addParameter("feedstation_id", String.valueOf(cat.getFeedstationId()));
+
+            // fake location
+        /*lastLocation = new Location("dddd");
+        lastLocation.setLatitude(50.4437);
+        lastLocation.setLongitude(30.5008);*/
+
+            if (lastLocation != null) {
+                uploadCatRequest.addParameter("lat", String.valueOf(lastLocation.getLatitude()))
+                        .addParameter("lng", String.valueOf(lastLocation.getLongitude()));
+                Profile.setLocation(view, lastLocation);
+            }
+
+            uploadCatRequest.addParameter("name", cat.getPetName())
+                    .addParameter("nickname", cat.getNickname())
+                    .addParameter("color", colors)
+                    .addParameter("age", String.valueOf(age))
+                    .addParameter("sex", cat.getSex())
+                    .addParameter("weight", String.valueOf(cat.getWeight()))
+                    .addParameter("castrated", String.valueOf(cat.isCastrated()))
+                    .addParameter("description", cat.getDescription())
+                    .addParameter("type", type)
+                    .addParameter("next_flea_treatment", String.valueOf(nextFleaTreatment))
+                    .setNotificationConfig(new UploadNotificationConfig())
+                    .setMaxRetries(1)
+                    .setDelegate(new UploadStatusDelegate() {
+                        @Override
+                        public void onProgress(Context context, UploadInfo uploadInfo) {
+
+                        }
+
+                        @Override
+                        public void onError(Context context, UploadInfo uploadInfo, ServerResponse serverResponse, Exception exception) {
+                            Toaster.longToast("An error occurred while saving");
+                            view.hideWaitDialog();
+                            isCatUploading = false;
+                        }
+
+                        @Override
+                        public void onCompleted(Context context, UploadInfo uploadInfo, ServerResponse serverResponse) {
+                            Reader reader = null;
+                            JsonReader jsonReader = null;
+                            try {
+                                Gson gson = new Gson();
+                                InputStream instream = new ByteArrayInputStream(serverResponse.getBody());
+                                reader = new InputStreamReader(instream);
+                                jsonReader = new JsonReader(reader);
+
+                                BaseResponse<Cat> cat = gson.fromJson(jsonReader, new GenericOf<>(BaseResponse.class, Cat.class));
+                                if (cat != null && cat.getSuccess())
+                                    view.savedSuccessfully();
+                                else if (cat != null && cat.getData() != null && cat.getData().getCode() != null && cat.getData().getCode() == 422)
+                                    //Toaster.longToast(cat.getData().getMessage());
+                                    Toaster.longToast("You should fill in PetName and fields from age to description");
+                                else Toaster.longToast("An error occurred while saving");
+                            } catch (Exception e) {
+                            } finally {
+                                try {
+                                    if (reader != null)
+                                        reader.close();
+                                    if (jsonReader != null)
+                                        jsonReader.close();
+                                } catch (IOException e) {
+                                    Log.e(TAG, e.getMessage());
+                                }
+                            }
+                            view.hideWaitDialog();
+                            isCatUploading = false;
+                        }
+
+                        @Override
+                        public void onCancelled(Context context, UploadInfo uploadInfo) {
+                            view.hideWaitDialog();
+                            isCatUploading = false;
+                        }
+                    })
+                    .setNotificationConfig(config);
+
+            for (int i = 0; i < cat.getPhotos().size() && i < 5; i++) {
+                if (cat.getPhotos().get(i).getId() == null)
+                    uploadCatRequest.addFileToUpload(cat.getPhotos().get(i).getPhoto(), "images[" + i + "]");
+            }
+
+            String uploadId = uploadCatRequest.startUpload();
+        } catch (Exception exc) {
+            Log.e("AndroidUploadService", exc.getMessage(), exc);
+            view.hideWaitDialog();
+            isCatUploading = false;
+        }
     }
 
     public void updateCat(CatProfile cat) {
