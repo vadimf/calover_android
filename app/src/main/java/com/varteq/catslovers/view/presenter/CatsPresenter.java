@@ -122,6 +122,12 @@ public class CatsPresenter {
                 catProfile.setPhotos(photos);
             }
 
+            if (cat.getFeedstation() != null)
+                catProfile.setFeedstationId(cat.getFeedstation().getId());
+
+            if (cat.getAvatarUrl() != null)
+                catProfile.setAvatar(new PhotoWithPreview(null, cat.getAvatarUrl(), cat.getAvatarUrlThumbnail()));
+
             list.add(catProfile);
         }
         return list;

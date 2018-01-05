@@ -46,6 +46,23 @@ public class Cat extends ErrorData {
     @SerializedName("photos")
     @Expose
     private List<RPhoto> photos = null;
+    @SerializedName("feedstation")
+    @Expose
+    private RFeedstation feedstation;
+    @SerializedName("avatar_url")
+    @Expose
+    private String avatarUrl;
+    @SerializedName("avatar_url_thumbnail")
+    @Expose
+    private String avatarUrlThumbnail;
+
+    public RFeedstation getFeedstation() {
+        return feedstation;
+    }
+
+    public void setFeedstation(RFeedstation feedstation) {
+        this.feedstation = feedstation;
+    }
 
     public List<RPhoto> getPhotos() {
         return photos;
@@ -149,5 +166,21 @@ public class Cat extends ErrorData {
 
     public void setPermissions(RFeedstationPermissions permissions) {
         this.permissions = permissions;
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
+    }
+
+    public String getAvatarUrlThumbnail() {
+        return avatarUrlThumbnail;
+    }
+
+    public void setAvatarUrlThumbnail(String avatarUrlThumbnail) {
+        this.avatarUrlThumbnail = avatarUrlThumbnail;
     }
 }

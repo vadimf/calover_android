@@ -378,26 +378,26 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     public void feedstationsLoaded(List<Feedstation> stations) {
-        if (isAdded()) {
-            listUpdated = true;
-            googleMap.clear();
-            for (Feedstation feedstation : stations) {
-                if (feedstation.getLocation() == null) continue;
-                int resourceId = R.drawable.location_blue;
-                if (feedstation.getUserRole() != null) {
-                    if (feedstation.getUserRole().equals(Feedstation.UserRole.ADMIN) && !feedstation.getIsPublic())
-                        resourceId = R.drawable.location_red;
-                    else if (feedstation.getStatus() != null && feedstation.getStatus().equals(GroupPartner.Status.JOINED))
-                        resourceId = R.drawable.location_orange;
-                }
-                Marker marker = googleMap.addMarker(new MarkerOptions()
-                        .title(feedstation.getName())
-                        //.icon(BitmapDescriptorFactory.fromResource(resourceId)) // insert image from request
-                        .icon(BitmapDescriptorFactory.fromBitmap(resizeMarkerIcon(resourceId))) // insert image from request
-                        //.icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(R.drawable.ic_star))) // insert image from request
-                        .anchor(markerPositionX, markerPositionY)
-                        .position(feedstation.getLocation()));
-                marker.setTag(feedstation);
+        listUpdated = true;
+        googleMap.clear();
+        for (Feedstation feedstation : stations) {
+            if (feedstation.getLocation() == null) continue;
+            int resourceId = R.drawable.location_blue;
+            if (feedstation.getUserRole() != null) {
+                if (feedstation.getUserRole().equals(Feedstation.UserRole.ADMIN) && !feedstation.getIsPublic())
+                    resourceId = R.drawable.location_red;
+                else if (feedstation.getStatus() != null && feedstation.getStatus().equals(GroupPartner.Status.JOINED))
+                    resourceId = R.drawable.location_orange;
+            }
+            if (!isAdded()) return;
+            Marker marker = googleMap.addMarker(new MarkerOptions()
+                    .title(feedstation.getName())
+                    //.icon(BitmapDescriptorFactory.fromResource(resourceId)) // insert image from request
+                    .icon(BitmapDescriptorFactory.fromBitmap(resizeMarkerIcon(resourceId))) // insert image from request
+                    //.icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(R.drawable.ic_star))) // insert image from request
+                    .anchor(markerPositionX, markerPositionY)
+                    .position(feedstation.getLocation()));
+            marker.setTag(feedstation);
 
                 if (bottomSheetBehaviorFeedstation.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
                     if (feedstation.getId().equals(((Feedstation) bottomSheetFeedstationFrameLayout.getTag()).getId())) {
@@ -406,9 +406,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     }
                 }
 
-            }
-            addUserLocationMarker();
         }
+        addUserLocationMarker();
     }
 
     private void addUserLocationMarker() {

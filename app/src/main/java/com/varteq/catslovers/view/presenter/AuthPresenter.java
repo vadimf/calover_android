@@ -19,6 +19,7 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.Authentic
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.ForgotPasswordHandler;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.GenericHandler;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.SignUpHandler;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.UpdateAttributesHandler;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.VerificationHandler;
 import com.amazonaws.services.cognitoidentityprovider.model.CodeMismatchException;
 import com.amazonaws.services.cognitoidentityprovider.model.InvalidParameterException;
@@ -67,6 +68,7 @@ public class AuthPresenter {
     private String lastCode;
     private long lastResendTime = System.currentTimeMillis();
     private long RESEND_INTERVAL = 90 * 1000;
+    private boolean isPasswordReseted;
 
     public AuthPresenter(String username, ValidateNumberActivity view) {
         this.username = username;
@@ -118,6 +120,7 @@ public class AuthPresenter {
                     CognitoAuthHelper.getPool().getUser(username).getSessionInBackground(authenticationHandler);
                 }
             };
+            isPasswordReseted = true;
             CognitoAuthHelper.getPool().getUser(username).getSessionInBackground(authenticationHandler);
         }
 
@@ -229,6 +232,31 @@ public class AuthPresenter {
             view.showDialogMessage("Confirmation failed", CognitoAuthHelper.formatException(exception));
         }
     };
+
+    private void updateUserAttributes() {
+        errListener = new OneTimeOnClickListener() {
+            @Override
+            protected void onClick() {
+                updateUserAttributes();
+            }
+        };
+
+        CognitoUserAttributes userAttributes = new CognitoUserAttributes();
+        userAttributes.addAttribute("name", Profile.getUserName(view));
+        userAttributes.addAttribute("email", Profile.getEmail(view));
+        CognitoAuthHelper.getPool().getUser(username).updateAttributesInBackground(userAttributes, new UpdateAttributesHandler() {
+            @Override
+            public void onSuccess(List<CognitoUserCodeDeliveryDetails> attributesVerificationList) {
+                getAuthToken(CognitoAuthHelper.getCurrSession().getAccessToken().getJWTToken());
+                Log.i(TAG, "updateUserAttributes success");
+            }
+
+            @Override
+            public void onFailure(Exception exception) {
+                Log.e(TAG, "updateUserAttributes onFailure " + exception.getMessage());
+            }
+        });
+    }
 
     private void getAuthToken(String token) {
         errListener = new OneTimeOnClickListener() {
@@ -421,7 +449,9 @@ public class AuthPresenter {
             Log.i(TAG, "cognitoUserSession.getAccessToken " + cognitoUserSession.getAccessToken().getJWTToken());
             //closeWaitDialog();
             Profile.setUserPhone(view, username);
-            getAuthToken(cognitoUserSession.getAccessToken().getJWTToken());
+            if (isPasswordReseted)
+                updateUserAttributes();
+            else getAuthToken(CognitoAuthHelper.getCurrSession().getAccessToken().getJWTToken());
         }
 
         @Override

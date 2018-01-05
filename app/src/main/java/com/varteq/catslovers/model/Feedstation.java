@@ -5,7 +5,9 @@ import android.os.Parcelable;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class Feedstation implements Parcelable {
 
@@ -23,6 +25,7 @@ public class Feedstation implements Parcelable {
     private Date timeToFeed;
     private String createdUserId;
     private UserRole userRole;
+    private List<PhotoWithPreview> photos = null;
     private GroupPartner.Status status;
 
     public Integer getId() {
@@ -105,6 +108,15 @@ public class Feedstation implements Parcelable {
         this.status = status;
     }
 
+    public List<PhotoWithPreview> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(List<PhotoWithPreview> photos) {
+        this.photos = photos;
+    }
+
+
     @Override
     public int describeContents() {
         return 0;
@@ -121,6 +133,7 @@ public class Feedstation implements Parcelable {
         dest.writeLong(this.timeToFeed != null ? this.timeToFeed.getTime() : -1);
         dest.writeString(this.createdUserId);
         dest.writeInt(this.userRole == null ? -1 : this.userRole.ordinal());
+        dest.writeList(this.photos);
         dest.writeInt(this.status == null ? -1 : this.status.ordinal());
     }
 
@@ -139,6 +152,8 @@ public class Feedstation implements Parcelable {
         this.createdUserId = in.readString();
         int tmpUserRole = in.readInt();
         this.userRole = tmpUserRole == -1 ? null : UserRole.values()[tmpUserRole];
+        this.photos = new ArrayList<PhotoWithPreview>();
+        in.readList(this.photos, PhotoWithPreview.class.getClassLoader());
         int tmpStatus = in.readInt();
         this.status = tmpStatus == -1 ? null : GroupPartner.Status.values()[tmpStatus];
     }
