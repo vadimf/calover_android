@@ -13,9 +13,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -30,6 +30,7 @@ import com.quickblox.chat.listeners.QBChatDialogMessageListener;
 import com.quickblox.chat.listeners.QBSystemMessageListener;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBChatMessage;
+import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBRequestGetBuilder;
@@ -50,9 +51,11 @@ import com.varteq.catslovers.view.qb.dialog.ProgressDialogFragment;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -62,14 +65,25 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
     private static final int REQUEST_SELECT_PEOPLE = 174;
     private static final int REQUEST_DIALOG_ID_FOR_UPDATE = 165;
 
-    @BindView(R.id.list_dialogs_chats)
-    ListView dialogsListView;
+    @BindView(R.id.list_dialogs_chats_friends)
+    ListView dialogsFriendsListView;
+    @BindView(R.id.list_dialogs_chats_groups)
+    ListView dialogsGroupsListView;
     @BindView(R.id.progress_dialogs)
     ProgressBar progressBar;
     //@BindView(R.id.fab_dialogs_new_chat)
     //FloatingActionButton fab;
     @BindView(R.id.swipy_refresh_layout)
     SwipyRefreshLayout setOnRefreshListener;
+    @BindView(R.id.friends_type_button_layout)
+    FrameLayout friendsTypeButtonLayout;
+    @BindView(R.id.groups_type_button_layout)
+    FrameLayout groupsTypeButtonLayout;
+    @BindView(R.id.friends_type_button)
+    Button friendsTypeButton;
+    @BindView(R.id.groups_type_button)
+    Button groupsTypeButton;
+
     private QBRequestGetBuilder requestBuilder;
     private Menu menu;
     private int skipRecords = 0;
@@ -78,7 +92,8 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
 
     private BroadcastReceiver pushBroadcastReceiver;
     //private GooglePlayServicesHelper googlePlayServicesHelper;
-    private DialogsAdapter dialogsAdapter;
+    private DialogsAdapter friendsDialogsAdapter;
+    private DialogsAdapter groupsDialogsAdapter;
     private QBChatDialogMessageListener allDialogsMessagesListener;
     private SystemMessagesListener systemMessagesListener;
     private QBSystemMessagesManager systemMessagesManager;
@@ -87,6 +102,10 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
     private QBUser currentUser;
 
     private MessagesPresenter presenter;
+
+    private List<QBChatDialog> friendsDialogsList;
+    private List<QBChatDialog> groupsDialogsList;
+    private boolean isFriendsChat = true;
 
     @Nullable
     @Override
@@ -126,6 +145,9 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
 
         currentUser = ChatHelper.getCurrentUser();
         presenter = new MessagesPresenter(this);
+
+        friendsDialogsList = new ArrayList<>();
+        groupsDialogsList = new ArrayList<>();
     }
 
     @Override
@@ -175,8 +197,28 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
                 }
             }
         } else {
-            updateDialogsAdapter();
+            updateDialogsAdapters();
         }
+    }
+
+    private void switchFriendsChat() {
+        isFriendsChat = true;
+        dialogsFriendsListView.setVisibility(View.VISIBLE);
+        dialogsGroupsListView.setVisibility(View.INVISIBLE);
+        friendsTypeButtonLayout.setBackgroundResource(R.drawable.messages_type_selected_shape);
+        groupsTypeButtonLayout.setBackgroundResource(R.drawable.messages_type_unselected_shape);
+        friendsTypeButton.setTextAppearance(getContext(), R.style.PrimaryTextButton);
+        groupsTypeButton.setTextAppearance(getContext(), R.style.SecondaryTextButton);
+    }
+
+    private void switchGroupsChat() {
+        isFriendsChat = false;
+        dialogsFriendsListView.setVisibility(View.INVISIBLE);
+        dialogsGroupsListView.setVisibility(View.VISIBLE);
+        groupsTypeButtonLayout.setBackgroundResource(R.drawable.messages_type_selected_shape);
+        friendsTypeButtonLayout.setBackgroundResource(R.drawable.messages_type_unselected_shape);
+        groupsTypeButton.setTextAppearance(getContext(), R.style.PrimaryTextButton);
+        friendsTypeButton.setTextAppearance(getContext(), R.style.SecondaryTextButton);
     }
 
     @Override
@@ -198,7 +240,7 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
             public void onSuccess(QBChatDialog result, Bundle bundle) {
                 isProcessingResultInProgress = false;
                 QbDialogHolder.getInstance().addDialog(result);
-                updateDialogsAdapter();
+                updateDialogsAdapters();
             }
 
             @Override
@@ -261,37 +303,53 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
     }
 
     private void initUi() {
-        dialogsAdapter = new DialogsAdapter(getContext(), new ArrayList<>(QbDialogHolder.getInstance().getDialogs().values()));
+
+        sortDialogs();
+
+        friendsDialogsAdapter = new DialogsAdapter(getContext(), friendsDialogsList);
+        groupsDialogsAdapter = new DialogsAdapter(getContext(), groupsDialogsList);
 
         /*LinearLayout emptyHintLayout = _findViewById(R.id.layout_chat_empty);
         TextView listHeader = (TextView) LayoutInflater.from(this)
-                .inflate(R.layout.include_list_hint_header, dialogsListView, false);
+                .inflate(R.layout.include_list_hint_header, dialogsFriendsListView, false);
         listHeader.setText(R.string.dialogs_list_hint);
-        dialogsListView.setEmptyView(emptyHintLayout);
-        dialogsListView.addHeaderView(listHeader, null, false);*/
+        dialogsFriendsListView.setEmptyView(emptyHintLayout);
+        dialogsFriendsListView.addHeaderView(listHeader, null, false);*/
 
-        dialogsListView.setAdapter(dialogsAdapter);
+        dialogsFriendsListView.setAdapter(friendsDialogsAdapter);
+        dialogsGroupsListView.setAdapter(groupsDialogsAdapter);
 
-        dialogsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                QBChatDialog selectedDialog = (QBChatDialog) parent.getItemAtPosition(position);
-                if (currentActionMode == null) {
-                    ChatActivity.startForResult(getActivity(), REQUEST_DIALOG_ID_FOR_UPDATE, selectedDialog);
-                } else {
-                    dialogsAdapter.toggleSelection(selectedDialog);
-                }
+        dialogsFriendsListView.setOnItemClickListener((parent, view, position, id) -> {
+            QBChatDialog selectedDialog = (QBChatDialog) parent.getItemAtPosition(position);
+            if (currentActionMode == null) {
+                ChatActivity.startForResult(getActivity(), REQUEST_DIALOG_ID_FOR_UPDATE, selectedDialog);
+            } else {
+                friendsDialogsAdapter.toggleSelection(selectedDialog);
             }
         });
-        dialogsListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                QBChatDialog selectedDialog = (QBChatDialog) parent.getItemAtPosition(position);
-                ((AppCompatActivity) getActivity()).startSupportActionMode(new DeleteActionModeCallback());
-                dialogsAdapter.selectItem(selectedDialog);
-                return true;
+
+        dialogsFriendsListView.setOnItemLongClickListener((parent, view, position, id) -> {
+            QBChatDialog selectedDialog = (QBChatDialog) parent.getItemAtPosition(position);
+            ((AppCompatActivity) getActivity()).startSupportActionMode(new DeleteActionModeCallback());
+            friendsDialogsAdapter.selectItem(selectedDialog);
+            return true;
+        });
+        dialogsGroupsListView.setOnItemClickListener((parent, view, position, id) -> {
+            QBChatDialog selectedDialog = (QBChatDialog) parent.getItemAtPosition(position);
+            if (currentActionMode == null) {
+                ChatActivity.startForResult(getActivity(), REQUEST_DIALOG_ID_FOR_UPDATE, selectedDialog);
+            } else {
+                friendsDialogsAdapter.toggleSelection(selectedDialog);
             }
         });
+
+        dialogsGroupsListView.setOnItemLongClickListener((parent, view, position, id) -> {
+            QBChatDialog selectedDialog = (QBChatDialog) parent.getItemAtPosition(position);
+            ((AppCompatActivity) getActivity()).startSupportActionMode(new DeleteActionModeCallback());
+            groupsDialogsAdapter.selectItem(selectedDialog);
+            return true;
+        });
+
         requestBuilder = new QBRequestGetBuilder();
 
         setOnRefreshListener.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
@@ -380,7 +438,7 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
                     QbDialogHolder.getInstance().clear();
                 }
                 QbDialogHolder.getInstance().addDialogs(dialogs);
-                updateDialogsAdapter();
+                updateDialogsAdapters();
             }
 
             @Override
@@ -393,23 +451,37 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
         });
     }
 
-    private void updateDialogsAdapter() {
-        dialogsAdapter.updateList(new ArrayList<>(QbDialogHolder.getInstance().getDialogs().values()));
+    private void updateDialogsAdapters() {
+        sortDialogs();
+        friendsDialogsAdapter.updateList(friendsDialogsList);
+        groupsDialogsAdapter.updateList(groupsDialogsList);
+    }
+
+    private void sortDialogs() {
+        friendsDialogsList.clear();
+        groupsDialogsList.clear();
+        for (QBChatDialog dialog : QbDialogHolder.getInstance().getDialogs().values()) {
+            if (dialog.getType().equals(QBDialogType.PRIVATE)) {
+                friendsDialogsList.add(dialog);
+            } else {
+                groupsDialogsList.add(dialog);
+            }
+        }
     }
 
     @Override
     public void onDialogCreated(QBChatDialog chatDialog) {
-        updateDialogsAdapter();
+        updateDialogsAdapters();
     }
 
     @Override
     public void onDialogUpdated(String chatDialog) {
-        updateDialogsAdapter();
+        updateDialogsAdapters();
     }
 
     @Override
     public void onNewDialogLoaded(QBChatDialog chatDialog) {
-        updateDialogsAdapter();
+        updateDialogsAdapters();
     }
 
     public void showError(String message) {
@@ -453,17 +525,22 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
         @Override
         public void onDestroyActionMode(ActionMode mode) {
             currentActionMode = null;
-            dialogsAdapter.clearSelection();
+            friendsDialogsAdapter.clearSelection();
             //fab.show();
         }
 
         private void deleteSelectedDialogs() {
-            final Collection<QBChatDialog> selectedDialogs = dialogsAdapter.getSelectedItems();
+            final Collection<QBChatDialog> selectedDialogs;
+            if (isFriendsChat)
+                selectedDialogs = friendsDialogsAdapter.getSelectedItems();
+            else
+                selectedDialogs = groupsDialogsAdapter.getSelectedItems();
+
             ChatHelper.getInstance().deleteDialogs(selectedDialogs, new QBEntityCallback<ArrayList<String>>() {
                 @Override
                 public void onSuccess(ArrayList<String> dialogsIds, Bundle bundle) {
                     QbDialogHolder.getInstance().deleteDialogs(dialogsIds);
-                    updateDialogsAdapter();
+                    updateDialogsAdapters();
                 }
 
                 @Override
@@ -478,6 +555,17 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
                 }
             });
         }
+    }
+
+    @OnClick(R.id.friends_type_button)
+    public void onFriendsTypeButtonClicked() {
+        switchFriendsChat();
+    }
+
+
+    @OnClick(R.id.groups_type_button)
+    public void onGroupsTypeButtonClicked() {
+        switchGroupsChat();
     }
 
     /*private class PushBroadcastReceiver extends BroadcastReceiver {

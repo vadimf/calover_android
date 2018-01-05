@@ -1,20 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/layout_root"
     style="@style/MatchParent"
     tools:ignore="RtlHardcoded,RtlSymmetry">
 
-    <com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout
-        android:id="@+id/swipy_refresh_layout"
-        style="@style/MatchParent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <ListView
-            android:id="@+id/list_dialogs_chats"
-            style="@style/ListViewWithoutDividerStyle" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:gravity="center"
+            android:orientation="horizontal">
 
-    </com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout>
+            <FrameLayout
+                android:id="@+id/friends_type_button_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="6dp"
+                android:layout_marginStart="17dp"
+                android:layout_weight="1"
+                android:background="@drawable/messages_type_selected_shape">
+
+                <Button
+                    android:id="@+id/friends_type_button"
+                    style="@style/PrimaryTextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@string/friends" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/groups_type_button_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="17dp"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:background="@drawable/messages_type_unselected_shape">
+
+                <Button
+                    android:id="@+id/groups_type_button"
+                    style="@style/SecondaryTextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@string/groups" />
+            </FrameLayout>
+
+
+        </LinearLayout>
+
+        <com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout
+            android:id="@+id/swipy_refresh_layout"
+            style="@style/MatchParent">
+
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ListView
+                    android:id="@+id/list_dialogs_chats_friends"
+                    style="@style/ListViewWithoutDividerStyle"
+                    android:visibility="visible" />
+
+                <ListView
+                    android:id="@+id/list_dialogs_chats_groups"
+                    style="@style/ListViewWithoutDividerStyle"
+                    android:visibility="invisible" />
+            </FrameLayout>
+
+        </com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout>
+    </LinearLayout>
+
 
     <LinearLayout
         android:id="@+id/layout_chat_empty"
@@ -45,8 +110,8 @@
         android:visibility="gone" />
 
     <android.support.design.widget.FloatingActionButton
-        android:visibility="gone"
         android:id="@+id/fab_dialogs_new_chat"
         style="@style/FabStyle"
+        android:visibility="gone"
         app:srcCompat="@drawable/ic_add_white_24dp" />
 </android.support.design.widget.CoordinatorLayout>

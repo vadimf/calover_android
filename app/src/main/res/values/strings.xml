@@ -142,5 +142,7 @@
     <string name="add_photo">Add photo</string>
     <string name="your_text_here">Your text here...</string>
     <string name="no">no</string>
+    <string name="friends">FRIENDS</string>
+    <string name="groups">GROUPS</string>
 
 </resources>

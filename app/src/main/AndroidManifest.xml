@@ -98,6 +98,7 @@
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:screenOrientation="portrait" />
         <activity
+            android:theme="@style/AppTheme.WhiteActionBar.NoShadow"
             android:name=".view.qb.ChatActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:screenOrientation="portrait"
