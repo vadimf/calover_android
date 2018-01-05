@@ -1,7 +1,5 @@
 package com.varteq.catslovers.model;
 
-import android.net.Uri;
-
 public class GroupPartner {
 
     public enum Status {
@@ -10,32 +8,32 @@ public class GroupPartner {
         REQUESTED
     }
 
-    private Uri avatarUri;
+    private String avatar;
     private Integer userId;
     private String name;
     private String phone;
     private Status status;
     private boolean isAdmin;
 
-    public GroupPartner(Uri avatarUri, String name, Status status, boolean isAdmin) {
-        this.avatarUri = avatarUri;
+    public GroupPartner(String avatar, String name, Status status, boolean isAdmin) {
+        this.avatar = avatar;
         this.name = name;
         this.status = status;
         this.isAdmin = isAdmin;
     }
 
-    public GroupPartner(Uri avatarUri, Integer userId, String name, String phone, Status status, boolean isAdmin) {
-        this(avatarUri, name, status, isAdmin);
+    public GroupPartner(String avatar, Integer userId, String name, String phone, Status status, boolean isAdmin) {
+        this(avatar, name, status, isAdmin);
         this.userId = userId;
         this.phone = phone;
     }
 
-    public Uri getAvatarUri() {
-        return avatarUri;
+    public String getAvatar() {
+        return avatar;
     }
 
-    public void setAvatarUri(Uri avatarUri) {
-        this.avatarUri = avatarUri;
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 
     public Integer getUserId() {

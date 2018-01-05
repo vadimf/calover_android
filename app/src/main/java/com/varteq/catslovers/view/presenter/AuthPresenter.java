@@ -1,5 +1,6 @@
 package com.varteq.catslovers.view.presenter;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -45,6 +46,12 @@ import com.varteq.catslovers.utils.qb.CognitoAuthHelper;
 import com.varteq.catslovers.utils.qb.ItemToDisplay;
 import com.varteq.catslovers.view.ValidateNumberActivity;
 
+import net.gotev.uploadservice.MultipartUploadRequest;
+import net.gotev.uploadservice.ServerResponse;
+import net.gotev.uploadservice.UploadInfo;
+import net.gotev.uploadservice.UploadNotificationConfig;
+import net.gotev.uploadservice.UploadStatusDelegate;
+
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -76,9 +83,9 @@ public class AuthPresenter {
     }
 
     public void resetPassword() {
-        startResetCall();
+        //startResetCall();
         //fakeLogin();
-        //fakeLogin2();
+        fakeLogin2();
     }
 
     private void startResetCall() {
@@ -105,6 +112,7 @@ public class AuthPresenter {
     }
 
     private void fakeLogin2() {
+        isPasswordReseted = true;
         password = "yTx6/Y1L9]45e79E";
         CognitoAuthHelper.getPool().getUser(username).getSessionInBackground(authenticationHandler);
     }
@@ -265,6 +273,7 @@ public class AuthPresenter {
                 getAuthToken(token);
             }
         };
+        view.showWaitDialog();
         Call<BaseResponse<AuthToken>> call = ServiceGenerator.getApiService().auth(token);
         call.enqueue(new Callback<BaseResponse<AuthToken>>() {
             @Override
@@ -290,6 +299,7 @@ public class AuthPresenter {
                                 Log.e(TAG, error.getMessage() + error.getCode());
                                 view.showIndefiniteError(error.getMessage(), errListener);
                             }
+                            view.hideWaitDialog();
                         }
                     };
                 }
@@ -303,6 +313,7 @@ public class AuthPresenter {
                 }*/
                 checkNetworkErrAndShowSnackbar(t.toString());
                 Log.e(TAG, "getApiService().auth onFailure " + t.getMessage());
+                view.hideWaitDialog();
             }
         });
     }
@@ -311,6 +322,7 @@ public class AuthPresenter {
         errListener = new OneTimeOnClickListener() {
             @Override
             protected void onClick() {
+                view.showWaitDialog();
                 loginToQB();
             }
         };
@@ -335,10 +347,16 @@ public class AuthPresenter {
             @Override
             public void onError(QBResponseException e) {
                 Log.e(TAG, "loginToQB", e);
-                if (checkNetworkErrAndShowSnackbar(e)) return;
+                if (checkNetworkErrAndShowSnackbar(e)) {
+                    view.hideWaitDialog();
+                    return;
+                }
                 if (e.getHttpStatusCode() == 401)
                     signUpToQB(qbUser);
-                else view.showIndefiniteError(e.getLocalizedMessage(), errListener);
+                else {
+                    view.showIndefiniteError(e.getLocalizedMessage(), errListener);
+                    view.hideWaitDialog();
+                }
             }
         });
     }
@@ -347,6 +365,7 @@ public class AuthPresenter {
         errListener = new OneTimeOnClickListener() {
             @Override
             protected void onClick() {
+                view.showWaitDialog();
                 signUpToQB(qbUser);
             }
         };
@@ -362,7 +381,10 @@ public class AuthPresenter {
             @Override
             public void onError(QBResponseException e) {
                 Log.e(TAG, "chat singUp error", e);
-                if (checkNetworkErrAndShowSnackbar(e)) return;
+                if (checkNetworkErrAndShowSnackbar(e)) {
+                    view.hideWaitDialog();
+                    return;
+                }
                 getCats();
             }
         });
@@ -372,6 +394,7 @@ public class AuthPresenter {
         errListener = new OneTimeOnClickListener() {
             @Override
             protected void onClick() {
+                view.showWaitDialog();
                 getCats();
             }
         };
@@ -382,13 +405,16 @@ public class AuthPresenter {
             @Override
             public void onResponse(Call<BaseResponse<List<Cat>>> call, Response<BaseResponse<List<Cat>>> response) {
                 Profile.setUserPetCount(view, 1);
-                getPrivateFeedstation();
+                uploadAvatar();
             }
 
             @Override
             public void onFailure(Call<BaseResponse<List<Cat>>> call, Throwable t) {
                 Log.e(TAG, "getCats() onFailure " + t.getMessage());
-                if (checkNetworkErrAndShowSnackbar(t.toString())) return;
+                if (checkNetworkErrAndShowSnackbar(t.toString())) {
+                    view.hideWaitDialog();
+                    return;
+                }
                 view.onSuccessSignIn();
             }
         });
@@ -398,6 +424,7 @@ public class AuthPresenter {
         errListener = new OneTimeOnClickListener() {
             @Override
             protected void onClick() {
+                view.showWaitDialog();
                 getPrivateFeedstation();
             }
         };
@@ -434,7 +461,10 @@ public class AuthPresenter {
             @Override
             public void onFailure(Call<BaseResponse<List<RFeedstation>>> call, Throwable t) {
                 Log.e(TAG, "getPrivateFeedstation onFailure " + t.getMessage());
-                if (checkNetworkErrAndShowSnackbar(t.toString())) return;
+                if (checkNetworkErrAndShowSnackbar(t.toString())) {
+                    view.hideWaitDialog();
+                    return;
+                }
                 view.onSuccessSignIn();
             }
         });
@@ -604,5 +634,59 @@ public class AuthPresenter {
         }
 
         protected abstract void onClick();
+    }
+
+    public void uploadAvatar() {
+        errListener = new OneTimeOnClickListener() {
+            @Override
+            protected void onClick() {
+                view.showWaitDialog();
+                uploadAvatar();
+            }
+        };
+
+        String path = Profile.getUserAvatar(view);
+        if (path.isEmpty()) {
+
+            return;
+        }
+        try {
+            MultipartUploadRequest uploadCatRequest = new MultipartUploadRequest(view, ServiceGenerator.apiBaseUrl + "user")
+                    .setMethod("PUT")
+                    .setNotificationConfig(new UploadNotificationConfig())
+                    .setDelegate(new UploadStatusDelegate() {
+                        @Override
+                        public void onProgress(Context context, UploadInfo uploadInfo) {
+                        }
+
+                        @Override
+                        public void onError(Context context, UploadInfo uploadInfo, ServerResponse serverResponse, Exception exception) {
+                            Log.e("uploadAvatar ", exception.getMessage());
+                            if (checkNetworkErrAndShowSnackbar(exception)) {
+                                view.hideWaitDialog();
+                                return;
+                            }
+                            getPrivateFeedstation();
+                        }
+
+                        @Override
+                        public void onCompleted(Context context, UploadInfo uploadInfo, ServerResponse serverResponse) {
+                            Log.d("uploadAvatar ", "onCompleted");
+                            getPrivateFeedstation();
+                        }
+
+                        @Override
+                        public void onCancelled(Context context, UploadInfo uploadInfo) {
+                            Log.d("uploadAvatar ", "canceled");
+                            getPrivateFeedstation();
+                        }
+                    })
+                    .setNotificationConfig(null)
+                    .addFileToUpload(path, "avatar");
+
+            String uploadId = uploadCatRequest.startUpload();
+        } catch (Exception exc) {
+            Log.e("uploadAvatar", exc.getMessage(), exc);
+        }
     }
 }

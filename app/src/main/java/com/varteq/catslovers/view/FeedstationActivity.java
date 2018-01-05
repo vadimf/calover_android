@@ -273,7 +273,8 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
                     @Override
                     public void onAddPerson() {
                         Log.d(TAG, "onAddPerson");
-                        pickContact();
+                        if (feedstation.getUserRole() != null && feedstation.getUserRole().equals(Feedstation.UserRole.ADMIN))
+                            pickContact();
                     }
                 });
         groupPartnersRecyclerView.setAdapter(groupPartnersAdapter);
@@ -578,7 +579,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
             imageView.setLayoutParams(new LinearLayout.LayoutParams(100, 100));
             Glide.with(container)
                     .asBitmap()
-                    .load(photoList.get(position).getPhoto())
+                    .load(photoList.get(photoList.size() - 1 - position).getPhoto())
                     .into(new SimpleTarget<Bitmap>() {
                         @Override
                         public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
@@ -749,6 +750,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
     public void onImagePicked(int requestCode, File file) {
         if (REQUEST_CODE_GET_IMAGE == requestCode && file != null) {
             photoList.add(0, new PhotoWithPreview(file.getPath(), file.getPath()));
+            pagerAdapter.notifyDataSetChanged();
             photosAdapter.notifyItemInserted(0);
             photosRecyclerView.scrollToPosition(0);
             photoCountTextView.setText(String.valueOf(photoList.size()));

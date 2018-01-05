@@ -18,6 +18,7 @@ import net.gotev.uploadservice.UploadService;
 import net.gotev.uploadservice.okhttp.OkHttpStack;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import io.fabric.sdk.android.Fabric;
 import okhttp3.Interceptor;
@@ -98,9 +99,9 @@ public class AppController extends Application {//extends MultiDexApplication {
                 .followRedirects(true)
                 .followSslRedirects(true)
                 .retryOnConnectionFailure(true)
-                //.connectTimeout(15, TimeUnit.SECONDS)
-                //.writeTimeout(30, TimeUnit.SECONDS)
-                //.readTimeout(30, TimeUnit.SECONDS)
+                .connectTimeout(15, TimeUnit.SECONDS)
+                .writeTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
 
                 // you can add your own request interceptors to add authorization headers.
                 // do not modify the body or the http method here, as they are set and managed

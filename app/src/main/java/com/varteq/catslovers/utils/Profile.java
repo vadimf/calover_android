@@ -3,7 +3,6 @@ package com.varteq.catslovers.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Location;
-import android.net.Uri;
 import android.preference.PreferenceManager;
 
 public class Profile {
@@ -34,8 +33,8 @@ public class Profile {
                 .apply();
     }
 
-    public static void saveUserAvatar(Context context, Uri avatar) {
-        getDefaultSharedPreferences(context).edit().putString(USER_AVATAR_KEY, avatar.toString()).apply();
+    public static void saveUserAvatar(Context context, String avatar) {
+        getDefaultSharedPreferences(context).edit().putString(USER_AVATAR_KEY, avatar).apply();
     }
 
     public static void setUserLogin(Context context, boolean isLoggedIn) {
@@ -54,9 +53,9 @@ public class Profile {
         return getDefaultSharedPreferences(context).getString(USER_EMAIL_KEY, "");
     }
 
-    public static Uri getUserAvatar(Context context) {
+    public static String getUserAvatar(Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        return Uri.parse(preferences.getString(USER_AVATAR_KEY, ""));
+        return preferences.getString(USER_AVATAR_KEY, "");
     }
 
     public static void setAuthToken(Context context, String token) {

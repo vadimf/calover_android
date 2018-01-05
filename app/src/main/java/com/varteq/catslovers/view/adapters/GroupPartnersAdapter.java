@@ -1,6 +1,5 @@
 package com.varteq.catslovers.view.adapters;
 
-import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +7,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.model.GroupPartner;
@@ -21,18 +22,18 @@ public class GroupPartnersAdapter extends RecyclerView.Adapter<GroupPartnersAdap
 
     private OnPersonClickListener externalClickListener;
     private List<GroupPartner> personList;
-    private Uri addNewPartnerUri = Uri.parse("addNewPartnerUri");
-    private final GroupPartner addNewPartnerView = new GroupPartner(addNewPartnerUri, "", GroupPartner.Status.JOINED, false);
+    private String addNewPartnerString = "addNewPartnerString";
+    private final GroupPartner addNewPartnerView = new GroupPartner(addNewPartnerString, "", GroupPartner.Status.JOINED, false);
     private View.OnClickListener internalClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) view.getLayoutParams();
             int itemPosition = lp.getViewLayoutPosition();
             if (externalClickListener != null) {
-                if (personList.get(itemPosition).getAvatarUri() != addNewPartnerUri)
-                    externalClickListener.onPersonClicked(personList.get(itemPosition));
-                else
+                if (personList.get(itemPosition).getAvatar() != null && personList.get(itemPosition).getAvatar().equals(addNewPartnerString))
                     externalClickListener.onAddPerson();
+                else
+                    externalClickListener.onPersonClicked(personList.get(itemPosition));
             }
         }
     };
@@ -71,8 +72,11 @@ public class GroupPartnersAdapter extends RecyclerView.Adapter<GroupPartnersAdap
     public void onBindViewHolder(GroupPartnerViewHolder viewHolder, int i) {
         GroupPartner person = personList.get(i);
         if (person != addNewPartnerView) {
-            if (person.getAvatarUri()!=null)
-                viewHolder.partnerAvatarImageView.setImageURI(person.getAvatarUri());
+            if (person.getAvatar() != null)
+                Glide.with(viewHolder.itemView)
+                        .load(person.getAvatar())
+                        .apply(new RequestOptions().centerCrop())
+                        .into(viewHolder.partnerAvatarImageView);
             else
                 viewHolder.partnerAvatarImageView.setImageResource(R.drawable.ic_person);
         }

@@ -377,7 +377,7 @@ public class FeedstationPresenter {
                 joinFeedstation(feedstationId);*/
         } else if (name == null || name.isEmpty())
             name = user.getUserInfo().getPhone();
-        return new GroupPartner(null, user.getUserId(), name, user.getUserInfo().getPhone(), status, isAdmin);
+        return new GroupPartner(user.getUserInfo().getAvatarUrlThumbnail(), user.getUserId(), name, user.getUserInfo().getPhone(), status, isAdmin);
     }
 
     public void onGroupActionButtonClicked(Feedstation feedstation) {

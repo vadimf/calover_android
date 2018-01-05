@@ -116,8 +116,9 @@ public class CatProfilePresenter {
         String name = user.getUserInfo().getName();
         if (user.getUserId().equals(Integer.parseInt(Profile.getUserId(view)))) {
             name = "You";
-        }
-        return new GroupPartner(null, user.getUserId(), name, user.getUserInfo().getPhone(), status, isAdmin);
+        } else if (name == null || name.isEmpty())
+            name = user.getUserInfo().getPhone();
+        return new GroupPartner(user.getUserInfo().getAvatarUrlThumbnail(), user.getUserId(), name, user.getUserInfo().getPhone(), status, isAdmin);
     }
 
     public String getAgeInString(long petBirthdayMillis) {

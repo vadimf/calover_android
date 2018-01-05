@@ -26,6 +26,12 @@ public class RUserInfo {
     @SerializedName("status")
     @Expose
     private String status;
+    @SerializedName("avatar_url")
+    @Expose
+    private String avatarUrl;
+    @SerializedName("avatar_url_thumbnail")
+    @Expose
+    private String avatarUrlThumbnail;
 
     public String getName() {
         return name;
@@ -83,4 +89,19 @@ public class RUserInfo {
         this.status = status;
     }
 
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
+    }
+
+    public String getAvatarUrlThumbnail() {
+        return avatarUrlThumbnail;
+    }
+
+    public void setAvatarUrlThumbnail(String avatarUrlThumbnail) {
+        this.avatarUrlThumbnail = avatarUrlThumbnail;
+    }
 }

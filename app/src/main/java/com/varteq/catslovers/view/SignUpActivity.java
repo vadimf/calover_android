@@ -2,28 +2,37 @@ package com.varteq.catslovers.view;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
+import android.media.ThumbnailUtils;
 import android.os.Bundle;
 import android.util.Patterns;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.utils.Toaster;
+import com.varteq.catslovers.utils.Utils;
+import com.varteq.catslovers.utils.qb.imagepick.ImagePickHelper;
+import com.varteq.catslovers.utils.qb.imagepick.OnImagePickedListener;
+
+import java.io.File;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class SignUpActivity extends PhotoPickerActivity {
+public class SignUpActivity extends BaseActivity implements OnImagePickedListener {
 
     private String TAG = SignUpActivity.class.getSimpleName();
     @BindView(R.id.avatar)
-    RoundedImageView avatar;
+    RoundedImageView avatarImageView;
     @BindView(R.id.continue_button)
     Button continueButton;
     @BindView(R.id.twitter_linearLayout)
@@ -36,6 +45,7 @@ public class SignUpActivity extends PhotoPickerActivity {
     EditText nameEditText;
     @BindView(R.id.upload_photo_button)
     Button uploadPhotoButton;
+    private String avatar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,14 +57,8 @@ public class SignUpActivity extends PhotoPickerActivity {
         ButterKnife.bind(this);
         nameEditText.requestFocus();
 
-        Uri avatarUri = Profile.getUserAvatar(this);
-        if (avatarUri != null && !avatarUri.toString().isEmpty())
-            avatar.setImageURI(avatarUri);
-        else {
-            Bitmap image = Bitmap.createBitmap(10, 10, Bitmap.Config.ARGB_8888);
-            image.eraseColor(getResources().getColor(R.color.transparent));
-            avatar.setImageBitmap(image);
-        }
+        avatar = Profile.getUserAvatar(this);
+        updateAvatar();
 
         findViewById(R.id.continue_button).setOnClickListener(
                 view -> {
@@ -67,10 +71,14 @@ public class SignUpActivity extends PhotoPickerActivity {
                 });
     }
 
+    @Override
+    protected View getSnackbarAnchorView() {
+        return null;
+    }
+
     @OnClick(R.id.upload_photo_button)
     void uploadPhoto() {
-        //pickPhotoWithPermission(getString(R.string.select_avatar));
-        Toaster.shortToast(R.string.coming_soon);
+        new ImagePickHelper().pickAnImage(this, 0);
     }
     @OnClick(R.id.facebook_linearLayout)
     void facebookSignUp() {
@@ -97,12 +105,48 @@ public class SignUpActivity extends PhotoPickerActivity {
         return true;
     }
 
+    private void updateAvatar() {
+        if (avatar != null)
+            Glide.with(this)
+                    .asBitmap()
+                    .load(avatar)
+                    .into(new SimpleTarget<Bitmap>() {
+                        final int THUMBSIZE = 250;
+
+                        @Override
+                        public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                            if (resource.getWidth() > THUMBSIZE)
+                                avatarImageView.setImageBitmap(ThumbnailUtils.extractThumbnail(resource,
+                                        THUMBSIZE, THUMBSIZE));
+                            else
+                                avatarImageView.setImageBitmap(resource);
+                        }
+                    });
+        else
+            avatarImageView.setImageBitmap(Utils.getBitmapWithColor(getResources().getColor(R.color.transparent)));
+    }
+
     @Override
-    protected void onImageSelected(Uri uri) {
-        super.onImageSelected(uri);
-        if (null != uri) {
-            Profile.saveUserAvatar(this, uri);
-            avatar.setImageURI(uri);
+    public void onImagePicked(int requestCode, File file) {
+        if (null != file) {
+            avatar = file.getPath();
+            Profile.saveUserAvatar(this, avatar);
+            updateAvatar();
         }
+    }
+
+    @Override
+    public void onVideoPicked(int requestCode, File file, Bitmap preview) {
+
+    }
+
+    @Override
+    public void onImagePickError(int requestCode, Exception e) {
+
+    }
+
+    @Override
+    public void onImagePickClosed(int requestCode) {
+
     }
 }
