@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.location.Location;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -33,6 +34,9 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -82,6 +86,7 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
     private String DEFAULT_VALUE = "setup";
     private String PET_DEFAULT_NAME = "Pet Name";
     private final int REQUEST_CODE_GET_IMAGE = 1;
+    private final int REQUEST_CODE_GET_AVATAR = 2;
 
     @BindView(R.id.main_layout)
     ConstraintLayout mainLayout;
@@ -194,6 +199,7 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
     private List<RoundedImageView> colorPickers;
     private List<PhotoWithPreview> photoList;
     private CatPhotosAdapter photosAdapter;
+    private PhotoWithPreview avatar;
 
     private List<GroupPartner> groupPartnersList;
     private GroupPartnersAdapter groupPartnersAdapter;
@@ -389,6 +395,7 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
                 fleaTreatmentValueTextView.setText(TimeUtils.getDateAsDDMMYYYY(fleaTreatmentDateMilis));
             }
             descriptionEditText.setText(catProfile.getDescription());
+            avatar = catProfile.getAvatar();
             photoList = catProfile.getPhotos();
         } else {
             colorsList = new ArrayList<>();
@@ -407,11 +414,7 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
             return false;
         });
 
-        Uri avatarUri = Profile.getUserAvatar(this);
-        if (avatarUri != null && !avatarUri.toString().isEmpty())
-            avatarImageView.setImageURI(avatarUri);
-        else
-            avatarImageView.setImageBitmap(Utils.getBitmapWithColor(getResources().getColor(R.color.transparent)));
+        updateAvatar();
 
         if (photoList == null)
             photoList = new ArrayList<>();
@@ -452,6 +455,27 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
     }
 
+    private void updateAvatar() {
+        if (avatar != null)
+            Glide.with(this)
+                    .asBitmap()
+                    .load(avatar.getThumbnail())
+                    .into(new SimpleTarget<Bitmap>() {
+                        final int THUMBSIZE = 250;
+
+                        @Override
+                        public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                            if (resource.getWidth() > THUMBSIZE)
+                                avatarImageView.setImageBitmap(ThumbnailUtils.extractThumbnail(resource,
+                                        THUMBSIZE, THUMBSIZE));
+                            else
+                                avatarImageView.setImageBitmap(resource);
+                        }
+                    });
+        else
+            avatarImageView.setImageBitmap(Utils.getBitmapWithColor(getResources().getColor(R.color.transparent)));
+    }
+
     private void setupColorPickersColors() {
         for (int i = 0; i < colorPickers.size(); i++) {
             if (i < colorsList.size()) {
@@ -487,7 +511,6 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
 
         infoLinearLayout.setVisibility(View.VISIBLE);
         addPhotoButton.setVisibility(View.INVISIBLE);
-        addPhotoButton.setOnClickListener(null);
 
         petLayout.setEnabled(false);
         strayLayout.setEnabled(false);
@@ -539,7 +562,6 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
 
         infoLinearLayout.setVisibility(View.GONE);
         addPhotoButton.setVisibility(View.VISIBLE);
-        addPhotoButton.setOnClickListener(view -> Toaster.shortToast(R.string.coming_soon));
 
         petLayout.setEnabled(true);
         strayLayout.setEnabled(true);
@@ -629,9 +651,10 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
         switch (item.getItemId()) {
             case R.id.app_bar_save:
                 Log.d(TAG, "app_bar_save");
+                fillCatProfile();
                 if (!isProfileValid())
                     return true;
-                presenter.uploadCatWithPhotos(fillCatProfile(), lastLocation);
+                presenter.uploadCatWithPhotos(catProfile, lastLocation);
                 /*if (currentMode.equals(CatProfileScreenMode.CREATE_MODE))
                     presenter.saveCat(fillCatProfile(), lastLocation);
                 else if (currentMode.equals(CatProfileScreenMode.EDIT_MODE))
@@ -663,6 +686,9 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
                 (catProfile == null || catProfile.getFeedstationId() == null)) {
             selectAnimalTypePet();
             Toaster.shortToast(R.string.stray_cat_no_feedstation_error);
+            return false;
+        } else if (catProfile.getPetName().isEmpty() || catProfile.getColorsList().isEmpty() || catProfile.getWeight() <= 0f) {
+            Toaster.longToast("You should fill in PetName, color(s), weight");
             return false;
         } else return true;
     }
@@ -758,6 +784,12 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
         }
     }
 
+    @OnClick(R.id.addPhotoButton)
+    void selectAvatar() {
+        //pickPhotoWithPermission(getString(R.string.select_cat_photo));
+        new ImagePickHelper().pickAnImage(this, REQUEST_CODE_GET_AVATAR);
+    }
+
     @OnClick(R.id.upload_image_button)
     void uploadCatImage() {
         //pickPhotoWithPermission(getString(R.string.select_cat_photo));
@@ -796,6 +828,7 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
         catProfile.setType(catType);
         catProfile.setFleaTreatmentDate(nextFleaTreatment);
         catProfile.setPhotos(photoList);
+        catProfile.setAvatar(avatar);
 
         return catProfile;
     }
@@ -944,11 +977,22 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
 
     @Override
     public void onImagePicked(int requestCode, File file) {
-        if (REQUEST_CODE_GET_IMAGE == requestCode && file != null) {
-            photoList.add(0, new PhotoWithPreview(file.getPath(), file.getPath()));
-            photosAdapter.notifyItemInserted(0);
-            photosRecyclerView.scrollToPosition(0);
-            photoCountTextView.setText(String.valueOf(photoList.size()));
+        if (file != null) {
+            if (REQUEST_CODE_GET_IMAGE == requestCode) {
+                photoList.add(0, new PhotoWithPreview(file.getPath(), file.getPath()));
+                photosAdapter.notifyItemInserted(0);
+                photosRecyclerView.scrollToPosition(0);
+                photoCountTextView.setText(String.valueOf(photoList.size()));
+            } else if (REQUEST_CODE_GET_AVATAR == requestCode) {
+                if (avatar == null)
+                    avatar = new PhotoWithPreview(null, file.getPath(), file.getPath());
+                else {
+                    avatar.setPhoto(file.getPath());
+                    avatar.setThumbnail(file.getPath());
+                }
+                avatar.setNeedToUpdate(true);
+                updateAvatar();
+            }
         }
     }
 

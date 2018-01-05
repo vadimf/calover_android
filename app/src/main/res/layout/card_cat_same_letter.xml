@@ -9,8 +9,8 @@
 
     <com.makeramen.roundedimageview.RoundedImageView
         android:id="@+id/cat_avatar_RoundedImageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/card_cat_same_letter_width"
+        android:layout_height="@dimen/card_cat_same_letter_width"
         android:src="@drawable/ic_person"
         app:riv_border_color="@color/transparent"
         app:riv_border_width="2dp"

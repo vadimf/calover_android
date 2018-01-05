@@ -47,38 +47,9 @@ public class CatsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_cats, container, false);
         ButterKnife.bind(this, view);
 
-        ArrayList<CatProfile> aList = new ArrayList<>();
-        aList.add(new CatProfile(1, "A Cat"));
-        aList.add(new CatProfile(2, "AB Cat"));
-
-        ArrayList<CatProfile> bList = new ArrayList<>();
-        bList.add(new CatProfile(3, "B Cat"));
-        bList.add(new CatProfile(4, "BA Cat"));
-        bList.add(new CatProfile(5, "BB Cat"));
-        bList.add(new CatProfile(6, "BC Cat"));
-        bList.add(new CatProfile(7, "BD Cat"));
-        bList.add(new CatProfile(8, "BE Cat"));
-        bList.add(new CatProfile(9, "BF Cat"));
-        bList.add(new CatProfile(10, "BG Cat"));
-        bList.add(new CatProfile(11, "BH Cat"));
-
-        ArrayList<CatProfile> cList = new ArrayList<>();
-        cList.add(new CatProfile(12, "C Cat"));
-        cList.add(new CatProfile(13, "CA Cat"));
-        cList.add(new CatProfile(14, "CB Cat"));
-        cList.add(new CatProfile(15, "CC Cat"));
-        cList.add(new CatProfile(16, "CD Cat"));
-        cList.add(new CatProfile(17, "CE Cat"));
-        cList.add(new CatProfile(18, "CF Cat"));
-        cList.add(new CatProfile(19, "CG Cat"));
-        cList.add(new CatProfile(20, "CH Cat"));
-
         catsHashMap = new HashMap<>();
-        /*catsHashMap.put("A", aList);
-        catsHashMap.put("B", bList);
-        catsHashMap.put("C", cList);*/
 
-        presenter.getCats(false);
+        presenter.getCats(seekBar.getProgress() > 0);
         listUpdated = true;
 
         catsListAdapter = new CatsListAdapter(catsHashMap, this::onCatClicked);
@@ -135,7 +106,7 @@ public class CatsFragment extends Fragment {
     public void onResume() {
         super.onResume();
         if (!listUpdated) {
-            presenter.getCats(false);
+            presenter.getCats(seekBar.getProgress() > 0);
             listUpdated = true;
         }
     }

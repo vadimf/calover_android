@@ -383,6 +383,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 else if (feedstation.getStatus() != null && feedstation.getStatus().equals(GroupPartner.Status.JOINED))
                     resourceId = R.drawable.location_orange;
             }
+            if (isDetached()) return;
             Marker marker = googleMap.addMarker(new MarkerOptions()
                     .title(feedstation.getName())
                     //.icon(BitmapDescriptorFactory.fromResource(resourceId)) // insert image from request

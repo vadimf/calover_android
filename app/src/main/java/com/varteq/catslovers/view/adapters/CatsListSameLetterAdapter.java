@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.model.CatProfile;
@@ -52,8 +54,13 @@ public class CatsListSameLetterAdapter extends RecyclerView.Adapter<CatsListSame
     public void onBindViewHolder(CatProfileViewHolder viewHolder, int i) {
         CatProfile catProfile = personList.get(i);
         Context context = viewHolder.itemView.getContext();
-        if (catProfile.getAvatarUri() != null)
-            viewHolder.catAvatarImageView.setImageURI(catProfile.getAvatarUri());
+        if (catProfile.getAvatar() != null) {
+            Glide.with(viewHolder.itemView)
+                    .load(catProfile.getAvatar().getThumbnail())
+                    .apply(new RequestOptions().centerCrop())
+                    .into(viewHolder.catAvatarImageView);
+            //viewHolder.catAvatarImageView.setImageURI(catProfile.getAvatar());
+        }
         else
             viewHolder.catAvatarImageView.setImageResource(R.drawable.ic_person);
 

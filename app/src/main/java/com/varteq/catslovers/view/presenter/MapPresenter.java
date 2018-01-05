@@ -7,8 +7,10 @@ import com.varteq.catslovers.api.entity.BaseResponse;
 import com.varteq.catslovers.api.entity.ErrorData;
 import com.varteq.catslovers.api.entity.ErrorResponse;
 import com.varteq.catslovers.api.entity.RFeedstation;
+import com.varteq.catslovers.api.entity.RPhoto;
 import com.varteq.catslovers.model.Feedstation;
 import com.varteq.catslovers.model.GroupPartner;
+import com.varteq.catslovers.model.PhotoWithPreview;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.TimeUtils;
 import com.varteq.catslovers.view.fragments.MapFragment;
@@ -170,6 +172,13 @@ public class MapPresenter {
 /*if (!station.getIsPublic() && Profile.getUserId(view.getContext()).equals(station.getCreated())){
     Profile.setUserStation(view.getContext(), String.valueOf(station.getId()));
 }*/
+            if (station.getPhotos() != null && !station.getPhotos().isEmpty()) {
+                List<PhotoWithPreview> photos = new ArrayList<>();
+                for (RPhoto photo : station.getPhotos())
+                    photos.add(new PhotoWithPreview(photo.getId(), photo.getPhoto(), photo.getThumbnail()));
+                feedstation.setPhotos(photos);
+            }
+
             list.add(feedstation);
         }
         return list;

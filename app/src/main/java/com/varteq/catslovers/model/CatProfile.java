@@ -1,7 +1,5 @@
 package com.varteq.catslovers.model;
 
-import android.net.Uri;
-
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -10,7 +8,7 @@ public class CatProfile implements Serializable {
 
     private Integer id;
 
-    private Uri avatarUri;
+    private PhotoWithPreview avatar;
     private String petName;
     private String nickname;
     private Date birthday;
@@ -53,12 +51,12 @@ public class CatProfile implements Serializable {
         this.id = id;
     }
 
-    public Uri getAvatarUri() {
-        return avatarUri;
+    public PhotoWithPreview getAvatar() {
+        return avatar;
     }
 
-    public void setAvatarUri(Uri avatarUri) {
-        this.avatarUri = avatarUri;
+    public void setAvatar(PhotoWithPreview avatar) {
+        this.avatar = avatar;
     }
 
     public String getPetName() {

@@ -6,8 +6,10 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Geocoder;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -30,17 +32,23 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.google.android.gms.maps.model.LatLng;
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.model.Feedstation;
 import com.varteq.catslovers.model.GroupPartner;
+import com.varteq.catslovers.model.PhotoWithPreview;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Toaster;
+import com.varteq.catslovers.utils.qb.imagepick.ImagePickHelper;
+import com.varteq.catslovers.utils.qb.imagepick.OnImagePickedListener;
 import com.varteq.catslovers.view.adapters.CatPhotosAdapter;
 import com.varteq.catslovers.view.adapters.GroupPartnersAdapter;
 import com.varteq.catslovers.view.dialog.EditTextDialog;
 import com.varteq.catslovers.view.presenter.FeedstationPresenter;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,8 +58,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class FeedstationActivity extends PhotoPickerActivity {
+public class FeedstationActivity extends BaseActivity implements OnImagePickedListener {
 
+    private final int REQUEST_CODE_GET_IMAGE = 110;
     private final int RESULT_PICK_CONTACT = 11;
     private final String STATION_DEFAULT_NAME = "Station name";
     private final String ADDRESS_DEFAULT_VALUE = "station address";
@@ -79,6 +88,8 @@ public class FeedstationActivity extends PhotoPickerActivity {
     RecyclerView photosRecyclerView;
     @BindView(R.id.upload_image_LinearLayout)
     LinearLayout uploadImageLinearLayout;
+    @BindView(R.id.photo_count_textView)
+    TextView photoCountTextView;
 
     @BindView(R.id.expand_partners_button)
     Button expandPartnersButton;
@@ -98,7 +109,7 @@ public class FeedstationActivity extends PhotoPickerActivity {
     }
 
     private FeedstationScreenMode currentMode = FeedstationScreenMode.EDIT_MODE;
-    private List<Uri> photoList;
+    private List<PhotoWithPreview> photoList;
     private List<GroupPartner> groupPartnersList = new ArrayList<>();
 
     private CatPhotosAdapter photosAdapter;
@@ -164,6 +175,11 @@ public class FeedstationActivity extends PhotoPickerActivity {
         setupUIMode();
     }
 
+    @Override
+    protected View getSnackbarAnchorView() {
+        return null;
+    }
+
     private void setAdress(LatLng location) {
         List<Address> addresses = null;
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
@@ -195,6 +211,8 @@ public class FeedstationActivity extends PhotoPickerActivity {
             stationNameTextView.setText(feedstation.getName());
             addressTextView.setText(feedstation.getAddress());
             descriptionEditText.setText(feedstation.getDescription());
+            photoList = feedstation.getPhotos();
+            pagerAdapter.notifyDataSetChanged();
             initStationAction();
         }
         /*scrollView.setOnTouchListener((v, event) -> {
@@ -217,8 +235,12 @@ public class FeedstationActivity extends PhotoPickerActivity {
         else
             avatarImageView.setImageBitmap(Utils.getBitmapWithColor(getResources().getColor(R.color.transparent)));*/
 
-        photoList = new ArrayList<>();
-        //photosAdapter = new CatPhotosAdapter(photoList, this::showImage);
+        if (photoList == null)
+            photoList = new ArrayList<>();
+
+        photoCountTextView.setText(String.valueOf(photoList.size()));
+
+        photosAdapter = new CatPhotosAdapter(photoList, null);
         photosRecyclerView.setAdapter(photosAdapter);
         photosRecyclerView.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -364,10 +386,11 @@ public class FeedstationActivity extends PhotoPickerActivity {
                 }
                 if (!isProfileValid())
                     return true;
-                if (currentMode.equals(FeedstationScreenMode.CREATE_MODE))
+                presenter.uploadFeedstationWithPhotos(fillFeedstation());
+                /*if (currentMode.equals(FeedstationScreenMode.CREATE_MODE))
                     presenter.saveFeedstation(fillFeedstation());
                 else if (currentMode.equals(FeedstationScreenMode.EDIT_MODE))
-                    presenter.updateFeedstation(fillFeedstation());
+                    presenter.updateFeedstation(fillFeedstation());*/
                 return true;
             case R.id.app_bar_edit:
                 Log.d(TAG, "app_bar_edit");
@@ -388,10 +411,14 @@ public class FeedstationActivity extends PhotoPickerActivity {
     }
 
     private boolean isProfileValid() {
-        if (stationNameTextView.getText().toString().equals(STATION_DEFAULT_NAME))
+        if (stationNameTextView.getText().toString().equals(STATION_DEFAULT_NAME)) {
+            Toaster.longToast("You should fill in station name");
             return false;
-        if (addressTextView.getText().toString().equals(ADDRESS_DEFAULT_VALUE))
+        }
+        if (addressTextView.getText().toString().equals(ADDRESS_DEFAULT_VALUE)) {
+            Toaster.longToast("You should fill in station address");
             return false;
+        }
         return true;
     }
 
@@ -406,15 +433,9 @@ public class FeedstationActivity extends PhotoPickerActivity {
         feedstation.setName(stationName);
         feedstation.setAddress(address);
         feedstation.setDescription(description);
+        feedstation.setPhotos(photoList);
 
         return feedstation;
-    }
-
-    @Override
-    protected void onImageSelected(Uri uri) {
-        super.onImageSelected(uri);
-        presenter.onPetImageSelected(uri, photoList, photosAdapter);
-        photosRecyclerView.scrollToPosition(0);
     }
 
     private void initStationAction() {
@@ -526,11 +547,11 @@ public class FeedstationActivity extends PhotoPickerActivity {
 
     @OnClick(R.id.upload_image_button)
     void uploadCatImage() {
-        pickPhotoWithPermission(getString(R.string.select_cat_photo));
+        new ImagePickHelper().pickAnImage(this, REQUEST_CODE_GET_IMAGE);
     }
 
-
     private class HeaderPhotosViewPagerAdapter extends PagerAdapter {
+        private static final int THUMBSIZE = 500;
         Context context;
 
         public HeaderPhotosViewPagerAdapter(Context context) {
@@ -539,7 +560,9 @@ public class FeedstationActivity extends PhotoPickerActivity {
 
         @Override
         public int getCount() {
-            return headerPhotos.length;
+            if (photoList == null)
+                return 0;
+            else return photoList.size() < 4 ? photoList.size() : 3;
         }
 
         @Override
@@ -553,7 +576,20 @@ public class FeedstationActivity extends PhotoPickerActivity {
             ImageView imageView = new ImageView(context);
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             imageView.setLayoutParams(new LinearLayout.LayoutParams(100, 100));
-            imageView.setImageDrawable(getResources().getDrawable(headerPhotos[position]));
+            Glide.with(container)
+                    .asBitmap()
+                    .load(photoList.get(position).getPhoto())
+                    .into(new SimpleTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                            if (resource.getWidth() > THUMBSIZE)
+                                imageView.setImageBitmap(ThumbnailUtils.extractThumbnail(resource,
+                                        THUMBSIZE, THUMBSIZE));
+                            else
+                                imageView.setImageBitmap(resource);
+                        }
+                    });
+            //imageView.setImageDrawable(getResources().getDrawable(headerPhotos[position]));
             container.addView(imageView);
             return imageView;
         }
@@ -617,6 +653,7 @@ public class FeedstationActivity extends PhotoPickerActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         // check whether the result is ok
         if (resultCode == RESULT_OK) {
             // Check for the request code, we might be usign multiple startActivityForReslut
@@ -706,5 +743,30 @@ public class FeedstationActivity extends PhotoPickerActivity {
         groupPartnersList.add(1, partner);
         groupPartnersAdapter.notifyItemInserted(1);
         groupPartnersRecyclerView.scrollToPosition(0);
+    }
+
+    @Override
+    public void onImagePicked(int requestCode, File file) {
+        if (REQUEST_CODE_GET_IMAGE == requestCode && file != null) {
+            photoList.add(0, new PhotoWithPreview(file.getPath(), file.getPath()));
+            photosAdapter.notifyItemInserted(0);
+            photosRecyclerView.scrollToPosition(0);
+            photoCountTextView.setText(String.valueOf(photoList.size()));
+        }
+    }
+
+    @Override
+    public void onVideoPicked(int requestCode, File file, Bitmap preview) {
+
+    }
+
+    @Override
+    public void onImagePickError(int requestCode, Exception e) {
+
+    }
+
+    @Override
+    public void onImagePickClosed(int requestCode) {
+
     }
 }

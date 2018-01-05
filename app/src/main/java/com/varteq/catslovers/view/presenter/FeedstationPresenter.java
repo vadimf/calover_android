@@ -1,9 +1,11 @@
 package com.varteq.catslovers.view.presenter;
 
+import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 
+import com.google.gson.Gson;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
@@ -16,14 +18,23 @@ import com.varteq.catslovers.api.entity.RFeedstation;
 import com.varteq.catslovers.api.entity.RUser;
 import com.varteq.catslovers.model.Feedstation;
 import com.varteq.catslovers.model.GroupPartner;
+import com.varteq.catslovers.model.PhotoWithPreview;
 import com.varteq.catslovers.utils.ChatHelper;
+import com.varteq.catslovers.utils.GenericOf;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.view.FeedstationActivity;
 
+import net.gotev.uploadservice.MultipartUploadRequest;
+import net.gotev.uploadservice.ServerResponse;
+import net.gotev.uploadservice.UploadInfo;
+import net.gotev.uploadservice.UploadNotificationConfig;
+import net.gotev.uploadservice.UploadStatusDelegate;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -32,8 +43,11 @@ import retrofit2.Response;
 public class FeedstationPresenter {
 
     private String TAG = FeedstationPresenter.class.getSimpleName();
+    private String CREATE_FEEDSTATION_TAG = "CREATE";
 
     private FeedstationActivity view;
+    private boolean isCatUploading;
+    private MultipartUploadRequest uploadCatRequest;
 
     public FeedstationPresenter(FeedstationActivity view) {
         this.view = view;
@@ -47,41 +61,90 @@ public class FeedstationPresenter {
         }
     }
 
-    public void saveFeedstation(Feedstation feedstation) {
+    public void uploadFeedstationWithPhotos(Feedstation feedstation) {
+        if (isCatUploading) return;
+        isCatUploading = true;
+        view.showWaitDialog();
 
-        Call<BaseResponse<RFeedstation>> call = ServiceGenerator.getApiServiceWithToken().createFeedstation(feedstation.getName(),
-                feedstation.getAddress(), feedstation.getDescription(), 0,
-                feedstation.getLocation().latitude, feedstation.getLocation().longitude);
+        try {
+            UploadNotificationConfig config = new UploadNotificationConfig();
+            config.setRingToneEnabled(false)
+                    .setClearOnActionForAllStatuses(true)
+                    .setTitleForAllStatuses("Uploading feedstation");
+
+            String uploadId = UUID.randomUUID().toString();
+            // update feedstation
+            if (feedstation.getId() != null) {
+                uploadCatRequest = new MultipartUploadRequest(view, uploadId, ServiceGenerator.apiBaseUrl + "feedstations/" + feedstation.getId())
+                        .setMethod("PUT");
+            }
+            // create feedstation
+            else
+                uploadCatRequest = new MultipartUploadRequest(view, uploadId + CREATE_FEEDSTATION_TAG, ServiceGenerator.apiBaseUrl + "feedstations");
 
 
-        call.enqueue(new Callback<BaseResponse<RFeedstation>>() {
-            @Override
-            public void onResponse(Call<BaseResponse<RFeedstation>> call, Response<BaseResponse<RFeedstation>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    new BaseParser<RFeedstation>(response) {
-
+            uploadCatRequest.addParameter("name", feedstation.getName())
+                    .addParameter("address", feedstation.getAddress())
+                    .addParameter("description", feedstation.getDescription())
+                    .addParameter("time_to_feed", String.valueOf(0))
+                    .addParameter("lat", String.valueOf(feedstation.getLocation().latitude))
+                    .addParameter("lng", String.valueOf(feedstation.getLocation().longitude))
+                    .setNotificationConfig(new UploadNotificationConfig())
+                    .setMaxRetries(1)
+                    .setDelegate(new UploadStatusDelegate() {
                         @Override
-                        protected void onSuccess(RFeedstation data) {
-                            view.savedSuccessfully();
-                            //checkChat(data.getId(), data.getName());
-                            createChat(data.getId(), data.getName());
+                        public void onProgress(Context context, UploadInfo uploadInfo) {
                         }
 
                         @Override
-                        protected void onFail(ErrorResponse error) {
-                            Log.d(TAG, error.getMessage() + error.getCode());
-                            if (error != null && error.getCode() == 422)
-                                Toaster.longToast("You should fill station data");
+                        public void onError(Context context, UploadInfo uploadInfo, ServerResponse serverResponse, Exception exception) {
+                            Toaster.longToast("An error occurred while saving");
+                            view.hideWaitDialog();
+                            isCatUploading = false;
+                            Log.e("uploadFeedstationWithPhotos ", exception.getMessage());
                         }
-                    };
-                }
+
+                        @Override
+                        public void onCompleted(Context context, UploadInfo uploadInfo, ServerResponse serverResponse) {
+                            Log.d("uploadFeedstationWithPhotos ", "onCompleted");
+                            try {
+                                Gson gson = new Gson();
+
+                                BaseResponse<RFeedstation> station = gson.fromJson(serverResponse.getBodyAsString(), new GenericOf<>(BaseResponse.class, RFeedstation.class));
+                                if (station != null && station.getSuccess()) {
+                                    view.savedSuccessfully();
+                                    if (uploadInfo.getUploadId().contains(CREATE_FEEDSTATION_TAG))
+                                        createChat(station.getData().getId(), station.getData().getName());
+                                } else Toaster.longToast("An error occurred while saving");
+                            } catch (Exception e) {
+                            }
+                            view.hideWaitDialog();
+                            isCatUploading = false;
+                        }
+
+                        @Override
+                        public void onCancelled(Context context, UploadInfo uploadInfo) {
+                            view.hideWaitDialog();
+                            isCatUploading = false;
+                            Log.d("uploadFeedstationWithPhotos ", "canceled");
+                        }
+                    })
+                    .setNotificationConfig(config);
+
+            int i = 0;
+            int currIndex = 0;
+            for (PhotoWithPreview photoWithPreview : feedstation.getPhotos()) {
+                if (photoWithPreview.getId() == null)
+                    uploadCatRequest.addFileToUpload(photoWithPreview.getPhoto(), "images[" + i++ + "]");
+                if (++currIndex > 4) break;
             }
 
-            @Override
-            public void onFailure(Call<BaseResponse<RFeedstation>> call, Throwable t) {
-                Log.e(TAG, "createFeedstation onFailure " + t.getMessage());
-            }
-        });
+            uploadCatRequest.startUpload();
+        } catch (Exception exc) {
+            Log.e("uploadFeedstationWithPhotos", exc.getMessage(), exc);
+            view.hideWaitDialog();
+            isCatUploading = false;
+        }
     }
 
     public void addGroupPartner(Integer feedstationId, String phone) {
@@ -312,43 +375,9 @@ public class FeedstationPresenter {
             name = "You";
             /*if (status.equals(GroupPartner.Status.INVITED))
                 joinFeedstation(feedstationId);*/
-        }
+        } else if (name == null || name.isEmpty())
+            name = user.getUserInfo().getPhone();
         return new GroupPartner(null, user.getUserId(), name, user.getUserInfo().getPhone(), status, isAdmin);
-    }
-
-    public void updateFeedstation(Feedstation feedstation) {
-        view.setToolbarTitle(feedstation.getName());
-        Call<BaseResponse<RFeedstation>> call = ServiceGenerator.getApiServiceWithToken().updateFeedstation(feedstation.getId(), feedstation.getName(),
-                feedstation.getAddress(), feedstation.getDescription(), 0,
-                feedstation.getLocation().latitude, feedstation.getLocation().longitude);
-
-
-        call.enqueue(new Callback<BaseResponse<RFeedstation>>() {
-            @Override
-            public void onResponse(Call<BaseResponse<RFeedstation>> call, Response<BaseResponse<RFeedstation>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    new BaseParser<RFeedstation>(response) {
-
-                        @Override
-                        protected void onSuccess(RFeedstation data) {
-                            view.savedSuccessfully();
-                        }
-
-                        @Override
-                        protected void onFail(ErrorResponse error) {
-                            Log.d(TAG, error.getMessage() + error.getCode());
-                            if (error != null && error.getCode() == 422)
-                                Toaster.longToast("You should fill station data");
-                        }
-                    };
-                }
-            }
-
-            @Override
-            public void onFailure(Call<BaseResponse<RFeedstation>> call, Throwable t) {
-                Log.e(TAG, "updateFeedstation onFailure " + t.getMessage());
-            }
-        });
     }
 
     public void onGroupActionButtonClicked(Feedstation feedstation) {

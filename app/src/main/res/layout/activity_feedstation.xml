@@ -69,10 +69,11 @@
                     android:layout_marginBottom="6dp"
                     android:scaleType="centerCrop"
                     android:src="@color/colorPrimary"
+                    android:visibility="invisible"
                     app:riv_border_color="@color/white"
                     app:riv_border_width="2dp"
                     app:riv_corner_radius="29dp"
-                    app:riv_oval="true"/>
+                    app:riv_oval="true" />
             </FrameLayout>
 
             <android.support.constraint.Guideline
@@ -253,7 +254,6 @@
                 android:id="@+id/group_partners_RecyclerView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
                 android:layout_marginTop="8dp"
                 app:layout_constraintEnd_toStartOf="@+id/end_guideline"
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
@@ -275,11 +275,11 @@
                 style="@style/PrimaryTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="16dp"
                 android:text="Shylee's Babies"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
-                app:layout_constraintTop_toTopOf="@+id/photos_background"/>
+                app:layout_constraintTop_toBottomOf="@+id/group_partners_RecyclerView" />
 
             <TextView
                 android:id="@+id/photo_count_textView"
@@ -301,6 +301,16 @@
                 app:layout_constraintBottom_toBottomOf="@+id/photo_count_textView"
                 app:layout_constraintStart_toEndOf="@+id/photo_count_textView"
                 app:layout_constraintTop_toTopOf="@+id/photo_count_textView"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/photos_RecyclerView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:paddingBottom="16dp"
+                app:layout_constraintEnd_toStartOf="@+id/end_guideline"
+                app:layout_constraintStart_toStartOf="@+id/start_guideline"
+                app:layout_constraintTop_toBottomOf="@+id/photo_count_textView" />
 
             <LinearLayout
 
@@ -326,16 +336,6 @@
                     android:background="@drawable/ic_add_24dp"/>
 
             </LinearLayout>
-
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/photos_RecyclerView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:paddingBottom="16dp"
-                app:layout_constraintEnd_toStartOf="@+id/end_guideline"
-                app:layout_constraintStart_toStartOf="@+id/start_guideline"
-                app:layout_constraintTop_toBottomOf="@+id/photo_count_textView"/>
 
         </android.support.constraint.ConstraintLayout>
 
