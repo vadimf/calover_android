@@ -83,9 +83,9 @@ public class AuthPresenter {
     }
 
     public void resetPassword() {
-        //startResetCall();
+        startResetCall();
         //fakeLogin();
-        fakeLogin2();
+        //fakeLogin2();
     }
 
     private void startResetCall() {
