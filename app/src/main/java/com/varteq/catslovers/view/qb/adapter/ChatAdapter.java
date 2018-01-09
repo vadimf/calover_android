@@ -82,7 +82,7 @@ public class ChatAdapter extends BaseListAdapter<QBChatMessage> {
         setIncomingOrOutgoingMessageAttributes(holder, chatMessage);
         setMessageBody(holder, chatMessage);
         setMessageInfo(chatMessage, holder);
-        setMessageAuthor(holder, chatMessage);
+        //setMessageAuthor(holder, chatMessage);
 
 
         holder.messageContainerLayout.setOnClickListener(new View.OnClickListener() {
@@ -93,7 +93,7 @@ public class ChatAdapter extends BaseListAdapter<QBChatMessage> {
                     QBAttachment attachment = attachments.iterator().next();
                     AttachmentImageActivity.start(context, attachment.getUrl());
                 } else {
-                    toggleItemInfo(holder, position);
+                    //toggleItemInfo(holder, position);
                 }
             }
         });
@@ -101,14 +101,14 @@ public class ChatAdapter extends BaseListAdapter<QBChatMessage> {
             @Override
             public boolean onLongClick(View v) {
                 if (hasAttachments(chatMessage)) {
-                    toggleItemInfo(holder, position);
+                    //toggleItemInfo(holder, position);
                     return true;
                 }
 
                 return false;
             }
         });
-        holder.messageInfoTextView.setVisibility(View.GONE);
+        holder.messageInfoTextView.setVisibility(View.VISIBLE);
 
         if (isIncoming(chatMessage) && !isRead(chatMessage)) {
             readMessage(chatMessage);
@@ -240,8 +240,8 @@ public class ChatAdapter extends BaseListAdapter<QBChatMessage> {
         holder.messageInfoTextView.setGravity(gravity);
 
         int messageBodyContainerBgResource = isIncoming
-                ? R.drawable.incoming_message_bg
-                : R.drawable.outgoing_message_bg;
+                ? R.drawable.incoming_messages_shape
+                : R.drawable.outgoing_messages_shape;
         if (hasAttachments(chatMessage)) {
             holder.messageBodyContainerLayout.setBackgroundResource(0);
             holder.messageBodyContainerLayout.setPadding(0, 0, 0, 0);
@@ -261,8 +261,8 @@ public class ChatAdapter extends BaseListAdapter<QBChatMessage> {
         holder.messageAuthorTextView.setLayoutParams(lp);
 
         int textColorResource = isIncoming
-                ? R.color.text_color_black
-                : R.color.text_color_white;
+                ? R.color.text_color_white
+                : R.color.colorPrimary;
         holder.messageBodyTextView.setTextColor(ResourceUtils.getColor(textColorResource));
     }
 

@@ -16,7 +16,7 @@ import com.varteq.catslovers.model.PhotoWithPreview;
 
 import java.util.List;
 
-public class CatPhotosAdapter extends RecyclerView.Adapter<CatPhotosAdapter.PhotoViewHolder> {
+public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.PhotoViewHolder> {
 
     private final int THUMBSIZE = 250;
     private OnImageClickListener externalClickListener;
@@ -31,7 +31,7 @@ public class CatPhotosAdapter extends RecyclerView.Adapter<CatPhotosAdapter.Phot
         }
     };
 
-    public CatPhotosAdapter(List<PhotoWithPreview> photoList, OnImageClickListener externalClickListener) {
+    public PhotosAdapter(List<PhotoWithPreview> photoList, OnImageClickListener externalClickListener) {
         this.externalClickListener = externalClickListener;
         this.photoList = photoList;
     }

@@ -13,6 +13,7 @@
         tools:background="@drawable/outgoing_message_bg">
 
         <TextView
+            android:padding="8dp"
             android:id="@+id/text_image_message"
             style="@style/MessageTextStyle"
             android:layout_below="@+id/text_message_author"
@@ -31,6 +32,7 @@
             android:theme="@style/AppTheme" />
 
         <TextView
+            android:visibility="gone"
             android:id="@+id/text_message_author"
             style="@style/MessageAuthorStyle"
             android:layout_alignParentTop="true"
@@ -40,5 +42,6 @@
     <TextView
         android:id="@+id/text_message_info"
         style="@style/MessageInfoStyle"
+        android:textColor="@color/colorPrimary"
         tools:text="10:50" />
 </LinearLayout>

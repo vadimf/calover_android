@@ -647,7 +647,7 @@ public class AuthPresenter {
 
         String path = Profile.getUserAvatar(view);
         if (path.isEmpty()) {
-
+            getPrivateFeedstation();
             return;
         }
         try {

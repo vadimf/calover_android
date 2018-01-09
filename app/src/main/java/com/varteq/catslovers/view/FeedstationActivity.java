@@ -3,15 +3,12 @@ package com.varteq.catslovers.view;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Geocoder;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.v4.view.PagerAdapter;
@@ -43,10 +40,11 @@ import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.utils.qb.imagepick.ImagePickHelper;
 import com.varteq.catslovers.utils.qb.imagepick.OnImagePickedListener;
-import com.varteq.catslovers.view.adapters.CatPhotosAdapter;
 import com.varteq.catslovers.view.adapters.GroupPartnersAdapter;
+import com.varteq.catslovers.view.adapters.PhotosAdapter;
 import com.varteq.catslovers.view.dialog.EditTextDialog;
 import com.varteq.catslovers.view.presenter.FeedstationPresenter;
+import com.varteq.catslovers.view.qb.AttachmentImageActivity;
 
 import java.io.File;
 import java.io.IOException;
@@ -112,7 +110,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
     private List<PhotoWithPreview> photoList;
     private List<GroupPartner> groupPartnersList = new ArrayList<>();
 
-    private CatPhotosAdapter photosAdapter;
+    private PhotosAdapter photosAdapter;
     private GroupPartnersAdapter groupPartnersAdapter;
     private Feedstation feedstation;
 
@@ -240,7 +238,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
 
         photoCountTextView.setText(String.valueOf(photoList.size()));
 
-        photosAdapter = new CatPhotosAdapter(photoList, null);
+        photosAdapter = new PhotosAdapter(photoList, this::showImage);
         photosRecyclerView.setAdapter(photosAdapter);
         photosRecyclerView.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -474,11 +472,12 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
     }
 
 
-    private void showImage(Uri imageUri) {
-        if (imageUri == null) return;
-        Log.d(TAG, "showImage " + imageUri);
+    private void showImage(String path) {
+        if (path == null || path.isEmpty()) return;
+        AttachmentImageActivity.start(this, path);
+        Log.d(TAG, "showImage " + path);
 
-        Intent intent = new Intent();
+        /*Intent intent = new Intent();
         Uri uri;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             //uri = FileProvider.getUriForFile(getApplicationContext(), BuildConfig.APPLICATION_ID + ".media.fileprovider", new File(chatEntry.getAvatar().getFile()));
@@ -493,9 +492,9 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
         }
 
         intent.setAction(Intent.ACTION_VIEW);
-        intent.setDataAndType(imageUri, "image/*");
+        intent.setDataAndType(imageUri, "image*//*");
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        startActivity(intent);
+        startActivity(intent);*/
     }
 
     @OnClick(R.id.station_name_textView)

@@ -69,11 +69,13 @@
             style="@style/BorderlessImageButtonStyle"
             android:layout_gravity="center_vertical"
             android:onClick="onAttachmentsClick"
-            android:src="@drawable/ic_action_attachment" />
+            android:src="@drawable/ic_attachment_24dp" />
 
         <EditText
             android:id="@+id/edit_chat_message"
-            style="@style/WeightWidth"
+            style="@style/PrimaryEditText"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:hint="@string/chat_edit_text_hint"
             android:inputType="textShortMessage"
@@ -84,7 +86,7 @@
             style="@style/BorderlessImageButtonStyle"
             android:layout_gravity="center_vertical"
             android:onClick="onSendChatClick"
-            android:src="@drawable/ic_send"
+            android:src="@drawable/ic_send_24dp"
             android:text="@string/chat_send" />
     </LinearLayout>
 </RelativeLayout>

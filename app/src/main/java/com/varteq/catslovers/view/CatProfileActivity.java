@@ -7,12 +7,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.media.ThumbnailUtils;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AlertDialog;
@@ -56,13 +53,14 @@ import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.utils.Utils;
 import com.varteq.catslovers.utils.qb.imagepick.ImagePickHelper;
 import com.varteq.catslovers.utils.qb.imagepick.OnImagePickedListener;
-import com.varteq.catslovers.view.adapters.CatPhotosAdapter;
 import com.varteq.catslovers.view.adapters.GroupPartnersAdapter;
+import com.varteq.catslovers.view.adapters.PhotosAdapter;
 import com.varteq.catslovers.view.adapters.ViewColorsAdapter;
 import com.varteq.catslovers.view.dialog.ColorPickerDialog;
 import com.varteq.catslovers.view.dialog.EditTextDialog;
 import com.varteq.catslovers.view.dialog.WrappedDatePickerDialog;
 import com.varteq.catslovers.view.presenter.CatProfilePresenter;
+import com.varteq.catslovers.view.qb.AttachmentImageActivity;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -198,7 +196,7 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
     private int clickedRoundViewId;
     private List<RoundedImageView> colorPickers;
     private List<PhotoWithPreview> photoList;
-    private CatPhotosAdapter photosAdapter;
+    private PhotosAdapter photosAdapter;
     private PhotoWithPreview avatar;
 
     private List<GroupPartner> groupPartnersList;
@@ -421,8 +419,8 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
 
         photoCountTextView.setText(String.valueOf(photoList.size()));
 
-        photosAdapter = new CatPhotosAdapter(photoList, null);
-        //photosAdapter = new CatPhotosAdapter(photoList, this::showImage);
+        photosAdapter = new PhotosAdapter(photoList, this::showImage);
+        //photosAdapter = new PhotosAdapter(photoList, this::showImage);
         photosRecyclerView.setAdapter(photosAdapter);
         photosRecyclerView.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -620,28 +618,10 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
         weightValueTextView.setEnabled(true);
     }
 
-    private void showImage(Uri imageUri) {
-        if (imageUri == null) return;
-        Log.d(TAG, "showImage " + imageUri);
-
-        Intent intent = new Intent();
-        Uri uri;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            //uri = FileProvider.getUriForFile(getApplicationContext(), BuildConfig.APPLICATION_ID + ".media.fileprovider", new File(chatEntry.getAvatar().getFile()));
-
-            List<ResolveInfo> resInfoList = getPackageManager().queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
-            for (ResolveInfo resolveInfo : resInfoList) {
-                String packageName = resolveInfo.activityInfo.packageName;
-                grantUriPermission(packageName, imageUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            }
-        } else {
-            //uri = Uri.fromFile(new File(chatEntry.getAvatar().getFile()));
-        }
-
-        intent.setAction(Intent.ACTION_VIEW);
-        intent.setDataAndType(imageUri, "image/*");
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        startActivity(intent);
+    private void showImage(String path) {
+        if (path == null || path.isEmpty()) return;
+        AttachmentImageActivity.start(this, path);
+        Log.d(TAG, "showImage " + path);
     }
 
     @Override
