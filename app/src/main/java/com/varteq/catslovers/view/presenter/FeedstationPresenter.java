@@ -89,7 +89,6 @@ public class FeedstationPresenter {
                     .addParameter("time_to_feed", String.valueOf(0))
                     .addParameter("lat", String.valueOf(feedstation.getLocation().latitude))
                     .addParameter("lng", String.valueOf(feedstation.getLocation().longitude))
-                    .setNotificationConfig(new UploadNotificationConfig())
                     .setMaxRetries(1)
                     .setDelegate(new UploadStatusDelegate() {
                         @Override

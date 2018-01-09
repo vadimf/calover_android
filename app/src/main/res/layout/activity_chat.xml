@@ -74,6 +74,7 @@
         <EditText
             android:id="@+id/edit_chat_message"
             style="@style/PrimaryEditText"
+            android:textSize="@dimen/medium_text_size"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"

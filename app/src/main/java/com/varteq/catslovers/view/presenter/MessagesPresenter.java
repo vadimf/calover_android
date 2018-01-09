@@ -75,7 +75,7 @@ public class MessagesPresenter {
                                     public void onError(QBResponseException e) {
                                         Log.e(TAG, e.getMessage());
                                     }
-                                });
+                                }, null);
                             }
                         }
 
@@ -86,6 +86,6 @@ public class MessagesPresenter {
                     });
                 }
             }
-        });
+        }, null);
     }
 }

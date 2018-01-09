@@ -23,6 +23,8 @@ import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.view.presenter.AuthPresenter;
 
+import net.gotev.uploadservice.UploadServiceBroadcastReceiver;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -269,5 +271,14 @@ public class ValidateNumberActivity extends BaseActivity implements TextWatcher 
     @Override
     protected View getSnackbarAnchorView() {
         return mainLayout;
+    }
+
+
+    public void registerUploadAvatarReceiver(UploadServiceBroadcastReceiver broadcastReceiver) {
+        broadcastReceiver.register(this);
+    }
+
+    public void unregisterUploadAvatarReceiver(UploadServiceBroadcastReceiver broadcastReceiver) {
+        broadcastReceiver.unregister(this);
     }
 }

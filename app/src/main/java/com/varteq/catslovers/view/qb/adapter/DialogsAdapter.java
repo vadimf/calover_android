@@ -7,9 +7,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBDialogType;
+import com.quickblox.users.model.QBUser;
 import com.varteq.catslovers.R;
+import com.varteq.catslovers.utils.ChatHelper;
+import com.varteq.catslovers.utils.NetworkUtils;
 import com.varteq.catslovers.utils.ResourceUtils;
 import com.varteq.catslovers.utils.UiUtils;
 import com.varteq.catslovers.utils.qb.QbDialogUtils;
@@ -43,12 +47,20 @@ public class DialogsAdapter extends BaseSelectableListAdapter<QBChatDialog> {
         }
 
         QBChatDialog dialog = getItem(position);
-        if (dialog.getType().equals(QBDialogType.GROUP)) {
+        if (dialog.getType().equals(QBDialogType.PRIVATE)) {
+            QBUser user = ChatHelper.getInstance().getInterlocutorUserFromDialog(dialog);
+            if (user != null && user.getFileId() != null)
+                Glide.with(holder.rootLayout)
+                        .load(NetworkUtils.getUserAvatarGlideUrl(String.valueOf(user.getFileId())))
+                        .into(holder.dialogImageView);
+            else {
+                holder.dialogImageView.setBackgroundDrawable(UiUtils.getColorCircleDrawable(position));
+                holder.dialogImageView.setImageDrawable(null);
+            }
+
+        } else {
             holder.dialogImageView.setBackgroundDrawable(UiUtils.getGreyCircleDrawable());
             holder.dialogImageView.setImageResource(R.drawable.ic_chat_group);
-        } else {
-            holder.dialogImageView.setBackgroundDrawable(UiUtils.getColorCircleDrawable(position));
-            holder.dialogImageView.setImageDrawable(null);
         }
 
         holder.nameTextView.setText(QbDialogUtils.getDialogName(dialog));

@@ -378,6 +378,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     public void feedstationsLoaded(List<Feedstation> stations) {
+        if (stations == null) return;
         listUpdated = true;
         googleMap.clear();
         for (Feedstation feedstation : stations) {

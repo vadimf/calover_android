@@ -1,6 +1,7 @@
 package com.varteq.catslovers.view.adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,11 +13,16 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
+import com.quickblox.users.model.QBUser;
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.model.FeedPost;
+import com.varteq.catslovers.utils.NetworkUtils;
 import com.varteq.catslovers.utils.PostPreviewDownloader;
 import com.varteq.catslovers.utils.TimeUtils;
 import com.varteq.catslovers.utils.UiUtils;
+import com.varteq.catslovers.utils.qb.QbUsersHolder;
 import com.varteq.catslovers.view.MediaViewerActivity;
 
 import java.util.List;
@@ -45,7 +51,19 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
 
         holder.nameTextView.setText(feed.getName());
         //holder.likesTextView.setText(String.valueOf(feed.getLikes()));
-        holder.avatarImageView.setBackgroundDrawable(UiUtils.getColorCircleDrawable(feed.getUserId()));
+        QBUser user = QbUsersHolder.getInstance().getUserById(feed.getUserId());
+        if (user != null && user.getFileId() != null) {
+            Glide.with(holder.itemView)
+                    .asBitmap()
+                    .load(NetworkUtils.getUserAvatarGlideUrl(String.valueOf(user.getFileId())))
+                    .into(new SimpleTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                            holder.avatarImageView.setImageBitmap(resource);
+                        }
+                    });
+        } else
+            holder.avatarImageView.setBackgroundDrawable(UiUtils.getColorCircleDrawable(feed.getUserId()));
         String message = feed.getMessage();
         if (message != null && !message.equals("null"))
             holder.messageTextView.setText(feed.getMessage());
