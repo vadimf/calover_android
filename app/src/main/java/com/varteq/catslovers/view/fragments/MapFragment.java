@@ -3,6 +3,7 @@ package com.varteq.catslovers.view.fragments;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -20,9 +21,11 @@ import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -283,7 +286,30 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             /*Location selectedLocation = new Location("");
             selectedLocation.setLatitude(latLng.latitude);
             selectedLocation.setLongitude(latLng.longitude);*/
-            FeedstationActivity.startInCreateMode(getActivity(), latLng);
+            final Dialog dialog = new Dialog(getContext());
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+            RelativeLayout mapOptionsDialogLayout = (RelativeLayout) LayoutInflater.from(getContext()).inflate(R.layout.dialog_map_options, null);
+            Button openFeedStationButton = mapOptionsDialogLayout.findViewById(R.id.button_open_feedstation);
+            Button warningsButton = mapOptionsDialogLayout.findViewById(R.id.button_warnings);
+            Button emergenciesButton = mapOptionsDialogLayout.findViewById(R.id.button_emergencies);
+
+            openFeedStationButton.setOnClickListener(view -> {
+                FeedstationActivity.startInCreateMode(getActivity(), latLng);
+                dialog.dismiss();
+            });
+            warningsButton.setOnClickListener(view -> {
+                showChooseWarningsBottomSheet(latLng);
+                dialog.dismiss();
+            });
+            emergenciesButton.setOnClickListener(view -> {
+                showChooseEmergenciesBottomSheet(latLng);
+                dialog.dismiss();
+            });
+
+
+            dialog.setContentView(mapOptionsDialogLayout);
+            dialog.show();
             Log.d(TAG, "OnMapLongClick " + latLng.latitude + " / " + latLng.longitude + "]");
         });
 
@@ -296,6 +322,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             listUpdated = true;
             presenter.getFeedstations(userLocation.latitude, userLocation.longitude, 20);
         }
+    }
+
+    private void showChooseEmergenciesBottomSheet(LatLng latLng) {
+
+    }
+
+    private void showChooseWarningsBottomSheet(LatLng latLng) {
+
     }
 
     private void setStationActionName(String name) {
@@ -399,12 +433,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     .position(feedstation.getLocation()));
             marker.setTag(feedstation);
 
-                if (bottomSheetBehaviorFeedstation.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
-                    if (feedstation.getId().equals(((Feedstation) bottomSheetFeedstationFrameLayout.getTag()).getId())) {
-                        bottomSheetFeedstationFrameLayout.setTag(marker.getTag());
-                        initStationAction(feedstation);
-                    }
+            if (bottomSheetBehaviorFeedstation.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
+                if (feedstation.getId().equals(((Feedstation) bottomSheetFeedstationFrameLayout.getTag()).getId())) {
+                    bottomSheetFeedstationFrameLayout.setTag(marker.getTag());
+                    initStationAction(feedstation);
                 }
+            }
 
         }
         addUserLocationMarker();
