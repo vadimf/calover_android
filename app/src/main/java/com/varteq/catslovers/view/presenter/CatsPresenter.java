@@ -5,8 +5,8 @@ import android.location.Location;
 import com.varteq.catslovers.api.BaseParser;
 import com.varteq.catslovers.api.ServiceGenerator;
 import com.varteq.catslovers.api.entity.BaseResponse;
-import com.varteq.catslovers.api.entity.Cat;
 import com.varteq.catslovers.api.entity.ErrorResponse;
+import com.varteq.catslovers.api.entity.RCat;
 import com.varteq.catslovers.api.entity.RPhoto;
 import com.varteq.catslovers.model.CatProfile;
 import com.varteq.catslovers.model.Feedstation;
@@ -37,20 +37,20 @@ public class CatsPresenter {
 
     public void getCats(boolean inRadius) {
 
-        Call<BaseResponse<List<Cat>>> call;
+        Call<BaseResponse<List<RCat>>> call;
         if (inRadius) {
             Location location = Profile.getLocation(view.getContext());
             if (location == null) return;
             call = ServiceGenerator.getApiServiceWithToken().getCatsInRadius(location.getLatitude(), location.getLongitude(), 20);
         } else
             call = ServiceGenerator.getApiServiceWithToken().getCats();
-        call.enqueue(new Callback<BaseResponse<List<Cat>>>() {
+        call.enqueue(new Callback<BaseResponse<List<RCat>>>() {
             @Override
-            public void onResponse(Call<BaseResponse<List<Cat>>> call, Response<BaseResponse<List<Cat>>> response) {
-                new BaseParser<List<Cat>>(response) {
+            public void onResponse(Call<BaseResponse<List<RCat>>> call, Response<BaseResponse<List<RCat>>> response) {
+                new BaseParser<List<RCat>>(response) {
 
                     @Override
-                    protected void onSuccess(List<Cat> data) {
+                    protected void onSuccess(List<RCat> data) {
                         Log.i(TAG, String.valueOf(data.size()));
                         if (data.size() < 1) return;
                         List<CatProfile> catProfiles = getCatProfiles(data);
@@ -67,66 +67,66 @@ public class CatsPresenter {
             }
 
             @Override
-            public void onFailure(Call<BaseResponse<List<Cat>>> call, Throwable t) {
+            public void onFailure(Call<BaseResponse<List<RCat>>> call, Throwable t) {
                 Log.e(TAG, "getCats onFailure " + t.getMessage());
             }
         });
     }
 
-    private List<CatProfile> getCatProfiles(List<Cat> data) {
+    private List<CatProfile> getCatProfiles(List<RCat> data) {
         List<CatProfile> list = new ArrayList<>();
-        for (Cat cat : data) {
+        for (RCat RCat : data) {
             CatProfile catProfile = new CatProfile();
-            catProfile.setId(cat.getId());
-            catProfile.setPetName(cat.getName());
-            catProfile.setNickname(cat.getNickname());
-            catProfile.setBirthday(TimeUtils.getLocalDateFromUtc(cat.getAge()));
+            catProfile.setId(RCat.getId());
+            catProfile.setPetName(RCat.getName());
+            catProfile.setNickname(RCat.getNickname());
+            catProfile.setBirthday(TimeUtils.getLocalDateFromUtc(RCat.getAge()));
             catProfile.setSex(null);
-            catProfile.setWeight(cat.getWeight());
-            catProfile.setCastrated(cat.getCastrated());
-            catProfile.setDescription(cat.getDescription());
-            catProfile.setType(cat.getType().equals("pet") ? CatProfile.Status.PET : CatProfile.Status.STRAY);
-            catProfile.setFleaTreatmentDate(TimeUtils.getLocalDateFromUtc(cat.getNextFleaTreatment()));
+            catProfile.setWeight(RCat.getWeight());
+            catProfile.setCastrated(RCat.getCastrated());
+            catProfile.setDescription(RCat.getDescription());
+            catProfile.setType(RCat.getType().equals("pet") ? CatProfile.Status.PET : CatProfile.Status.STRAY);
+            catProfile.setFleaTreatmentDate(TimeUtils.getLocalDateFromUtc(RCat.getNextFleaTreatment()));
 
-            if (cat.getPermissions() != null) {
-                if (cat.getPermissions().getRole() != null) {
-                    if (cat.getPermissions().getRole().equals("admin"))
+            if (RCat.getPermissions() != null) {
+                if (RCat.getPermissions().getRole() != null) {
+                    if (RCat.getPermissions().getRole().equals("admin"))
                         catProfile.setUserRole(Feedstation.UserRole.ADMIN);
-                    else if (cat.getPermissions().getRole().equals("user"))
+                    else if (RCat.getPermissions().getRole().equals("user"))
                         catProfile.setUserRole(Feedstation.UserRole.USER);
                 }
-                if (cat.getPermissions().getStatus() != null) {
+                if (RCat.getPermissions().getStatus() != null) {
                     GroupPartner.Status status = null;
-                    if (cat.getPermissions().getStatus().equals("joined"))
+                    if (RCat.getPermissions().getStatus().equals("joined"))
                         status = GroupPartner.Status.JOINED;
-                    else if (cat.getPermissions().getStatus().equals("invited"))
+                    else if (RCat.getPermissions().getStatus().equals("invited"))
                         status = GroupPartner.Status.INVITED;
-                    else if (cat.getPermissions().getStatus().equals("requested"))
+                    else if (RCat.getPermissions().getStatus().equals("requested"))
                         status = GroupPartner.Status.REQUESTED;
                     catProfile.setStatus(status);
                 }
             }
 
             List<Integer> colors = new ArrayList<>();
-            for (String s : cat.getColor().split(","))
+            for (String s : RCat.getColor().split(","))
                 try {
                     colors.add(Integer.parseInt(s));
                 } catch (Exception e) {
                 }
             catProfile.setColorsList(colors);
 
-            if (cat.getPhotos() != null && !cat.getPhotos().isEmpty()) {
+            if (RCat.getPhotos() != null && !RCat.getPhotos().isEmpty()) {
                 List<PhotoWithPreview> photos = new ArrayList<>();
-                for (RPhoto photo : cat.getPhotos())
+                for (RPhoto photo : RCat.getPhotos())
                     photos.add(new PhotoWithPreview(photo.getId(), photo.getPhoto(), photo.getThumbnail()));
                 catProfile.setPhotos(photos);
             }
 
-            if (cat.getFeedstation() != null)
-                catProfile.setFeedstationId(cat.getFeedstation().getId());
+            if (RCat.getFeedstation() != null)
+                catProfile.setFeedstationId(RCat.getFeedstation().getId());
 
-            if (cat.getAvatarUrl() != null)
-                catProfile.setAvatar(new PhotoWithPreview(null, cat.getAvatarUrl(), cat.getAvatarUrlThumbnail()));
+            if (RCat.getAvatarUrl() != null)
+                catProfile.setAvatar(new PhotoWithPreview(null, RCat.getAvatarUrl(), RCat.getAvatarUrlThumbnail()));
 
             list.add(catProfile);
         }

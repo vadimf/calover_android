@@ -35,8 +35,8 @@ import com.varteq.catslovers.api.BaseParser;
 import com.varteq.catslovers.api.ServiceGenerator;
 import com.varteq.catslovers.api.entity.AuthToken;
 import com.varteq.catslovers.api.entity.BaseResponse;
-import com.varteq.catslovers.api.entity.Cat;
 import com.varteq.catslovers.api.entity.ErrorResponse;
+import com.varteq.catslovers.api.entity.RCat;
 import com.varteq.catslovers.api.entity.RFeedstation;
 import com.varteq.catslovers.utils.ChatHelper;
 import com.varteq.catslovers.utils.Log;
@@ -399,17 +399,17 @@ public class AuthPresenter {
             }
         };
 
-        Call<BaseResponse<List<Cat>>> call = ServiceGenerator.getApiServiceWithToken().getCats();
-        call.enqueue(new Callback<BaseResponse<List<com.varteq.catslovers.api.entity.Cat>>>() {
+        Call<BaseResponse<List<RCat>>> call = ServiceGenerator.getApiServiceWithToken().getCats();
+        call.enqueue(new Callback<BaseResponse<List<RCat>>>() {
 
             @Override
-            public void onResponse(Call<BaseResponse<List<Cat>>> call, Response<BaseResponse<List<Cat>>> response) {
+            public void onResponse(Call<BaseResponse<List<RCat>>> call, Response<BaseResponse<List<RCat>>> response) {
                 Profile.setUserPetCount(view, 1);
                 uploadAvatar();
             }
 
             @Override
-            public void onFailure(Call<BaseResponse<List<Cat>>> call, Throwable t) {
+            public void onFailure(Call<BaseResponse<List<RCat>>> call, Throwable t) {
                 Log.e(TAG, "getCats() onFailure " + t.getMessage());
                 if (checkNetworkErrAndShowSnackbar(t.toString())) {
                     view.hideWaitDialog();

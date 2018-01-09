@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class Cat extends ErrorData {
+public class RCat extends ErrorData {
 
     @SerializedName("id")
     @Expose

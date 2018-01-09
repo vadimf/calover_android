@@ -8,8 +8,8 @@ import com.google.gson.Gson;
 import com.varteq.catslovers.api.BaseParser;
 import com.varteq.catslovers.api.ServiceGenerator;
 import com.varteq.catslovers.api.entity.BaseResponse;
-import com.varteq.catslovers.api.entity.Cat;
 import com.varteq.catslovers.api.entity.ErrorResponse;
+import com.varteq.catslovers.api.entity.RCat;
 import com.varteq.catslovers.api.entity.RFeedstation;
 import com.varteq.catslovers.api.entity.RUser;
 import com.varteq.catslovers.model.CatProfile;
@@ -225,7 +225,7 @@ public class CatProfilePresenter {
                             try {
                                 Gson gson = new Gson();
 
-                                BaseResponse<Cat> cat = gson.fromJson(serverResponse.getBodyAsString(), new GenericOf<>(BaseResponse.class, Cat.class));
+                                BaseResponse<RCat> cat = gson.fromJson(serverResponse.getBodyAsString(), new GenericOf<>(BaseResponse.class, RCat.class));
                                 if (cat != null && cat.getSuccess())
                                     view.savedSuccessfully();
                                 else Toaster.longToast("An error occurred while saving");

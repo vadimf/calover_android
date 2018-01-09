@@ -9,6 +9,7 @@ import com.varteq.catslovers.api.entity.BaseResponse;
 import com.varteq.catslovers.api.entity.ErrorData;
 import com.varteq.catslovers.api.entity.ErrorResponse;
 import com.varteq.catslovers.api.entity.RFeedstation;
+import com.varteq.catslovers.api.entity.RGeoSearch;
 import com.varteq.catslovers.api.entity.RPhoto;
 import com.varteq.catslovers.model.Feedstation;
 import com.varteq.catslovers.model.GroupPartner;
@@ -42,16 +43,16 @@ public class MapPresenter {
 
     public void getFeedstations(double lat, double lng, Integer distance) {
 
-        Call<BaseResponse<List<RFeedstation>>> call = ServiceGenerator.getApiServiceWithToken().getGeoFeedstations(lat, lng, distance);
-        call.enqueue(new Callback<BaseResponse<List<RFeedstation>>>() {
+        Call<BaseResponse<RGeoSearch>> call = ServiceGenerator.getApiServiceWithToken().getGeoFeedstations(lat, lng, distance);
+        call.enqueue(new Callback<BaseResponse<RGeoSearch>>() {
             @Override
-            public void onResponse(Call<BaseResponse<List<RFeedstation>>> call, Response<BaseResponse<List<RFeedstation>>> response) {
+            public void onResponse(Call<BaseResponse<RGeoSearch>> call, Response<BaseResponse<RGeoSearch>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    new BaseParser<List<RFeedstation>>(response) {
+                    new BaseParser<RGeoSearch>(response) {
 
                         @Override
-                        protected void onSuccess(List<RFeedstation> data) {
-                            view.feedstationsLoaded(from(data));
+                        protected void onSuccess(RGeoSearch data) {
+                            view.feedstationsLoaded(from(data.getFeedstations()));
                         }
 
                         @Override
@@ -64,7 +65,7 @@ public class MapPresenter {
             }
 
             @Override
-            public void onFailure(Call<BaseResponse<List<RFeedstation>>> call, Throwable t) {
+            public void onFailure(Call<BaseResponse<RGeoSearch>> call, Throwable t) {
                 Log.e(TAG, "getFeedstations onFailure " + t.getMessage());
             }
         });
@@ -164,6 +165,7 @@ public class MapPresenter {
     }
 
     public static List<Feedstation> from(List<RFeedstation> data) {
+        if (data == null || data.isEmpty()) return null;
         List<Feedstation> list = new ArrayList<>();
         for (RFeedstation station : data) {
             if (station.getType() != null && !station.getType().equals("Feedstation"))

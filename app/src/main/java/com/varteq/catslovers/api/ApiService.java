@@ -2,9 +2,10 @@ package com.varteq.catslovers.api;
 
 import com.varteq.catslovers.api.entity.AuthToken;
 import com.varteq.catslovers.api.entity.BaseResponse;
-import com.varteq.catslovers.api.entity.Cat;
 import com.varteq.catslovers.api.entity.ErrorData;
+import com.varteq.catslovers.api.entity.RCat;
 import com.varteq.catslovers.api.entity.RFeedstation;
+import com.varteq.catslovers.api.entity.RGeoSearch;
 import com.varteq.catslovers.api.entity.RUser;
 
 import java.util.List;
@@ -26,58 +27,58 @@ public interface ApiService {
 
     @FormUrlEncoded
     @POST("cats")
-    Call<BaseResponse<Cat>> createCat(@Field("feedstation_id") int feedstationId,
-                                      @Field("name") String name,
-                                      @Field("nickname") String nickname,
-                                      @Field("color") String colors,
-                                      @Field("age") int age,
-                                      @Field("sex") String sex,
-                                      @Field("weight") float weight,
-                                      @Field("castrated") boolean castrated,
-                                      @Field("description") String description,
-                                      @Field("type") String type,
-                                      @Field("next_flea_treatment") int nextFleaTreatment);
+    Call<BaseResponse<RCat>> createCat(@Field("feedstation_id") int feedstationId,
+                                       @Field("name") String name,
+                                       @Field("nickname") String nickname,
+                                       @Field("color") String colors,
+                                       @Field("age") int age,
+                                       @Field("sex") String sex,
+                                       @Field("weight") float weight,
+                                       @Field("castrated") boolean castrated,
+                                       @Field("description") String description,
+                                       @Field("type") String type,
+                                       @Field("next_flea_treatment") int nextFleaTreatment);
 
     @FormUrlEncoded
     @POST("cats")
-    Call<BaseResponse<Cat>> createPrivateCat(@Field("name") String name,
-                                             @Field("nickname") String nickname,
-                                             @Field("color") String colors,
-                                             @Field("age") int age,
-                                             @Field("sex") String sex,
-                                             @Field("weight") float weight,
-                                             @Field("castrated") boolean castrated,
-                                             @Field("description") String description,
-                                             @Field("type") String type,
-                                             @Field("next_flea_treatment") int nextFleaTreatment,
-                                             @Field("lat") double lat,
-                                             @Field("lng") double lng);
+    Call<BaseResponse<RCat>> createPrivateCat(@Field("name") String name,
+                                              @Field("nickname") String nickname,
+                                              @Field("color") String colors,
+                                              @Field("age") int age,
+                                              @Field("sex") String sex,
+                                              @Field("weight") float weight,
+                                              @Field("castrated") boolean castrated,
+                                              @Field("description") String description,
+                                              @Field("type") String type,
+                                              @Field("next_flea_treatment") int nextFleaTreatment,
+                                              @Field("lat") double lat,
+                                              @Field("lng") double lng);
 
     /*@PUT("cats/{id}")
-    Call<BaseResponse<Cat>> updateFeedstation(@Path("id") int id, @Body Cat cat);*/
+    Call<BaseResponse<RCat>> updateFeedstation(@Path("id") int id, @Body RCat cat);*/
 
     @FormUrlEncoded
     @PUT("cats/{id}")
-    Call<BaseResponse<Cat>> updateCat(@Path("id") int id,
-                                      @Field("name") String name,
-                                      @Field("nickname") String nickname,
-                                      @Field("color") String colors,
-                                      @Field("age") int age,
-                                      @Field("sex") String sex,
-                                      @Field("weight") float weight,
-                                      @Field("castrated") boolean castrated,
-                                      @Field("description") String description,
-                                      @Field("type") String type,
-                                      @Field("next_flea_treatment") int nextFleaTreatment);
+    Call<BaseResponse<RCat>> updateCat(@Path("id") int id,
+                                       @Field("name") String name,
+                                       @Field("nickname") String nickname,
+                                       @Field("color") String colors,
+                                       @Field("age") int age,
+                                       @Field("sex") String sex,
+                                       @Field("weight") float weight,
+                                       @Field("castrated") boolean castrated,
+                                       @Field("description") String description,
+                                       @Field("type") String type,
+                                       @Field("next_flea_treatment") int nextFleaTreatment);
 
     @GET("cats")
-    Call<BaseResponse<List<Cat>>> getCats();
+    Call<BaseResponse<List<RCat>>> getCats();
 
     @FormUrlEncoded
     @POST("geo/search/cats")
-    Call<BaseResponse<List<Cat>>> getCatsInRadius(@Field("lat") double lat,
-                                                  @Field("lng") double lng,
-                                                  @Field("distance") Integer distance);
+    Call<BaseResponse<List<RCat>>> getCatsInRadius(@Field("lat") double lat,
+                                                   @Field("lng") double lng,
+                                                   @Field("distance") Integer distance);
 
     @FormUrlEncoded
     @POST("feedstations")
@@ -103,7 +104,7 @@ public interface ApiService {
 
     @FormUrlEncoded
     @POST("geo/search")
-    Call<BaseResponse<List<RFeedstation>>> getGeoFeedstations(
+    Call<BaseResponse<RGeoSearch>> getGeoFeedstations(
                                                        @Field("lat") double lat,
                                                        @Field("lng") double lng,
                                                        @Field("distance") Integer distance);

@@ -27,7 +27,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="24dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/cat1"
+            android:src="@color/transparent"
             app:layout_constraintBottom_toTopOf="@+id/upload_photo_button"
             app:layout_constraintDimensionRatio="w,1:1"
             app:layout_constraintEnd_toEndOf="parent"
