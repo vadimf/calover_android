@@ -8,17 +8,18 @@ public class Event {
         WARNING, EMERGENCY
     }
 
-    public enum Name {
+    public enum EventType {
         NEWBORN_KITTENS, MUNICIPALITY_INSPECTOR, CAT_IN_HEAT, STRAY_CAT, POISON, MISSING_CAT, CARCASS
     }
 
     private int id;
-    private Name name;
+    private EventType mEventType;
     private Type type;
     private String address;
     private LatLng latLng;
     private String description;
     private String createdAt;
+    private String name;
 
 
     public int getId() {
@@ -29,12 +30,12 @@ public class Event {
         this.id = id;
     }
 
-    public Name getName() {
-        return name;
+    public EventType getEventType() {
+        return mEventType;
     }
 
-    public void setName(Name name) {
-        this.name = name;
+    public void setEventType(EventType eventType) {
+        this.mEventType = eventType;
     }
 
     public Type getType() {
@@ -75,5 +76,13 @@ public class Event {
 
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

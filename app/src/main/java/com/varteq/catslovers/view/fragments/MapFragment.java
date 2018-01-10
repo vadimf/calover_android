@@ -51,6 +51,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.varteq.catslovers.R;
+import com.varteq.catslovers.model.Event;
 import com.varteq.catslovers.model.Feedstation;
 import com.varteq.catslovers.model.GroupPartner;
 import com.varteq.catslovers.utils.ImageUtils;
@@ -364,12 +365,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         this.googleMap.setOnMarkerClickListener(marker -> {
             if (marker.getTag() == null) return false;
             hideBottomSheets();
-            bottomSheetBehaviorFeedstation.setState(BottomSheetBehavior.STATE_COLLAPSED);
-            stationNameTextView.setText(((Feedstation) marker.getTag()).getName());
-            addressTextView.setText(((Feedstation) marker.getTag()).getAddress());
-            bottomSheetFeedstationFrameLayout.setTag(marker.getTag());
+            if (marker.getTag() instanceof Feedstation) {
+                bottomSheetBehaviorFeedstation.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                stationNameTextView.setText(((Feedstation) marker.getTag()).getName());
+                addressTextView.setText(((Feedstation) marker.getTag()).getAddress());
+                bottomSheetFeedstationFrameLayout.setTag(marker.getTag());
 
-            initStationAction((Feedstation) marker.getTag());
+                initStationAction((Feedstation) marker.getTag());
+            }
             return false;
         });
 
@@ -515,7 +518,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         FeedstationActivity.startInViewMode(getActivity(), station);
     }
 
-    public void feedstationsLoaded(List<Feedstation> stations) {
+    public void setMapMarkers(List<Feedstation> stations, List<Event> events) {
         listUpdated = true;
         googleMap.clear();
         for (Feedstation feedstation : stations) {
@@ -545,6 +548,24 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             }
 
         }
+
+        for (Event event : events) {
+            if (event.getLatLng() == null) continue;
+            int resourceId = R.drawable.event_orange;
+            if (event.getType().equals(Event.Type.EMERGENCY))
+                resourceId = R.drawable.event_red;
+
+            if (!isAdded()) return;
+
+            Marker marker = googleMap.addMarker(new MarkerOptions()
+                    .title(event.getName())
+                    .icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory.decodeResource(getResources(),resourceId)))
+                    .anchor(markerPositionX, markerPositionY)
+                    .position(event.getLatLng())
+            );
+            marker.setTag(event);
+        }
+
         addUserLocationMarker();
     }
 

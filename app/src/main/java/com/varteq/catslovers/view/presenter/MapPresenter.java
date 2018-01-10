@@ -12,6 +12,7 @@ import com.varteq.catslovers.api.entity.REvent;
 import com.varteq.catslovers.api.entity.RFeedstation;
 import com.varteq.catslovers.api.entity.RGeoSearch;
 import com.varteq.catslovers.api.entity.RPhoto;
+import com.varteq.catslovers.model.Event;
 import com.varteq.catslovers.model.Feedstation;
 import com.varteq.catslovers.model.GroupPartner;
 import com.varteq.catslovers.model.PhotoWithPreview;
@@ -54,7 +55,7 @@ public class MapPresenter {
 
                         @Override
                         protected void onSuccess(RGeoSearch data) {
-                            view.feedstationsLoaded(from(data.getFeedstations()));
+                            view.setMapMarkers(from(data.getFeedstations()), fromEvents(data.getEvents()));
                         }
 
                         @Override
@@ -205,6 +206,53 @@ public class MapPresenter {
         });
     }
 
+    public static List<Event> fromEvents(List<REvent> data) {
+        if (data == null || data.isEmpty()) return null;
+        List<Event> eventList = new ArrayList<>();
+        for (REvent rEvent : data) {
+            Event event = new Event();
+            event.setId(rEvent.getId());
+            switch (rEvent.getId()) {
+                case MapFragment.EVENT_TYPE_WARNING_NEWBORN_KITTENS:
+                    event.setEventType(Event.EventType.NEWBORN_KITTENS);
+                    break;
+                case MapFragment.EVENT_TYPE_WARNING_MUNICIPALITY_INSPECTOR:
+                    event.setEventType(Event.EventType.MUNICIPALITY_INSPECTOR);
+                    break;
+                case MapFragment.EVENT_TYPE_WARNING_CAT_IN_HEAT:
+                    event.setEventType(Event.EventType.CAT_IN_HEAT);
+                    break;
+                case MapFragment.EVENT_TYPE_WARNING_STRAY_CAT:
+                    event.setEventType(Event.EventType.STRAY_CAT);
+                    break;
+                case MapFragment.EVENT_TYPE_EMERGENCY_POISON:
+                    event.setEventType(Event.EventType.POISON);
+                    break;
+                case MapFragment.EVENT_TYPE_EMERGENCY_MISSING_CAT:
+                    event.setEventType(Event.EventType.MISSING_CAT);
+                    break;
+                case MapFragment.EVENT_TYPE_EMERGENCY_CARCASS:
+                    event.setEventType(Event.EventType.CARCASS);
+                    break;
+            }
+            switch (rEvent.getEventType().getCategory()){
+                case "warning":
+                        event.setType(Event.Type.WARNING);
+                    break;
+                case "emergency":
+                    event.setType(Event.Type.EMERGENCY);
+                    break;
+            }
+            event.setAddress(rEvent.getAddress());
+            event.setCreatedAt(rEvent.getCreatedAt());
+            event.setDescription(rEvent.getDescription());
+            event.setLatLng(new LatLng(rEvent.getLat(), rEvent.getLng()));
+            event.setName(rEvent.getName());
+
+            eventList.add(event);
+        }
+        return eventList;
+    }
 
     public static List<Feedstation> from(List<RFeedstation> data) {
         if (data == null || data.isEmpty()) return null;
