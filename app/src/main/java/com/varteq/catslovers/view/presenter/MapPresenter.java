@@ -8,6 +8,7 @@ import com.varteq.catslovers.api.ServiceGenerator;
 import com.varteq.catslovers.api.entity.BaseResponse;
 import com.varteq.catslovers.api.entity.ErrorData;
 import com.varteq.catslovers.api.entity.ErrorResponse;
+import com.varteq.catslovers.api.entity.REvent;
 import com.varteq.catslovers.api.entity.RFeedstation;
 import com.varteq.catslovers.api.entity.RGeoSearch;
 import com.varteq.catslovers.api.entity.RPhoto;
@@ -16,6 +17,7 @@ import com.varteq.catslovers.model.GroupPartner;
 import com.varteq.catslovers.model.PhotoWithPreview;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.TimeUtils;
+import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.view.fragments.MapFragment;
 
 import java.util.ArrayList;
@@ -163,6 +165,46 @@ public class MapPresenter {
             }
         });
     }
+
+    public void onCreateEventChoosed(int eventType, double latitude, double longitude) {
+        String address = view.getAddress(latitude, longitude);
+        Call<BaseResponse> call = ServiceGenerator.getApiServiceWithToken().createEvent(address, address, latitude, longitude, eventType);
+        call.enqueue(new Callback<BaseResponse>() {
+            @Override
+            public void onResponse(Call<BaseResponse> call, Response<BaseResponse> response) {
+                if (response.isSuccessful()) {
+                    if (response.body().getSuccess()) {
+                        Toaster.shortToast("Event successful created");
+                    } else {
+                        Toaster.shortToast("Fail to create event");
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseResponse> call, Throwable t) {
+                Toaster.shortToast("Fail to create event");
+            }
+        });
+    }
+
+    public void getEventTypes() {
+        Call<BaseResponse<REvent>> call = ServiceGenerator.getApiServiceWithToken().getEventsTypes();
+        call.enqueue(new Callback<BaseResponse<REvent>>() {
+            @Override
+            public void onResponse(Call<BaseResponse<REvent>> call, Response<BaseResponse<REvent>> response) {
+                if (response.isSuccessful()) {
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseResponse<REvent>> call, Throwable t) {
+
+            }
+        });
+    }
+
 
     public static List<Feedstation> from(List<RFeedstation> data) {
         if (data == null || data.isEmpty()) return null;

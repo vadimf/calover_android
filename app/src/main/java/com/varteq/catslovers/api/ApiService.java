@@ -4,6 +4,7 @@ import com.varteq.catslovers.api.entity.AuthToken;
 import com.varteq.catslovers.api.entity.BaseResponse;
 import com.varteq.catslovers.api.entity.ErrorData;
 import com.varteq.catslovers.api.entity.RCat;
+import com.varteq.catslovers.api.entity.REvent;
 import com.varteq.catslovers.api.entity.RFeedstation;
 import com.varteq.catslovers.api.entity.RGeoSearch;
 import com.varteq.catslovers.api.entity.RUser;
@@ -105,9 +106,9 @@ public interface ApiService {
     @FormUrlEncoded
     @POST("geo/search")
     Call<BaseResponse<RGeoSearch>> getGeoFeedstations(
-                                                       @Field("lat") double lat,
-                                                       @Field("lng") double lng,
-                                                       @Field("distance") Integer distance);
+            @Field("lat") double lat,
+            @Field("lng") double lng,
+            @Field("distance") Integer distance);
 
     @GET("feedstations/invitations")
     Call<BaseResponse<List<RFeedstation>>> getInvitations();
@@ -137,4 +138,15 @@ public interface ApiService {
 
     @GET("feedstations/users/joined")
     Call<BaseResponse<List<RUser>>> getAllowedUsers();
+
+    @GET("events/types")
+    Call<BaseResponse<REvent>> getEventsTypes();
+
+    @FormUrlEncoded
+    @POST("events")
+    Call<BaseResponse> createEvent(@Field("name") String name,
+                                   @Field("address") String address,
+                                   @Field("lat") double lat,
+                                   @Field("lng") double lng,
+                                   @Field("type_id") int type_id);
 }
