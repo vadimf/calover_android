@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    style="@style/ListItem"
     android:id="@+id/root"
+    style="@style/ListItem"
+    android:layout_height="wrap_content"
+    android:paddingTop="@dimen/list_item_side_margin"
+    android:paddingBottom="@dimen/list_item_side_margin"
     android:paddingLeft="@dimen/list_item_side_margin"
     android:paddingRight="@dimen/list_item_side_margin"
     tools:ignore="RtlHardcoded">
 
-    <ImageView
+    <com.makeramen.roundedimageview.RoundedImageView
         android:id="@+id/image_dialog_icon"
         style="@style/ListItemIconStyle"
+        app:riv_corner_radius="29dp"
+        app:riv_oval="true"
         tools:ignore="ContentDescription"
         tools:src="@drawable/ic_chat_group" />
 
@@ -20,13 +26,29 @@
 
         <TextView
             android:id="@+id/text_dialog_name"
-            style="@style/DialogNameStyle"
+            style="@style/PrimaryTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
             tools:text="Room name" />
 
         <TextView
             android:id="@+id/text_dialog_last_message"
-            style="@style/DialogLastMessageStyle"
+            style="@style/SecondarySmallTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
             tools:text="Long last message to see how margin on the right side works" />
+
+        <TextView
+            android:id="@+id/text_dialog_last_message_time"
+            style="@style/SecondarySmallTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:paddingTop="2dp"
+            android:textColor="@color/colorSecondaryLight"
+            tools:text="Wed 05-06-2017 07:50AM" />
     </LinearLayout>
 
     <TextView

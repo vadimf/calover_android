@@ -317,7 +317,11 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
         dialogsFriendsListView.addHeaderView(listHeader, null, false);*/
 
         dialogsFriendsListView.setAdapter(friendsDialogsAdapter);
+        dialogsFriendsListView.setDivider(getResources().getDrawable(R.drawable.dialog_list_divider));
+        dialogsFriendsListView.setDividerHeight(2);
         dialogsGroupsListView.setAdapter(groupsDialogsAdapter);
+        dialogsGroupsListView.setDivider(getResources().getDrawable(R.drawable.dialog_list_divider));
+        dialogsGroupsListView.setDividerHeight(2);
 
         dialogsFriendsListView.setOnItemClickListener((parent, view, position, id) -> {
             QBChatDialog selectedDialog = (QBChatDialog) parent.getItemAtPosition(position);
