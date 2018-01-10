@@ -13,7 +13,6 @@ import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.users.model.QBUser;
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.utils.ChatHelper;
-import com.varteq.catslovers.utils.NetworkUtils;
 import com.varteq.catslovers.utils.ResourceUtils;
 import com.varteq.catslovers.utils.UiUtils;
 import com.varteq.catslovers.utils.qb.QbDialogUtils;
@@ -49,9 +48,9 @@ public class DialogsAdapter extends BaseSelectableListAdapter<QBChatDialog> {
         QBChatDialog dialog = getItem(position);
         if (dialog.getType().equals(QBDialogType.PRIVATE)) {
             QBUser user = ChatHelper.getInstance().getInterlocutorUserFromDialog(dialog);
-            if (user != null && user.getFileId() != null)
+            if (user != null && user.getCustomData() != null)
                 Glide.with(holder.rootLayout)
-                        .load(NetworkUtils.getUserAvatarGlideUrl(String.valueOf(user.getFileId())))
+                        .load(user.getCustomData())
                         .into(holder.dialogImageView);
             else {
                 holder.dialogImageView.setBackgroundDrawable(UiUtils.getColorCircleDrawable(position));

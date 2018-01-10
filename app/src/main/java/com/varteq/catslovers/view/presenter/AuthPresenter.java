@@ -1,8 +1,6 @@
 package com.varteq.catslovers.view.presenter;
 
 import android.content.Context;
-import android.graphics.BitmapFactory;
-import android.media.ThumbnailUtils;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -29,8 +27,7 @@ import com.amazonaws.services.cognitoidentityprovider.model.InvalidParameterExce
 import com.amazonaws.services.cognitoidentityprovider.model.LimitExceededException;
 import com.amazonaws.services.cognitoidentityprovider.model.NotAuthorizedException;
 import com.amazonaws.services.cognitoidentityprovider.model.UserNotFoundException;
-import com.quickblox.content.QBContent;
-import com.quickblox.content.model.QBFile;
+import com.google.gson.Gson;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.users.QBUsers;
@@ -43,8 +40,9 @@ import com.varteq.catslovers.api.entity.BaseResponse;
 import com.varteq.catslovers.api.entity.ErrorResponse;
 import com.varteq.catslovers.api.entity.RCat;
 import com.varteq.catslovers.api.entity.RFeedstation;
+import com.varteq.catslovers.api.entity.RUserInfo;
 import com.varteq.catslovers.utils.ChatHelper;
-import com.varteq.catslovers.utils.ImageUtils;
+import com.varteq.catslovers.utils.GenericOf;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.utils.Utils;
@@ -57,7 +55,6 @@ import net.gotev.uploadservice.ServerResponse;
 import net.gotev.uploadservice.UploadInfo;
 import net.gotev.uploadservice.UploadServiceBroadcastReceiver;
 
-import java.io.File;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -82,6 +79,7 @@ public class AuthPresenter {
     private long lastResendTime = System.currentTimeMillis();
     private long RESEND_INTERVAL = 90 * 1000;
     private boolean isPasswordReseted;
+    private QBUser qbUser;
 
     public AuthPresenter(String username, ValidateNumberActivity view) {
         this.username = username;
@@ -338,7 +336,7 @@ public class AuthPresenter {
             view.showIndefiniteError("Fatal error, you must reinstall app", null);
             return;
         }
-        final QBUser qbUser = new QBUser(id, AppController.USER_PASS);
+        qbUser = new QBUser(id, AppController.USER_PASS);
         qbUser.setFullName(Profile.getUserName(view));
         //qbUser.setExternalId(profile.getUserId());
         //qbUser.setWebsite(profile.getPicture());
@@ -350,7 +348,8 @@ public class AuthPresenter {
             @Override
             public void onSuccess(Void aVoid, Bundle bundle) {
                 Log.i(TAG, "chat login success");
-                String path = Profile.getUserAvatar(view);
+                getCats();
+                /*String path = Profile.getUserAvatar(view);
                 if (!path.isEmpty()) {
                     try {
                         path = ImageUtils.saveBitmapToFile(ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(path),
@@ -360,7 +359,7 @@ public class AuthPresenter {
                         e.printStackTrace();
                         updateQBUser(qbUser);
                     }
-                } else updateQBUser(qbUser);
+                } else updateQBUser(qbUser);*/
             }
 
             @Override
@@ -423,81 +422,6 @@ public class AuthPresenter {
         });
     }
 
-    private void changeQBUserAvatar(QBUser user, String path) {
-        errListener = new OneTimeOnClickListener() {
-            @Override
-            protected void onClick() {
-                view.showWaitDialog();
-                changeQBUserAvatar(user, path);
-            }
-        };
-
-        if (user.getFileId() != null) {
-            deleteOldAvatar(user, path);
-            return;
-        }
-
-        if (path.isEmpty()) {
-            updateQBUser(user);
-            return;
-        }
-        File file = new File(path);
-
-        Boolean fileIsPublic = false;
-
-        QBContent.uploadFileTask(file, fileIsPublic, null).performAsync(new QBEntityCallback<QBFile>() {
-            @Override
-            public void onSuccess(QBFile qbFile, Bundle bundle) {
-                int uploadedFileID = qbFile.getId();
-                Log.i(TAG, "changeQBUserAvatar success");
-
-                // Connect image to user
-                user.setFileId(uploadedFileID);
-                updateQBUser(user);
-            }
-
-            @Override
-            public void onError(QBResponseException e) {
-                Log.e(TAG, "changeQBUserAvatar", e);
-                if (checkNetworkErrAndShowSnackbar(e)) {
-                    view.hideWaitDialog();
-                    return;
-                }
-                view.showIndefiniteError(e.getLocalizedMessage(), errListener);
-                view.hideWaitDialog();
-            }
-        });
-    }
-
-    private void deleteOldAvatar(QBUser user, String path) {
-        errListener = new OneTimeOnClickListener() {
-            @Override
-            protected void onClick() {
-                view.showWaitDialog();
-                deleteOldAvatar(user, path);
-            }
-        };
-
-        QBContent.deleteFile(user.getFileId()).performAsync(new QBEntityCallback<Void>() {
-            @Override
-            public void onSuccess(Void aVoid, Bundle bundle) {
-                user.setFileId(null);
-                changeQBUserAvatar(user, path);
-            }
-
-            @Override
-            public void onError(QBResponseException e) {
-                Log.e(TAG, "deleteFile", e);
-                if (checkNetworkErrAndShowSnackbar(e)) {
-                    view.hideWaitDialog();
-                    return;
-                }
-                view.showIndefiniteError(e.getLocalizedMessage(), errListener);
-                view.hideWaitDialog();
-            }
-        });
-    }
-
     private void updateQBUser(QBUser user) {
         errListener = new OneTimeOnClickListener() {
             @Override
@@ -515,7 +439,7 @@ public class AuthPresenter {
             @Override
             public void onSuccess(QBUser qbUser, Bundle bundle) {
                 Log.i(TAG, "updateQBUser success");
-                getCats();
+                view.onSuccessSignIn();
             }
 
             @Override
@@ -546,7 +470,7 @@ public class AuthPresenter {
             @Override
             public void onResponse(Call<BaseResponse<List<RCat>>> call, Response<BaseResponse<List<RCat>>> response) {
                 Profile.setUserPetCount(view, 1);
-                uploadAvatar();
+                getPrivateFeedstation();
             }
 
             @Override
@@ -556,7 +480,8 @@ public class AuthPresenter {
                     view.hideWaitDialog();
                     return;
                 }
-                view.onSuccessSignIn();
+                view.showIndefiniteError(t.getLocalizedMessage(), errListener);
+                view.hideWaitDialog();
             }
         });
     }
@@ -586,14 +511,16 @@ public class AuthPresenter {
                                     break;
                                 }
                             }
-                            view.onSuccessSignIn();
+                            uploadAvatar();
                         }
 
                         @Override
                         protected void onFail(ErrorResponse error) {
-                            if (error != null)
-                                Log.d(TAG, error.getMessage() + error.getCode());
-                            view.onSuccessSignIn();
+                            if (error != null) {
+                                Log.e(TAG, error.getMessage() + error.getCode());
+                                view.showIndefiniteError(error.getMessage(), errListener);
+                            }
+                            view.hideWaitDialog();
                         }
                     };
                 }
@@ -606,7 +533,8 @@ public class AuthPresenter {
                     view.hideWaitDialog();
                     return;
                 }
-                view.onSuccessSignIn();
+                view.showIndefiniteError(t.getLocalizedMessage(), errListener);
+                view.hideWaitDialog();
             }
         });
     }
@@ -788,7 +716,7 @@ public class AuthPresenter {
 
         String path = Profile.getUserAvatar(view);
         if (path.isEmpty()) {
-            getPrivateFeedstation();
+            updateQBUser(qbUser);
             return;
         }
         try {
@@ -815,21 +743,30 @@ public class AuthPresenter {
                 view.hideWaitDialog();
                 return;
             }
-            getPrivateFeedstation();
+            updateQBUser(qbUser);
             view.unregisterUploadAvatarReceiver(broadcastReceiver);
         }
 
         @Override
         public void onCompleted(Context context, UploadInfo uploadInfo, ServerResponse serverResponse) {
             Log.d("uploadAvatar ", "onCompleted");
-            getPrivateFeedstation();
+
+            try {
+                Gson gson = new Gson();
+
+                BaseResponse<RUserInfo> user = gson.fromJson(serverResponse.getBodyAsString(), new GenericOf<>(BaseResponse.class, RUserInfo.class));
+                if (user != null && user.getSuccess() && user.getData() != null && user.getData().getAvatarUrlThumbnail() != null)
+                    qbUser.setCustomData(user.getData().getAvatarUrlThumbnail());
+            } catch (Exception e) {
+            }
+            updateQBUser(qbUser);
             view.unregisterUploadAvatarReceiver(broadcastReceiver);
         }
 
         @Override
         public void onCancelled(Context context, UploadInfo uploadInfo) {
             Log.d("uploadAvatar ", "canceled");
-            getPrivateFeedstation();
+            updateQBUser(qbUser);
             view.unregisterUploadAvatarReceiver(broadcastReceiver);
         }
     };
