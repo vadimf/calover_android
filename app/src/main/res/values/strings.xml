@@ -145,4 +145,20 @@
     <string name="friends">FRIENDS</string>
     <string name="groups">GROUPS</string>
 
+    <!--Events-->
+    <string name="choose_option">Choose option</string>
+    <string name="emergencies">Emergencies</string>
+    <string name="warnings">Warnings</string>
+    <string name="open_feedstation">Open Feedstation</string>
+    <string name="choose_which_emergencies">Choose which Emergencies</string>
+    <string name="poison">Poison</string>
+    <string name="missing_cat">Missing Cat</string>
+    <string name="carcass">Carcass</string>
+    <string name="choose_which_warnings">Choose which warnings</string>
+
+    <string name="months">months</string>
+    <string name="newborn_kittens">Newborn Kittens</string>
+    <string name="municipality_inspector">Municipality Inspector</string>
+    <string name="cat_in_heat">Cat in Heat</string>
+    <string name="stray_cat_capture_operation">Stray cat (capture operation)</string>
 </resources>

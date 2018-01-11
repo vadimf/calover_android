@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="190dp"
+                android:background="@color/transparent"
+                app:behavior_peekHeight="190dp">
+
+    <Button
+        style="@style/OrangeColorButton"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_marginStart="40dp"
+        android:text="@string/choose_which_warnings"
+        />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="175dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/white">
+
+        <RadioGroup
+            android:id="@+id/radioGroup_warnings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical">
+
+            <android.support.v7.widget.AppCompatRadioButton
+                android:id="@+id/radioButton_warnings_newborn_kittens"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/newborn_kittens"
+                android:textColor="@color/orange"
+                android:textStyle="bold"
+                app:buttonTint="@color/orange"/>
+
+            <android.support.v7.widget.AppCompatRadioButton
+                android:id="@+id/radioButton_warnings_municipality_inspector"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/municipality_inspector"
+                android:textColor="@color/orange"
+                android:textStyle="bold"
+                app:buttonTint="@color/orange"/>
+
+            <android.support.v7.widget.AppCompatRadioButton
+                android:id="@+id/radioButton_warnings_cat_in_heat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/cat_in_heat"
+                android:textColor="@color/orange"
+                android:textStyle="bold"
+                app:buttonTint="@color/orange"/>
+
+            <android.support.v7.widget.AppCompatRadioButton
+                android:id="@+id/radioButton_warnings_stray_cat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/stray_cat_capture_operation"
+                android:textColor="@color/orange"
+                android:textStyle="bold"
+                app:buttonTint="@color/orange"/>
+        </RadioGroup>
+    </FrameLayout>
+
+
+</RelativeLayout>

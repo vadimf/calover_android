@@ -8,14 +8,17 @@ import com.varteq.catslovers.api.ServiceGenerator;
 import com.varteq.catslovers.api.entity.BaseResponse;
 import com.varteq.catslovers.api.entity.ErrorData;
 import com.varteq.catslovers.api.entity.ErrorResponse;
+import com.varteq.catslovers.api.entity.REvent;
 import com.varteq.catslovers.api.entity.RFeedstation;
 import com.varteq.catslovers.api.entity.RGeoSearch;
 import com.varteq.catslovers.api.entity.RPhoto;
+import com.varteq.catslovers.model.Event;
 import com.varteq.catslovers.model.Feedstation;
 import com.varteq.catslovers.model.GroupPartner;
 import com.varteq.catslovers.model.PhotoWithPreview;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.TimeUtils;
+import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.view.fragments.MapFragment;
 
 import java.util.ArrayList;
@@ -52,7 +55,7 @@ public class MapPresenter {
 
                         @Override
                         protected void onSuccess(RGeoSearch data) {
-                            view.feedstationsLoaded(from(data.getFeedstations()));
+                            view.feedstationsLoaded(from(data.getFeedstations()), fromEvents(data.getEvents()));
                         }
 
                         @Override
@@ -162,6 +165,93 @@ public class MapPresenter {
                 Log.e(TAG, "followFeedstation onFailure " + t.getMessage());
             }
         });
+    }
+
+    public void onCreateEventChoosed(int eventType, double latitude, double longitude) {
+        String address = view.getAddress(latitude, longitude);
+        Call<BaseResponse> call = ServiceGenerator.getApiServiceWithToken().createEvent(address, address, latitude, longitude, eventType);
+        call.enqueue(new Callback<BaseResponse>() {
+            @Override
+            public void onResponse(Call<BaseResponse> call, Response<BaseResponse> response) {
+                if (response.isSuccessful()) {
+                    if (response.body().getSuccess()) {
+                        Toaster.shortToast("Event successful created");
+                    } else {
+                        Toaster.shortToast("Fail to create event");
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseResponse> call, Throwable t) {
+                Toaster.shortToast("Fail to create event");
+            }
+        });
+    }
+
+    public void getEventTypes() {
+        Call<BaseResponse<REvent>> call = ServiceGenerator.getApiServiceWithToken().getEventsTypes();
+        call.enqueue(new Callback<BaseResponse<REvent>>() {
+            @Override
+            public void onResponse(Call<BaseResponse<REvent>> call, Response<BaseResponse<REvent>> response) {
+                if (response.isSuccessful()) {
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseResponse<REvent>> call, Throwable t) {
+
+            }
+        });
+    }
+
+    public static List<Event> fromEvents(List<REvent> data) {
+        if (data == null || data.isEmpty()) return null;
+        List<Event> eventList = new ArrayList<>();
+        for (REvent rEvent : data) {
+            Event event = new Event();
+            event.setId(rEvent.getId());
+            switch (rEvent.getId()) {
+                case MapFragment.EVENT_TYPE_WARNING_NEWBORN_KITTENS:
+                    event.setEventType(Event.EventType.NEWBORN_KITTENS);
+                    break;
+                case MapFragment.EVENT_TYPE_WARNING_MUNICIPALITY_INSPECTOR:
+                    event.setEventType(Event.EventType.MUNICIPALITY_INSPECTOR);
+                    break;
+                case MapFragment.EVENT_TYPE_WARNING_CAT_IN_HEAT:
+                    event.setEventType(Event.EventType.CAT_IN_HEAT);
+                    break;
+                case MapFragment.EVENT_TYPE_WARNING_STRAY_CAT:
+                    event.setEventType(Event.EventType.STRAY_CAT);
+                    break;
+                case MapFragment.EVENT_TYPE_EMERGENCY_POISON:
+                    event.setEventType(Event.EventType.POISON);
+                    break;
+                case MapFragment.EVENT_TYPE_EMERGENCY_MISSING_CAT:
+                    event.setEventType(Event.EventType.MISSING_CAT);
+                    break;
+                case MapFragment.EVENT_TYPE_EMERGENCY_CARCASS:
+                    event.setEventType(Event.EventType.CARCASS);
+                    break;
+            }
+            switch (rEvent.getEventType().getCategory()){
+                case "warning":
+                        event.setType(Event.Type.WARNING);
+                    break;
+                case "emergency":
+                    event.setType(Event.Type.EMERGENCY);
+                    break;
+            }
+            event.setAddress(rEvent.getAddress());
+            event.setCreatedAt(rEvent.getCreatedAt());
+            event.setDescription(rEvent.getDescription());
+            event.setLatLng(new LatLng(rEvent.getLat(), rEvent.getLng()));
+            event.setName(rEvent.getName());
+
+            eventList.add(event);
+        }
+        return eventList;
     }
 
     public static List<Feedstation> from(List<RFeedstation> data) {

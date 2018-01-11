@@ -65,6 +65,7 @@ import com.varteq.catslovers.view.qb.AttachmentImageActivity;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -85,6 +86,12 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
     private String PET_DEFAULT_NAME = "Pet Name";
     private final int REQUEST_CODE_GET_IMAGE = 1;
     private final int REQUEST_CODE_GET_AVATAR = 2;
+
+    CharSequence[] fleaTreatmentPickerList = new CharSequence[]{"3 " + getString(R.string.months),
+            "6 " + getString(R.string.months), "12 " + getString(R.string.months)};
+    private final int FLEA_TREATMENT_THREE_MONTHS = 0;
+    private final int FLEA_TREATMENT_SIX_MONTHS = 1;
+    private final int FLEA_TREATMENT_TWELVE_MONTHS = 2;
 
     @BindView(R.id.main_layout)
     ConstraintLayout mainLayout;
@@ -724,14 +731,18 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
 
     @OnClick(R.id.weight_value_textView)
     void onWeightClick() {
-        EditTextDialog editTextDialog = new EditTextDialog(this, "Enter cat's weight", "kg",
+        EditTextDialog editTextDialog = new EditTextDialog(this, "Enter cat's weight", "For example: 5.350",
                 new EditTextDialog.OnClickListener() {
                     @Override
                     public void onPositiveButtonClick() {
                         String enteredValue = getEditTextDialog().getEditText().getText().toString();
                         if (Utils.isStringNumericPositive(enteredValue)) {
-                            setWeight(enteredValue);
-                            dismiss();
+                            if (Float.parseFloat(enteredValue) <= 20) {
+                                setWeight(enteredValue);
+                                dismiss();
+                            } else {
+                                Toaster.shortToast("Weight should be no more than 20");
+                            }
                         } else {
                             Toaster.shortToast("Invalid weight");
                         }
@@ -833,10 +844,27 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
 
     @OnClick(R.id.flea_treatment_picker_button)
     void showFleaTreatmentPicker() {
-        new WrappedDatePickerDialog(this, fleaTreatmentDateMilis, (datePicker, i, i1, i2) -> {
-            fleaTreatmentDateMilis = TimeUtils.getTimeInMillis(i, i1, i2);
-            fleaTreatmentValueTextView.setText(TimeUtils.getDateAsDDMMYYYY(fleaTreatmentDateMilis));
-        });
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setItems(fleaTreatmentPickerList,
+                (dialogInterface, i) -> {
+                    int addMonthsCount = 0;
+                    switch (i) {
+                        case FLEA_TREATMENT_THREE_MONTHS:
+                            addMonthsCount = 3;
+                            break;
+                        case FLEA_TREATMENT_SIX_MONTHS:
+                            addMonthsCount = 6;
+                            break;
+                        case FLEA_TREATMENT_TWELVE_MONTHS:
+                            addMonthsCount = 12;
+                            break;
+                    }
+                    Calendar fleaThretmentCalendar = Calendar.getInstance();
+                    fleaThretmentCalendar.add(Calendar.MONTH, addMonthsCount);
+                    fleaTreatmentDateMilis = fleaThretmentCalendar.getTimeInMillis();
+                    fleaTreatmentValueTextView.setText(TimeUtils.getDateAsDDMMYYYY(fleaTreatmentDateMilis));
+                });
+        builder.show();
     }
 
     @OnClick(R.id.pet_name_textView)

@@ -3,6 +3,7 @@ package com.varteq.catslovers.view.fragments;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -10,6 +11,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -20,9 +23,12 @@ import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -45,6 +51,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.varteq.catslovers.R;
+import com.varteq.catslovers.model.Event;
 import com.varteq.catslovers.model.Feedstation;
 import com.varteq.catslovers.model.GroupPartner;
 import com.varteq.catslovers.utils.ImageUtils;
@@ -56,7 +63,9 @@ import com.varteq.catslovers.utils.Utils;
 import com.varteq.catslovers.view.FeedstationActivity;
 import com.varteq.catslovers.view.presenter.MapPresenter;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -64,6 +73,14 @@ import butterknife.ButterKnife;
 import static com.varteq.catslovers.utils.SystemPermissionHelper.PERMISSIONS_ACCESS_LOCATION_REQUEST;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
+
+    public static final int EVENT_TYPE_WARNING_NEWBORN_KITTENS = 1;
+    public static final int EVENT_TYPE_WARNING_MUNICIPALITY_INSPECTOR = 2;
+    public static final int EVENT_TYPE_WARNING_CAT_IN_HEAT = 3;
+    public static final int EVENT_TYPE_WARNING_STRAY_CAT = 4;
+    public static final int EVENT_TYPE_EMERGENCY_POISON = 5;
+    public static final int EVENT_TYPE_EMERGENCY_MISSING_CAT = 6;
+    public static final int EVENT_TYPE_EMERGENCY_CARCASS = 7;
 
     private final String TAG = MapFragment.class.getSimpleName();
     private final int DEFAULT_ZOOM = 5;
@@ -84,7 +101,20 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     TextView stationNameTextView;
     @BindView(R.id.address_textView)
     TextView addressTextView;
+
+    @BindView(R.id.bottom_sheet_warnings)
+    FrameLayout bottomSheetEventsWarningsFrameLayout;
+    @BindView(R.id.radioGroup_warnings)
+    RadioGroup warningsRadioGroup;
+
+    @BindView(R.id.bottom_sheet_emergencies)
+    FrameLayout bottomSheetEventsEmergenciesFrameLayout;
+    @BindView(R.id.radioGroup_emergencies)
+    RadioGroup emergenciesRadioGroup;
+
     BottomSheetBehavior bottomSheetBehaviorFeedstation;
+    BottomSheetBehavior bottomSheetBehaviorEventsWarnings;
+    BottomSheetBehavior bottomSheetBehaviorEventsEmergencies;
     @BindView(R.id.bottom_sheet_other_view)
     View bottomSheetOtherView;
     Button followButton;
@@ -94,6 +124,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private MarkerOptions userLocationMarkerOptions;
     private boolean listUpdated;
     private LatLng userLocation;
+    private LatLng selectedLocation;
 
     private SystemPermissionHelper permissionHelper;
     private LocationRequest locationRequest;
@@ -121,10 +152,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         ButterKnife.bind(this, view);
         followButton = bottomSheetFeedstationFrameLayout.findViewById(R.id.follow_button);
         dialogTextView = bottomSheetFeedstationFrameLayout.findViewById(R.id.dialogTextView);
-        bottomSheetBehaviorFeedstation = BottomSheetBehavior.from(bottomSheetFeedstationFrameLayout);
-        bottomSheetBehaviorFeedstation.setState(BottomSheetBehavior.STATE_HIDDEN);
-        setBottomSheetDimensions();
+        setFeedstationBottomSheetDimensions();
 
+        initBottomBehaviors();
         initLocation();
         initListeners();
 
@@ -197,7 +227,71 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
             }
         });
+
+        warningsRadioGroup.setOnCheckedChangeListener((radioGroup, i) -> {
+            switch (radioGroup.getCheckedRadioButtonId()) {
+                case R.id.radioButton_warnings_newborn_kittens:
+                    presenter.onCreateEventChoosed(EVENT_TYPE_WARNING_NEWBORN_KITTENS, selectedLocation.latitude, selectedLocation.longitude);
+                    hideBottomSheets();
+                    break;
+                case R.id.radioButton_warnings_municipality_inspector:
+                    presenter.onCreateEventChoosed(EVENT_TYPE_WARNING_MUNICIPALITY_INSPECTOR, selectedLocation.latitude, selectedLocation.longitude);
+                    hideBottomSheets();
+                    break;
+                case R.id.radioButton_warnings_cat_in_heat:
+                    presenter.onCreateEventChoosed(EVENT_TYPE_WARNING_CAT_IN_HEAT, selectedLocation.latitude, selectedLocation.longitude);
+                    hideBottomSheets();
+                    break;
+                case R.id.radioButton_warnings_stray_cat:
+                    presenter.onCreateEventChoosed(EVENT_TYPE_WARNING_STRAY_CAT, selectedLocation.latitude, selectedLocation.longitude);
+                    hideBottomSheets();
+                    break;
+            }
+        });
+        emergenciesRadioGroup.setOnCheckedChangeListener((radioGroup, i) -> {
+            switch (radioGroup.getCheckedRadioButtonId()) {
+                case R.id.radioButton_emergencies_poison:
+                    presenter.onCreateEventChoosed(EVENT_TYPE_EMERGENCY_POISON, selectedLocation.latitude, selectedLocation.longitude);
+                    hideBottomSheets();
+                    break;
+                case R.id.radioButton_emergencies_missing_cat:
+                    presenter.onCreateEventChoosed(EVENT_TYPE_EMERGENCY_MISSING_CAT, selectedLocation.latitude, selectedLocation.longitude);
+                    hideBottomSheets();
+                    break;
+                case R.id.radioButton_emergencies_carcass:
+                    presenter.onCreateEventChoosed(EVENT_TYPE_EMERGENCY_CARCASS, selectedLocation.latitude, selectedLocation.longitude);
+                    hideBottomSheets();
+                    break;
+            }
+
+        });
     }
+
+    private void initBottomBehaviors() {
+        bottomSheetBehaviorFeedstation = BottomSheetBehavior.from(bottomSheetFeedstationFrameLayout);
+        bottomSheetBehaviorFeedstation.setState(BottomSheetBehavior.STATE_HIDDEN);
+        bottomSheetBehaviorEventsWarnings = BottomSheetBehavior.from(bottomSheetEventsWarningsFrameLayout);
+        bottomSheetBehaviorEventsWarnings.setState(BottomSheetBehavior.STATE_HIDDEN);
+        bottomSheetBehaviorEventsEmergencies = BottomSheetBehavior.from(bottomSheetEventsEmergenciesFrameLayout);
+        bottomSheetBehaviorEventsEmergencies.setState(BottomSheetBehavior.STATE_HIDDEN);
+    }
+
+    public String getAddress(double lat, double lng) {
+        Geocoder geocoder;
+        List<Address> addresses = null;
+        String address = null;
+        geocoder = new Geocoder(getContext(), Locale.getDefault());
+
+        try {
+            addresses = geocoder.getFromLocation(lat, lng, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (addresses != null && !addresses.isEmpty())
+            address = addresses.get(0).getAddressLine(0);
+        return address;
+    }
+
 
     @Override
     public void onResume() {
@@ -266,16 +360,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         setUserPosition();
 
-        this.googleMap.setOnMapClickListener(latLng -> bottomSheetBehaviorFeedstation.setState(BottomSheetBehavior.STATE_HIDDEN));
+        this.googleMap.setOnMapClickListener(latLng -> hideBottomSheets());
 
         this.googleMap.setOnMarkerClickListener(marker -> {
             if (marker.getTag() == null) return false;
-            bottomSheetBehaviorFeedstation.setState(BottomSheetBehavior.STATE_COLLAPSED);
-            stationNameTextView.setText(((Feedstation) marker.getTag()).getName());
-            addressTextView.setText(((Feedstation) marker.getTag()).getAddress());
-            bottomSheetFeedstationFrameLayout.setTag(marker.getTag());
+            hideBottomSheets();
+            if (marker.getTag() instanceof Feedstation) {
+                bottomSheetBehaviorFeedstation.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                stationNameTextView.setText(((Feedstation) marker.getTag()).getName());
+                addressTextView.setText(((Feedstation) marker.getTag()).getAddress());
+                bottomSheetFeedstationFrameLayout.setTag(marker.getTag());
 
-            initStationAction((Feedstation) marker.getTag());
+                initStationAction((Feedstation) marker.getTag());
+            }
             return false;
         });
 
@@ -283,7 +380,31 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             /*Location selectedLocation = new Location("");
             selectedLocation.setLatitude(latLng.latitude);
             selectedLocation.setLongitude(latLng.longitude);*/
-            FeedstationActivity.startInCreateMode(getActivity(), latLng);
+            final Dialog dialog = new Dialog(getContext());
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+            RelativeLayout mapOptionsDialogLayout = (RelativeLayout) LayoutInflater.from(getContext()).inflate(R.layout.dialog_map_options, null);
+            Button openFeedStationButton = mapOptionsDialogLayout.findViewById(R.id.button_open_feedstation);
+            Button warningsButton = mapOptionsDialogLayout.findViewById(R.id.button_warnings);
+            Button emergenciesButton = mapOptionsDialogLayout.findViewById(R.id.button_emergencies);
+
+            openFeedStationButton.setOnClickListener(view -> {
+                FeedstationActivity.startInCreateMode(getActivity(), latLng);
+                dialog.dismiss();
+            });
+            selectedLocation = latLng;
+            warningsButton.setOnClickListener(view -> {
+                showWarningsBottomSheet();
+                dialog.dismiss();
+            });
+            emergenciesButton.setOnClickListener(view -> {
+                showEmergenciesBottomSheet();
+                dialog.dismiss();
+            });
+
+
+            dialog.setContentView(mapOptionsDialogLayout);
+            dialog.show();
             Log.d(TAG, "OnMapLongClick " + latLng.latitude + " / " + latLng.longitude + "]");
         });
 
@@ -296,6 +417,26 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             listUpdated = true;
             presenter.getFeedstations(userLocation.latitude, userLocation.longitude, 20);
         }
+    }
+
+    private void showWarningsBottomSheet() {
+        hideBottomSheets();
+        warningsRadioGroup.clearCheck();
+        bottomSheetBehaviorEventsWarnings.setState(BottomSheetBehavior.STATE_EXPANDED);
+    }
+
+    private void showEmergenciesBottomSheet() {
+        hideBottomSheets();
+        emergenciesRadioGroup.clearCheck();
+        bottomSheetBehaviorEventsEmergencies.setState(BottomSheetBehavior.STATE_EXPANDED);
+    }
+
+    private void hideBottomSheets() {
+        bottomSheetBehaviorEventsEmergencies.setState(BottomSheetBehavior.STATE_HIDDEN);
+        bottomSheetBehaviorEventsWarnings.setState(BottomSheetBehavior.STATE_HIDDEN);
+        bottomSheetBehaviorFeedstation.setState(BottomSheetBehavior.STATE_HIDDEN);
+        emergenciesRadioGroup.clearCheck();
+        warningsRadioGroup.clearCheck();
     }
 
     private void setStationActionName(String name) {
@@ -359,7 +500,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         return Bitmap.createScaledBitmap(bitmap, inWidth, inHeight, false);
     }
 
-    private void setBottomSheetDimensions() {
+    private void setFeedstationBottomSheetDimensions() {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int screenHeight = displayMetrics.heightPixels;
@@ -377,8 +518,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         FeedstationActivity.startInViewMode(getActivity(), station);
     }
 
-    public void feedstationsLoaded(List<Feedstation> stations) {
-        if (stations == null) return;
+    public void feedstationsLoaded(List<Feedstation> stations, List<Event> events) {
+        if (stations == null || events == null) return;
         listUpdated = true;
         googleMap.clear();
         for (Feedstation feedstation : stations) {
@@ -400,14 +541,32 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     .position(feedstation.getLocation()));
             marker.setTag(feedstation);
 
-                if (bottomSheetBehaviorFeedstation.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
-                    if (feedstation.getId().equals(((Feedstation) bottomSheetFeedstationFrameLayout.getTag()).getId())) {
-                        bottomSheetFeedstationFrameLayout.setTag(marker.getTag());
-                        initStationAction(feedstation);
-                    }
+            if (bottomSheetBehaviorFeedstation.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
+                if (feedstation.getId().equals(((Feedstation) bottomSheetFeedstationFrameLayout.getTag()).getId())) {
+                    bottomSheetFeedstationFrameLayout.setTag(marker.getTag());
+                    initStationAction(feedstation);
                 }
+            }
 
         }
+
+        for (Event event : events) {
+            if (event.getLatLng() == null) continue;
+            int resourceId = R.drawable.event_orange;
+            if (event.getType().equals(Event.Type.EMERGENCY))
+                resourceId = R.drawable.event_red;
+
+            if (!isAdded()) return;
+
+            Marker marker = googleMap.addMarker(new MarkerOptions()
+                    .title(event.getName())
+                    .icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory.decodeResource(getResources(),resourceId)))
+                    .anchor(markerPositionX, markerPositionY)
+                    .position(event.getLatLng())
+            );
+            marker.setTag(event);
+        }
+
         addUserLocationMarker();
     }
 

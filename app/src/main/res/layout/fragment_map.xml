@@ -48,4 +48,29 @@
         <include layout="@layout/bottom_sheet_feedstation"/>
     </FrameLayout>
 
+    <FrameLayout
+        android:id="@+id/bottom_sheet_warnings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="true"
+        app:behavior_hideable="true"
+        app:layout_behavior="android.support.design.widget.BottomSheetBehavior"
+        >
+
+        <include layout="@layout/bottom_sheet_warnings"/>
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/bottom_sheet_emergencies"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="true"
+        app:behavior_hideable="true"
+        app:layout_behavior="android.support.design.widget.BottomSheetBehavior"
+        >
+
+        <include layout="@layout/bottom_sheet_emergencies"/>
+    </FrameLayout>
+
+
 </android.support.design.widget.CoordinatorLayout>
