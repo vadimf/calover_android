@@ -25,9 +25,9 @@ public class REvent {
     @SerializedName("description")
     @Expose
     private String description;
-    @SerializedName("created_at")
+    @SerializedName("created")
     @Expose
-    private String createdAt;
+    private int created;
 
     public int getId() {
         return id;
@@ -85,11 +85,11 @@ public class REvent {
         this.description = description;
     }
 
-    public String getCreatedAt() {
-        return createdAt;
+    public int getCreated() {
+        return created;
     }
 
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
+    public void setCreated(int created) {
+        this.created = created;
     }
 }

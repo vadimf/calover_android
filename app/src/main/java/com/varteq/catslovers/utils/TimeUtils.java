@@ -42,6 +42,11 @@ public class TimeUtils {
         return dateFormat.format(new Date(milis));
     }
 
+    public static String getDateAsddMMMyyyy(Date date) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
+        return dateFormat.format(date);
+    }
+
     public static long getTimeInMillis(int year, int month, int monthDay) {
         Calendar birthday = Calendar.getInstance();
         birthday.set(Calendar.YEAR, year);

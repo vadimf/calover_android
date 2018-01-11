@@ -60,4 +60,18 @@ public class Utils {
             return false;
     }
 
+    public static String splitAddress(String fullAddress, int partsCount) {
+        String[] parts = fullAddress.split(",");
+        StringBuilder splitAddress = new StringBuilder();
+        
+        if (parts.length > partsCount) {
+            for (int i = 0; i < partsCount; i++) {
+                splitAddress.append(parts[i]);
+                if (i != partsCount - 1)
+                    splitAddress.append(", ");
+            }
+        }
+        return splitAddress.toString();
+    }
+
 }
