@@ -53,7 +53,7 @@ public class FeedFragment extends Fragment {
 
         feedRecyclerView = view.findViewById(R.id.feedRecyclerView);
 
-        adapter = new FeedAdapter(feedList, getContext());
+        adapter = new FeedAdapter(feedList, getContext(), feedPost -> presenter.updateFeedPost(feedPost));
         layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         layoutManager.setStackFromEnd(true);
         feedRecyclerView.setAdapter(adapter);

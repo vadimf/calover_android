@@ -4,11 +4,14 @@ import android.net.Uri;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class FeedPost implements Serializable {
     private String id;
     private Integer userId;
+    private Integer stationId;
     private Date date;
     private Uri previewUri;
     private Uri mediaUri;
@@ -19,7 +22,7 @@ public class FeedPost implements Serializable {
     private String avatarName;
     private String name;
     private String message;
-    private int likes;
+    private List<Integer> likes;
     private FeedPostType type;
 
     public enum FeedPostType {
@@ -42,7 +45,8 @@ public class FeedPost implements Serializable {
         this.mediaUri = mediaUri;
     }
 
-    public FeedPost(String id, Integer userId, Date date, Uri avatarUri, String userName, String message, String previewName, String mediaName, FeedPostType type) {
+    public FeedPost(String id, Integer userId, Date date, Uri avatarUri, String userName, String message,
+                    String previewName, String mediaName, List<Integer> likes, Integer stationId, FeedPostType type) {
         this.id = id;
         this.userId = userId;
         this.date = date;
@@ -52,9 +56,11 @@ public class FeedPost implements Serializable {
         this.name = userName;
         this.message = message;
         this.type = type;
+        this.likes = likes;
+        this.stationId = stationId;
     }
 
-    public FeedPost(String id, Date date, Uri previewUri, Uri mediaUri, Uri avatarUri, String name, String message, int likes, FeedPostType type) {
+    public FeedPost(String id, Date date, Uri previewUri, Uri mediaUri, Uri avatarUri, String name, String message, List<Integer> likes, FeedPostType type) {
         this.id = id;
         this.date = date;
         this.previewUri = previewUri;
@@ -114,11 +120,11 @@ public class FeedPost implements Serializable {
         this.message = message;
     }
 
-    public int getLikes() {
+    public List<Integer> getLikes() {
         return likes;
     }
 
-    public void setLikes(int likes) {
+    public void setLikes(List<Integer> likes) {
         this.likes = likes;
     }
 
@@ -160,5 +166,24 @@ public class FeedPost implements Serializable {
 
     public Integer getUserId() {
         return userId;
+    }
+
+    public Integer getStationId() {
+        return stationId;
+    }
+
+    public boolean getIsUserLiked(Integer id) {
+        if (likes != null && likes.contains(id))
+            return true;
+        else return false;
+    }
+
+    public void onUserLiked(Integer currentUserId, boolean isLiked) {
+        if (isLiked) {
+            if (likes == null)
+                likes = new ArrayList<>();
+            likes.add(currentUserId);
+        } else if (likes != null)
+            likes.remove(currentUserId);
     }
 }

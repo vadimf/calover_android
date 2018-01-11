@@ -135,4 +135,22 @@ public class FeedPresenter {
             }
         });
     }
+
+    public void updateFeedPost(FeedPost feedPost) {
+        QBFeedPost object = new QBFeedPost(feedPost.getId(), feedPost.getLikes(), feedPost.getMessage(), String.valueOf(feedPost.getStationId()));
+
+        QBCustomObjects.updateObject(object).performAsync(new QBEntityCallback<QBCustomObject>() {
+            @Override
+            public void onSuccess(QBCustomObject createdObject, Bundle params) {
+                int i = 0;
+                Log.d(TAG, "updateFeedPost onSuccess ");
+            }
+
+            @Override
+            public void onError(QBResponseException errors) {
+                int i = 0;
+                Log.e(TAG, "updateFeedPost onError " + errors.getMessage());
+            }
+        });
+    }
 }

@@ -5,6 +5,7 @@ import android.net.Uri;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.customobjects.model.QBCustomObject;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -16,11 +17,18 @@ public class QBFeedPost extends QBCustomObject {
     public static final String VIDEO_FIELD = "video";
     public static final String STATION_ID_FIELD = "station_id";
     public static final String PREVIEW_FIELD = "preview";
+    public static final String USERS_LIKED_FIELD = "users_liked_post";
 
     public QBFeedPost(String message, String stationId) {
         putString("description", message);
         putString(STATION_ID_FIELD, stationId);
         setClassName(CLASS_NAME);
+    }
+
+    public QBFeedPost(String id, List<Integer> usersLiked, String message, String stationId) {
+        this(message, stationId);
+        setCustomObjectId(id);
+        putArray(USERS_LIKED_FIELD, usersLiked);
     }
 
     public QBFeedPost(String id) {
@@ -44,11 +52,18 @@ public class QBFeedPost extends QBCustomObject {
             type = FeedPost.FeedPostType.PICTURE;
         }
 
-        object.getString(STATION_ID_FIELD);
+        List<Object> usersObjects = object.getArray(USERS_LIKED_FIELD);
+        List<Integer> usersIds = null;
+        if (usersObjects != null && !usersObjects.isEmpty()) {
+            usersIds = new ArrayList<>();
+            for (Object o : usersObjects)
+                usersIds.add(Integer.parseInt((String) o));
+        }
+
         return new FeedPost(object.getCustomObjectId(), object.getUserId(), object.getCreatedAt(),
                 avatarUri,
                 userName,
-                object.getString("description"), previewName, mediaName, type);
+                object.getString("description"), previewName, mediaName, usersIds, Integer.parseInt(object.getString(STATION_ID_FIELD)), type);
     }
 
     public static QBRequestGetBuilder getRequestBuilder(List<String> ids) {
