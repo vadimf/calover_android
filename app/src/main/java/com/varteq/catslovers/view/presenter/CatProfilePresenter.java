@@ -204,7 +204,6 @@ public class CatProfilePresenter {
                     .addParameter("description", cat.getDescription())
                     .addParameter("type", type)
                     .addParameter("next_flea_treatment", String.valueOf(nextFleaTreatment))
-                    .setNotificationConfig(new UploadNotificationConfig())
                     .setMaxRetries(1)
                     .setDelegate(new UploadStatusDelegate() {
                         @Override

@@ -56,6 +56,10 @@ public class UiUtils {
         return previousColor;
     }
 
+    public static int getCircleColorForPosition(int colorPosition) {
+        return getCircleColor(colorPosition % RANDOM_COLOR_END_RANGE);
+    }
+
     public static int getCircleColor(@IntRange(from = RANDOM_COLOR_START_RANGE, to = RANDOM_COLOR_END_RANGE)
                                              int colorPosition) {
         String colorIdName = String.format("random_color_%d", colorPosition + 1);

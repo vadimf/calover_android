@@ -11,7 +11,7 @@ public class ErrorResponse {
     }
 
     public String getMessage() {
-        return message;
+        return message != null ? message : "";
     }
 
     public void setMessage(String message) {
@@ -19,7 +19,7 @@ public class ErrorResponse {
     }
 
     public Integer getCode() {
-        return code;
+        return code != null ? code : 0;
     }
 
     public void setCode(Integer code) {

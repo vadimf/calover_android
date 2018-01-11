@@ -36,6 +36,12 @@ public class TimeUtils {
         return dateFormat.format(date);
     }
 
+    public static String getDateAsEEEMMddyyyyHHmmaa(long milis) {
+        if (milis <= 0) return "";
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MM-dd-yyyy HH:mmaa", Locale.getDefault());
+        return dateFormat.format(new Date(milis));
+    }
+
     public static long getTimeInMillis(int year, int month, int monthDay) {
         Calendar birthday = Calendar.getInstance();
         birthday.set(Calendar.YEAR, year);

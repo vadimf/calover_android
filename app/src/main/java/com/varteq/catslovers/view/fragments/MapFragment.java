@@ -518,7 +518,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         FeedstationActivity.startInViewMode(getActivity(), station);
     }
 
-    public void setMapMarkers(List<Feedstation> stations, List<Event> events) {
+    public void feedstationsLoaded(List<Feedstation> stations, List<Event> events) {
+        if (stations == null || events == null) return;
         listUpdated = true;
         googleMap.clear();
         for (Feedstation feedstation : stations) {

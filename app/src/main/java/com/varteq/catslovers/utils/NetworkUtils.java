@@ -1,5 +1,8 @@
 package com.varteq.catslovers.utils;
 
+import com.bumptech.glide.load.model.GlideUrl;
+import com.bumptech.glide.load.model.LazyHeaders;
+import com.quickblox.auth.session.QBSessionManager;
 import com.varteq.catslovers.api.ServiceGenerator;
 import com.varteq.catslovers.api.entity.ErrorData;
 
@@ -33,6 +36,22 @@ public class NetworkUtils {
 
     public static boolean isNetworkErr(Exception e) {
         return isNetworkErr(e.toString());
+    }
+
+    /**
+     * -H "QuickBlox-REST-API-Version: 0.1.0" \
+     * -H "QB-Token: 69217f8cfa59ebbb42d610ccb8ac1e55988cadd7" \
+     * https://api.quickblox.com/blobs/43234/download.json
+     */
+    public static GlideUrl getUserAvatarGlideUrl(String avatarId) {
+        if (!ChatHelper.getInstance().isLogged())
+            return null;
+        GlideUrl glideUrl = new GlideUrl("https://api.quickblox.com/blobs/" + avatarId + "/download.json",
+                new LazyHeaders.Builder()
+                        .addHeader("QuickBlox-REST-API-Version", "0.1.0")
+                        .addHeader("QB-Token", QBSessionManager.getInstance().getToken())
+                        .build());
+        return glideUrl;
     }
 }
 

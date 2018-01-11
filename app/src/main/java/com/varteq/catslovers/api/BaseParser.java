@@ -18,7 +18,7 @@ public abstract class BaseParser<T> {
                             ((ErrorData) response.body().getData()).getCode()));
                 else onFail(null);
             }
-        } else onFail(null);
+        } else onFail(new ErrorResponse(response.message(), response.code()));
     }
 
     protected abstract void onSuccess(T data);

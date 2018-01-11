@@ -11,12 +11,15 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
+import com.makeramen.roundedimageview.RoundedImageView;
+import com.quickblox.users.model.QBUser;
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.model.FeedPost;
 import com.varteq.catslovers.utils.PostPreviewDownloader;
 import com.varteq.catslovers.utils.TimeUtils;
 import com.varteq.catslovers.utils.UiUtils;
+import com.varteq.catslovers.utils.Utils;
+import com.varteq.catslovers.utils.qb.QbUsersHolder;
 import com.varteq.catslovers.view.MediaViewerActivity;
 
 import java.util.List;
@@ -45,19 +48,20 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
 
         holder.nameTextView.setText(feed.getName());
         //holder.likesTextView.setText(String.valueOf(feed.getLikes()));
-        holder.avatarImageView.setBackgroundDrawable(UiUtils.getColorCircleDrawable(feed.getUserId()));
+        QBUser user = QbUsersHolder.getInstance().getUserById(feed.getUserId());
+        if (user != null && user.getCustomData() != null) {
+            Glide.with(holder.itemView)
+                    .load(user.getCustomData())
+                    .into(holder.avatarImageView);
+        } else
+            holder.avatarImageView.setImageBitmap(Utils.getBitmapWithColor(UiUtils.getCircleColorForPosition(feed.getUserId())));
+
         String message = feed.getMessage();
         if (message != null && !message.equals("null"))
             holder.messageTextView.setText(feed.getMessage());
         else holder.messageTextView.setText(null);
 
         cleanView(holder);
-
-        Glide.with(context)
-                .load(feed.getAvatarUri())
-                .apply(new RequestOptions().centerCrop())
-                .into(holder.avatarImageView);
-
 
         if (feed.getType().equals(FeedPost.FeedPostType.VIDEO)) {
             // video
@@ -119,7 +123,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         TextView nameTextView;
         TextView timeTextView;
         //TextView likesTextView;
-        ImageView avatarImageView;
+        RoundedImageView avatarImageView;
         //ImageButton menuButton;
         TextView messageTextView;
         //ImageButton likeButton;

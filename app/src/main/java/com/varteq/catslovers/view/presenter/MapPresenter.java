@@ -55,7 +55,7 @@ public class MapPresenter {
 
                         @Override
                         protected void onSuccess(RGeoSearch data) {
-                            view.setMapMarkers(from(data.getFeedstations()), fromEvents(data.getEvents()));
+                            view.feedstationsLoaded(from(data.getFeedstations()), fromEvents(data.getEvents()));
                         }
 
                         @Override

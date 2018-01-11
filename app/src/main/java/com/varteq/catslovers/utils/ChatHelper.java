@@ -126,12 +126,17 @@ public class ChatHelper {
         });
     }
 
-    public void login(final QBUser user, final QBEntityCallback<Void> callback) {
+    public void login(final QBUser user, final QBEntityCallback<Void> callback, QBEntityCallback<QBUser> callbackWithFileId) {
         // Create REST API session on QuickBlox
         QBUsers.signIn(user).performAsync(new QbEntityCallbackTwoTypeWrapper<QBUser, Void>(callback) {
             @Override
             public void onSuccess(QBUser qbUser, Bundle args) {
                 user.setId(qbUser.getId());
+                if (callbackWithFileId != null) {
+                    user.setFileId(qbUser.getFileId());
+                    user.setOldPassword(qbUser.getOldPassword());
+                    callbackWithFileId.onSuccess(user, null);
+                }
                 loginToChat(user, new QbEntityCallbackWrapper<>(callback));
             }
         });
@@ -421,6 +426,15 @@ public class ChatHelper {
                         callback.onSuccess(qbUsers, bundle);
                     }
                 });
+    }
+
+    public QBUser getInterlocutorUserFromDialog(QBChatDialog dialog) {
+        if (ChatHelper.getCurrentUser().getId() == null) return null;
+        for (Integer id : dialog.getOccupants()) {
+            if (!ChatHelper.getCurrentUser().getId().equals(id))
+                return QbUsersHolder.getInstance().getUserById(id);
+        }
+        return null;
     }
 
     public void loadFileAsAttachment(File file, QBEntityCallback<QBAttachment> callback) {

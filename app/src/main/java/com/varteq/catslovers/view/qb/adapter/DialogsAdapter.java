@@ -4,13 +4,17 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.makeramen.roundedimageview.RoundedImageView;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBDialogType;
+import com.quickblox.users.model.QBUser;
 import com.varteq.catslovers.R;
+import com.varteq.catslovers.utils.ChatHelper;
 import com.varteq.catslovers.utils.ResourceUtils;
+import com.varteq.catslovers.utils.TimeUtils;
 import com.varteq.catslovers.utils.UiUtils;
 import com.varteq.catslovers.utils.qb.QbDialogUtils;
 
@@ -34,7 +38,8 @@ public class DialogsAdapter extends BaseSelectableListAdapter<QBChatDialog> {
             holder.rootLayout = (ViewGroup) convertView.findViewById(R.id.root);
             holder.nameTextView = (TextView) convertView.findViewById(R.id.text_dialog_name);
             holder.lastMessageTextView = (TextView) convertView.findViewById(R.id.text_dialog_last_message);
-            holder.dialogImageView = (ImageView) convertView.findViewById(R.id.image_dialog_icon);
+            holder.lastMessageTimeTextView = (TextView) convertView.findViewById(R.id.text_dialog_last_message_time);
+            holder.dialogImageView = convertView.findViewById(R.id.image_dialog_icon);
             holder.unreadCounterTextView = (TextView) convertView.findViewById(R.id.text_dialog_unread_count);
 
             convertView.setTag(holder);
@@ -43,16 +48,25 @@ public class DialogsAdapter extends BaseSelectableListAdapter<QBChatDialog> {
         }
 
         QBChatDialog dialog = getItem(position);
-        if (dialog.getType().equals(QBDialogType.GROUP)) {
+        if (dialog.getType().equals(QBDialogType.PRIVATE)) {
+            QBUser user = ChatHelper.getInstance().getInterlocutorUserFromDialog(dialog);
+            if (user != null && user.getCustomData() != null)
+                Glide.with(holder.rootLayout)
+                        .load(user.getCustomData())
+                        .into(holder.dialogImageView);
+            else {
+                holder.dialogImageView.setBackgroundDrawable(UiUtils.getColorCircleDrawable(position));
+                holder.dialogImageView.setImageDrawable(null);
+            }
+
+        } else {
             holder.dialogImageView.setBackgroundDrawable(UiUtils.getGreyCircleDrawable());
             holder.dialogImageView.setImageResource(R.drawable.ic_chat_group);
-        } else {
-            holder.dialogImageView.setBackgroundDrawable(UiUtils.getColorCircleDrawable(position));
-            holder.dialogImageView.setImageDrawable(null);
         }
 
         holder.nameTextView.setText(QbDialogUtils.getDialogName(dialog));
         holder.lastMessageTextView.setText(prepareTextLastMessage(dialog));
+        holder.lastMessageTimeTextView.setText(TimeUtils.getDateAsEEEMMddyyyyHHmmaa(dialog.getLastMessageDateSent() * 1000L));
 
         int unreadMessagesCount = getUnreadMsgCount(dialog);
         if (unreadMessagesCount == 0) {
@@ -93,9 +107,10 @@ public class DialogsAdapter extends BaseSelectableListAdapter<QBChatDialog> {
 
     private static class ViewHolder {
         ViewGroup rootLayout;
-        ImageView dialogImageView;
+        RoundedImageView dialogImageView;
         TextView nameTextView;
         TextView lastMessageTextView;
+        TextView lastMessageTimeTextView;
         TextView unreadCounterTextView;
     }
 }
