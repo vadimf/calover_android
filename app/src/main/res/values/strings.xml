@@ -137,6 +137,7 @@
     <string name="group_join_request_sent">Request to join group sent</string>
     <string name="group_join_invited">You invited to this group. Join</string>
     <string name="group_admin">You are admin of group</string>
+    <string name="photos">photos</string>
 
     <!--New feed-->
     <string name="add_photo">Add photo</string>

@@ -404,6 +404,7 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
             descriptionEditText.setText(catProfile.getDescription());
             avatar = catProfile.getAvatar();
             photoList = catProfile.getPhotos();
+            petNamePhotosTextView.setText(catProfile.getPetName() + " " + getString(R.string.photos));
         } else {
             colorsList = new ArrayList<>();
         }

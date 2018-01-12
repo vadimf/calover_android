@@ -81,6 +81,8 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
     Button followButton;
     @BindView(R.id.dialogTextView)
     TextView dialogTextView;
+    @BindView(R.id.station_name_photos_textView)
+    TextView stationNamePhotosTextView;
 
     @BindView(R.id.photos_RecyclerView)
     RecyclerView photosRecyclerView;
@@ -211,6 +213,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
             descriptionEditText.setText(feedstation.getDescription());
             photoList = feedstation.getPhotos();
             pagerAdapter.notifyDataSetChanged();
+            stationNamePhotosTextView.setText(feedstation.getName() + " " + getString(R.string.photos));
             initStationAction();
         }
         /*scrollView.setOnTouchListener((v, event) -> {
@@ -305,7 +308,6 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
         setToolbarTitle(stationNameTextView.getText().toString());
 
         stationNameTextView.setEnabled(false);
-        addressTextView.setEnabled(false);
 
         currentMode = FeedstationScreenMode.VIEW_MODE;
 
@@ -333,7 +335,6 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
             addressTextView.setText(ADDRESS_DEFAULT_VALUE);
 
         stationNameTextView.setEnabled(true);
-        addressTextView.setEnabled(true);
 
         /*addPhotoButton.setVisibility(View.VISIBLE);
         addPhotoButton.setOnClickListener(view -> Toaster.shortToast("Coming soon"));*/
@@ -379,10 +380,10 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
         switch (item.getItemId()) {
             case R.id.app_bar_save:
                 Log.d(TAG, "app_bar_save");
-                if (!feedstation.getIsPublic()) {
+/*                if (!feedstation.getIsPublic()) {
                     savedSuccessfully();
                     return true;
-                }
+                }*/
                 if (!isProfileValid())
                     return true;
                 presenter.uploadFeedstationWithPhotos(fillFeedstation());

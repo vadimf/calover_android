@@ -84,7 +84,6 @@ public class FeedstationPresenter {
 
 
             uploadCatRequest.addParameter("name", feedstation.getName())
-                    .addParameter("address", feedstation.getAddress())
                     .addParameter("description", feedstation.getDescription())
                     .addParameter("time_to_feed", String.valueOf(0))
                     .addParameter("lat", String.valueOf(feedstation.getLocation().latitude))

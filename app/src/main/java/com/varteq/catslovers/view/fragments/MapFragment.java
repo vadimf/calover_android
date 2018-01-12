@@ -292,12 +292,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onResume() {
         super.onResume();
-        switch (bottomSheetBehaviorFeedstation.getState()) {
-            case BottomSheetBehavior.STATE_EXPANDED:
-                bottomSheetBehaviorFeedstation.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                break;
+        if (bottomSheetBehaviorFeedstation.getState() == BottomSheetBehavior.STATE_EXPANDED || bottomSheetBehaviorFeedstation.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
+            switch (bottomSheetBehaviorFeedstation.getState()) {
+                case BottomSheetBehavior.STATE_EXPANDED:
+                    bottomSheetBehaviorFeedstation.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                    break;
+            }
+            Feedstation feedstation = (Feedstation) bottomSheetFeedstationFrameLayout.getTag();
+            fillFeedstationBottomSheet(feedstation.getName(), feedstation.getAddress());
+            initStationAction(feedstation);
         }
-        initStationAction((Feedstation) bottomSheetFeedstationFrameLayout.getTag());
+
     }
 
     public void initStationAction(Feedstation feedstation) {
@@ -440,6 +445,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     public void showFeedstationMarkerBottomSheet(String name, String address) {
         bottomSheetBehaviorFeedstation.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        fillFeedstationBottomSheet(name, address);
+    }
+
+    public void fillFeedstationBottomSheet(String name, String address) {
         stationNameTextView.setText(name);
         addressTextView.setText(address);
     }
@@ -563,6 +572,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     if (feedstation.getId().equals(((Feedstation) bottomSheetFeedstationFrameLayout.getTag()).getId())) {
                         bottomSheetFeedstationFrameLayout.setTag(marker.getTag());
                         initStationAction(feedstation);
+                        fillFeedstationBottomSheet(feedstation.getName(), feedstation.getAddress());
                     }
                 }
             }

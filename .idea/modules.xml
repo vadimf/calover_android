@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/CatLovers.iml" filepath="$PROJECT_DIR$/CatLovers.iml" />
-      <module fileurl="file://$PROJECT_DIR$/CatsLovers.iml" filepath="$PROJECT_DIR$/CatsLovers.iml" />
+      <module fileurl="file://$PROJECT_DIR$/CatLoversAndroid_Client.iml" filepath="$PROJECT_DIR$/CatLoversAndroid_Client.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
