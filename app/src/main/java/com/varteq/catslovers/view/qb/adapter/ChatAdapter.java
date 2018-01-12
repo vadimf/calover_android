@@ -19,6 +19,7 @@ import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.makeramen.roundedimageview.RoundedImageView;
 import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBChatMessage;
@@ -28,6 +29,8 @@ import com.varteq.catslovers.R;
 import com.varteq.catslovers.utils.ChatHelper;
 import com.varteq.catslovers.utils.ResourceUtils;
 import com.varteq.catslovers.utils.TimeUtils;
+import com.varteq.catslovers.utils.UiUtils;
+import com.varteq.catslovers.utils.Utils;
 import com.varteq.catslovers.utils.qb.PaginationHistoryListener;
 import com.varteq.catslovers.utils.qb.QbUsersHolder;
 import com.varteq.catslovers.view.qb.AttachmentImageActivity;
@@ -64,6 +67,7 @@ public class ChatAdapter extends BaseListAdapter<QBChatMessage> {
             holder = new ViewHolder();
             convertView = inflater.inflate(R.layout.list_item_chat_message, parent, false);
 
+            holder.avatarImageView = convertView.findViewById(R.id.avatarImageView);
             holder.messageBodyTextView = (TextView) convertView.findViewById(R.id.text_image_message);
             holder.messageAuthorTextView = (TextView) convertView.findViewById(R.id.text_message_author);
             holder.messageContainerLayout = (LinearLayout) convertView.findViewById(R.id.layout_chat_message_container);
@@ -78,6 +82,17 @@ public class ChatAdapter extends BaseListAdapter<QBChatMessage> {
         }
 
         final QBChatMessage chatMessage = getItem(position);
+
+        QBUser user;
+        if (chatMessage.getSenderId() != null)
+            user = QbUsersHolder.getInstance().getUserById(chatMessage.getSenderId());
+        else user = ChatHelper.getCurrentUser();
+        if (user != null && user.getCustomData() != null) {
+            Glide.with(convertView)
+                    .load(user.getCustomData())
+                    .into(holder.avatarImageView);
+        } else
+            holder.avatarImageView.setImageBitmap(Utils.getBitmapWithColor(UiUtils.getCircleColorForPosition(user != null ? user.getId() : 0)));
 
         setIncomingOrOutgoingMessageAttributes(holder, chatMessage);
         setMessageBody(holder, chatMessage);
@@ -264,6 +279,22 @@ public class ChatAdapter extends BaseListAdapter<QBChatMessage> {
                 ? R.color.text_color_white
                 : R.color.colorPrimary;
         holder.messageBodyTextView.setTextColor(ResourceUtils.getColor(textColorResource));
+
+        RelativeLayout.LayoutParams avatarParams = (RelativeLayout.LayoutParams) holder.avatarImageView.getLayoutParams();
+        RelativeLayout.LayoutParams messageBodyContainerParams = (RelativeLayout.LayoutParams) holder.messageBodyContainerLayout.getLayoutParams();
+        if (isIncoming) {
+            avatarParams.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+            avatarParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
+            messageBodyContainerParams.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+            messageBodyContainerParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
+        } else {
+            avatarParams.removeRule(RelativeLayout.ALIGN_PARENT_LEFT);
+            avatarParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+            messageBodyContainerParams.removeRule(RelativeLayout.ALIGN_PARENT_LEFT);
+            messageBodyContainerParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+        }
+        holder.avatarImageView.setLayoutParams(avatarParams);
+        holder.messageBodyContainerLayout.setLayoutParams(messageBodyContainerParams);
     }
 
     private boolean hasAttachments(QBChatMessage chatMessage) {
@@ -294,6 +325,7 @@ public class ChatAdapter extends BaseListAdapter<QBChatMessage> {
     }
 
     private static class ViewHolder {
+        public RoundedImageView avatarImageView;
         public TextView messageBodyTextView;
         public TextView messageAuthorTextView;
         public TextView messageInfoTextView;
