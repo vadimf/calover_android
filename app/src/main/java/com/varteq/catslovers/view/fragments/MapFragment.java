@@ -465,6 +465,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         warningsRadioGroup.clearCheck();
     }
 
+    public boolean isFeedstationBottomSheetShowed() {
+        return bottomSheetBehaviorFeedstation.getState() == BottomSheetBehavior.STATE_COLLAPSED
+                || bottomSheetBehaviorFeedstation.getState() == BottomSheetBehavior.STATE_EXPANDED;
+    }
+
     private void setStationActionName(String name) {
         dialogTextView.setText(name);
     }

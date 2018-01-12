@@ -199,15 +199,17 @@ public class MapPresenter {
 
     public void onMarkerClicked(Object markerTag) {
         if (markerTag == null) return;
-        view.hideBottomSheets();
 
         if (markerTag instanceof Feedstation) {
+            if (!view.isFeedstationBottomSheetShowed())
+                view.hideBottomSheets();
             Feedstation feedstation = (Feedstation) markerTag;
             view.showFeedstationMarkerBottomSheet(feedstation.getName(), feedstation.getAddress());
             view.setBottomSheetFeedstationTag(feedstation);
             view.initStationAction(feedstation);
             view.hideEventMarkerDialog();
         } else if (markerTag instanceof Event) {
+            view.hideBottomSheets();
             Event event = (Event) markerTag;
             view.showEventMarkerDialog(event.getAddress(), TimeUtils.getDateAsddMMMyyyy(event.getDate()), event.getTypeName(), event.getType());
         }

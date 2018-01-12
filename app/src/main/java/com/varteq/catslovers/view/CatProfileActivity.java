@@ -589,8 +589,10 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
         infoLinearLayout.setVisibility(View.GONE);
         addPhotoButton.setVisibility(View.VISIBLE);
 
-        petLayout.setEnabled(true);
-        strayLayout.setEnabled(true);
+        if (currentMode.equals(CatProfileScreenMode.CREATE_MODE)) {
+            petLayout.setEnabled(true);
+            strayLayout.setEnabled(true);
+        }
 
         petNameTextView.setEnabled(true);
 
