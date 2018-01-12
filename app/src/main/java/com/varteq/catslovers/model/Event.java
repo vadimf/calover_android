@@ -2,6 +2,8 @@ package com.varteq.catslovers.model;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.Date;
+
 public class Event {
 
     public enum Type {
@@ -18,8 +20,9 @@ public class Event {
     private String address;
     private LatLng latLng;
     private String description;
-    private String createdAt;
+    private Date date;
     private String name;
+    private String typeName;
 
 
     public int getId() {
@@ -70,12 +73,12 @@ public class Event {
         this.description = description;
     }
 
-    public String getCreatedAt() {
-        return createdAt;
+    public Date getDate() {
+        return date;
     }
 
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
+    public void setDate(Date date) {
+        this.date = date;
     }
 
     public String getName() {
@@ -84,5 +87,13 @@ public class Event {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getTypeName() {
+        return typeName;
+    }
+
+    public void setTypeName(String typeName) {
+        this.typeName = typeName;
     }
 }

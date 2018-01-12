@@ -30,6 +30,14 @@ import retrofit2.Response;
 
 public class MapPresenter {
 
+    public static final int EVENT_TYPE_WARNING_NEWBORN_KITTENS = 1;
+    public static final int EVENT_TYPE_WARNING_MUNICIPALITY_INSPECTOR = 2;
+    public static final int EVENT_TYPE_WARNING_CAT_IN_HEAT = 3;
+    public static final int EVENT_TYPE_WARNING_STRAY_CAT = 4;
+    public static final int EVENT_TYPE_EMERGENCY_POISON = 5;
+    public static final int EVENT_TYPE_EMERGENCY_MISSING_CAT = 6;
+    public static final int EVENT_TYPE_EMERGENCY_CARCASS = 7;
+
     private String TAG = MapPresenter.class.getSimpleName();
 
     private MapFragment view;
@@ -189,6 +197,23 @@ public class MapPresenter {
         });
     }
 
+    public void onMarkerClicked(Object markerTag) {
+        if (markerTag == null) return;
+        view.hideBottomSheets();
+
+        if (markerTag instanceof Feedstation) {
+            Feedstation feedstation = (Feedstation) markerTag;
+            view.showFeedstationMarkerBottomSheet(feedstation.getName(), feedstation.getAddress());
+            view.setBottomSheetFeedstationTag(feedstation);
+            view.initStationAction(feedstation);
+            view.hideEventMarkerDialog();
+        } else if (markerTag instanceof Event) {
+            Event event = (Event) markerTag;
+            view.showEventMarkerDialog(event.getAddress(), TimeUtils.getDateAsddMMMyyyy(event.getDate()), event.getTypeName(), event.getType());
+        }
+
+    }
+
     public void getEventTypes() {
         Call<BaseResponse<REvent>> call = ServiceGenerator.getApiServiceWithToken().getEventsTypes();
         call.enqueue(new Callback<BaseResponse<REvent>>() {
@@ -212,39 +237,40 @@ public class MapPresenter {
         for (REvent rEvent : data) {
             Event event = new Event();
             event.setId(rEvent.getId());
+            event.setTypeName(rEvent.getEventType().getName());
             switch (rEvent.getId()) {
-                case MapFragment.EVENT_TYPE_WARNING_NEWBORN_KITTENS:
+                case EVENT_TYPE_WARNING_NEWBORN_KITTENS:
                     event.setEventType(Event.EventType.NEWBORN_KITTENS);
                     break;
-                case MapFragment.EVENT_TYPE_WARNING_MUNICIPALITY_INSPECTOR:
+                case EVENT_TYPE_WARNING_MUNICIPALITY_INSPECTOR:
                     event.setEventType(Event.EventType.MUNICIPALITY_INSPECTOR);
                     break;
-                case MapFragment.EVENT_TYPE_WARNING_CAT_IN_HEAT:
+                case EVENT_TYPE_WARNING_CAT_IN_HEAT:
                     event.setEventType(Event.EventType.CAT_IN_HEAT);
                     break;
-                case MapFragment.EVENT_TYPE_WARNING_STRAY_CAT:
+                case EVENT_TYPE_WARNING_STRAY_CAT:
                     event.setEventType(Event.EventType.STRAY_CAT);
                     break;
-                case MapFragment.EVENT_TYPE_EMERGENCY_POISON:
+                case EVENT_TYPE_EMERGENCY_POISON:
                     event.setEventType(Event.EventType.POISON);
                     break;
-                case MapFragment.EVENT_TYPE_EMERGENCY_MISSING_CAT:
+                case EVENT_TYPE_EMERGENCY_MISSING_CAT:
                     event.setEventType(Event.EventType.MISSING_CAT);
                     break;
-                case MapFragment.EVENT_TYPE_EMERGENCY_CARCASS:
+                case EVENT_TYPE_EMERGENCY_CARCASS:
                     event.setEventType(Event.EventType.CARCASS);
                     break;
             }
-            switch (rEvent.getEventType().getCategory()){
+            switch (rEvent.getEventType().getCategory()) {
                 case "warning":
-                        event.setType(Event.Type.WARNING);
+                    event.setType(Event.Type.WARNING);
                     break;
                 case "emergency":
                     event.setType(Event.Type.EMERGENCY);
                     break;
             }
             event.setAddress(rEvent.getAddress());
-            event.setCreatedAt(rEvent.getCreatedAt());
+            event.setDate(TimeUtils.getLocalDateFromUtc(rEvent.getCreated()));
             event.setDescription(rEvent.getDescription());
             event.setLatLng(new LatLng(rEvent.getLat(), rEvent.getLng()));
             event.setName(rEvent.getName());

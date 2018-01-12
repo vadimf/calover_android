@@ -87,8 +87,7 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
     private final int REQUEST_CODE_GET_IMAGE = 1;
     private final int REQUEST_CODE_GET_AVATAR = 2;
 
-    CharSequence[] fleaTreatmentPickerList = new CharSequence[]{"3 " + getString(R.string.months),
-            "6 " + getString(R.string.months), "12 " + getString(R.string.months)};
+    CharSequence[] fleaTreatmentPickerList;
     private final int FLEA_TREATMENT_THREE_MONTHS = 0;
     private final int FLEA_TREATMENT_SIX_MONTHS = 1;
     private final int FLEA_TREATMENT_TWELVE_MONTHS = 2;
@@ -278,6 +277,9 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
                         colorFourRoundedImageView,
                         colorFiveRoundedImageView,
                         colorSixRoundedImageView));
+
+        fleaTreatmentPickerList = new CharSequence[]{"3 " + getString(R.string.months),
+                "6 " + getString(R.string.months), "12 " + getString(R.string.months)};
 
         fillUI();
         setupUIMode();

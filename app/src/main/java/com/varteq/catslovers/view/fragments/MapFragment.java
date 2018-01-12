@@ -61,6 +61,7 @@ import com.varteq.catslovers.utils.SystemPermissionHelper;
 import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.utils.Utils;
 import com.varteq.catslovers.view.FeedstationActivity;
+import com.varteq.catslovers.view.adapters.info_window_adapter.EventInfoWindowAdapter;
 import com.varteq.catslovers.view.presenter.MapPresenter;
 
 import java.io.IOException;
@@ -73,14 +74,6 @@ import butterknife.ButterKnife;
 import static com.varteq.catslovers.utils.SystemPermissionHelper.PERMISSIONS_ACCESS_LOCATION_REQUEST;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
-
-    public static final int EVENT_TYPE_WARNING_NEWBORN_KITTENS = 1;
-    public static final int EVENT_TYPE_WARNING_MUNICIPALITY_INSPECTOR = 2;
-    public static final int EVENT_TYPE_WARNING_CAT_IN_HEAT = 3;
-    public static final int EVENT_TYPE_WARNING_STRAY_CAT = 4;
-    public static final int EVENT_TYPE_EMERGENCY_POISON = 5;
-    public static final int EVENT_TYPE_EMERGENCY_MISSING_CAT = 6;
-    public static final int EVENT_TYPE_EMERGENCY_CARCASS = 7;
 
     private final String TAG = MapFragment.class.getSimpleName();
     private final int DEFAULT_ZOOM = 5;
@@ -131,6 +124,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private FusedLocationProviderClient mFusedLocationClient;
     private LocationCallback locationCallback;
     private Marker userLocationMarker;
+
+    private Marker clickedMarker;
+    private EventInfoWindowAdapter eventInfoWindowAdapter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -231,19 +227,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         warningsRadioGroup.setOnCheckedChangeListener((radioGroup, i) -> {
             switch (radioGroup.getCheckedRadioButtonId()) {
                 case R.id.radioButton_warnings_newborn_kittens:
-                    presenter.onCreateEventChoosed(EVENT_TYPE_WARNING_NEWBORN_KITTENS, selectedLocation.latitude, selectedLocation.longitude);
+                    presenter.onCreateEventChoosed(MapPresenter.EVENT_TYPE_WARNING_NEWBORN_KITTENS, selectedLocation.latitude, selectedLocation.longitude);
                     hideBottomSheets();
                     break;
                 case R.id.radioButton_warnings_municipality_inspector:
-                    presenter.onCreateEventChoosed(EVENT_TYPE_WARNING_MUNICIPALITY_INSPECTOR, selectedLocation.latitude, selectedLocation.longitude);
+                    presenter.onCreateEventChoosed(MapPresenter.EVENT_TYPE_WARNING_MUNICIPALITY_INSPECTOR, selectedLocation.latitude, selectedLocation.longitude);
                     hideBottomSheets();
                     break;
                 case R.id.radioButton_warnings_cat_in_heat:
-                    presenter.onCreateEventChoosed(EVENT_TYPE_WARNING_CAT_IN_HEAT, selectedLocation.latitude, selectedLocation.longitude);
+                    presenter.onCreateEventChoosed(MapPresenter.EVENT_TYPE_WARNING_CAT_IN_HEAT, selectedLocation.latitude, selectedLocation.longitude);
                     hideBottomSheets();
                     break;
                 case R.id.radioButton_warnings_stray_cat:
-                    presenter.onCreateEventChoosed(EVENT_TYPE_WARNING_STRAY_CAT, selectedLocation.latitude, selectedLocation.longitude);
+                    presenter.onCreateEventChoosed(MapPresenter.EVENT_TYPE_WARNING_STRAY_CAT, selectedLocation.latitude, selectedLocation.longitude);
                     hideBottomSheets();
                     break;
             }
@@ -251,15 +247,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         emergenciesRadioGroup.setOnCheckedChangeListener((radioGroup, i) -> {
             switch (radioGroup.getCheckedRadioButtonId()) {
                 case R.id.radioButton_emergencies_poison:
-                    presenter.onCreateEventChoosed(EVENT_TYPE_EMERGENCY_POISON, selectedLocation.latitude, selectedLocation.longitude);
+                    presenter.onCreateEventChoosed(MapPresenter.EVENT_TYPE_EMERGENCY_POISON, selectedLocation.latitude, selectedLocation.longitude);
                     hideBottomSheets();
                     break;
                 case R.id.radioButton_emergencies_missing_cat:
-                    presenter.onCreateEventChoosed(EVENT_TYPE_EMERGENCY_MISSING_CAT, selectedLocation.latitude, selectedLocation.longitude);
+                    presenter.onCreateEventChoosed(MapPresenter.EVENT_TYPE_EMERGENCY_MISSING_CAT, selectedLocation.latitude, selectedLocation.longitude);
                     hideBottomSheets();
                     break;
                 case R.id.radioButton_emergencies_carcass:
-                    presenter.onCreateEventChoosed(EVENT_TYPE_EMERGENCY_CARCASS, selectedLocation.latitude, selectedLocation.longitude);
+                    presenter.onCreateEventChoosed(MapPresenter.EVENT_TYPE_EMERGENCY_CARCASS, selectedLocation.latitude, selectedLocation.longitude);
                     hideBottomSheets();
                     break;
             }
@@ -289,7 +285,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
         if (addresses != null && !addresses.isEmpty())
             address = addresses.get(0).getAddressLine(0);
-        return address;
+        return Utils.splitAddress(address, 3);
     }
 
 
@@ -304,7 +300,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         initStationAction((Feedstation) bottomSheetFeedstationFrameLayout.getTag());
     }
 
-    private void initStationAction(Feedstation feedstation) {
+    public void initStationAction(Feedstation feedstation) {
         if (feedstation != null) {
             if (feedstation.getUserRole() != Feedstation.UserRole.ADMIN) {
                 if (feedstation.getStatus() != null) {
@@ -357,22 +353,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
+        eventInfoWindowAdapter = new EventInfoWindowAdapter(getContext());
+        googleMap.setInfoWindowAdapter(eventInfoWindowAdapter);
 
         setUserPosition();
 
         this.googleMap.setOnMapClickListener(latLng -> hideBottomSheets());
 
         this.googleMap.setOnMarkerClickListener(marker -> {
-            if (marker.getTag() == null) return false;
-            hideBottomSheets();
-            if (marker.getTag() instanceof Feedstation) {
-                bottomSheetBehaviorFeedstation.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                stationNameTextView.setText(((Feedstation) marker.getTag()).getName());
-                addressTextView.setText(((Feedstation) marker.getTag()).getAddress());
-                bottomSheetFeedstationFrameLayout.setTag(marker.getTag());
-
-                initStationAction((Feedstation) marker.getTag());
-            }
+            clickedMarker = marker;
+            presenter.onMarkerClicked(marker.getTag());
             return false;
         });
 
@@ -394,11 +384,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             });
             selectedLocation = latLng;
             warningsButton.setOnClickListener(view -> {
-                showWarningsBottomSheet();
+                showCreateWarningsEventBottomSheet();
                 dialog.dismiss();
             });
             emergenciesButton.setOnClickListener(view -> {
-                showEmergenciesBottomSheet();
+                showCreateEmergenciesEventBottomSheet();
                 dialog.dismiss();
             });
 
@@ -419,19 +409,46 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    private void showWarningsBottomSheet() {
+    public void showEventMarkerDialog(String address, String date, String eventTypeName, Event.Type type) {
+        showMarkerInfoWindow(address, date, eventTypeName, type);
+    }
+
+    private void showMarkerInfoWindow(String address, String date, String eventTypeName, Event.Type type) {
+        if (clickedMarker != null) {
+            eventInfoWindowAdapter.setShowWindow(true);
+            eventInfoWindowAdapter.setValues(address, date, eventTypeName, type);
+            clickedMarker.showInfoWindow();
+        }
+    }
+
+    public void hideEventMarkerDialog() {
+        eventInfoWindowAdapter.setShowWindow(false);
+        clickedMarker.showInfoWindow();
+    }
+
+    private void showCreateWarningsEventBottomSheet() {
         hideBottomSheets();
         warningsRadioGroup.clearCheck();
         bottomSheetBehaviorEventsWarnings.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
 
-    private void showEmergenciesBottomSheet() {
+    private void showCreateEmergenciesEventBottomSheet() {
         hideBottomSheets();
         emergenciesRadioGroup.clearCheck();
         bottomSheetBehaviorEventsEmergencies.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
 
-    private void hideBottomSheets() {
+    public void showFeedstationMarkerBottomSheet(String name, String address) {
+        bottomSheetBehaviorFeedstation.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        stationNameTextView.setText(name);
+        addressTextView.setText(address);
+    }
+
+    public void setBottomSheetFeedstationTag(Object tag) {
+        bottomSheetFeedstationFrameLayout.setTag(tag);
+    }
+
+    public void hideBottomSheets() {
         bottomSheetBehaviorEventsEmergencies.setState(BottomSheetBehavior.STATE_HIDDEN);
         bottomSheetBehaviorEventsWarnings.setState(BottomSheetBehavior.STATE_HIDDEN);
         bottomSheetBehaviorFeedstation.setState(BottomSheetBehavior.STATE_HIDDEN);
@@ -519,53 +536,54 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     public void feedstationsLoaded(List<Feedstation> stations, List<Event> events) {
-        if (stations == null || events == null) return;
+
         listUpdated = true;
         googleMap.clear();
-        for (Feedstation feedstation : stations) {
-            if (feedstation.getLocation() == null) continue;
-            int resourceId = R.drawable.location_blue;
-            if (feedstation.getUserRole() != null) {
-                if (feedstation.getUserRole().equals(Feedstation.UserRole.ADMIN) && !feedstation.getIsPublic())
-                    resourceId = R.drawable.location_red;
-                else if (feedstation.getStatus() != null && feedstation.getStatus().equals(GroupPartner.Status.JOINED))
-                    resourceId = R.drawable.location_orange;
-            }
-            if (!isAdded()) return;
-            Marker marker = googleMap.addMarker(new MarkerOptions()
-                    .title(feedstation.getName())
-                    //.icon(BitmapDescriptorFactory.fromResource(resourceId)) // insert image from request
-                    .icon(BitmapDescriptorFactory.fromBitmap(resizeMarkerIcon(resourceId))) // insert image from request
-                    //.icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(R.drawable.ic_star))) // insert image from request
-                    .anchor(markerPositionX, markerPositionY)
-                    .position(feedstation.getLocation()));
-            marker.setTag(feedstation);
+        if (stations != null)
+            for (Feedstation feedstation : stations) {
+                if (feedstation.getLocation() == null) continue;
+                int resourceId = R.drawable.location_blue;
+                if (feedstation.getUserRole() != null) {
+                    if (feedstation.getUserRole().equals(Feedstation.UserRole.ADMIN) && !feedstation.getIsPublic())
+                        resourceId = R.drawable.location_red;
+                    else if (feedstation.getStatus() != null && feedstation.getStatus().equals(GroupPartner.Status.JOINED))
+                        resourceId = R.drawable.location_orange;
+                }
+                if (!isAdded()) return;
+                Marker marker = googleMap.addMarker(new MarkerOptions()
+                        .title(feedstation.getName())
+                        //.icon(BitmapDescriptorFactory.fromResource(resourceId)) // insert image from request
+                        .icon(BitmapDescriptorFactory.fromBitmap(resizeMarkerIcon(resourceId))) // insert image from request
+                        //.icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(R.drawable.ic_star))) // insert image from request
+                        .anchor(markerPositionX, markerPositionY)
+                        .position(feedstation.getLocation()));
+                marker.setTag(feedstation);
 
-            if (bottomSheetBehaviorFeedstation.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
-                if (feedstation.getId().equals(((Feedstation) bottomSheetFeedstationFrameLayout.getTag()).getId())) {
-                    bottomSheetFeedstationFrameLayout.setTag(marker.getTag());
-                    initStationAction(feedstation);
+                if (bottomSheetBehaviorFeedstation.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
+                    if (feedstation.getId().equals(((Feedstation) bottomSheetFeedstationFrameLayout.getTag()).getId())) {
+                        bottomSheetFeedstationFrameLayout.setTag(marker.getTag());
+                        initStationAction(feedstation);
+                    }
                 }
             }
 
-        }
+        if (events != null)
+            for (Event event : events) {
+                if (event.getLatLng() == null) continue;
+                int resourceId = R.drawable.event_orange;
+                if (event.getType().equals(Event.Type.EMERGENCY))
+                    resourceId = R.drawable.event_red;
 
-        for (Event event : events) {
-            if (event.getLatLng() == null) continue;
-            int resourceId = R.drawable.event_orange;
-            if (event.getType().equals(Event.Type.EMERGENCY))
-                resourceId = R.drawable.event_red;
+                if (!isAdded()) return;
 
-            if (!isAdded()) return;
-
-            Marker marker = googleMap.addMarker(new MarkerOptions()
-                    .title(event.getName())
-                    .icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory.decodeResource(getResources(),resourceId)))
-                    .anchor(markerPositionX, markerPositionY)
-                    .position(event.getLatLng())
-            );
-            marker.setTag(event);
-        }
+                Marker marker = googleMap.addMarker(new MarkerOptions()
+                        .title(event.getName())
+                        .icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory.decodeResource(getResources(), resourceId)))
+                        .anchor(markerPositionX, markerPositionY)
+                        .position(event.getLatLng())
+                );
+                marker.setTag(event);
+            }
 
         addUserLocationMarker();
     }
