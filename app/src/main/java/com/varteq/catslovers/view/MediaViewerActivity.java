@@ -5,8 +5,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.MediaController;
 import android.widget.ProgressBar;
@@ -23,8 +21,6 @@ public class MediaViewerActivity extends BaseActivity {
 
     private static String MEDIA_KEY = "media";
 
-    ImageButton backButton;
-    FrameLayout forwardButton;
     ImageView imageView;
     VideoView videoView;
     TextView captionsTextView;
@@ -43,14 +39,11 @@ public class MediaViewerActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_media_viewer);
-        backButton = findViewById(R.id.backButton);
-        forwardButton = findViewById(R.id.forwardButton);
         imageView = findViewById(R.id.imageView);
         videoView = findViewById(R.id.videoView);
         captionsTextView = findViewById(R.id.captionsTextView);
         progressBar = findViewById(R.id.progress_activity_media);
 
-        backButton.setOnClickListener(view -> onBackPressed());
 
         Intent intent = getIntent();
         FeedPost media = (FeedPost) intent.getSerializableExtra(MEDIA_KEY);

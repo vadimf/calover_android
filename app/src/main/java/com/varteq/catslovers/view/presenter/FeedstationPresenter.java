@@ -82,6 +82,8 @@ public class FeedstationPresenter {
             else
                 uploadCatRequest = new MultipartUploadRequest(view, uploadId + CREATE_FEEDSTATION_TAG, ServiceGenerator.apiBaseUrl + "feedstations");
 
+            if (uploadCatRequest != null)
+                uploadCatRequest.setUtf8Charset();
 
             uploadCatRequest.addParameter("name", feedstation.getName())
                     .addParameter("description", feedstation.getDescription())

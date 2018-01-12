@@ -83,6 +83,8 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
     TextView dialogTextView;
     @BindView(R.id.station_name_photos_textView)
     TextView stationNamePhotosTextView;
+    @BindView(R.id.imageView_avatar_catBackground)
+    ImageView avatarCatBackgroundImageView;
 
     @BindView(R.id.photos_RecyclerView)
     RecyclerView photosRecyclerView;
@@ -325,6 +327,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
             saveMenu.setVisible(false);
         if (editMenu != null)
             editMenu.setVisible(true);
+        initAvatarCatBackground(feedstation);
     }
 
     private void setupEditMode() {
@@ -351,6 +354,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
             saveMenu.setVisible(true);
         if (editMenu != null)
             editMenu.setVisible(false);
+        initAvatarCatBackground(feedstation);
     }
 
     public void setToolbarTitle(String title) {
@@ -410,6 +414,17 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void initAvatarCatBackground(Feedstation feedstation) {
+        int resourceId = R.drawable.location_blue;
+        if (feedstation.getUserRole() != null) {
+            if (feedstation.getUserRole().equals(Feedstation.UserRole.ADMIN) && !feedstation.getIsPublic())
+                resourceId = R.drawable.location_red;
+            else if (feedstation.getStatus() != null && feedstation.getStatus().equals(GroupPartner.Status.JOINED))
+                resourceId = R.drawable.location_orange;
+        }
+        avatarCatBackgroundImageView.setImageDrawable(getResources().getDrawable(resourceId));
     }
 
     private boolean isProfileValid() {
@@ -714,6 +729,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
         setStationActionName(getString(R.string.join_group));
         followButton.setVisibility(View.VISIBLE);
         feedstation.setStatus(null);
+        initAvatarCatBackground(feedstation);
     }
 
     public void onSuccessJoin() {

@@ -2,9 +2,13 @@ package com.varteq.catslovers.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.location.Address;
+import android.location.Geocoder;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
 public class Utils {
@@ -72,6 +76,22 @@ public class Utils {
             }
         }
         return splitAddress.toString();
+    }
+
+    public static String getAddressByLocation(double latitute, double longitute, Context context){
+        Geocoder geocoder;
+        List<Address> addresses = null;
+        String address = null;
+        geocoder = new Geocoder(context, Locale.getDefault());
+
+        try {
+            addresses = geocoder.getFromLocation(latitute, longitute, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (addresses != null && !addresses.isEmpty())
+            address = addresses.get(0).getAddressLine(0);
+        return Utils.splitAddress(address, 3);
     }
 
 }

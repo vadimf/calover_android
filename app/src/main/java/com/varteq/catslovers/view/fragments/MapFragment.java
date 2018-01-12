@@ -11,8 +11,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -64,9 +62,7 @@ import com.varteq.catslovers.view.FeedstationActivity;
 import com.varteq.catslovers.view.adapters.info_window_adapter.EventInfoWindowAdapter;
 import com.varteq.catslovers.view.presenter.MapPresenter;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -104,6 +100,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     FrameLayout bottomSheetEventsEmergenciesFrameLayout;
     @BindView(R.id.radioGroup_emergencies)
     RadioGroup emergenciesRadioGroup;
+    @BindView(R.id.imageView_avatar_catBackground)
+    ImageView avatarCatBackgroundImageView;
 
     BottomSheetBehavior bottomSheetBehaviorFeedstation;
     BottomSheetBehavior bottomSheetBehaviorEventsWarnings;
@@ -272,22 +270,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         bottomSheetBehaviorEventsEmergencies.setState(BottomSheetBehavior.STATE_HIDDEN);
     }
 
-    public String getAddress(double lat, double lng) {
-        Geocoder geocoder;
-        List<Address> addresses = null;
-        String address = null;
-        geocoder = new Geocoder(getContext(), Locale.getDefault());
-
-        try {
-            addresses = geocoder.getFromLocation(lat, lng, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if (addresses != null && !addresses.isEmpty())
-            address = addresses.get(0).getAddressLine(0);
-        return Utils.splitAddress(address, 3);
-    }
-
 
     @Override
     public void onResume() {
@@ -301,8 +283,20 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             Feedstation feedstation = (Feedstation) bottomSheetFeedstationFrameLayout.getTag();
             fillFeedstationBottomSheet(feedstation.getName(), feedstation.getAddress());
             initStationAction(feedstation);
+            initAvatarCatBackground(feedstation);
         }
 
+    }
+
+    public void initAvatarCatBackground(Feedstation feedstation){
+        int resourceId = R.drawable.location_blue;
+        if (feedstation.getUserRole() != null) {
+            if (feedstation.getUserRole().equals(Feedstation.UserRole.ADMIN) && !feedstation.getIsPublic())
+                resourceId = R.drawable.location_red;
+            else if (feedstation.getStatus() != null && feedstation.getStatus().equals(GroupPartner.Status.JOINED))
+                resourceId = R.drawable.location_orange;
+        }
+        avatarCatBackgroundImageView.setImageDrawable(getResources().getDrawable(resourceId));
     }
 
     public void initStationAction(Feedstation feedstation) {
@@ -578,6 +572,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         bottomSheetFeedstationFrameLayout.setTag(marker.getTag());
                         initStationAction(feedstation);
                         fillFeedstationBottomSheet(feedstation.getName(), feedstation.getAddress());
+                        initAvatarCatBackground(feedstation);
                     }
                 }
             }
@@ -705,6 +700,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         setStationActionName(getString(R.string.join_group));
         followButton.setVisibility(View.VISIBLE);
         ((Feedstation) bottomSheetFeedstationFrameLayout.getTag()).setStatus(null);
+        initAvatarCatBackground((Feedstation) bottomSheetFeedstationFrameLayout.getTag());
     }
 
     public void onSuccessJoin() {
