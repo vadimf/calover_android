@@ -34,6 +34,10 @@ public class CatProfile implements Serializable {
     public CatProfile() {
     }
 
+    public CatProfile(boolean isAdmin) {
+        userRole = Feedstation.UserRole.ADMIN;
+    }
+
     public CatProfile(int id, String petName) {
         this.id = id;
         this.petName = petName;

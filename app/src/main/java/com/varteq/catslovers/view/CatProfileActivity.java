@@ -404,7 +404,7 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
             descriptionEditText.setText(catProfile.getDescription());
             avatar = catProfile.getAvatar();
             photoList = catProfile.getPhotos();
-            petNamePhotosTextView.setText(catProfile.getPetName() + " " + getString(R.string.photos));
+            petNamePhotosTextView.setText(catProfile.getPetName());
         } else {
             colorsList = new ArrayList<>();
         }
@@ -437,7 +437,7 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
 
         groupPartnersList = new ArrayList<>();
         //groupPartnersList.add(new GroupPartner(null, "User1", false));
-        groupPartnersAdapter = new GroupPartnersAdapter(groupPartnersList, !currentMode.equals(CatProfileScreenMode.VIEW_MODE),
+        groupPartnersAdapter = new GroupPartnersAdapter(groupPartnersList, false,//currentMode.equals(CatProfileScreenMode.EDIT_MODE),
                 new GroupPartnersAdapter.OnPersonClickListener() {
 
                     @Override
@@ -812,7 +812,7 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
 
     private CatProfile fillCatProfile() {
         if (catProfile == null)
-            catProfile = new CatProfile();
+            catProfile = new CatProfile(true);
 
         presenter.compressColorsList(colorsList);
 
@@ -987,7 +987,7 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
         AlertDialog alertDialog = builder.create();
         alertDialog.getListView().setOnItemClickListener((adapterView, view, i, l) -> {
             if (catProfile == null)
-                catProfile = new CatProfile();
+                catProfile = new CatProfile(true);
             catProfile.setFeedstationId(feedstations.get(i).getId());
             alertDialog.dismiss();
         });
