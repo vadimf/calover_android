@@ -154,6 +154,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
                 if (feedstation == null)
                     feedstation = new Feedstation();
                 feedstation.setIsPublic(true);
+                feedstation.setUserRole(Feedstation.UserRole.ADMIN);
                 feedstation.setLocation(getIntent().getExtras().getParcelable(LOCATION_KEY));
                 setAdress(feedstation.getLocation());
             }
@@ -213,7 +214,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
             descriptionEditText.setText(feedstation.getDescription());
             photoList = feedstation.getPhotos();
             pagerAdapter.notifyDataSetChanged();
-            stationNamePhotosTextView.setText(feedstation.getName() + " " + getString(R.string.photos));
+            stationNamePhotosTextView.setText(feedstation.getName() != null ? feedstation.getName() : getString(R.string.new_cat_profile_screen_title));
             initStationAction();
         }
         /*scrollView.setOnTouchListener((v, event) -> {
@@ -248,7 +249,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
 
         //groupPartnersList.add(new GroupPartner(null, "Admin", GroupPartner.Status.JOINED, true));
         //groupPartnersList.add(new GroupPartner(null, "User1", false));
-        groupPartnersAdapter = new GroupPartnersAdapter(groupPartnersList, !currentMode.equals(FeedstationScreenMode.VIEW_MODE),
+        groupPartnersAdapter = new GroupPartnersAdapter(groupPartnersList, currentMode.equals(FeedstationScreenMode.EDIT_MODE),
                 new GroupPartnersAdapter.OnPersonClickListener() {
 
                     @Override
@@ -343,7 +344,8 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
 
         descriptionEditText.setEnabled(true);
 
-        groupPartnersAdapter.switchToEditMode();
+        if (currentMode.equals(FeedstationScreenMode.EDIT_MODE))
+            groupPartnersAdapter.switchToEditMode();
 
         if (saveMenu != null)
             saveMenu.setVisible(true);

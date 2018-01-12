@@ -411,7 +411,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Cat's"
+                android:text="@string/new_cat_profile_screen_title"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
                 app:layout_constraintTop_toBottomOf="@+id/description_editText"/>
@@ -421,7 +421,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="photos ONLY"
+                android:text="@string/photos"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="@+id/pet_name_photos_textView"
                 app:layout_constraintStart_toEndOf="@+id/pet_name_photos_textView"
@@ -487,7 +487,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Cat's followers"
+                android:text="Followers"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
                 app:layout_constraintTop_toBottomOf="@+id/photos_RecyclerView"/>
