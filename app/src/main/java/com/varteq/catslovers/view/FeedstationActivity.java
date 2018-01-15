@@ -33,6 +33,7 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.android.gms.maps.model.LatLng;
 import com.varteq.catslovers.R;
+import com.varteq.catslovers.model.CatProfile;
 import com.varteq.catslovers.model.Feedstation;
 import com.varteq.catslovers.model.GroupPartner;
 import com.varteq.catslovers.model.PhotoWithPreview;
@@ -281,8 +282,10 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
                 });
         groupPartnersRecyclerView.setAdapter(groupPartnersAdapter);
 
-        if (!currentMode.equals(FeedstationScreenMode.CREATE_MODE))
+        if (!currentMode.equals(FeedstationScreenMode.CREATE_MODE)) {
             presenter.getGroupPartners(feedstation.getId());
+            presenter.getCatsImages(feedstation.getId());
+        }
 
         groupPartnersRecyclerView.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -720,6 +723,13 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
         Toaster.shortToast("You have successfully joined");
     }
 
+    public void addCatsImages(List<CatProfile> cats) {
+        if (cats == null || cats.isEmpty()) return;
+        for (CatProfile cat : cats) {
+
+        }
+    }
+
     public void refreshGroupPartners(List<GroupPartner> partners) {
         if (partners == null || partners.isEmpty() || groupPartnersRecyclerView == null) return;
         groupPartnersList.clear();
@@ -746,6 +756,18 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
         groupPartnersList.add(1, partner);
         groupPartnersAdapter.notifyItemInserted(1);
         groupPartnersRecyclerView.scrollToPosition(0);
+    }
+
+    public void catsLoaded(List<CatProfile> list) {
+        if (null != list) {
+            for (CatProfile item : list) {
+                if (null != item.getAvatar()) //TODO check why server returns null for avatar
+                    photosAdapter.getPhotoList().add(item.getAvatar());
+            }
+            //TODO select correct adapter(line 777)
+            pagerAdapter.notifyDataSetChanged();
+            photosAdapter.notifyDataSetChanged();
+        }
     }
 
     @Override

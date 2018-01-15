@@ -110,6 +110,10 @@ public interface ApiService {
             @Field("lng") double lng,
             @Field("distance") Integer distance);
 
+    @GET("feedstations/{feedstation_id}/cats")
+    Call<BaseResponse<List<RCat>>> getFeedstatisonCats(
+            @Path("feedstation_id") Integer feedstation_id);
+
     @GET("feedstations/invitations")
     Call<BaseResponse<List<RFeedstation>>> getInvitations();
 
