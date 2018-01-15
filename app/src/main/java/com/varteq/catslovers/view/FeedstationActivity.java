@@ -26,6 +26,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -85,6 +86,8 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
     TextView stationNamePhotosTextView;
     @BindView(R.id.imageView_avatar_catBackground)
     ImageView avatarCatBackgroundImageView;
+    @BindView(R.id.relativeLayout_hungry)
+    RelativeLayout hungryRelativeLayout;
 
     @BindView(R.id.photos_RecyclerView)
     RecyclerView photosRecyclerView;
@@ -418,11 +421,18 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
 
     public void initAvatarCatBackground(Feedstation feedstation) {
         int resourceId = R.drawable.location_blue;
-        if (feedstation.getUserRole() != null) {
-            if (feedstation.getUserRole().equals(Feedstation.UserRole.ADMIN) && !feedstation.getIsPublic())
-                resourceId = R.drawable.location_red;
-            else if (feedstation.getStatus() != null && feedstation.getStatus().equals(GroupPartner.Status.JOINED))
-                resourceId = R.drawable.location_orange;
+        if (feedstation.isHungry()){
+            hungryRelativeLayout.setVisibility(View.VISIBLE);
+            resourceId = R.drawable.location_red;
+        }
+        else {
+            hungryRelativeLayout.setVisibility(View.INVISIBLE);
+            if (feedstation.getUserRole() != null) {
+                if (feedstation.getUserRole().equals(Feedstation.UserRole.ADMIN) && !feedstation.getIsPublic())
+                    resourceId = R.drawable.location_red;
+                else if (feedstation.getStatus() != null && feedstation.getStatus().equals(GroupPartner.Status.JOINED))
+                    resourceId = R.drawable.location_orange;
+            }
         }
         avatarCatBackgroundImageView.setImageDrawable(getResources().getDrawable(resourceId));
     }

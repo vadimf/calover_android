@@ -102,6 +102,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     RadioGroup emergenciesRadioGroup;
     @BindView(R.id.imageView_avatar_catBackground)
     ImageView avatarCatBackgroundImageView;
+    @BindView(R.id.relativeLayout_hungry)
+    RelativeLayout hungryRelativeLayout;
 
     BottomSheetBehavior bottomSheetBehaviorFeedstation;
     BottomSheetBehavior bottomSheetBehaviorEventsWarnings;
@@ -281,20 +283,24 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     break;
             }
             Feedstation feedstation = (Feedstation) bottomSheetFeedstationFrameLayout.getTag();
-            fillFeedstationBottomSheet(feedstation.getName(), feedstation.getAddress());
+            fillFeedstationBottomSheet(feedstation);
             initStationAction(feedstation);
             initAvatarCatBackground(feedstation);
         }
 
     }
 
-    public void initAvatarCatBackground(Feedstation feedstation){
+    public void initAvatarCatBackground(Feedstation feedstation) {
         int resourceId = R.drawable.location_blue;
-        if (feedstation.getUserRole() != null) {
-            if (feedstation.getUserRole().equals(Feedstation.UserRole.ADMIN) && !feedstation.getIsPublic())
-                resourceId = R.drawable.location_red;
-            else if (feedstation.getStatus() != null && feedstation.getStatus().equals(GroupPartner.Status.JOINED))
-                resourceId = R.drawable.location_orange;
+        if (feedstation.isHungry())
+            resourceId = R.drawable.location_red;
+        else {
+            if (feedstation.getUserRole() != null) {
+                if (feedstation.getUserRole().equals(Feedstation.UserRole.ADMIN) && !feedstation.getIsPublic())
+                    resourceId = R.drawable.location_red;
+                else if (feedstation.getStatus() != null && feedstation.getStatus().equals(GroupPartner.Status.JOINED))
+                    resourceId = R.drawable.location_orange;
+            }
         }
         avatarCatBackgroundImageView.setImageDrawable(getResources().getDrawable(resourceId));
     }
@@ -437,14 +443,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         bottomSheetBehaviorEventsEmergencies.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
 
-    public void showFeedstationMarkerBottomSheet(String name, String address) {
+    public void showFeedstationMarkerBottomSheet(Feedstation feedstation) {
         bottomSheetBehaviorFeedstation.setState(BottomSheetBehavior.STATE_COLLAPSED);
-        fillFeedstationBottomSheet(name, address);
+        fillFeedstationBottomSheet(feedstation);
     }
 
-    public void fillFeedstationBottomSheet(String name, String address) {
-        stationNameTextView.setText(name);
-        addressTextView.setText(address);
+    public void fillFeedstationBottomSheet(Feedstation feedstation) {
+        stationNameTextView.setText(feedstation.getName());
+        addressTextView.setText(feedstation.getAddress());
+        if (feedstation.isHungry()) {
+            hungryRelativeLayout.setVisibility(View.VISIBLE);
+        } else
+            hungryRelativeLayout.setVisibility(View.INVISIBLE);
     }
 
     public void setBottomSheetFeedstationTag(Object tag) {
@@ -551,17 +561,26 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             for (Feedstation feedstation : stations) {
                 if (feedstation.getLocation() == null) continue;
                 int resourceId = R.drawable.location_blue;
-                if (feedstation.getUserRole() != null) {
-                    if (feedstation.getUserRole().equals(Feedstation.UserRole.ADMIN) && !feedstation.getIsPublic())
-                        resourceId = R.drawable.location_red;
-                    else if (feedstation.getStatus() != null && feedstation.getStatus().equals(GroupPartner.Status.JOINED))
-                        resourceId = R.drawable.location_orange;
+                if (feedstation.isHungry())
+                    resourceId = R.drawable.location_red;
+                else {
+                    if (feedstation.getUserRole() != null) {
+                        if (feedstation.getUserRole().equals(Feedstation.UserRole.ADMIN) && !feedstation.getIsPublic())
+                            resourceId = R.drawable.location_red;
+                        else if (feedstation.getStatus() != null && feedstation.getStatus().equals(GroupPartner.Status.JOINED))
+                            resourceId = R.drawable.location_orange;
+                    }
                 }
                 if (!isAdded()) return;
+
+                Bitmap markerIcon = resizeMarkerIcon(resourceId);
+                if (feedstation.isHungry())
+                    markerIcon = Utils.drawTextOnBitmap(markerIcon, "!", getResources().getColor(R.color.white), 18f);
+
                 Marker marker = googleMap.addMarker(new MarkerOptions()
                         .title(feedstation.getName())
                         //.icon(BitmapDescriptorFactory.fromResource(resourceId)) // insert image from request
-                        .icon(BitmapDescriptorFactory.fromBitmap(resizeMarkerIcon(resourceId))) // insert image from request
+                        .icon(BitmapDescriptorFactory.fromBitmap(markerIcon)) // insert image from request
                         //.icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(R.drawable.ic_star))) // insert image from request
                         .anchor(markerPositionX, markerPositionY)
                         .position(feedstation.getLocation()));
@@ -571,7 +590,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     if (feedstation.getId().equals(((Feedstation) bottomSheetFeedstationFrameLayout.getTag()).getId())) {
                         bottomSheetFeedstationFrameLayout.setTag(marker.getTag());
                         initStationAction(feedstation);
-                        fillFeedstationBottomSheet(feedstation.getName(), feedstation.getAddress());
+                        fillFeedstationBottomSheet(feedstation);
                         initAvatarCatBackground(feedstation);
                     }
                 }

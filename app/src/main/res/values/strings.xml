@@ -162,4 +162,5 @@
     <string name="municipality_inspector">Municipality Inspector</string>
     <string name="cat_in_heat">Cat in Heat</string>
     <string name="stray_cat_capture_operation">Stray cat (capture operation)</string>
+    <string name="hungry">Hungry</string>
 </resources>

@@ -205,7 +205,7 @@ public class MapPresenter {
             if (!view.isFeedstationBottomSheetShowed())
                 view.hideBottomSheets();
             Feedstation feedstation = (Feedstation) markerTag;
-            view.showFeedstationMarkerBottomSheet(feedstation.getName(), feedstation.getAddress());
+            view.showFeedstationMarkerBottomSheet(feedstation);
             view.setBottomSheetFeedstationTag(feedstation);
             view.initStationAction(feedstation);
             view.hideEventMarkerDialog();

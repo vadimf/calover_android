@@ -116,6 +116,10 @@ public class Feedstation implements Parcelable {
         this.photos = photos;
     }
 
+    public boolean isHungry() {
+        return getTimeToFeed() != null && getTimeToFeed().before(new Date());
+    }
+
 
     @Override
     public int describeContents() {
