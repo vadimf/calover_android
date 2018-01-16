@@ -57,27 +57,40 @@
 
         </LinearLayout>
 
-        <com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout
-            android:id="@+id/swipy_refresh_layout"
-            style="@style/MatchParent">
 
+        <FrameLayout
+            android:id="@+id/frame_friends"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+            <com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout
+                android:id="@+id/swipy_refresh_layout_friends"
+                style="@style/MatchParent">
 
                 <ListView
                     android:id="@+id/list_dialogs_chats_friends"
-                    style="@style/ListViewWithoutDividerStyle"
-                    android:visibility="visible" />
+                    style="@style/ListViewWithoutDividerStyle" />
+            </com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout>
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/frame_groups"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout
+                android:id="@+id/swipy_refresh_layout_groups"
+                style="@style/MatchParent">
 
                 <ListView
                     android:id="@+id/list_dialogs_chats_groups"
-                    style="@style/ListViewWithoutDividerStyle"
-                    android:visibility="invisible" />
-            </FrameLayout>
+                    style="@style/ListViewWithoutDividerStyle" />
+            </com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout>
 
-        </com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout>
+        </FrameLayout>
+
+
     </LinearLayout>
 
 
