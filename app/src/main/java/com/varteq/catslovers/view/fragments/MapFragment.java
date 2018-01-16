@@ -56,6 +56,7 @@ import com.varteq.catslovers.utils.ImageUtils;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.utils.SystemPermissionHelper;
+import com.varteq.catslovers.utils.TimeUtils;
 import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.utils.Utils;
 import com.varteq.catslovers.view.FeedstationActivity;
@@ -126,6 +127,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private Marker userLocationMarker;
 
     private Marker clickedMarker;
+    private LatLng clickedMarkerLocation;
     private EventInfoWindowAdapter eventInfoWindowAdapter;
 
     @Override
@@ -363,7 +365,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         setUserPosition();
 
-        this.googleMap.setOnMapClickListener(latLng -> hideBottomSheets());
+        this.googleMap.setOnMapClickListener(latLng -> {
+            hideBottomSheets();
+            releaseClickedLocation();
+        });
 
         this.googleMap.setOnMarkerClickListener(marker -> {
             clickedMarker = marker;
@@ -414,8 +419,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    public void showEventMarkerDialog(String address, String date, String eventTypeName, Event.Type type) {
-        showMarkerInfoWindow(address, date, eventTypeName, type);
+    public void showEventMarkerDialog(Event event) {
+        clickedMarkerLocation = event.getLatLng();
+        if (event != null)
+            showMarkerInfoWindow(event.getAddress(), TimeUtils.getDateAsddMMMyyyy(event.getDate()), event.getTypeName(), event.getType());
     }
 
     private void showMarkerInfoWindow(String address, String date, String eventTypeName, Event.Type type) {
@@ -424,6 +431,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             eventInfoWindowAdapter.setValues(address, date, eventTypeName, type);
             clickedMarker.showInfoWindow();
         }
+    }
+
+    public void releaseClickedLocation(){
+        clickedMarkerLocation = null;
     }
 
     public void hideEventMarkerDialog() {
@@ -612,6 +623,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         .position(event.getLatLng())
                 );
                 marker.setTag(event);
+                if (clickedMarkerLocation != null
+                        && event.getLatLng().latitude == clickedMarkerLocation.latitude
+                        && event.getLatLng().longitude == clickedMarkerLocation.longitude) {
+                    clickedMarker = marker;
+                    showEventMarkerDialog(event);
+                }
             }
 
         addUserLocationMarker();

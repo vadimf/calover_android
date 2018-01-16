@@ -210,10 +210,11 @@ public class MapPresenter {
             view.initStationAction(feedstation);
             view.hideEventMarkerDialog();
             view.initAvatarCatBackground(feedstation);
+            view.releaseClickedLocation();
         } else if (markerTag instanceof Event) {
             view.hideBottomSheets();
             Event event = (Event) markerTag;
-            view.showEventMarkerDialog(event.getAddress(), TimeUtils.getDateAsddMMMyyyy(event.getDate()), event.getTypeName(), event.getType());
+            view.showEventMarkerDialog(event);
         }
 
     }
