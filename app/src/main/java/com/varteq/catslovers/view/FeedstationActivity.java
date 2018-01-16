@@ -170,10 +170,6 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
                 .load(getResources().getDrawable(R.drawable.cat2))
                 .into(avatarImageView);
 
-        pagerAdapter = new HeaderPhotosViewPagerAdapter(this);
-        viewPager = findViewById(R.id.header_photo_viewPager);
-        viewPager.setAdapter(pagerAdapter);
-
         fillUI();
         setupUIMode();
     }
@@ -216,8 +212,6 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
             descriptionEditText.setText(feedstation.getDescription());
             photoList = feedstation.getPhotos();
             pagerPhotoList = new ArrayList<>();
-            pagerPhotoList.addAll(feedstation.getPhotos());
-            pagerAdapter.notifyDataSetChanged();
             stationNamePhotosTextView.setText(feedstation.getName() != null ? feedstation.getName() : getString(R.string.new_cat_profile_screen_title));
             initStationAction();
         }
@@ -235,16 +229,11 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
             return false;
         });*/
 
-        /*Uri avatarUri = Profile.getUserAvatar(this);
-        if (avatarUri != null && !avatarUri.toString().isEmpty())
-            avatarImageView.setImageURI(avatarUri);
-        else
-            avatarImageView.setImageBitmap(Utils.getBitmapWithColor(getResources().getColor(R.color.transparent)));*/
-
         if (photoList == null)
             photoList = new ArrayList<>();
         if (pagerPhotoList == null)
             pagerPhotoList = new ArrayList<>();
+        pagerPhotoList.addAll(photoList);
 
         photoCountTextView.setText(String.valueOf(photoList.size()));
 
@@ -253,8 +242,10 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
         photosRecyclerView.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
-        //groupPartnersList.add(new GroupPartner(null, "Admin", GroupPartner.Status.JOINED, true));
-        //groupPartnersList.add(new GroupPartner(null, "User1", false));
+        pagerAdapter = new HeaderPhotosViewPagerAdapter(this);
+        viewPager = findViewById(R.id.header_photo_viewPager);
+        viewPager.setAdapter(pagerAdapter);
+
         groupPartnersAdapter = new GroupPartnersAdapter(groupPartnersList, currentMode.equals(FeedstationScreenMode.EDIT_MODE),
                 new GroupPartnersAdapter.OnPersonClickListener() {
 
