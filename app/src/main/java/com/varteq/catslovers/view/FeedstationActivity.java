@@ -111,6 +111,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
 
     private FeedstationScreenMode currentMode = FeedstationScreenMode.EDIT_MODE;
     private List<PhotoWithPreview> photoList;
+    private List<PhotoWithPreview> pagerPhotoList;
     private List<GroupPartner> groupPartnersList = new ArrayList<>();
 
     private PhotosAdapter photosAdapter;
@@ -214,6 +215,8 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
             addressTextView.setText(feedstation.getAddress());
             descriptionEditText.setText(feedstation.getDescription());
             photoList = feedstation.getPhotos();
+            pagerPhotoList = new ArrayList<>();
+            pagerPhotoList.addAll(feedstation.getPhotos());
             pagerAdapter.notifyDataSetChanged();
             stationNamePhotosTextView.setText(feedstation.getName() != null ? feedstation.getName() : getString(R.string.new_cat_profile_screen_title));
             initStationAction();
@@ -240,6 +243,8 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
 
         if (photoList == null)
             photoList = new ArrayList<>();
+        if (pagerPhotoList == null)
+            pagerPhotoList = new ArrayList<>();
 
         photoCountTextView.setText(String.valueOf(photoList.size()));
 
@@ -566,9 +571,9 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
 
         @Override
         public int getCount() {
-            if (photoList == null)
+            if (pagerPhotoList == null)
                 return 0;
-            else return photoList.size() < 4 ? photoList.size() : 3;
+            else return pagerPhotoList.size() < 4 ? pagerPhotoList.size() : 3;
         }
 
         @Override
@@ -584,7 +589,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
             imageView.setLayoutParams(new LinearLayout.LayoutParams(100, 100));
             Glide.with(container)
                     .asBitmap()
-                    .load(photoList.get(photoList.size() - 1 - position).getPhoto())
+                    .load(pagerPhotoList.get(position).getPhoto())
                     .into(new SimpleTarget<Bitmap>() {
                         @Override
                         public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
@@ -761,12 +766,11 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
     public void catsLoaded(List<CatProfile> list) {
         if (null != list) {
             for (CatProfile item : list) {
-                if (null != item.getAvatar()) //TODO check why server returns null for avatar
-                    photosAdapter.getPhotoList().add(item.getAvatar());
+                if (null != item.getAvatar())
+                    photoList.add(item.getAvatar());
             }
-            //TODO select correct adapter(line 777)
-            pagerAdapter.notifyDataSetChanged();
             photosAdapter.notifyDataSetChanged();
+            photoCountTextView.setText(String.valueOf(photoList.size()));
         }
     }
 
@@ -774,6 +778,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
     public void onImagePicked(int requestCode, File file) {
         if (REQUEST_CODE_GET_IMAGE == requestCode && file != null) {
             photoList.add(0, new PhotoWithPreview(file.getPath(), file.getPath()));
+            pagerPhotoList.add(photoList.get(0));
             pagerAdapter.notifyDataSetChanged();
             photosAdapter.notifyItemInserted(0);
             photosRecyclerView.scrollToPosition(0);

@@ -37,7 +37,6 @@ import net.gotev.uploadservice.UploadNotificationConfig;
 import net.gotev.uploadservice.UploadStatusDelegate;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -163,7 +162,6 @@ public class FeedstationPresenter {
                         Log.i(TAG, String.valueOf(data.size()));
                         if (data.size() < 1) return;
                         List<CatProfile> catProfiles = getCatProfiles(data);
-                        Collections.sort(catProfiles, (catProfile, t1) -> catProfile.getPetName().toUpperCase().compareTo(t1.getPetName().toUpperCase()));
                         view.catsLoaded(catProfiles);
                     }
 
