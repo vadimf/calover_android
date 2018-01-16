@@ -59,7 +59,7 @@ import butterknife.OnClick;
 
 import static android.app.Activity.RESULT_OK;
 
-public class MessagesFragment extends Fragment implements DialogsManager.ManagingDialogsCallbacks {
+public class MessagesFragment extends Fragment implements DialogsManager.ManagingDialogsCallbacks, SwipyRefreshLayout.OnRefreshListener {
 
     private static final String TAG = DialogsActivity.class.getSimpleName();
     private static final int REQUEST_SELECT_PEOPLE = 174;
@@ -73,8 +73,10 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
     ProgressBar progressBar;
     //@BindView(R.id.fab_dialogs_new_chat)
     //FloatingActionButton fab;
-    @BindView(R.id.swipy_refresh_layout)
-    SwipyRefreshLayout setOnRefreshListener;
+    @BindView(R.id.swipy_refresh_layout_groups)
+    SwipyRefreshLayout swipyRefreshLayoutGroups;
+    @BindView(R.id.swipy_refresh_layout_friends)
+    SwipyRefreshLayout swipyRefreshLayoutFriends;
     @BindView(R.id.friends_type_button_layout)
     FrameLayout friendsTypeButtonLayout;
     @BindView(R.id.groups_type_button_layout)
@@ -83,6 +85,12 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
     Button friendsTypeButton;
     @BindView(R.id.groups_type_button)
     Button groupsTypeButton;
+
+    //frames for lists
+    @BindView(R.id.frame_friends)
+    FrameLayout frameFriends;
+    @BindView(R.id.frame_groups)
+    FrameLayout frameGroups;
 
     private QBRequestGetBuilder requestBuilder;
     private Menu menu;
@@ -203,8 +211,8 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
 
     private void switchFriendsChat() {
         isFriendsChat = true;
-        dialogsFriendsListView.setVisibility(View.VISIBLE);
-        dialogsGroupsListView.setVisibility(View.INVISIBLE);
+        frameFriends.setVisibility(View.VISIBLE);
+        frameGroups.setVisibility(View.GONE);
         friendsTypeButtonLayout.setBackgroundResource(R.drawable.messages_type_selected_shape);
         groupsTypeButtonLayout.setBackgroundResource(R.drawable.messages_type_unselected_shape);
         friendsTypeButton.setTextAppearance(getContext(), R.style.PrimaryTextButton);
@@ -213,8 +221,8 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
 
     private void switchGroupsChat() {
         isFriendsChat = false;
-        dialogsFriendsListView.setVisibility(View.INVISIBLE);
-        dialogsGroupsListView.setVisibility(View.VISIBLE);
+        frameFriends.setVisibility(View.GONE);
+        frameGroups.setVisibility(View.VISIBLE);
         groupsTypeButtonLayout.setBackgroundResource(R.drawable.messages_type_selected_shape);
         friendsTypeButtonLayout.setBackgroundResource(R.drawable.messages_type_unselected_shape);
         groupsTypeButton.setTextAppearance(getContext(), R.style.PrimaryTextButton);
@@ -356,14 +364,10 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
 
         requestBuilder = new QBRequestGetBuilder();
 
-        setOnRefreshListener.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh(SwipyRefreshLayoutDirection direction) {
-                requestBuilder.setSkip(skipRecords += ChatHelper.DIALOG_ITEMS_PER_PAGE);
-                loadDialogsFromQb(true, false);
-            }
-        });
-        setOnRefreshListener.setColorSchemeResources(R.color.colorPrimary);
+        swipyRefreshLayoutFriends.setOnRefreshListener(this);
+        swipyRefreshLayoutGroups.setOnRefreshListener(this);
+        swipyRefreshLayoutFriends.setColorSchemeResources(R.color.colorPrimary);
+        swipyRefreshLayoutGroups.setColorSchemeResources(R.color.colorPrimary);
     }
 
     private void registerQbChatListeners() {
@@ -436,7 +440,8 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
             public void onSuccess(ArrayList<QBChatDialog> dialogs, Bundle bundle) {
                 isProcessingResultInProgress = false;
                 progressBar.setVisibility(View.GONE);
-                setOnRefreshListener.setRefreshing(false);
+                swipyRefreshLayoutFriends.setRefreshing(false);
+                swipyRefreshLayoutGroups.setRefreshing(false);
 
                 if (clearDialogHolder) {
                     QbDialogHolder.getInstance().clear();
@@ -449,7 +454,8 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
             public void onError(QBResponseException e) {
                 isProcessingResultInProgress = false;
                 progressBar.setVisibility(View.GONE);
-                setOnRefreshListener.setRefreshing(false);
+                swipyRefreshLayoutFriends.setRefreshing(false);
+                swipyRefreshLayoutGroups.setRefreshing(false);
                 Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -492,7 +498,14 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
         Toaster.longToast(message);
         isProcessingResultInProgress = false;
         progressBar.setVisibility(View.GONE);
-        setOnRefreshListener.setRefreshing(false);
+        swipyRefreshLayoutFriends.setRefreshing(false);
+        swipyRefreshLayoutGroups.setRefreshing(false);
+    }
+
+    @Override
+    public void onRefresh(SwipyRefreshLayoutDirection direction) {
+        requestBuilder.setSkip(skipRecords += ChatHelper.DIALOG_ITEMS_PER_PAGE);
+        loadDialogsFromQb(true, false);
     }
 
     private class DeleteActionModeCallback implements ActionMode.Callback {
