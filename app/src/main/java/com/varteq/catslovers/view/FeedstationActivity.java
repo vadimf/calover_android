@@ -34,6 +34,7 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.android.gms.maps.model.LatLng;
 import com.varteq.catslovers.R;
+import com.varteq.catslovers.model.CatProfile;
 import com.varteq.catslovers.model.Feedstation;
 import com.varteq.catslovers.model.GroupPartner;
 import com.varteq.catslovers.model.PhotoWithPreview;
@@ -115,6 +116,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
 
     private FeedstationScreenMode currentMode = FeedstationScreenMode.EDIT_MODE;
     private List<PhotoWithPreview> photoList;
+    private List<PhotoWithPreview> pagerPhotoList;
     private List<GroupPartner> groupPartnersList = new ArrayList<>();
 
     private PhotosAdapter photosAdapter;
@@ -173,10 +175,6 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
                 .load(getResources().getDrawable(R.drawable.cat2))
                 .into(avatarImageView);
 
-        pagerAdapter = new HeaderPhotosViewPagerAdapter(this);
-        viewPager = findViewById(R.id.header_photo_viewPager);
-        viewPager.setAdapter(pagerAdapter);
-
         fillUI();
         setupUIMode();
     }
@@ -218,7 +216,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
             addressTextView.setText(feedstation.getAddress());
             descriptionEditText.setText(feedstation.getDescription());
             photoList = feedstation.getPhotos();
-            pagerAdapter.notifyDataSetChanged();
+            pagerPhotoList = new ArrayList<>();
             stationNamePhotosTextView.setText(feedstation.getName() != null ? feedstation.getName() : getString(R.string.new_cat_profile_screen_title));
             initStationAction();
         }
@@ -236,14 +234,11 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
             return false;
         });*/
 
-        /*Uri avatarUri = Profile.getUserAvatar(this);
-        if (avatarUri != null && !avatarUri.toString().isEmpty())
-            avatarImageView.setImageURI(avatarUri);
-        else
-            avatarImageView.setImageBitmap(Utils.getBitmapWithColor(getResources().getColor(R.color.transparent)));*/
-
         if (photoList == null)
             photoList = new ArrayList<>();
+        if (pagerPhotoList == null)
+            pagerPhotoList = new ArrayList<>();
+        pagerPhotoList.addAll(photoList);
 
         photoCountTextView.setText(String.valueOf(photoList.size()));
 
@@ -252,8 +247,10 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
         photosRecyclerView.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
-        //groupPartnersList.add(new GroupPartner(null, "Admin", GroupPartner.Status.JOINED, true));
-        //groupPartnersList.add(new GroupPartner(null, "User1", false));
+        pagerAdapter = new HeaderPhotosViewPagerAdapter(this);
+        viewPager = findViewById(R.id.header_photo_viewPager);
+        viewPager.setAdapter(pagerAdapter);
+
         groupPartnersAdapter = new GroupPartnersAdapter(groupPartnersList, currentMode.equals(FeedstationScreenMode.EDIT_MODE),
                 new GroupPartnersAdapter.OnPersonClickListener() {
 
@@ -286,8 +283,10 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
                 });
         groupPartnersRecyclerView.setAdapter(groupPartnersAdapter);
 
-        if (!currentMode.equals(FeedstationScreenMode.CREATE_MODE))
+        if (!currentMode.equals(FeedstationScreenMode.CREATE_MODE)) {
             presenter.getGroupPartners(feedstation.getId());
+            presenter.getCatsImages(feedstation.getId());
+        }
 
         groupPartnersRecyclerView.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -588,9 +587,9 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
 
         @Override
         public int getCount() {
-            if (photoList == null)
+            if (pagerPhotoList == null)
                 return 0;
-            else return photoList.size() < 4 ? photoList.size() : 3;
+            else return pagerPhotoList.size() < 4 ? pagerPhotoList.size() : 3;
         }
 
         @Override
@@ -606,7 +605,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
             imageView.setLayoutParams(new LinearLayout.LayoutParams(100, 100));
             Glide.with(container)
                     .asBitmap()
-                    .load(photoList.get(photoList.size() - 1 - position).getPhoto())
+                    .load(pagerPhotoList.get(position).getPhoto())
                     .into(new SimpleTarget<Bitmap>() {
                         @Override
                         public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
@@ -746,6 +745,13 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
         Toaster.shortToast("You have successfully joined");
     }
 
+    public void addCatsImages(List<CatProfile> cats) {
+        if (cats == null || cats.isEmpty()) return;
+        for (CatProfile cat : cats) {
+
+        }
+    }
+
     public void refreshGroupPartners(List<GroupPartner> partners) {
         if (partners == null || partners.isEmpty() || groupPartnersRecyclerView == null) return;
         groupPartnersList.clear();
@@ -774,10 +780,22 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
         groupPartnersRecyclerView.scrollToPosition(0);
     }
 
+    public void catsLoaded(List<CatProfile> list) {
+        if (null != list) {
+            for (CatProfile item : list) {
+                if (null != item.getAvatar())
+                    photoList.add(item.getAvatar());
+            }
+            photosAdapter.notifyDataSetChanged();
+            photoCountTextView.setText(String.valueOf(photoList.size()));
+        }
+    }
+
     @Override
     public void onImagePicked(int requestCode, File file) {
         if (REQUEST_CODE_GET_IMAGE == requestCode && file != null) {
             photoList.add(0, new PhotoWithPreview(file.getPath(), file.getPath()));
+            pagerPhotoList.add(photoList.get(0));
             pagerAdapter.notifyDataSetChanged();
             photosAdapter.notifyItemInserted(0);
             photosRecyclerView.scrollToPosition(0);

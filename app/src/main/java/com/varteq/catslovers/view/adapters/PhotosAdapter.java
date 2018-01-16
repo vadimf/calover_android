@@ -83,4 +83,9 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.PhotoViewH
     public interface OnImageClickListener {
         void onImageClicked(String imagePath);
     }
+
+    public List<PhotoWithPreview> getPhotoList(){
+        return photoList;
+    }
+
 }

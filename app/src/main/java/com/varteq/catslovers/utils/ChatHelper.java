@@ -67,6 +67,8 @@ public class ChatHelper {
 
     private QBChatService qbChatService;
     private List<Feedstation> myFeedstations;
+    private long lastStationsUpdateTime;
+    private long UPDATE_PERIOD = 5000;
 
     public static synchronized ChatHelper getInstance() {
         if (instance == null) {
@@ -364,6 +366,8 @@ public class ChatHelper {
     }
 
     public void getDialogs(QBRequestGetBuilder customObjectRequestBuilder, final QBEntityCallback<ArrayList<QBChatDialog>> callback) {
+        if (lastStationsUpdateTime + UPDATE_PERIOD < System.currentTimeMillis())
+            updateMyFeedstations();
         customObjectRequestBuilder.setLimit(DIALOG_ITEMS_PER_PAGE);
 
         QBRestChatService.getChatDialogs(null, customObjectRequestBuilder).performAsync(
@@ -494,6 +498,7 @@ public class ChatHelper {
     }
 
     private void updateMyFeedstations() {
+        lastStationsUpdateTime = System.currentTimeMillis();
 
         Call<BaseResponse<List<RFeedstation>>> call = ServiceGenerator.getApiServiceWithToken().getFeedstations();
         call.enqueue(new Callback<BaseResponse<List<RFeedstation>>>() {

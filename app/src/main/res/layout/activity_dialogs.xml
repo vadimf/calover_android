@@ -8,7 +8,8 @@
 
     <com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout
         android:id="@+id/swipy_refresh_layout"
-        style="@style/MatchParent">
+        style="@style/MatchParent"
+        app:srl_direction="bottom">
 
         <ListView
             android:id="@+id/list_dialogs_chats"

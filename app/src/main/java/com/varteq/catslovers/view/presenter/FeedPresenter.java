@@ -15,6 +15,8 @@ import com.varteq.catslovers.api.entity.BaseResponse;
 import com.varteq.catslovers.api.entity.ErrorResponse;
 import com.varteq.catslovers.api.entity.RFeedstation;
 import com.varteq.catslovers.model.FeedPost;
+import com.varteq.catslovers.model.Feedstation;
+import com.varteq.catslovers.model.GroupPartner;
 import com.varteq.catslovers.model.QBFeedPost;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.view.fragments.FeedFragment;
@@ -111,8 +113,9 @@ public class FeedPresenter {
                         protected void onSuccess(List<RFeedstation> data) {
                             //view.feedstationsLoaded(from(data));
                             List<String> ids = new ArrayList<>();
-                            for (RFeedstation feedstation : data) {
-                                if (!feedstation.getIsPublic())
+                            for (Feedstation feedstation : MapPresenter.from(data)) {
+                                if (!feedstation.getIsPublic() && feedstation.getStatus() != null
+                                        && feedstation.getStatus().equals(GroupPartner.Status.JOINED))
                                     ids.add(String.valueOf(feedstation.getId()));
                             }
                             getFeeds(ids);
