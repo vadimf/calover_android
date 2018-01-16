@@ -119,6 +119,17 @@
     <string name="network_error_message">Network error. Please try again</string>
     <string name="retry">Retry</string>
 
+    <!--Popup-->
+    <string name="ok_3sc">OK (3SC)</string>
+    <string name="thank_you_for_sharing">Thank you for sharing!</string>
+    <string name="anti_flea_expires">Anti-Flea expires!</string>
+    <string name="small_error_occured">A small error occurred</string>
+    <string name="thank_you_for_update">Thank you for your update!</string>
+    <string name="tasty">Mmmm Tasty!!</string>
+    <string name="see_you_again_soon">See you again soon!</string>
+    <string name="we_are_fixing_it">We are fixing it</string>
+    <string name="opssss">OPSSSS</string>
+
     <!--Boarding-->
     <string name="onboarding_text_1">THE\nCATS LOVERS\nSOCIAL\nNETWORK</string>
     <string name="onboarding_text_2">COMMUNAL\nTREATMENT\nFOR ALL FEEDING\nSTATIONS</string>
@@ -163,4 +174,5 @@
     <string name="cat_in_heat">Cat in Heat</string>
     <string name="stray_cat_capture_operation">Stray cat (capture operation)</string>
     <string name="hungry">Hungry</string>
+
 </resources>

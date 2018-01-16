@@ -194,11 +194,12 @@ public class CatProfilePresenter {
             if (lastLocation != null) {
                 uploadCatRequest.addParameter("lat", String.valueOf(lastLocation.getLatitude()))
                         .addParameter("lng", String.valueOf(lastLocation.getLongitude()));
+                uploadCatRequest.addParameter("address",
+                        Utils.getAddressByLocation(lastLocation.getLatitude(), lastLocation.getLongitude(), view));
                 Profile.setLocation(view, lastLocation);
             }
 
             uploadCatRequest.addParameter("name", cat.getPetName())
-                    .addParameter("address", Utils.getAddressByLocation(lastLocation.getLatitude(), lastLocation.getLongitude(), view))
                     .addParameter("nickname", cat.getNickname())
                     .addParameter("color", colors)
                     .addParameter("age", String.valueOf(age))
