@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Location;
-import android.media.ThumbnailUtils;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AlertDialog;
@@ -32,8 +31,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.SimpleTarget;
-import com.bumptech.glide.request.transition.Transition;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -190,6 +188,7 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
     private SystemPermissionHelper permissionHelper;
     private LocationRequest locationRequest;
     private LocationCallback locationCallback;
+    private int countOfSelectedPhotos;
 
     public enum CatProfileScreenMode {
         EDIT_MODE,
@@ -480,24 +479,13 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
         groupPartnersRecyclerView.scrollToPosition(0);
     }
 
-
+    final int THUMBSIZE = 250;
     private void updateAvatar() {
         if (avatar != null)
             Glide.with(this)
-                    .asBitmap()
                     .load(avatar.getThumbnail())
-                    .into(new SimpleTarget<Bitmap>() {
-                        final int THUMBSIZE = 250;
-
-                        @Override
-                        public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
-                            if (resource.getWidth() > THUMBSIZE)
-                                avatarImageView.setImageBitmap(ThumbnailUtils.extractThumbnail(resource,
-                                        THUMBSIZE, THUMBSIZE));
-                            else
-                                avatarImageView.setImageBitmap(resource);
-                        }
-                    });
+                    .apply(new RequestOptions().override(THUMBSIZE, THUMBSIZE))
+                    .into(avatarImageView);
         else
             avatarImageView.setImageBitmap(Utils.getBitmapWithColor(getResources().getColor(R.color.transparent)));
     }
@@ -807,7 +795,9 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
     @OnClick(R.id.upload_image_button)
     void uploadCatImage() {
         //pickPhotoWithPermission(getString(R.string.select_cat_photo));
-        new ImagePickHelper().pickAnImage(this, REQUEST_CODE_GET_IMAGE);
+        if (countOfSelectedPhotos < 5)
+            new ImagePickHelper().pickAnImages(this, REQUEST_CODE_GET_IMAGE);
+        else Toaster.shortToast("You can add up to 5 photos per cat update");
     }
 
     private CatProfile fillCatProfile() {
@@ -1010,7 +1000,7 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
     public void onImagePicked(int requestCode, File file) {
         if (file != null) {
             if (REQUEST_CODE_GET_IMAGE == requestCode) {
-                photoList.add(0, new PhotoWithPreview(file.getPath(), file.getPath()));
+                addImageToPhotosAndTopImagesList(file);
                 photosAdapter.notifyItemInserted(0);
                 photosRecyclerView.scrollToPosition(0);
                 photoCountTextView.setText(String.valueOf(photoList.size()));
@@ -1021,9 +1011,20 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
                     avatar.setPhoto(file.getPath());
                     avatar.setThumbnail(file.getPath());
                 }
-                avatar.setNeedToUpdate(true);
+                avatar.setExpectedAction(PhotoWithPreview.Action.CHANGE);
                 updateAvatar();
             }
+        }
+    }
+
+    @Override
+    public void onImagesPicked(int requestCode, List<File> files) {
+        if (REQUEST_CODE_GET_IMAGE == requestCode && files != null) {
+            for (File file : files)
+                addImageToPhotosAndTopImagesList(file);
+            photosAdapter.notifyDataSetChanged();
+            photosRecyclerView.scrollToPosition(0);
+            photoCountTextView.setText(String.valueOf(photoList.size()));
         }
     }
 
@@ -1040,5 +1041,10 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
     @Override
     public void onImagePickClosed(int requestCode) {
 
+    }
+
+    private void addImageToPhotosAndTopImagesList(File file) {
+        countOfSelectedPhotos++;
+        photoList.add(0, new PhotoWithPreview(file.getPath(), file.getPath(), PhotoWithPreview.Action.ADD));
     }
 }

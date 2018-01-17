@@ -11,12 +11,17 @@ public class ImagePickHelper {
 
     public void pickAnImage(Fragment fragment, int requestCode) {
         ImagePickHelperFragment imagePickHelperFragment = ImagePickHelperFragment.start(fragment, requestCode);
-        showImageSourcePickerDialog(fragment.getChildFragmentManager(), imagePickHelperFragment);
+        showImageSourcePickerDialog(fragment.getChildFragmentManager(), imagePickHelperFragment, false);
     }
 
     public void pickAnImage(FragmentActivity activity, int requestCode) {
         ImagePickHelperFragment imagePickHelperFragment = ImagePickHelperFragment.start(activity, requestCode);
-        showImageSourcePickerDialog(activity.getSupportFragmentManager(), imagePickHelperFragment);
+        showImageSourcePickerDialog(activity.getSupportFragmentManager(), imagePickHelperFragment, false);
+    }
+
+    public void pickAnImages(FragmentActivity activity, int requestCode) {
+        ImagePickHelperFragment imagePickHelperFragment = ImagePickHelperFragment.start(activity, requestCode);
+        showImageSourcePickerDialog(activity.getSupportFragmentManager(), imagePickHelperFragment, true);
     }
 
     public void pickAnImageOrVideo(FragmentActivity activity, int requestCode) {
@@ -24,8 +29,8 @@ public class ImagePickHelper {
         ImageSourcePickDialogFragment.showImageAndVideoPicker(imagePickHelperFragment, activity.getSupportFragmentManager());
     }
 
-    private void showImageSourcePickerDialog(FragmentManager fm, ImagePickHelperFragment fragment) {
+    private void showImageSourcePickerDialog(FragmentManager fm, ImagePickHelperFragment fragment, boolean isMultiselect) {
         ImageSourcePickDialogFragment.show(fm,
-                new ImageSourcePickDialogFragment.LoggableActivityImageSourcePickedListener(fragment));
+                new ImageSourcePickDialogFragment.LoggableActivityImageSourcePickedListener(fragment), isMultiselect);
     }
 }

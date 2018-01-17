@@ -2,7 +2,6 @@ package com.varteq.catslovers.view;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.media.ThumbnailUtils;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
@@ -11,8 +10,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.SimpleTarget;
-import com.bumptech.glide.request.transition.Transition;
+import com.bumptech.glide.request.RequestOptions;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.utils.Log;
@@ -23,6 +21,7 @@ import com.varteq.catslovers.utils.qb.imagepick.ImagePickHelper;
 import com.varteq.catslovers.utils.qb.imagepick.OnImagePickedListener;
 
 import java.io.File;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -105,23 +104,13 @@ public class SignUpActivity extends BaseActivity implements OnImagePickedListene
         return true;
     }
 
+    final int THUMBSIZE = 250;
     private void updateAvatar() {
-        if (avatar != null)
+        if (avatar != null && !avatar.isEmpty())
             Glide.with(this)
-                    .asBitmap()
                     .load(avatar)
-                    .into(new SimpleTarget<Bitmap>() {
-                        final int THUMBSIZE = 250;
-
-                        @Override
-                        public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
-                            if (resource.getWidth() > THUMBSIZE)
-                                avatarImageView.setImageBitmap(ThumbnailUtils.extractThumbnail(resource,
-                                        THUMBSIZE, THUMBSIZE));
-                            else
-                                avatarImageView.setImageBitmap(resource);
-                        }
-                    });
+                    .apply(new RequestOptions().override(THUMBSIZE, THUMBSIZE))
+                    .into(avatarImageView);
         else
             avatarImageView.setImageBitmap(Utils.getBitmapWithColor(getResources().getColor(R.color.transparent)));
     }
@@ -133,6 +122,11 @@ public class SignUpActivity extends BaseActivity implements OnImagePickedListene
             Profile.saveUserAvatar(this, avatar);
             updateAvatar();
         }
+    }
+
+    @Override
+    public void onImagesPicked(int requestCode, List<File> file) {
+
     }
 
     @Override

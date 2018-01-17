@@ -19,6 +19,7 @@ import com.varteq.catslovers.utils.qb.imagepick.OnImagePickedListener;
 import com.varteq.catslovers.view.presenter.NewFeedPostPresenter;
 
 import java.io.File;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -100,6 +101,11 @@ public class NewFeedPostActivity extends BaseActivity implements OnImagePickedLi
                 }
                 break;
         }
+    }
+
+    @Override
+    public void onImagesPicked(int requestCode, List<File> file) {
+
     }
 
     @Override
