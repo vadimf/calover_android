@@ -21,6 +21,7 @@ import com.varteq.catslovers.view.presenter.SettingsPresenter;
 import net.gotev.uploadservice.UploadServiceBroadcastReceiver;
 
 import java.io.File;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -104,6 +105,11 @@ public class SettingsActivity extends BaseActivity implements OnImagePickedListe
             updateAvatar();
             presenter.uploadAvatar();
         }
+    }
+
+    @Override
+    public void onImagesPicked(int requestCode, List<File> file) {
+
     }
 
     @Override
