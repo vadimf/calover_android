@@ -10,16 +10,23 @@ public class PhotoWithPreview implements Serializable, Parcelable {
     private Integer id;
     private String photo;
     private String thumbnail;
-    private boolean needToUpdate;
+    private Action expectedAction;
+
+    public enum Action {
+        ADD,
+        CHANGE,
+        DELETE
+    }
 
     public PhotoWithPreview(Integer id, String photo, String thumbnail) {
-        this(photo, thumbnail);
+        this(photo, thumbnail, null);
         this.id = id;
     }
 
-    public PhotoWithPreview(String photo, String thumbnail) {
+    public PhotoWithPreview(String photo, String thumbnail, Action expectedAction) {
         this.photo = photo;
         this.thumbnail = thumbnail;
+        this.expectedAction = expectedAction;
     }
 
     public Integer getId() {
@@ -46,12 +53,12 @@ public class PhotoWithPreview implements Serializable, Parcelable {
         this.thumbnail = thumbnail;
     }
 
-    public boolean isNeedToUpdate() {
-        return needToUpdate;
+    public Action getExpectedAction() {
+        return expectedAction;
     }
 
-    public void setNeedToUpdate(boolean needToUpdate) {
-        this.needToUpdate = needToUpdate;
+    public void setExpectedAction(Action expectedAction) {
+        this.expectedAction = expectedAction;
     }
 
     @Override
@@ -64,14 +71,15 @@ public class PhotoWithPreview implements Serializable, Parcelable {
         dest.writeValue(this.id);
         dest.writeString(this.photo);
         dest.writeString(this.thumbnail);
-        dest.writeByte(this.needToUpdate ? (byte) 1 : (byte) 0);
+        dest.writeInt(this.expectedAction == null ? -1 : this.expectedAction.ordinal());
     }
 
     protected PhotoWithPreview(Parcel in) {
         this.id = (Integer) in.readValue(Integer.class.getClassLoader());
         this.photo = in.readString();
         this.thumbnail = in.readString();
-        this.needToUpdate = in.readByte() != 0;
+        int tmpExpectedAction = in.readInt();
+        this.expectedAction = tmpExpectedAction == -1 ? null : Action.values()[tmpExpectedAction];
     }
 
     public static final Creator<PhotoWithPreview> CREATOR = new Creator<PhotoWithPreview>() {

@@ -245,6 +245,11 @@ public class ChatActivity extends QBBaseActivity implements OnImagePickedListene
     }
 
     @Override
+    public void onImagesPicked(int requestCode, List<File> file) {
+
+    }
+
+    @Override
     public void onVideoPicked(int requestCode, File file, Bitmap preview) {
 
     }

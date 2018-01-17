@@ -1,5 +1,6 @@
 package com.varteq.catslovers.utils.qb.imagepick;
 
+import android.content.ClipData;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -20,8 +21,11 @@ import com.varteq.catslovers.view.qb.dialog.ProgressDialogFragment;
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-public class GetFilepathFromUriTask extends BaseAsyncTask<Intent, Void, File> {
+public class GetFilepathFromUriTask extends BaseAsyncTask<Intent, Void, List<File>> {
 
     private WeakReference<FragmentManager> fmWeakReference;
     private OnImagePickedListener listener;
@@ -40,11 +44,30 @@ public class GetFilepathFromUriTask extends BaseAsyncTask<Intent, Void, File> {
     }
 
     @Override
-    public File performInBackground(Intent... params) throws Exception {
+    public List<File> performInBackground(Intent... params) throws Exception {
         Intent data = params[0];
 
-        String imageFilePath = null;
         Uri uri = data.getData();
+        if (uri != null)
+            return Collections.singletonList(getFileFromUri(uri));
+
+        if (data.getClipData() != null) {
+            ClipData mClipData = data.getClipData();
+            List<File> files = new ArrayList<>();
+            for (int i = 0; i < mClipData.getItemCount() && i < 5; i++) {
+
+                ClipData.Item item = mClipData.getItemAt(i);
+                uri = item.getUri();
+                files.add(getFileFromUri(uri));
+
+            }
+            return files;
+        }
+        return null;
+    }
+
+    private File getFileFromUri(Uri uri) throws Exception {
+        String imageFilePath = null;
         String uriScheme = uri.getScheme();
 
         boolean isFromGoogleApp = uri.toString().startsWith(SchemeType.SCHEME_CONTENT_GOOGLE);
@@ -75,16 +98,19 @@ public class GetFilepathFromUriTask extends BaseAsyncTask<Intent, Void, File> {
     }
 
     @Override
-    public void onResult(File file) {
+    public void onResult(List<File> files) {
         hideProgress();
         Log.w(GetFilepathFromUriTask.class.getSimpleName(), "onResult listener = " + listener);
         if (listener != null) {
-            Bitmap thumb = ThumbnailUtils.createVideoThumbnail(file.getPath(),
+            Bitmap thumb = ThumbnailUtils.createVideoThumbnail(files.get(0).getPath(),
                     MediaStore.Images.Thumbnails.MINI_KIND);
             if (thumb != null)
-                listener.onVideoPicked(requestCode, file, ThumbnailUtils.createVideoThumbnail(file.getPath(),
+                listener.onVideoPicked(requestCode, files.get(0), ThumbnailUtils.createVideoThumbnail(files.get(0).getPath(),
                         MediaStore.Images.Thumbnails.MINI_KIND));
-            else listener.onImagePicked(requestCode, file);
+            else if (files.size() > 1)
+                listener.onImagesPicked(requestCode, files);
+            else
+                listener.onImagePicked(requestCode, files.get(0));
             /*if (file.getName().endsWith(ImageUtils.IMAGE_FILE_EXTENSION))
                 listener.onImagePicked(requestCode, file);
             else if (file.getName().endsWith(ImageUtils.VIDEO_FILE_EXTENSION))

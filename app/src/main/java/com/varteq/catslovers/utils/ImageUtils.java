@@ -110,15 +110,19 @@ public class ImageUtils {
         return resultFile;
     }
 
-    public static void startImagePicker(Activity activity) {
+    public static void startImagePicker(Activity activity, boolean isMultiselect) {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType(MimeType.IMAGE_MIME);
+        if (isMultiselect)
+            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
         activity.startActivityForResult(Intent.createChooser(intent, activity.getString(R.string.dlg_choose_image_from)), GALLERY_REQUEST_CODE);
     }
 
-    public static void startImagePicker(Fragment fragment) {
+    public static void startImagePicker(Fragment fragment, boolean isMultiselect) {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType(MimeType.IMAGE_MIME);
+        if (isMultiselect)
+            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
         fragment.startActivityForResult(Intent.createChooser(intent, fragment.getString(R.string.dlg_choose_image_from)), GALLERY_REQUEST_CODE);
     }
 

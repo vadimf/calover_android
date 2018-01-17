@@ -138,9 +138,10 @@ public class FeedstationPresenter {
             int i = 0;
             int currIndex = 0;
             for (PhotoWithPreview photoWithPreview : feedstation.getPhotos()) {
-                if (photoWithPreview.getId() == null)
+                if (photoWithPreview.getExpectedAction() != null && photoWithPreview.getExpectedAction().equals(PhotoWithPreview.Action.ADD))
                     uploadCatRequest.addFileToUpload(photoWithPreview.getPhoto(), "images[" + i++ + "]");
-                if (++currIndex > 4) break;
+                if (i > 4) break;
+                //if (++currIndex > 4) break;
             }
 
             uploadCatRequest.startUpload();

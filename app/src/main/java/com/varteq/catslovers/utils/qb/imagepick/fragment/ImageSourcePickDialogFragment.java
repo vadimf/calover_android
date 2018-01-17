@@ -29,15 +29,17 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
     private boolean permissionsResultReceived;
     private boolean showImageAndVideoPickerWithoutChoose = false;
     private Fragment fragment;
+    private boolean isMultiselect;
 
     public ImageSourcePickDialogFragment() {
         systemPermissionHelper = new SystemPermissionHelper(this);
     }
 
-    public static void show(FragmentManager fm, OnImageSourcePickedListener onImageSourcePickedListener) {
+    public static void show(FragmentManager fm, OnImageSourcePickedListener onImageSourcePickedListener, boolean isMultiselect) {
         ImageSourcePickDialogFragment fragment = new ImageSourcePickDialogFragment();
         fragment.setCancelable(false);
         fragment.setOnImageSourcePickedListener(onImageSourcePickedListener);
+        fragment.setMultiselect(isMultiselect);
         fragment.show(fm, ImageSourcePickDialogFragment.class.getSimpleName());
     }
 
@@ -64,7 +66,7 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
                             systemPermissionHelper.requestPermissionsForSaveFileImage();
                             return;
                         }
-                        onImageSourcePickedListener.onImageSourcePicked(ImageSource.GALLERY);
+                        onImageSourcePickedListener.onImageSourcePicked(ImageSource.GALLERY, isMultiselect);
                         dismiss();
                         break;
                     case POSITION_CAMERA:
@@ -72,7 +74,7 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
                             systemPermissionHelper.requestPermissionsTakePhoto();
                             return;
                         }
-                        onImageSourcePickedListener.onImageSourcePicked(ImageSource.CAMERA);
+                        onImageSourcePickedListener.onImageSourcePicked(ImageSource.CAMERA, isMultiselect);
                         dismiss();
                         break;
                 }
@@ -123,13 +125,14 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 if (showImageAndVideoPickerWithoutChoose) {
                     ImageUtils.startImageAndVideoPicker(fragment);
-                } else onImageSourcePickedListener.onImageSourcePicked(ImageSource.GALLERY);
+                } else
+                    onImageSourcePickedListener.onImageSourcePicked(ImageSource.GALLERY, isMultiselect);
             }
         }
         if (requestCode == PERMISSIONS_FOR_TAKE_PHOTO_REQUEST) {
             if (permissions[0].equals(Manifest.permission.CAMERA)
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                onImageSourcePickedListener.onImageSourcePicked(ImageSource.CAMERA);
+                onImageSourcePickedListener.onImageSourcePicked(ImageSource.CAMERA, isMultiselect);
             }
         }
         permissionsResultReceived = true;
@@ -139,9 +142,13 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
         this.onImageSourcePickedListener = onImageSourcePickedListener;
     }
 
+    public void setMultiselect(boolean multiselect) {
+        isMultiselect = multiselect;
+    }
+
     public interface OnImageSourcePickedListener {
 
-        void onImageSourcePicked(ImageSource source);
+        void onImageSourcePicked(ImageSource source, boolean isMultiselect);
     }
 
     public enum ImageSource {
@@ -163,13 +170,13 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
         }
 
         @Override
-        public void onImageSourcePicked(ImageSource source) {
+        public void onImageSourcePicked(ImageSource source, boolean isMultiselect) {
             switch (source) {
                 case GALLERY:
                     if (fragment != null) {
-                        ImageUtils.startImagePicker(fragment);
+                        ImageUtils.startImagePicker(fragment, isMultiselect);
                     } else {
-                        ImageUtils.startImagePicker(activity);
+                        ImageUtils.startImagePicker(activity, isMultiselect);
                     }
                     break;
                 case CAMERA:

@@ -7,7 +7,6 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Geocoder;
-import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -30,8 +29,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.SimpleTarget;
-import com.bumptech.glide.request.transition.Transition;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.model.CatProfile;
@@ -107,6 +105,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
     public static final String MODE_KEY = "mode_key";
     private MenuItem saveMenu;
     private MenuItem editMenu;
+    private int countOfSelectedPhotos = 0;
 
     public enum FeedstationScreenMode {
         EDIT_MODE,
@@ -171,9 +170,9 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        Glide.with(this)
+        /*Glide.with(this)
                 .load(getResources().getDrawable(R.drawable.cat2))
-                .into(avatarImageView);
+                .into(avatarImageView);*/
 
         fillUI();
         setupUIMode();
@@ -574,7 +573,9 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
 
     @OnClick(R.id.upload_image_button)
     void uploadCatImage() {
-        new ImagePickHelper().pickAnImage(this, REQUEST_CODE_GET_IMAGE);
+        if (countOfSelectedPhotos < 5)
+            new ImagePickHelper().pickAnImages(this, REQUEST_CODE_GET_IMAGE);
+        else Toaster.shortToast("You can add up to 5 photos per station update");
     }
 
     private class HeaderPhotosViewPagerAdapter extends PagerAdapter {
@@ -604,19 +605,10 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             imageView.setLayoutParams(new LinearLayout.LayoutParams(100, 100));
             Glide.with(container)
-                    .asBitmap()
                     .load(pagerPhotoList.get(position).getPhoto())
-                    .into(new SimpleTarget<Bitmap>() {
-                        @Override
-                        public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
-                            if (resource.getWidth() > THUMBSIZE)
-                                imageView.setImageBitmap(ThumbnailUtils.extractThumbnail(resource,
-                                        THUMBSIZE, THUMBSIZE));
-                            else
-                                imageView.setImageBitmap(resource);
-                        }
-                    });
-            //imageView.setImageDrawable(getResources().getDrawable(headerPhotos[position]));
+                    .apply(new RequestOptions().override(THUMBSIZE, THUMBSIZE))
+                    .into(imageView);
+
             container.addView(imageView);
             return imageView;
         }
@@ -794,10 +786,21 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
     @Override
     public void onImagePicked(int requestCode, File file) {
         if (REQUEST_CODE_GET_IMAGE == requestCode && file != null) {
-            photoList.add(0, new PhotoWithPreview(file.getPath(), file.getPath()));
-            pagerPhotoList.add(photoList.get(0));
+            addImageToPhotosAndTopImagesList(file);
             pagerAdapter.notifyDataSetChanged();
             photosAdapter.notifyItemInserted(0);
+            photosRecyclerView.scrollToPosition(0);
+            photoCountTextView.setText(String.valueOf(photoList.size()));
+        }
+    }
+
+    @Override
+    public void onImagesPicked(int requestCode, List<File> files) {
+        if (REQUEST_CODE_GET_IMAGE == requestCode && files != null) {
+            for (File file : files)
+                addImageToPhotosAndTopImagesList(file);
+            pagerAdapter.notifyDataSetChanged();
+            photosAdapter.notifyDataSetChanged();
             photosRecyclerView.scrollToPosition(0);
             photoCountTextView.setText(String.valueOf(photoList.size()));
         }
@@ -816,5 +819,11 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
     @Override
     public void onImagePickClosed(int requestCode) {
 
+    }
+
+    private void addImageToPhotosAndTopImagesList(File file) {
+        countOfSelectedPhotos++;
+        photoList.add(0, new PhotoWithPreview(file.getPath(), file.getPath(), PhotoWithPreview.Action.ADD));
+        pagerPhotoList.add(photoList.get(0));
     }
 }
