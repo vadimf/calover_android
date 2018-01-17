@@ -6,9 +6,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.internal.BottomNavigationMenuView;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -63,6 +66,11 @@ public class MainActivity extends BaseActivity {
     final String STATE_NAVIGATION_SELECTED = "navigationSelected";
     int navigationSelectedItemId;
 
+    private DrawerLayout drawerLayout;
+    private NavigationView navigationView;
+    ImageButton navigationEditImageButton;
+    View navigationHeaderLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,7 +92,9 @@ public class MainActivity extends BaseActivity {
         toolbarView = getLayoutInflater().inflate(R.layout.toolbar_main, toolbar);
         toolbarTitle = findViewById(R.id.toolbarTitle);
         menuButton = findViewById(R.id.menu_imageButton);
-        menuButton.setOnClickListener(view -> Toaster.shortToast(R.string.coming_soon));
+        menuButton.setOnClickListener(view -> {
+            drawerLayout.openDrawer(Gravity.LEFT);
+        });
 
         catsNotificationButton = findViewById(R.id.catsNotificationButton);
         catsNotificationButton.setOnClickListener(view -> {
@@ -126,6 +136,9 @@ public class MainActivity extends BaseActivity {
         } else {
             mBottomNavigationView.setSelectedItemId(R.id.action_map);
         }
+
+        initNavigationDrawer();
+
     }
 
     private void runDialogTimer() {
@@ -288,5 +301,15 @@ public class MainActivity extends BaseActivity {
 
     public void onSuccessJoin() {
         Toaster.shortToast("You have successfully joined");
+    }
+
+    private void initNavigationDrawer() {
+
+        drawerLayout = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.navigation_view);
+        navigationHeaderLayout = navigationView.getHeaderView(0);
+        navigationEditImageButton = navigationHeaderLayout.findViewById(R.id.imageButton_edit);
+        navigationEditImageButton.setOnClickListener(view -> startActivity(new Intent(MainActivity.this, SettingsActivity.class)));
+
     }
 }

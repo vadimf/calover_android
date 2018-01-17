@@ -1,0 +1,24 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/add_business"
+            android:icon="@drawable/ic_star"
+            android:title="Add new business"/>
+        <item
+            android:id="@+id/clear_history"
+            android:icon="@drawable/ic_star"
+            android:title="Clear history"/>
+        <item
+            android:icon="@drawable/ic_star"
+            android:title="Option Three"/>
+        <item
+            android:icon="@drawable/ic_star"
+            android:title="Share this app"/>
+        <item
+            android:icon="@drawable/ic_star"
+            android:title="About"/>
+    </group>
+
+
+</menu>
