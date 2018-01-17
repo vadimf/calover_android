@@ -8,10 +8,12 @@ import com.varteq.catslovers.api.ServiceGenerator;
 import com.varteq.catslovers.api.entity.BaseResponse;
 import com.varteq.catslovers.api.entity.ErrorData;
 import com.varteq.catslovers.api.entity.ErrorResponse;
+import com.varteq.catslovers.api.entity.RBusiness;
 import com.varteq.catslovers.api.entity.REvent;
 import com.varteq.catslovers.api.entity.RFeedstation;
 import com.varteq.catslovers.api.entity.RGeoSearch;
 import com.varteq.catslovers.api.entity.RPhoto;
+import com.varteq.catslovers.model.Business;
 import com.varteq.catslovers.model.Event;
 import com.varteq.catslovers.model.Feedstation;
 import com.varteq.catslovers.model.GroupPartner;
@@ -63,7 +65,7 @@ public class MapPresenter {
 
                         @Override
                         protected void onSuccess(RGeoSearch data) {
-                            view.feedstationsLoaded(from(data.getFeedstations()), fromEvents(data.getEvents()));
+                            view.feedstationsLoaded(from(data.getFeedstations()), fromEvents(data.getEvents()), fromBusiness(data.getBusinesses()));
                         }
 
                         @Override
@@ -280,6 +282,34 @@ public class MapPresenter {
             eventList.add(event);
         }
         return eventList;
+    }
+
+    public static List<Business> fromBusiness(List<RBusiness> data) {
+        if (data == null || data.isEmpty()) return null;
+        List<Business> businessList = new ArrayList<>();
+        for (RBusiness rBusiness : data) {
+            Business business = new Business();
+            business.setId(rBusiness.getId());
+            business.setAddress(rBusiness.getAddress());
+            business.setDescription(rBusiness.getDescription());
+            business.setLocation(new LatLng(rBusiness.getLat(), rBusiness.getLng()));
+            business.setName(rBusiness.getName());
+            business.setLink(rBusiness.getLink());
+            business.setPhone(rBusiness.getPhone());
+            business.setDistance(rBusiness.getDistance());
+            business.setOpenHours(rBusiness.getOpenHours());
+            switch (rBusiness.getCategory()) {
+                case "food":
+                    business.setCategory(Business.Category.FOOD);
+                    break;
+                case "veterinary":
+                    business.setCategory(Business.Category.VETERINARY);
+                    break;
+            }
+
+            businessList.add(business);
+        }
+        return businessList;
     }
 
     public static List<Feedstation> from(List<RFeedstation> data) {
