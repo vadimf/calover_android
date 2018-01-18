@@ -133,6 +133,17 @@ public class FeedstationPresenter {
                     })
                     .setNotificationConfig(config);
 
+            if (feedstation.getTimeToEat1() != null)
+                uploadCatRequest.addParameter("time_to_feed_morning",
+                        String.valueOf(TimeUtils.getUtcDayStartOffset(feedstation.getTimeToEat1())));
+            if (feedstation.getTimeToEat2() != null)
+                uploadCatRequest.addParameter("time_to_feed_evening",
+                        String.valueOf(TimeUtils.getUtcDayStartOffset(feedstation.getTimeToEat2())));
+
+            if (feedstation.getLastFeeding() != null)
+                uploadCatRequest.addParameter("time_to_feed_evening",
+                        String.valueOf(TimeUtils.getUtcFromLocal(feedstation.getLastFeeding().getTime())));
+
             int i = 0;
             int currIndex = 0;
             for (PhotoWithPreview photoWithPreview : feedstation.getPhotos()) {

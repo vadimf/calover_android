@@ -40,6 +40,18 @@ public class RFeedstation extends ErrorData {
     @SerializedName("type")
     @Expose
     private String type;
+    @SerializedName("time_to_feed_morning")
+    @Expose
+    private Integer timeToFeedMorning;
+    @SerializedName("time_to_feed_evening")
+    @Expose
+    private Integer timeToFeedEvening;
+    @SerializedName("last_feeding")
+    @Expose
+    private Integer lastFeeding;
+    @SerializedName("feed_status")
+    @Expose
+    private String feedStatus;
     @SerializedName("permission")
     @Expose
     private RFeedstationPermissions permissions;
@@ -149,5 +161,37 @@ public class RFeedstation extends ErrorData {
 
     public void setPhotos(List<RPhoto> photos) {
         this.photos = photos;
+    }
+
+    public Integer getTimeToFeedMorning() {
+        return timeToFeedMorning;
+    }
+
+    public void setTimeToFeedMorning(Integer timeToFeedMorning) {
+        this.timeToFeedMorning = timeToFeedMorning;
+    }
+
+    public Integer getTimeToFeedEvening() {
+        return timeToFeedEvening;
+    }
+
+    public void setTimeToFeedEvening(Integer timeToFeedEvening) {
+        this.timeToFeedEvening = timeToFeedEvening;
+    }
+
+    public Integer getLastFeeding() {
+        return lastFeeding;
+    }
+
+    public void setLastFeeding(Integer lastFeeding) {
+        this.lastFeeding = lastFeeding;
+    }
+
+    public String getFeedStatus() {
+        return feedStatus;
+    }
+
+    public void setFeedStatus(String feedStatus) {
+        this.feedStatus = feedStatus;
     }
 }

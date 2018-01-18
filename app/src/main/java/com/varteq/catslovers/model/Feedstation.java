@@ -5,7 +5,6 @@ import android.os.Parcelable;
 
 import com.google.android.gms.maps.model.LatLng;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -16,6 +15,12 @@ public class Feedstation implements Parcelable {
         USER
     }
 
+    public enum FeedStatus {
+        NORMAL,
+        HUNGRY,
+        STARVING
+    }
+
     private Integer id;
     private String name;
     private String description;
@@ -23,6 +28,10 @@ public class Feedstation implements Parcelable {
     private String address;
     private Boolean isPublic;
     private Date timeToFeed;
+    private Date timeToEat1;
+    private Date timeToEat2;
+    private Date lastFeeding;
+    private FeedStatus feedStatus;
     private String createdUserId;
     private UserRole userRole;
     private List<PhotoWithPreview> photos = null;
@@ -116,6 +125,38 @@ public class Feedstation implements Parcelable {
         this.photos = photos;
     }
 
+    public Date getTimeToEat1() {
+        return timeToEat1;
+    }
+
+    public void setTimeToEat1(Date timeToEat1) {
+        this.timeToEat1 = timeToEat1;
+    }
+
+    public Date getTimeToEat2() {
+        return timeToEat2;
+    }
+
+    public void setTimeToEat2(Date timeToEat2) {
+        this.timeToEat2 = timeToEat2;
+    }
+
+    public FeedStatus getFeedStatus() {
+        return feedStatus;
+    }
+
+    public void setFeedStatus(FeedStatus feedStatus) {
+        this.feedStatus = feedStatus;
+    }
+
+    public Date getLastFeeding() {
+        return lastFeeding;
+    }
+
+    public void setLastFeeding(Date lastFeeding) {
+        this.lastFeeding = lastFeeding;
+    }
+
 
     @Override
     public int describeContents() {
@@ -131,9 +172,13 @@ public class Feedstation implements Parcelable {
         dest.writeString(this.address);
         dest.writeValue(this.isPublic);
         dest.writeLong(this.timeToFeed != null ? this.timeToFeed.getTime() : -1);
+        dest.writeLong(this.timeToEat1 != null ? this.timeToEat1.getTime() : -1);
+        dest.writeLong(this.timeToEat2 != null ? this.timeToEat2.getTime() : -1);
+        dest.writeLong(this.lastFeeding != null ? this.lastFeeding.getTime() : -1);
+        dest.writeInt(this.feedStatus == null ? -1 : this.feedStatus.ordinal());
         dest.writeString(this.createdUserId);
         dest.writeInt(this.userRole == null ? -1 : this.userRole.ordinal());
-        dest.writeList(this.photos);
+        dest.writeTypedList(this.photos);
         dest.writeInt(this.status == null ? -1 : this.status.ordinal());
     }
 
@@ -149,11 +194,18 @@ public class Feedstation implements Parcelable {
         this.isPublic = (Boolean) in.readValue(Boolean.class.getClassLoader());
         long tmpTimeToFeed = in.readLong();
         this.timeToFeed = tmpTimeToFeed == -1 ? null : new Date(tmpTimeToFeed);
+        long tmpTimeToEat1 = in.readLong();
+        this.timeToEat1 = tmpTimeToEat1 == -1 ? null : new Date(tmpTimeToEat1);
+        long tmpTimeToEat2 = in.readLong();
+        this.timeToEat2 = tmpTimeToEat2 == -1 ? null : new Date(tmpTimeToEat2);
+        long tmpLastFeeding = in.readLong();
+        this.lastFeeding = tmpLastFeeding == -1 ? null : new Date(tmpLastFeeding);
+        int tmpFeedStatus = in.readInt();
+        this.feedStatus = tmpFeedStatus == -1 ? null : FeedStatus.values()[tmpFeedStatus];
         this.createdUserId = in.readString();
         int tmpUserRole = in.readInt();
         this.userRole = tmpUserRole == -1 ? null : UserRole.values()[tmpUserRole];
-        this.photos = new ArrayList<PhotoWithPreview>();
-        in.readList(this.photos, PhotoWithPreview.class.getClassLoader());
+        this.photos = in.createTypedArrayList(PhotoWithPreview.CREATOR);
         int tmpStatus = in.readInt();
         this.status = tmpStatus == -1 ? null : GroupPartner.Status.values()[tmpStatus];
     }

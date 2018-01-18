@@ -324,6 +324,12 @@ public class MapPresenter {
             feedstation.setCreatedUserId(station.getCreated());
             feedstation.setAddress(station.getAddress());
             feedstation.setDescription(station.getDescription());
+            feedstation.setTimeToEat1(TimeUtils.getLocalTimeFromDayStartOffset(station.getTimeToFeedMorning()));
+            feedstation.setTimeToEat2(TimeUtils.getLocalTimeFromDayStartOffset(station.getTimeToFeedEvening()));
+            feedstation.setTimeToFeed(TimeUtils.getLocalDateFromUtc(station.getTimeToFeed()));
+            feedstation.setLastFeeding(TimeUtils.getLocalDateFromUtc(station.getLastFeeding()));
+            feedstation.setDescription(station.getDescription());
+            feedstation.setDescription(station.getDescription());
             if (station.getIsPublic() != null && station.getIsPublic())
                 feedstation.setTimeToFeed(TimeUtils.getLocalDateFromUtc(station.getTimeToFeed()));
             if (station.getLat() != null && station.getLng() != null)
@@ -358,6 +364,20 @@ public class MapPresenter {
                 for (RPhoto photo : station.getPhotos())
                     photos.add(new PhotoWithPreview(photo.getId(), photo.getPhoto(), photo.getThumbnail()));
                 feedstation.setPhotos(photos);
+            }
+
+            if (station.getFeedStatus() != null) {
+                switch (station.getFeedStatus()) {
+                    case "normal":
+                        feedstation.setFeedStatus(Feedstation.FeedStatus.NORMAL);
+                        break;
+                    case "hungry":
+                        feedstation.setFeedStatus(Feedstation.FeedStatus.HUNGRY);
+                        break;
+                    case "starving":
+                        feedstation.setFeedStatus(Feedstation.FeedStatus.STARVING);
+                        break;
+                }
             }
 
             list.add(feedstation);

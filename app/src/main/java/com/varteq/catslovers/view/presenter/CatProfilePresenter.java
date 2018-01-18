@@ -18,6 +18,7 @@ import com.varteq.catslovers.model.PhotoWithPreview;
 import com.varteq.catslovers.utils.GenericOf;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
+import com.varteq.catslovers.utils.TimeUtils;
 import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.view.CatProfileActivity;
 
@@ -162,8 +163,8 @@ public class CatProfilePresenter {
 
         String type = cat.getType().equals(CatProfile.Status.PET) ? "pet" : "stray";
 
-        int age = (int) (cat.getBirthday().getTime() / 1000L);
-        int nextFleaTreatment = (int) (cat.getFleaTreatmentDate().getTime() / 1000L);
+        int age = TimeUtils.getUtcFromLocal(cat.getBirthday().getTime());
+        int nextFleaTreatment = TimeUtils.getUtcFromLocal(cat.getFleaTreatmentDate().getTime());
 
         try {
             UploadNotificationConfig config = new UploadNotificationConfig();

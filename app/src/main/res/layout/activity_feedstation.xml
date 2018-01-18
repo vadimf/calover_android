@@ -196,12 +196,12 @@
                 style="@style/PrimaryTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="16dp"
                 android:paddingTop="8dp"
                 android:text="More info..."
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
-                app:layout_constraintTop_toBottomOf="@+id/time_relativeLayout"/>
+                app:layout_constraintTop_toBottomOf="@+id/time_to_feed_layout" />
 
 
             <Button
@@ -336,6 +336,82 @@
                     android:background="@drawable/ic_add_24dp"/>
 
             </LinearLayout>
+
+            <android.support.constraint.ConstraintLayout
+                android:id="@+id/time_to_feed_layout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/start_guideline"
+                app:layout_constraintTop_toBottomOf="@+id/time_relativeLayout">
+
+                <TextView
+                    android:id="@+id/slot1_textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginTop="8dp"
+                    android:text="Slot 1"
+                    app:layout_constraintBottom_toTopOf="@+id/reset_time_to_eat2_button"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/reset_time_to_eat1_button" />
+
+                <TextView
+                    android:id="@+id/slot2_textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginTop="8dp"
+                    android:text="Slot 2"
+                    app:layout_constraintBottom_toBottomOf="@+id/reset_time_to_eat2_button"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/reset_time_to_eat2_button" />
+
+                <Button
+                    android:id="@+id/reset_time_to_eat1_button"
+                    style="@style/PrimaryBorderlessButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Reset"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <Button
+                    android:id="@+id/reset_time_to_eat2_button"
+                    style="@style/PrimaryBorderlessButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Reset"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/reset_time_to_eat1_button" />
+
+                <TextView
+                    android:id="@+id/time_to_eat1_textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintBottom_toTopOf="@+id/reset_time_to_eat2_button"
+                    app:layout_constraintEnd_toStartOf="@+id/reset_time_to_eat1_button"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="5:00 AM" />
+
+                <TextView
+                    android:id="@+id/time_to_eat2_textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/reset_time_to_eat2_button"
+                    app:layout_constraintEnd_toStartOf="@+id/reset_time_to_eat2_button"
+                    app:layout_constraintTop_toTopOf="@+id/reset_time_to_eat2_button"
+                    tools:text="5:00 PM" />
+
+
+            </android.support.constraint.ConstraintLayout>
 
         </android.support.constraint.ConstraintLayout>
 

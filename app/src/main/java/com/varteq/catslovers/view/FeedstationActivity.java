@@ -10,6 +10,7 @@ import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
@@ -36,18 +37,21 @@ import com.varteq.catslovers.model.Feedstation;
 import com.varteq.catslovers.model.GroupPartner;
 import com.varteq.catslovers.model.PhotoWithPreview;
 import com.varteq.catslovers.utils.Log;
+import com.varteq.catslovers.utils.TimeUtils;
 import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.utils.qb.imagepick.ImagePickHelper;
 import com.varteq.catslovers.utils.qb.imagepick.OnImagePickedListener;
 import com.varteq.catslovers.view.adapters.GroupPartnersAdapter;
 import com.varteq.catslovers.view.adapters.PhotosAdapter;
 import com.varteq.catslovers.view.dialog.EditTextDialog;
+import com.varteq.catslovers.view.dialog.WrappedTimePickerDialog;
 import com.varteq.catslovers.view.presenter.FeedstationPresenter;
 import com.varteq.catslovers.view.qb.AttachmentImageActivity;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -59,6 +63,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
 
     private final int REQUEST_CODE_GET_IMAGE = 110;
     private final int RESULT_PICK_CONTACT = 11;
+    private final String DEFAULT_VALUE = "setup";
     private final String STATION_DEFAULT_NAME = "Station name";
     private final String ADDRESS_DEFAULT_VALUE = "station address";
     private String TAG = FeedstationActivity.class.getSimpleName();
@@ -94,6 +99,17 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
     Button expandPartnersButton;
     @BindView(R.id.group_partners_RecyclerView)
     RecyclerView groupPartnersRecyclerView;
+
+    /*@BindView(R.id.reset_time_to_eat1_button)
+    Button resetTimeToEat1Button;
+    @BindView(R.id.reset_time_to_eat2_button)
+    Button resetTimeToEat2Button;*/
+    @BindView(R.id.time_to_eat1_textView)
+    TextView timeToEat1TextView;
+    @BindView(R.id.time_to_eat2_textView)
+    TextView timeToEat2TextView;
+    @BindView(R.id.time_to_feed_layout)
+    ConstraintLayout timeToFeedLayout;
 
     public static final String FEEDSTATION_KEY = "feed_key";
     public static final String LOCATION_KEY = "loc_key";
@@ -212,6 +228,8 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
             photoList = feedstation.getPhotos();
             pagerPhotoList = new ArrayList<>();
             stationNamePhotosTextView.setText(feedstation.getName() != null ? feedstation.getName() : getString(R.string.new_cat_profile_screen_title));
+            timeToEat1TextView.setText(TimeUtils.getDateAsHHmm(feedstation.getTimeToEat1()));
+            timeToEat2TextView.setText(TimeUtils.getDateAsHHmm(feedstation.getTimeToEat2()));
             initStationAction();
         }
         /*scrollView.setOnTouchListener((v, event) -> {
@@ -323,6 +341,8 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
             saveMenu.setVisible(false);
         if (editMenu != null)
             editMenu.setVisible(true);
+
+        timeToFeedLayout.setVisibility(View.GONE);
     }
 
     private void setupEditMode() {
@@ -332,6 +352,11 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
             stationNameTextView.setText(STATION_DEFAULT_NAME);
         if (addressTextView.getText().toString().isEmpty())
             addressTextView.setText(ADDRESS_DEFAULT_VALUE);
+
+        if (timeToEat1TextView.getText().toString().isEmpty())
+            timeToEat1TextView.setText(DEFAULT_VALUE);
+        if (timeToEat2TextView.getText().toString().isEmpty())
+            timeToEat2TextView.setText(DEFAULT_VALUE);
 
         stationNameTextView.setEnabled(true);
 
@@ -349,6 +374,9 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
             saveMenu.setVisible(true);
         if (editMenu != null)
             editMenu.setVisible(false);
+
+        if (feedstation.getIsPublic())
+            timeToFeedLayout.setVisibility(View.VISIBLE);
     }
 
     public void setToolbarTitle(String title) {
@@ -799,5 +827,31 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
         countOfSelectedPhotos++;
         photoList.add(0, new PhotoWithPreview(file.getPath(), file.getPath(), PhotoWithPreview.Action.ADD));
         pagerPhotoList.add(photoList.get(0));
+    }
+
+    @OnClick(R.id.reset_time_to_eat1_button)
+    void onResetTimeToEat1Button() {
+        feedstation.setLastFeeding(new Date());
+    }
+
+    @OnClick(R.id.reset_time_to_eat2_button)
+    void onResetTimeToEat2Button() {
+        feedstation.setLastFeeding(new Date());
+    }
+
+    @OnClick(R.id.time_to_eat1_textView)
+    void onTimeToEat1Selected() {
+        new WrappedTimePickerDialog(this, feedstation.getTimeToEat1(), (timePicker, i, i1) -> {
+            feedstation.setTimeToEat1(TimeUtils.getTimeInMillis(i, i1));
+            timeToEat1TextView.setText(TimeUtils.getDateAsHHmm(feedstation.getTimeToEat1()));
+        });
+    }
+
+    @OnClick(R.id.time_to_eat2_textView)
+    void onTimeToEat2Selected() {
+        new WrappedTimePickerDialog(this, feedstation.getTimeToEat2(), (timePicker, i, i1) -> {
+            feedstation.setTimeToEat2(TimeUtils.getTimeInMillis(i, i1));
+            timeToEat2TextView.setText(TimeUtils.getDateAsHHmm(feedstation.getTimeToEat2()));
+        });
     }
 }

@@ -550,6 +550,39 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         FeedstationActivity.startInViewMode(getActivity(), station);
     }
 
+    private int getFeedstationMarkerId(Feedstation feedstation) {
+        if (feedstation.getUserRole() != null) {
+            if (feedstation.getIsPublic()) {
+                if (feedstation.getUserRole().equals(Feedstation.UserRole.ADMIN)) {
+                    if (feedstation.getFeedStatus() != null) {
+                        if (feedstation.getFeedStatus().equals(Feedstation.FeedStatus.HUNGRY))
+                            return R.drawable.foodstation_copy_8;
+                        else if (feedstation.getFeedStatus().equals(Feedstation.FeedStatus.STARVING))
+                            return R.drawable.station_red_star_hollow;
+                    }
+                    return R.drawable.foodstation_copy_2;
+                } else if (feedstation.getStatus() != null && feedstation.getStatus().equals(GroupPartner.Status.JOINED)) {
+                    if (feedstation.getFeedStatus() != null) {
+                        if (feedstation.getFeedStatus().equals(Feedstation.FeedStatus.HUNGRY))
+                            return R.drawable.location_icon_2;
+                        else if (feedstation.getFeedStatus().equals(Feedstation.FeedStatus.STARVING))
+                            return R.drawable.foodstation_copy_9;
+                    }
+                    return R.drawable.foodstation_copy_4;
+                }
+            } else if (feedstation.getUserRole().equals(Feedstation.UserRole.ADMIN)) {
+                return R.drawable.foodstation_copy_3;
+            }
+        }
+        if (feedstation.getFeedStatus() != null) {
+            if (feedstation.getFeedStatus().equals(Feedstation.FeedStatus.HUNGRY))
+                return R.drawable.location_icon_2;
+            else if (feedstation.getFeedStatus().equals(Feedstation.FeedStatus.STARVING))
+                return R.drawable.foodstation_copy_9;
+        }
+        return R.drawable.location_icon;
+    }
+
     public void feedstationsLoaded(List<Feedstation> stations, List<Event> events, List<Business> businesses) {
 
         listUpdated = true;
@@ -557,18 +590,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         if (stations != null)
             for (Feedstation feedstation : stations) {
                 if (feedstation.getLocation() == null) continue;
-                int resourceId = R.drawable.location_blue;
-                if (feedstation.getUserRole() != null) {
-                    if (feedstation.getUserRole().equals(Feedstation.UserRole.ADMIN) && !feedstation.getIsPublic())
-                        resourceId = R.drawable.location_red;
-                    else if (feedstation.getStatus() != null && feedstation.getStatus().equals(GroupPartner.Status.JOINED))
-                        resourceId = R.drawable.location_orange;
-                }
+                int resourceId = getFeedstationMarkerId(feedstation);
                 if (!isAdded()) return;
                 Marker marker = googleMap.addMarker(new MarkerOptions()
                         .title(feedstation.getName())
-                        //.icon(BitmapDescriptorFactory.fromResource(resourceId)) // insert image from request
-                        .icon(BitmapDescriptorFactory.fromBitmap(resizeMarkerIcon(resourceId))) // insert image from request
+                        .icon(BitmapDescriptorFactory.fromResource(resourceId)) // insert image from request
+                        //.icon(BitmapDescriptorFactory.fromBitmap(resizeMarkerIcon(resourceId))) // insert image from request
                         //.icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(R.drawable.ic_star))) // insert image from request
                         .anchor(markerPositionX, markerPositionY)
                         .position(feedstation.getLocation()));
