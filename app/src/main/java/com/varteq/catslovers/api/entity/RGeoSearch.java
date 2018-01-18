@@ -15,7 +15,7 @@ public class RGeoSearch extends ErrorData {
     private List<REvent> events;
     @SerializedName("businesses")
     @Expose
-    private List<Object> businesses;
+    private List<RBusiness> businesses;
 
     public List<RFeedstation> getFeedstations() {
         return feedstations;
@@ -33,11 +33,11 @@ public class RGeoSearch extends ErrorData {
         this.events = events;
     }
 
-    public List<Object> getBusinesses() {
+    public List<RBusiness> getBusinesses() {
         return businesses;
     }
 
-    public void setBusinesses(List<Object> businesses) {
+    public void setBusinesses(List<RBusiness> businesses) {
         this.businesses = businesses;
     }
 }

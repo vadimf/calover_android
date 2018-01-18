@@ -49,6 +49,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.varteq.catslovers.R;
+import com.varteq.catslovers.model.Business;
 import com.varteq.catslovers.model.Event;
 import com.varteq.catslovers.model.Feedstation;
 import com.varteq.catslovers.model.GroupPartner;
@@ -564,7 +565,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         FeedstationActivity.startInViewMode(getActivity(), station);
     }
 
-    public void feedstationsLoaded(List<Feedstation> stations, List<Event> events) {
+    public void feedstationsLoaded(List<Feedstation> stations, List<Event> events, List<Business> businesses) {
 
         listUpdated = true;
         googleMap.clear();
@@ -629,6 +630,24 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     clickedMarker = marker;
                     showEventMarkerDialog(event);
                 }
+            }
+
+        if (businesses != null)
+            for (Business business : businesses) {
+                if (business.getLocation() == null) continue;
+                int resourceId = R.drawable.food_business;
+                if (business.getCategory() != null && business.getCategory().equals(Business.Category.VETERINARY))
+                    resourceId = R.drawable.veterinary_business;
+
+                if (!isAdded()) return;
+
+                Marker marker = googleMap.addMarker(new MarkerOptions()
+                        .title(business.getName())
+                        .icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory.decodeResource(getResources(), resourceId)))
+                        .anchor(markerPositionX, markerPositionY)
+                        .position(business.getLocation())
+                );
+                marker.setTag(business);
             }
 
         addUserLocationMarker();
