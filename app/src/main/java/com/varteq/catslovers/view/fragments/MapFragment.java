@@ -11,8 +11,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -59,15 +57,14 @@ import com.varteq.catslovers.utils.ImageUtils;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.utils.SystemPermissionHelper;
+import com.varteq.catslovers.utils.TimeUtils;
 import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.utils.Utils;
 import com.varteq.catslovers.view.FeedstationActivity;
 import com.varteq.catslovers.view.adapters.info_window_adapter.EventInfoWindowAdapter;
 import com.varteq.catslovers.view.presenter.MapPresenter;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -105,6 +102,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     FrameLayout bottomSheetEventsEmergenciesFrameLayout;
     @BindView(R.id.radioGroup_emergencies)
     RadioGroup emergenciesRadioGroup;
+    @BindView(R.id.imageView_avatar_catBackground)
+    ImageView avatarCatBackgroundImageView;
+    @BindView(R.id.relativeLayout_hungry)
+    RelativeLayout hungryRelativeLayout;
 
     BottomSheetBehavior bottomSheetBehaviorFeedstation;
     BottomSheetBehavior bottomSheetBehaviorEventsWarnings;
@@ -127,6 +128,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private Marker userLocationMarker;
 
     private Marker clickedMarker;
+    private LatLng clickedMarkerLocation;
     private EventInfoWindowAdapter eventInfoWindowAdapter;
 
     @Override
@@ -273,22 +275,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         bottomSheetBehaviorEventsEmergencies.setState(BottomSheetBehavior.STATE_HIDDEN);
     }
 
-    public String getAddress(double lat, double lng) {
-        Geocoder geocoder;
-        List<Address> addresses = null;
-        String address = null;
-        geocoder = new Geocoder(getContext(), Locale.getDefault());
-
-        try {
-            addresses = geocoder.getFromLocation(lat, lng, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if (addresses != null && !addresses.isEmpty())
-            address = addresses.get(0).getAddressLine(0);
-        return Utils.splitAddress(address, 3);
-    }
-
 
     @Override
     public void onResume() {
@@ -300,10 +286,22 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     break;
             }
             Feedstation feedstation = (Feedstation) bottomSheetFeedstationFrameLayout.getTag();
-            fillFeedstationBottomSheet(feedstation.getName(), feedstation.getAddress());
+            fillFeedstationBottomSheet(feedstation);
             initStationAction(feedstation);
+            initAvatarCatBackground(feedstation);
         }
 
+    }
+
+    public void initAvatarCatBackground(Feedstation feedstation) {
+        int resourceId = R.drawable.location_blue;
+        if (feedstation.getFeedStatus()!=null) {
+            if (feedstation.getFeedStatus().equals(Feedstation.FeedStatus.STARVING))
+                resourceId = R.drawable.location_red;
+            else if (feedstation.getFeedStatus().equals(Feedstation.FeedStatus.HUNGRY))
+                resourceId = R.drawable.location_orange;
+        }
+        avatarCatBackgroundImageView.setImageDrawable(getResources().getDrawable(resourceId));
     }
 
     public void initStationAction(Feedstation feedstation) {
@@ -364,7 +362,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         setUserPosition();
 
-        this.googleMap.setOnMapClickListener(latLng -> hideBottomSheets());
+        this.googleMap.setOnMapClickListener(latLng -> {
+            hideBottomSheets();
+            releaseClickedLocation();
+        });
 
         this.googleMap.setOnMarkerClickListener(marker -> {
             clickedMarker = marker;
@@ -415,8 +416,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    public void showEventMarkerDialog(String address, String date, String eventTypeName, Event.Type type) {
-        showMarkerInfoWindow(address, date, eventTypeName, type);
+    public void showEventMarkerDialog(Event event) {
+        clickedMarkerLocation = event.getLatLng();
+        if (event != null)
+            showMarkerInfoWindow(event.getAddress(), TimeUtils.getDateAsddMMMyyyy(event.getDate()), event.getTypeName(), event.getType());
     }
 
     private void showMarkerInfoWindow(String address, String date, String eventTypeName, Event.Type type) {
@@ -425,6 +428,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             eventInfoWindowAdapter.setValues(address, date, eventTypeName, type);
             clickedMarker.showInfoWindow();
         }
+    }
+
+    public void releaseClickedLocation(){
+        clickedMarkerLocation = null;
     }
 
     public void hideEventMarkerDialog() {
@@ -444,14 +451,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         bottomSheetBehaviorEventsEmergencies.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
 
-    public void showFeedstationMarkerBottomSheet(String name, String address) {
+    public void showFeedstationMarkerBottomSheet(Feedstation feedstation) {
         bottomSheetBehaviorFeedstation.setState(BottomSheetBehavior.STATE_COLLAPSED);
-        fillFeedstationBottomSheet(name, address);
+        fillFeedstationBottomSheet(feedstation);
     }
 
-    public void fillFeedstationBottomSheet(String name, String address) {
-        stationNameTextView.setText(name);
-        addressTextView.setText(address);
+    public void fillFeedstationBottomSheet(Feedstation feedstation) {
+        stationNameTextView.setText(feedstation.getName());
+        addressTextView.setText(feedstation.getAddress());
+        if (feedstation.getFeedStatus()!=null && feedstation.getFeedStatus().equals(Feedstation.FeedStatus.STARVING)) {
+            hungryRelativeLayout.setVisibility(View.VISIBLE);
+        } else
+            hungryRelativeLayout.setVisibility(View.INVISIBLE);
     }
 
     public void setBottomSheetFeedstationTag(Object tag) {
@@ -605,7 +616,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     if (feedstation.getId().equals(((Feedstation) bottomSheetFeedstationFrameLayout.getTag()).getId())) {
                         bottomSheetFeedstationFrameLayout.setTag(marker.getTag());
                         initStationAction(feedstation);
-                        fillFeedstationBottomSheet(feedstation.getName(), feedstation.getAddress());
+                        fillFeedstationBottomSheet(feedstation);
+                        initAvatarCatBackground(feedstation);
                     }
                 }
             }
@@ -626,6 +638,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         .position(event.getLatLng())
                 );
                 marker.setTag(event);
+                if (clickedMarkerLocation != null
+                        && event.getLatLng().latitude == clickedMarkerLocation.latitude
+                        && event.getLatLng().longitude == clickedMarkerLocation.longitude) {
+                    clickedMarker = marker;
+                    showEventMarkerDialog(event);
+                }
             }
 
         if (businesses != null)
@@ -751,6 +769,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         setStationActionName(getString(R.string.join_group));
         followButton.setVisibility(View.VISIBLE);
         ((Feedstation) bottomSheetFeedstationFrameLayout.getTag()).setStatus(null);
+        initAvatarCatBackground((Feedstation) bottomSheetFeedstationFrameLayout.getTag());
     }
 
     public void onSuccessJoin() {

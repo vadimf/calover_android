@@ -26,6 +26,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -87,6 +88,10 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
     TextView dialogTextView;
     @BindView(R.id.station_name_photos_textView)
     TextView stationNamePhotosTextView;
+    @BindView(R.id.imageView_avatar_catBackground)
+    ImageView avatarCatBackgroundImageView;
+    @BindView(R.id.relativeLayout_hungry)
+    RelativeLayout hungryRelativeLayout;
 
     @BindView(R.id.photos_RecyclerView)
     RecyclerView photosRecyclerView;
@@ -343,6 +348,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
             editMenu.setVisible(true);
 
         timeToFeedLayout.setVisibility(View.GONE);
+        initAvatarCatBackground(feedstation);
     }
 
     private void setupEditMode() {
@@ -377,6 +383,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
 
         if (feedstation.getIsPublic())
             timeToFeedLayout.setVisibility(View.VISIBLE);
+        initAvatarCatBackground(feedstation);
     }
 
     public void setToolbarTitle(String title) {
@@ -436,6 +443,25 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void initAvatarCatBackground(Feedstation feedstation) {
+        int resourceId = R.drawable.location_blue;
+        if (feedstation.getFeedStatus()!=null) {
+            if (feedstation.getFeedStatus().equals(Feedstation.FeedStatus.STARVING)) {
+                resourceId = R.drawable.location_red;
+                hungryRelativeLayout.setVisibility(View.VISIBLE);
+            }
+            else {
+                if (feedstation.getFeedStatus().equals(Feedstation.FeedStatus.HUNGRY))
+                    resourceId = R.drawable.location_orange;
+                hungryRelativeLayout.setVisibility(View.INVISIBLE);
+            }
+        }
+        else {
+            hungryRelativeLayout.setVisibility(View.INVISIBLE);
+        }
+        avatarCatBackgroundImageView.setImageDrawable(getResources().getDrawable(resourceId));
     }
 
     private boolean isProfileValid() {
@@ -733,6 +759,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
         setStationActionName(getString(R.string.join_group));
         followButton.setVisibility(View.VISIBLE);
         feedstation.setStatus(null);
+        initAvatarCatBackground(feedstation);
     }
 
     public void onSuccessJoin() {

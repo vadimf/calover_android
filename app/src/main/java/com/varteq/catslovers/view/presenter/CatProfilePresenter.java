@@ -20,6 +20,7 @@ import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.utils.TimeUtils;
 import com.varteq.catslovers.utils.Toaster;
+import com.varteq.catslovers.utils.Utils;
 import com.varteq.catslovers.view.CatProfileActivity;
 
 import net.gotev.uploadservice.MultipartUploadRequest;
@@ -184,6 +185,8 @@ public class CatProfilePresenter {
             if (cat.getFeedstationId() != null)
                 uploadCatRequest.addParameter("feedstation_id", String.valueOf(cat.getFeedstationId()));
 
+            if (uploadCatRequest != null)
+                uploadCatRequest.setUtf8Charset();
             // fake location
         /*lastLocation = new Location("dddd");
         lastLocation.setLatitude(50.4437);
@@ -192,6 +195,8 @@ public class CatProfilePresenter {
             if (lastLocation != null) {
                 uploadCatRequest.addParameter("lat", String.valueOf(lastLocation.getLatitude()))
                         .addParameter("lng", String.valueOf(lastLocation.getLongitude()));
+                uploadCatRequest.addParameter("address",
+                        Utils.getAddressByLocation(lastLocation.getLatitude(), lastLocation.getLongitude(), view));
                 Profile.setLocation(view, lastLocation);
             }
 

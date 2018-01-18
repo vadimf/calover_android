@@ -21,6 +21,7 @@ import com.varteq.catslovers.model.PhotoWithPreview;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.TimeUtils;
 import com.varteq.catslovers.utils.Toaster;
+import com.varteq.catslovers.utils.Utils;
 import com.varteq.catslovers.view.fragments.MapFragment;
 
 import java.util.ArrayList;
@@ -178,7 +179,7 @@ public class MapPresenter {
     }
 
     public void onCreateEventChoosed(int eventType, double latitude, double longitude) {
-        String address = view.getAddress(latitude, longitude);
+        String address = Utils.getAddressByLocation(latitude, longitude, view.getContext());
         Call<BaseResponse> call = ServiceGenerator.getApiServiceWithToken().createEvent(address, address, latitude, longitude, eventType);
         call.enqueue(new Callback<BaseResponse>() {
             @Override
@@ -206,14 +207,16 @@ public class MapPresenter {
             if (!view.isFeedstationBottomSheetShowed())
                 view.hideBottomSheets();
             Feedstation feedstation = (Feedstation) markerTag;
-            view.showFeedstationMarkerBottomSheet(feedstation.getName(), feedstation.getAddress());
+            view.showFeedstationMarkerBottomSheet(feedstation);
             view.setBottomSheetFeedstationTag(feedstation);
             view.initStationAction(feedstation);
             view.hideEventMarkerDialog();
+            view.initAvatarCatBackground(feedstation);
+            view.releaseClickedLocation();
         } else if (markerTag instanceof Event) {
             view.hideBottomSheets();
             Event event = (Event) markerTag;
-            view.showEventMarkerDialog(event.getAddress(), TimeUtils.getDateAsddMMMyyyy(event.getDate()), event.getTypeName(), event.getType());
+            view.showEventMarkerDialog(event);
         }
 
     }

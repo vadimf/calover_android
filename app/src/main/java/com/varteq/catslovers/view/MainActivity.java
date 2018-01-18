@@ -2,31 +2,46 @@ package com.varteq.catslovers.view;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.media.ThumbnailUtils;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.internal.BottomNavigationMenuView;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
+import com.makeramen.roundedimageview.RoundedImageView;
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.model.Feedstation;
 import com.varteq.catslovers.utils.Log;
+import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.utils.Utils;
+import com.varteq.catslovers.utils.qb.imagepick.ImagePickHelper;
+import com.varteq.catslovers.utils.qb.imagepick.OnImagePickedListener;
 import com.varteq.catslovers.view.fragments.CatsFragment;
 import com.varteq.catslovers.view.fragments.FeedFragment;
 import com.varteq.catslovers.view.fragments.MapFragment;
 import com.varteq.catslovers.view.fragments.MessagesFragment;
 import com.varteq.catslovers.view.presenter.MainPresenter;
 
+import java.io.File;
 import java.util.List;
 
 import butterknife.BindView;
@@ -35,7 +50,7 @@ import butterknife.ButterKnife;
 import static com.varteq.catslovers.utils.SystemPermissionHelper.REQUEST_CHECK_SETTINGS;
 
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity  implements OnImagePickedListener {
 
     private String TAG = MainActivity.class.getSimpleName();
     View view;
@@ -52,6 +67,10 @@ public class MainActivity extends BaseActivity {
     LinearLayout catsToolsRelativeLayout;
     @BindView(R.id.frameLayout)
     FrameLayout mainLayout;
+    RoundedImageView avatarImageView;
+    Button changeAvatarButton;
+    TextView emailTextView;
+    ImageButton drawerBackButton;
 
     CatsFragment catsFragment;
     MapFragment mapFragment;
@@ -62,6 +81,12 @@ public class MainActivity extends BaseActivity {
     private List<Feedstation> invitations;
     final String STATE_NAVIGATION_SELECTED = "navigationSelected";
     int navigationSelectedItemId;
+
+    private DrawerLayout drawerLayout;
+    private NavigationView navigationView;
+    ImageButton navigationEditImageButton;
+    View navigationHeaderLayout;
+    private String avatar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +102,9 @@ public class MainActivity extends BaseActivity {
         drawNavigationBar();
 
         presenter = new MainPresenter(this);
+        presenter.loadUserInfo();
+
+        avatar = Profile.getUserAvatar(this);
 
         view = findViewById(R.id.hiddenWindow);
         timerText = findViewById(R.id.timerText);
@@ -84,7 +112,9 @@ public class MainActivity extends BaseActivity {
         toolbarView = getLayoutInflater().inflate(R.layout.toolbar_main, toolbar);
         toolbarTitle = findViewById(R.id.toolbarTitle);
         menuButton = findViewById(R.id.menu_imageButton);
-        menuButton.setOnClickListener(view -> Toaster.shortToast(R.string.coming_soon));
+        menuButton.setOnClickListener(view -> {
+            drawerLayout.openDrawer(Gravity.LEFT);
+        });
 
         catsNotificationButton = findViewById(R.id.catsNotificationButton);
         catsNotificationButton.setOnClickListener(view -> {
@@ -126,6 +156,9 @@ public class MainActivity extends BaseActivity {
         } else {
             mBottomNavigationView.setSelectedItemId(R.id.action_map);
         }
+
+        initNavigationDrawer();
+
     }
 
     private void runDialogTimer() {
@@ -289,4 +322,141 @@ public class MainActivity extends BaseActivity {
     public void onSuccessJoin() {
         Toaster.shortToast("You have successfully joined");
     }
+
+    private void initNavigationDrawer() {
+        drawerLayout = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.navigation_view);
+
+        navigationHeaderLayout = navigationView.getHeaderView(0);
+        navigationEditImageButton = navigationHeaderLayout.findViewById(R.id.imageButton_edit);
+        avatarImageView = navigationHeaderLayout.findViewById(R.id.imageView_avatar);
+        changeAvatarButton = navigationHeaderLayout.findViewById(R.id.button_change_avatar);
+        emailTextView = navigationHeaderLayout.findViewById(R.id.textView_email);
+        drawerBackButton = navigationHeaderLayout.findViewById(R.id.button_navigation_drawer_back);
+
+        navigationEditImageButton.setOnClickListener(view -> startActivity(new Intent(MainActivity.this, SettingsActivity.class)));
+        changeAvatarButton.setOnClickListener(view -> new ImagePickHelper().pickAnImage(MainActivity.this, 0));
+        drawerBackButton.setOnClickListener(view -> drawerLayout.closeDrawer(Gravity.LEFT));
+        navigationView.setNavigationItemSelectedListener(item -> {
+            switch (item.getItemId()){
+                case R.id.navigation_menu_add_business:
+                    String addBusinessUrl = "http://catslovers-web.clients.in.ua/partners";
+                    Intent i = new Intent(Intent.ACTION_VIEW);
+                    i.setData(Uri.parse(addBusinessUrl));
+                    startActivity(i);
+                    break;
+                case R.id.navigation_menu_clear_history:
+                    break;
+                case R.id.navigation_menu_share:
+                    break;
+                case R.id.navigation_menu_info:
+                    break;
+            }
+            return false;
+        });
+    }
+
+    public void setNavigationEmail(String email) {
+        if (email != null)
+            emailTextView.setText(email);
+        else
+            emailTextView.setText(R.string.no_email);
+    }
+
+    public void setNavigationUsername(String name) {
+
+    }
+
+    public void updateNavigationAvatar(String url) {
+        if (url != null)
+            Glide.with(this)
+                    .asBitmap()
+                    .load(url)
+                    .into(avatarImageView);
+        else
+            updateNavigationAvatar();
+    }
+
+    private void updateNavigationAvatar() {
+        if (avatar != null)
+            Glide.with(this)
+                    .asBitmap()
+                    .load(avatar)
+                    .into(new SimpleTarget<Bitmap>() {
+                        final int THUMBSIZE = 250;
+
+                        @Override
+                        public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                            if (resource.getWidth() > THUMBSIZE)
+                                avatarImageView.setImageBitmap(ThumbnailUtils.extractThumbnail(resource,
+                                        THUMBSIZE, THUMBSIZE));
+                            else
+                                avatarImageView.setImageBitmap(resource);
+                        }
+                    });
+        else
+            avatarImageView.setImageBitmap(Utils.getBitmapWithColor(getResources().getColor(R.color.transparent)));
+    }
+
+    @Override
+    public void onImagePicked(int requestCode, File file) {
+        if (null != file) {
+            avatar = file.getPath();
+            Profile.saveUserAvatar(this, avatar);
+            updateAvatar();
+            presenter.uploadAvatar();
+        }
+    }
+
+    @Override
+    public void onImagesPicked(int requestCode, List<File> file) {
+
+    }
+
+    @Override
+    public void onVideoPicked(int requestCode, File file, Bitmap preview) {
+
+    }
+
+    @Override
+    public void onImagePickError(int requestCode, Exception e) {
+
+    }
+
+    @Override
+    public void onImagePickClosed(int requestCode) {
+
+    }
+
+    private void updateAvatar() {
+        if (avatar != null)
+            Glide.with(this)
+                    .asBitmap()
+                    .load(avatar)
+                    .into(new SimpleTarget<Bitmap>() {
+                        final int THUMBSIZE = 250;
+
+                        @Override
+                        public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                            if (resource.getWidth() > THUMBSIZE)
+                                avatarImageView.setImageBitmap(ThumbnailUtils.extractThumbnail(resource,
+                                        THUMBSIZE, THUMBSIZE));
+                            else
+                                avatarImageView.setImageBitmap(resource);
+                        }
+                    });
+        else
+            avatarImageView.setImageBitmap(Utils.getBitmapWithColor(getResources().getColor(R.color.transparent)));
+    }
+
+    public void updateAvatar(String url) {
+        if (url != null)
+            Glide.with(this)
+                    .asBitmap()
+                    .load(url)
+                    .into(avatarImageView);
+        else
+            updateAvatar();
+    }
+
 }

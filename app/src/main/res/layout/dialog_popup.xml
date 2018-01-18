@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/light_purple_transparent">
+
+    <View
+        android:id="@+id/view_background"
+        android:layout_width="250dp"
+        android:layout_height="300dp"
+        android:background="@drawable/rounded_corners_white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <Button
+        android:id="@+id/button_ok"
+        style="@style/PrimaryColorButton"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:text="@string/ok_3sc"
+        app:layout_constraintBottom_toBottomOf="@+id/view_background"
+        app:layout_constraintEnd_toEndOf="@+id/view_background"
+        app:layout_constraintStart_toStartOf="@+id/view_background"
+        app:layout_constraintTop_toBottomOf="@+id/view_background"/>
+
+    <TextView
+        android:id="@+id/textView_message"
+        style="@style/PrimaryTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@+id/button_ok"
+        app:layout_constraintEnd_toEndOf="@+id/view_background"
+        app:layout_constraintStart_toStartOf="@+id/view_background"
+        tools:text="Text"/>
+
+    <TextView
+        android:id="@+id/textView_additional_message"
+        style="@style/PrimaryBigTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/textView_message"
+        app:layout_constraintEnd_toEndOf="@+id/view_background"
+        app:layout_constraintStart_toStartOf="@+id/view_background"
+        tools:text="OPSSSS"/>
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="36dp"
+        android:layout_marginStart="36dp"
+        android:layout_marginTop="12dp"
+        app:layout_constraintBottom_toTopOf="@+id/textView_additional_message"
+        app:layout_constraintEnd_toEndOf="@+id/view_background"
+        app:layout_constraintStart_toStartOf="@+id/view_background"
+        app:layout_constraintTop_toTopOf="@+id/view_background"
+        app:srcCompat="@color/colorPrimary"/>
+
+</android.support.constraint.ConstraintLayout>

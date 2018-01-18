@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.varteq.catslovers">
+          package="com.varteq.catslovers">
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
          Google Maps Android API v2, but you must specify either coarse or fine
          location permissions for the 'MyLocation' functionality. 
     -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
     <application
         android:name=".AppController"
@@ -30,40 +30,40 @@
             android:screenOrientation="portrait"
             android:theme="@style/SplashTheme">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
         <activity
             android:name=".view.IntroActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".view.SignInActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".view.SignUpActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".view.ConfirmNumberActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".view.ValidateNumberActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".view.CatProfileActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
-            android:label="@string/new_cat_profile_screen_title" />
+            android:label="@string/new_cat_profile_screen_title"/>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -74,44 +74,44 @@
         -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAPztRztV5Naat9Ft-v0v-7uSV57c58VjU" />
+            android:value="AIzaSyAPztRztV5Naat9Ft-v0v-7uSV57c58VjU"/>
 
         <activity
             android:name=".view.MainActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:label="@string/title_activity_main"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".view.MediaViewerActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".view.FeedstationActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
-            android:label="@string/new_station_screen_title" />
+            android:label="@string/new_station_screen_title"/>
         <activity
             android:name=".view.qb.SelectUsersActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".view.qb.DialogsActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"/>
         <activity
-            android:theme="@style/AppTheme.WhiteActionBar.NoShadow"
             android:name=".view.qb.ChatActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden|adjustResize" />
+            android:theme="@style/AppTheme.WhiteActionBar.NoShadow"
+            android:windowSoftInputMode="stateHidden|adjustResize"/>
         <activity
             android:name=".view.qb.ChatInfoActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:label="@string/chat_info"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".view.qb.AttachmentImageActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"/>
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -120,19 +120,21 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths" />
+                android:resource="@xml/provider_paths"/>
         </provider>
 
         <meta-data
             android:name="io.fabric.ApiKey"
-            android:value="4297a273107d8d9d043a63c18f8140a4fa3d0194" />
+            android:value="4297a273107d8d9d043a63c18f8140a4fa3d0194"/>
 
         <activity
             android:name=".view.SuccessLoginActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".view.NewFeedPostActivity"
-            android:label="New feed post" />
+            android:label="New feed post"/>
+        <activity android:name=".view.SettingsActivity">
+        </activity>
     </application>
 
 </manifest>

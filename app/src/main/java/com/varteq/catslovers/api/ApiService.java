@@ -8,6 +8,7 @@ import com.varteq.catslovers.api.entity.REvent;
 import com.varteq.catslovers.api.entity.RFeedstation;
 import com.varteq.catslovers.api.entity.RGeoSearch;
 import com.varteq.catslovers.api.entity.RUser;
+import com.varteq.catslovers.api.entity.RUserSimple;
 
 import java.util.List;
 
@@ -145,6 +146,9 @@ public interface ApiService {
 
     @GET("events/types")
     Call<BaseResponse<REvent>> getEventsTypes();
+
+    @GET("user")
+    Call<BaseResponse<RUserSimple>> getUserInfo();
 
     @FormUrlEncoded
     @POST("events")
