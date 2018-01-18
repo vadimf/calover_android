@@ -26,9 +26,10 @@ public class Utils {
     private static final String PUNCTUATION = "!@#$%&*()_+-=[]|,./?><";
 
     public static Bitmap getBitmapWithColor(int color) {
-        Bitmap image = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
-        image.eraseColor(color);
-        return image;
+        Bitmap bmp = Bitmap.createBitmap(4, 4, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bmp);
+        canvas.drawColor(color);
+        return bmp;
     }
 
     public static String getPass(int length) {
