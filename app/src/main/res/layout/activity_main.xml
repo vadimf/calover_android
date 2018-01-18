@@ -74,12 +74,13 @@
 
     <!--Drawer-->
     <android.support.design.widget.NavigationView
-
         android:id="@+id/navigation_view"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         app:headerLayout="@layout/navigation_drawer_header"
+        app:itemTextColor="@color/colorPrimary"
+        app:itemIconTint="@color/colorPrimary"
         app:menu="@menu/navigation_drawer_menu"
         />
 </android.support.v4.widget.DrawerLayout>

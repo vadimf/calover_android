@@ -66,7 +66,6 @@ public class SettingsPresenter {
         String path = Profile.getUserAvatar(view);
         if (path.isEmpty()) {
             //  updateQBUser(qbUser);
-
             return;
         }
 
