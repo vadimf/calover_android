@@ -43,8 +43,8 @@ public class ImagePickHelperFragment extends Fragment {
         if (fragment == null) {
             fragment = new ImagePickHelperFragment();
             fm.beginTransaction().add(fragment, TAG).commitAllowingStateLoss();
-            fragment.setArguments(args);
         }
+        fragment.setArguments(args);
         return fragment;
     }
 

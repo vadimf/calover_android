@@ -74,13 +74,13 @@ public class TimeUtils {
 
     public static int getUtcDayStartOffset(Date date) {
         int millis = (int) (date.getTime() % MILLIS_IN_DAY);
-        return (int) ((millis - TimeZone.getDefault().getOffset(System.currentTimeMillis())) / 1000L);
+        return (int) ((millis) / 1000L);
     }
 
     public static Date getLocalTimeFromDayStartOffset(Integer seconds) {
         if (seconds == null)
             return null;
-        Calendar date = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+        Calendar date = Calendar.getInstance();
         date.set(Calendar.HOUR_OF_DAY, 0);
         date.set(Calendar.MINUTE, 0);
         date.set(Calendar.SECOND, 0);

@@ -55,12 +55,12 @@ public class CognitoAuthHelper {
     /**
      * Add your pool id here
      */
-    private static final String userPoolId = "eu-central-1_stXwzm1xQ";//"us-east-2_PJrh4MavS";//"us-east-2_JejZaetXf";
+    private static final String userPoolId = "eu-central-1_stXwzm1xQ";//"eu-west-1_WbvfR8oaj";//"us-east-2_PJrh4MavS";//"us-east-2_JejZaetXf";
 
     /**
      * Add you app id
      */
-    private static final String clientId = "3df22ki4pl7vuakper8gq2mdrd";//"5rg38ojmj4qp4lkhr2vmbmc8c2";//"6un4gdbg4mobf852k8ioqb3q1";
+    private static final String clientId = "3df22ki4pl7vuakper8gq2mdrd";//"456jc34hsbmms5r0hv8jq8lsjp";//"5rg38ojmj4qp4lkhr2vmbmc8c2";//"6un4gdbg4mobf852k8ioqb3q1";
 
     /**
      * App secret associated with your app id - if the App id does not have an associated App secret,
