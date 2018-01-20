@@ -2,6 +2,7 @@ package com.varteq.catslovers.view;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.ThumbnailUtils;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,6 +27,7 @@ import butterknife.ButterKnife;
 
 public class NewFeedPostActivity extends BaseActivity implements OnImagePickedListener {
 
+    private final int THUMBSIZE = 500;
     private final int REQUEST_CODE_ATTACHMENT = 1;
     private String TAG = CatProfileActivity.class.getSimpleName();
 
@@ -96,7 +98,9 @@ public class NewFeedPostActivity extends BaseActivity implements OnImagePickedLi
                     mediaFile = file;
                     mediaType = FeedPost.FeedPostType.PICTURE;
 
-                    feedImage.setImageBitmap(BitmapFactory.decodeFile(file.getPath()));
+                    preview = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(file.getPath()),
+                            THUMBSIZE, THUMBSIZE);
+                    feedImage.setImageBitmap(preview);
                     feedImage.setVisibility(View.VISIBLE);
                 }
                 break;

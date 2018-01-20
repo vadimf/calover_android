@@ -23,7 +23,7 @@ public class NewFeedPostPresenter {
     private String TAG = NewFeedPostPresenter.class.getSimpleName();
 
     private NewFeedPostActivity view;
-    private boolean needUploadPreview;
+    private boolean isPreviewUploaded;
     private QBCustomObject createdObject;
     private Bitmap preview;
 
@@ -47,7 +47,6 @@ public class NewFeedPostPresenter {
                 if (type.equals(FeedPost.FeedPostType.PICTURE))
                     attachFile(createdObject, mediaFile, QBFeedPost.PICTURE_FIELD, callback);
                 else if (type.equals(FeedPost.FeedPostType.VIDEO)) {
-                    needUploadPreview = true;
                     attachFile(createdObject, mediaFile, QBFeedPost.VIDEO_FIELD, callback);
                 }
                 else view.createdSuccessfully();
@@ -65,8 +64,8 @@ public class NewFeedPostPresenter {
 
         @Override
         public void onSuccess(QBCustomObjectFileField uploadFileResult, Bundle params) {
-            if (needUploadPreview) {
-                needUploadPreview = false;
+            if (!isPreviewUploaded) {
+                isPreviewUploaded = true;
                 try {
                     attachFile(createdObject, ImageUtils.saveBitmapToFile(preview, null), QBFeedPost.PREVIEW_FIELD, callback);
                 } catch (Exception e) {
