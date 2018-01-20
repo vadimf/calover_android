@@ -144,7 +144,7 @@ public class FeedstationPresenter {
                         String.valueOf(TimeUtils.getUtcDayStartOffset(feedstation.getTimeToEat2())));
 
             if (feedstation.getLastFeeding() != null)
-                uploadCatRequest.addParameter("time_to_feed_evening",
+                uploadCatRequest.addParameter("last_feeding",
                         String.valueOf(TimeUtils.getUtcFromLocal(feedstation.getLastFeeding().getTime())));
 
             int i = 0;
