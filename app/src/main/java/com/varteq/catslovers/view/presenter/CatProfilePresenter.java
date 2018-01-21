@@ -125,10 +125,12 @@ public class CatProfilePresenter {
 
     public String getAgeInString(long petBirthdayMillis) {
         long nowMillis = System.currentTimeMillis();
-        long timePassedMonthes = (TimeUnit.MILLISECONDS.toDays(nowMillis - petBirthdayMillis)) / 30;
+        long timePassedDays = (TimeUnit.MILLISECONDS.toDays(nowMillis - petBirthdayMillis));
+        long timePassedMonthes = timePassedDays / 30;
 
         int years = ((int) timePassedMonthes) / 12;
         int month = ((int) timePassedMonthes) - (years * 12);
+        int days = (int) timePassedDays;
 
         String age = null;
         if (years > 0) {
@@ -141,7 +143,7 @@ public class CatProfilePresenter {
             if (month > 0) {
                 age = String.valueOf(month) + " months";
             } else if (month == 0) {
-                age = "newborn";
+                age = String.valueOf(timePassedDays) + " days";
 
             }
         }
