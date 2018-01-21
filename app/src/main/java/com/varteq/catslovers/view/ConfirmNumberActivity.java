@@ -11,10 +11,15 @@ import android.widget.EditText;
 
 import com.hbb20.CountryCodePicker;
 import com.varteq.catslovers.R;
+import com.varteq.catslovers.api.ServiceGenerator;
+import com.varteq.catslovers.api.entity.RIPGeolocation;
 import com.varteq.catslovers.utils.Log;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static com.varteq.catslovers.view.ValidateNumberActivity.PHONE_NUMBER_KEY;
 
@@ -44,7 +49,9 @@ public class ConfirmNumberActivity extends AppCompatActivity {
         findViewById(R.id.confirm_number_button).setOnClickListener(view -> {
             confirmNumber();
         });
-        countryCodePicker.setCountryForNameCode("ua");
+
+        countryCodePicker.setCountryForNameCode("ru");
+        setCountryCodeByLocation();
     }
 
     private void confirmNumber() {
@@ -83,5 +90,30 @@ public class ConfirmNumberActivity extends AppCompatActivity {
         if (imm != null) {
             imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
         }
+    }
+
+    private void setCountryCodeByLocation() {
+        Call<RIPGeolocation> call = ServiceGenerator.getIPGeolocationService().getIPGeolocation();
+        call.enqueue(new Callback<RIPGeolocation>() {
+            @Override
+            public void onResponse(Call<RIPGeolocation> call, Response<RIPGeolocation> response) {
+                if (response.isSuccessful()) {
+                    try {
+                        if (!call.isCanceled())
+                            countryCodePicker.setCountryForNameCode(response.body().getCountryCode());
+                    } catch (NullPointerException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+
+
+            @Override
+            public void onFailure(Call<RIPGeolocation> call, Throwable t) {
+
+            }
+        });
+        countryCodePicker.setOnCountryChangeListener(call::cancel);
     }
 }
