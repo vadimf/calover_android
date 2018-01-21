@@ -7,6 +7,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
+import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageSwitcher;
@@ -50,10 +52,16 @@ public class IntroActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_intro);
-
         Log.d(TAG, "onCreate");
-
         ButterKnife.bind(this);
+
+        initUI();
+    }
+
+    private void initUI() {
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        float dpHeight = displayMetrics.heightPixels / displayMetrics.density;
+        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
 
         for (int i = 0; i < imageSwitcherImages.length; i++) {
             LinearLayout layout = new LinearLayout(getApplicationContext());
@@ -71,12 +79,14 @@ public class IntroActivity extends AppCompatActivity {
 
             TextView textView = new TextView(getApplicationContext());
             TableLayout.LayoutParams textLayoutParams = new TableLayout.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.MATCH_PARENT, 1);
-            textLayoutParams.topMargin = Utils.convertDpToPx(69, this);
+            textView.setGravity(Gravity.CENTER_VERTICAL);
             textView.setLayoutParams(textLayoutParams);
             textView.setText(imageSwitcherTexts[i]);
             textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-            textView.setTextSize(30);
             textView.setTextColor(getResources().getColor(R.color.colorPrimary));
+            textView.setTextSize(30);
+            if (dpWidth <= 320)
+                textView.setTextSize(20);
             layout.addView(textView);
 
             layouts.add(layout);
