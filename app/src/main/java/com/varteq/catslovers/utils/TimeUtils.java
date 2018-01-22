@@ -66,6 +66,7 @@ public class TimeUtils {
         Calendar date = Calendar.getInstance();
         date.set(Calendar.HOUR_OF_DAY, hours);
         date.set(Calendar.MINUTE, minutes);
+        date.set(Calendar.SECOND, 0);
         date.set(Calendar.MILLISECOND, 0);
         return date.getTime();
     }
@@ -73,8 +74,7 @@ public class TimeUtils {
     private static long MILLIS_IN_DAY = 24 * 60 * 60 * 1000;
 
     public static int getUtcDayStartOffset(Date date) {
-        int millis = (int) (date.getTime() % MILLIS_IN_DAY);
-        return (int) ((millis - TimeZone.getDefault().getOffset(System.currentTimeMillis())) / 1000L);
+        return (int) ((date.getTime() % MILLIS_IN_DAY) / 1000L);
     }
 
     public static Date getLocalTimeFromDayStartOffset(Integer seconds) {
@@ -83,8 +83,8 @@ public class TimeUtils {
         Calendar date = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         date.set(Calendar.HOUR_OF_DAY, 0);
         date.set(Calendar.MINUTE, 0);
-        date.set(Calendar.SECOND, 0);
-        return getLocalDateFromUtc((int) (date.getTimeInMillis() / 1000L) + seconds);
+        date.set(Calendar.SECOND, seconds);
+        return date.getTime();
     }
 
     public static Date getLocalDateFromUtc(Integer seconds) {

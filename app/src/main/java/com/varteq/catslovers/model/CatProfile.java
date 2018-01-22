@@ -13,9 +13,9 @@ public class CatProfile implements Serializable {
     private String nickname;
     private Date birthday;
     private String sex;
-    private float weight;
+    private Float weight;
     private String description;
-    private boolean isCastrated;
+    private Boolean isCastrated;
     private Date fleaTreatmentDate;
     private Integer feedstationId;
 
@@ -88,10 +88,10 @@ public class CatProfile implements Serializable {
     }
 
     public boolean isCastrated() {
-        return isCastrated;
+        return isCastrated != null ? isCastrated : false;
     }
 
-    public void setCastrated(boolean castrated) {
+    public void setCastrated(Boolean castrated) {
         isCastrated = castrated;
     }
 
@@ -147,11 +147,11 @@ public class CatProfile implements Serializable {
         this.sex = sex;
     }
 
-    public float getWeight() {
+    public Float getWeight() {
         return weight;
     }
 
-    public void setWeight(float weight) {
+    public void setWeight(Float weight) {
         this.weight = weight;
     }
 

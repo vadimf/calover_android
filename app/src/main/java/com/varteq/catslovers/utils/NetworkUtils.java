@@ -5,6 +5,7 @@ import com.bumptech.glide.load.model.LazyHeaders;
 import com.quickblox.auth.session.QBSessionManager;
 import com.varteq.catslovers.api.ServiceGenerator;
 import com.varteq.catslovers.api.entity.ErrorData;
+import com.varteq.catslovers.model.QBFeedPost;
 
 import java.lang.annotation.Annotation;
 
@@ -49,6 +50,19 @@ public class NetworkUtils {
         GlideUrl glideUrl = new GlideUrl("https://api.quickblox.com/blobs/" + avatarId + "/download.json",
                 new LazyHeaders.Builder()
                         .addHeader("QuickBlox-REST-API-Version", "0.1.0")
+                        .addHeader("QB-Token", QBSessionManager.getInstance().getToken())
+                        .build());
+        return glideUrl;
+    }
+
+    /*"QB-Token: 53247fce22672e627880bf9a7060aadecc2c3e59"
+            -d"field_name=avatar" https://api.quickblox.com/data/<Class_name>/<record_id>/file.json*/
+    public static GlideUrl getFeedPostPreviewGlideUrl(String feedPostId) {
+        if (!ChatHelper.getInstance().isLogged())
+            return null;
+        GlideUrl glideUrl = new GlideUrl("https://api.quickblox.com/data/" + QBFeedPost.CLASS_NAME + "/" + feedPostId +
+                "/file.json?field_name=" + QBFeedPost.PREVIEW_FIELD,
+                new LazyHeaders.Builder()
                         .addHeader("QB-Token", QBSessionManager.getInstance().getToken())
                         .build());
         return glideUrl;

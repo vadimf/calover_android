@@ -13,8 +13,8 @@ android {
         applicationId "com.varteq.catslovers"
         minSdkVersion 19
         targetSdkVersion 26
-        versionCode 6
-        versionName "1.7.1"
+        versionCode 7
+        versionName "1.8"
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         //multiDexEnabled true

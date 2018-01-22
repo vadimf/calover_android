@@ -75,58 +75,58 @@ public class CatsPresenter {
 
     private List<CatProfile> getCatProfiles(List<RCat> data) {
         List<CatProfile> list = new ArrayList<>();
-        for (RCat RCat : data) {
+        for (RCat rCat : data) {
             CatProfile catProfile = new CatProfile();
-            catProfile.setId(RCat.getId());
-            catProfile.setPetName(RCat.getName());
-            catProfile.setNickname(RCat.getNickname());
-            catProfile.setBirthday(TimeUtils.getLocalDateFromUtc(RCat.getAge()));
+            catProfile.setId(rCat.getId());
+            catProfile.setPetName(rCat.getName());
+            catProfile.setNickname(rCat.getNickname());
+            catProfile.setBirthday(TimeUtils.getLocalDateFromUtc(rCat.getAge()));
             catProfile.setSex(null);
-            catProfile.setWeight(RCat.getWeight());
-            catProfile.setCastrated(RCat.getCastrated());
-            catProfile.setDescription(RCat.getDescription());
-            catProfile.setType(RCat.getType().equals("pet") ? CatProfile.Status.PET : CatProfile.Status.STRAY);
-            catProfile.setFleaTreatmentDate(TimeUtils.getLocalDateFromUtc(RCat.getNextFleaTreatment()));
+            catProfile.setWeight(rCat.getWeight());
+            catProfile.setCastrated(rCat.getCastrated());
+            catProfile.setDescription(rCat.getDescription());
+            catProfile.setType(rCat.getType().equals("pet") ? CatProfile.Status.PET : CatProfile.Status.STRAY);
+            catProfile.setFleaTreatmentDate(TimeUtils.getLocalDateFromUtc(rCat.getNextFleaTreatment()));
 
-            if (RCat.getPermissions() != null) {
-                if (RCat.getPermissions().getRole() != null) {
-                    if (RCat.getPermissions().getRole().equals("admin"))
+            if (rCat.getPermissions() != null) {
+                if (rCat.getPermissions().getRole() != null) {
+                    if (rCat.getPermissions().getRole().equals("admin"))
                         catProfile.setUserRole(Feedstation.UserRole.ADMIN);
-                    else if (RCat.getPermissions().getRole().equals("user"))
+                    else if (rCat.getPermissions().getRole().equals("user"))
                         catProfile.setUserRole(Feedstation.UserRole.USER);
                 }
-                if (RCat.getPermissions().getStatus() != null) {
+                if (rCat.getPermissions().getStatus() != null) {
                     GroupPartner.Status status = null;
-                    if (RCat.getPermissions().getStatus().equals("joined"))
+                    if (rCat.getPermissions().getStatus().equals("joined"))
                         status = GroupPartner.Status.JOINED;
-                    else if (RCat.getPermissions().getStatus().equals("invited"))
+                    else if (rCat.getPermissions().getStatus().equals("invited"))
                         status = GroupPartner.Status.INVITED;
-                    else if (RCat.getPermissions().getStatus().equals("requested"))
+                    else if (rCat.getPermissions().getStatus().equals("requested"))
                         status = GroupPartner.Status.REQUESTED;
                     catProfile.setStatus(status);
                 }
             }
 
             List<Integer> colors = new ArrayList<>();
-            for (String s : RCat.getColor().split(","))
+            for (String s : rCat.getColor().split(","))
                 try {
                     colors.add(Integer.parseInt(s));
                 } catch (Exception e) {
                 }
             catProfile.setColorsList(colors);
 
-            if (RCat.getPhotos() != null && !RCat.getPhotos().isEmpty()) {
+            if (rCat.getPhotos() != null && !rCat.getPhotos().isEmpty()) {
                 List<PhotoWithPreview> photos = new ArrayList<>();
-                for (RPhoto photo : RCat.getPhotos())
+                for (RPhoto photo : rCat.getPhotos())
                     photos.add(new PhotoWithPreview(photo.getId(), photo.getPhoto(), photo.getThumbnail()));
                 catProfile.setPhotos(photos);
             }
 
-            if (RCat.getFeedstation() != null)
-                catProfile.setFeedstationId(RCat.getFeedstation().getId());
+            if (rCat.getFeedstation() != null)
+                catProfile.setFeedstationId(rCat.getFeedstation().getId());
 
-            if (RCat.getAvatarUrl() != null)
-                catProfile.setAvatar(new PhotoWithPreview(null, RCat.getAvatarUrl(), RCat.getAvatarUrlThumbnail()));
+            if (rCat.getAvatarUrl() != null)
+                catProfile.setAvatar(new PhotoWithPreview(null, rCat.getAvatarUrl(), rCat.getAvatarUrlThumbnail()));
 
             list.add(catProfile);
         }

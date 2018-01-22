@@ -90,6 +90,7 @@ public class FeedstationPresenter {
                 uploadCatRequest.setUtf8Charset();
 
             uploadCatRequest.addParameter("name", feedstation.getName())
+                    .addParameter("address", feedstation.getAddress())
                     .addParameter("description", feedstation.getDescription())
                     .addParameter("time_to_feed", String.valueOf(0))
                     .addParameter("lat", String.valueOf(feedstation.getLocation().latitude))
@@ -143,7 +144,7 @@ public class FeedstationPresenter {
                         String.valueOf(TimeUtils.getUtcDayStartOffset(feedstation.getTimeToEat2())));
 
             if (feedstation.getLastFeeding() != null)
-                uploadCatRequest.addParameter("time_to_feed_evening",
+                uploadCatRequest.addParameter("last_feeding",
                         String.valueOf(TimeUtils.getUtcFromLocal(feedstation.getLastFeeding().getTime())));
 
             int i = 0;

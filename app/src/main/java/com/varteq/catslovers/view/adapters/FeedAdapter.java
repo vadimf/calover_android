@@ -17,7 +17,7 @@ import com.makeramen.roundedimageview.RoundedImageView;
 import com.quickblox.users.model.QBUser;
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.model.FeedPost;
-import com.varteq.catslovers.utils.PostPreviewDownloader;
+import com.varteq.catslovers.utils.NetworkUtils;
 import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.utils.TimeUtils;
 import com.varteq.catslovers.utils.UiUtils;
@@ -86,21 +86,17 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
 
         if (feed.getType().equals(FeedPost.FeedPostType.VIDEO)) {
             // video
-            /*Glide.with(context)
-                    .load(feed.getPreviewUri())
-                    .apply(new RequestOptions().centerCrop())
-                    .into(holder.imageView);*/
-            holder.imageDownloader = new PostPreviewDownloader(holder.imageView, feed);
+            Glide.with(context)
+                    .load(NetworkUtils.getFeedPostPreviewGlideUrl(feed.getId()))
+                    .into(holder.imageView);
             holder.timeUnderTextView.setVisibility(View.GONE);
 
             holder.timeTextView.setText(TimeUtils.getDateAsMMMMddHHmm(feed.getDate()));
         } else if (feed.getType().equals(FeedPost.FeedPostType.PICTURE)) {
             // photo
-            /*Glide.with(context)
-                    .load(feed.getPreviewUri())
-                    .apply(new RequestOptions().centerCrop())
-                    .into(holder.imageView);*/
-            holder.imageDownloader = new PostPreviewDownloader(holder.imageView, feed);
+            Glide.with(context)
+                    .load(NetworkUtils.getFeedPostPreviewGlideUrl(feed.getId()))
+                    .into(holder.imageView);
             holder.timeUnderTextView.setVisibility(View.GONE);
             holder.playImageView.setVisibility(View.INVISIBLE);
 
@@ -116,9 +112,6 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
     }
 
     private void cleanView(FeedViewHolder holder) {
-        if (holder.imageDownloader != null)
-            holder.imageDownloader.cancelLoading();
-
         //holder.toolbarGradientView.setVisibility(View.VISIBLE);
         holder.imageView.setImageBitmap(null);
         holder.mediaLayout.setVisibility(View.VISIBLE);
@@ -153,7 +146,6 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         //RelativeLayout headerRelativeLayout;
         TextView timeUnderTextView;
         ImageView playImageView;
-        PostPreviewDownloader imageDownloader;
         RelativeLayout mediaLayout;
         View emptyView;
         LikeImageButton likeImageButton;
@@ -187,8 +179,6 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
                 MediaViewerActivity.startActivity(context, feed);
             });
         }
-
-
     }
 
     class LikeImageButton {
