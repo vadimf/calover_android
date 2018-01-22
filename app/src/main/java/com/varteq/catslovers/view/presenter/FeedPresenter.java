@@ -114,9 +114,14 @@ public class FeedPresenter {
                         @Override
                         protected void onSuccess(List<RFeedstation> data) {
                             //view.feedstationsLoaded(from(data));
-                            Log.d(TAG, "getFeedstationIds onSuccess count: " + data.size());
+                            Log.d(TAG, "getFeedstationIds onSuccess count: " + (data != null ? data.size() : "null"));
+                            List<Feedstation> feedstationList = MapPresenter.from(data);
+                            if (feedstationList == null) {
+                                view.onError();
+                                return;
+                            }
                             List<String> ids = new ArrayList<>();
-                            for (Feedstation feedstation : MapPresenter.from(data)) {
+                            for (Feedstation feedstation : feedstationList) {
                                 if (!feedstation.getIsPublic() && feedstation.getStatus() != null
                                         && feedstation.getStatus().equals(GroupPartner.Status.JOINED))
                                     ids.add(String.valueOf(feedstation.getId()));

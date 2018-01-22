@@ -156,7 +156,7 @@ public class Log {
             return null;
         }
         String fileName = LOG_FILE + "_" + currentDate + ".txt";
-        File dirFile = new File(StorageUtils.getAppExternalDataDirectoryPath() + "/logs");
+        File dirFile = new File(StorageUtils.getAppExternalDataDirectoryFile(), "/logs");
         if (!dirFile.exists()) {
             try {
                 dirFile.mkdir();

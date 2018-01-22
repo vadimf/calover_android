@@ -998,7 +998,7 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
     }
 
     public void feedstationsLoaded(List<Feedstation> feedstations) {
-        if (catType.equals(CatProfile.Status.PET)) return;
+        if (catType.equals(CatProfile.Status.PET) || feedstations == null) return;
         for (int i = 0; i < feedstations.size(); i++) {
             if (!feedstations.get(i).getIsPublic() || (feedstations.get(i).getStatus() != null && !feedstations.get(i).getStatus().equals(GroupPartner.Status.JOINED)))
                 feedstations.remove(i);

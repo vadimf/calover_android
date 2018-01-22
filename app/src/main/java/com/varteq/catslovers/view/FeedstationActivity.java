@@ -243,8 +243,6 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
             addressTextView.setText(feedstation.getAddress());
             descriptionEditText.setText(feedstation.getDescription());
             photoList = feedstation.getPhotos();
-            pagerPhotoList = new ArrayList<>();
-            catProfileList = new ArrayList<>();
             stationNamePhotosTextView.setText(feedstation.getName() != null ? feedstation.getName() : getString(R.string.new_cat_profile_screen_title));
             timeToEat1TextView.setText(TimeUtils.getDateAsHHmm(feedstation.getTimeToEat1()));
             timeToEat2TextView.setText(TimeUtils.getDateAsHHmm(feedstation.getTimeToEat2()));
@@ -263,6 +261,8 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
             }
             return false;
         });*/
+        pagerPhotoList = new ArrayList<>();
+        catProfileList = new ArrayList<>();
 
         if (photoList == null)
             photoList = new ArrayList<>();
@@ -883,13 +883,6 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
 
     public void catsLoaded(List<CatProfile> list) {
         if (null != list) {
-            for (CatProfile item : list) {
-                if (null != item.getAvatar())
-                    photoList.add(item.getAvatar());
-            }
-            photosAdapter.notifyDataSetChanged();
-            photoCountTextView.setText(String.valueOf(photoList.size()));
-
             catProfileList.clear();
             catProfileList.addAll(list);
             feedstationCatsAdapter.notifyDataSetChanged();

@@ -1,7 +1,5 @@
 package com.varteq.catslovers.utils;
 
-import android.os.Environment;
-
 import com.varteq.catslovers.AppController;
 
 import java.io.File;
@@ -13,38 +11,15 @@ import java.io.ObjectOutputStream;
 
 public class StorageUtils {
 
-    public static String getAppExternalDataDirectoryPath() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(Environment.getExternalStorageDirectory())
-                .append(File.separator)
-                .append("Android")
-                .append(File.separator)
-                .append("data")
-                .append(File.separator)
-                .append(AppController.getInstance().getPackageName())
-                .append(File.separator);
-
-        return sb.toString();
-    }
-
     public static File getAppExternalDataDirectoryFile() {
-        File dataDirectoryFile = new File(getAppExternalDataDirectoryPath());
+        File dataDirectoryFile = AppController.getInstance().getExternalFilesDir(null);
         dataDirectoryFile.mkdirs();
 
         return dataDirectoryFile;
     }
 
-    private static String getImagePickerDirectoryPath() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getAppExternalDataDirectoryPath())
-                .append("ImagePicker")
-                .append(File.separator);
-
-        return sb.toString();
-    }
-
     public static File getImagePickerDirectoryFile() {
-        File dataDirectoryFile = new File(getImagePickerDirectoryPath());
+        File dataDirectoryFile = new File(getAppExternalDataDirectoryFile(), "/ImagePicker");
         dataDirectoryFile.mkdirs();
 
         return dataDirectoryFile;
