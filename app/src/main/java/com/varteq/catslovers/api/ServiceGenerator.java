@@ -76,6 +76,14 @@ public class ServiceGenerator {
         return retrofit;
     }
 
+    public static IPGeolocationService getIPGeolocationService() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://ip-api.com/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        return retrofit.create(IPGeolocationService.class);
+    }
+
     public static ApiService getApiService() {
         return apiService;
     }
