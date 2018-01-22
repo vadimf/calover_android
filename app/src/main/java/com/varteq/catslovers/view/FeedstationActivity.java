@@ -42,6 +42,7 @@ import com.varteq.catslovers.utils.TimeUtils;
 import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.utils.qb.imagepick.ImagePickHelper;
 import com.varteq.catslovers.utils.qb.imagepick.OnImagePickedListener;
+import com.varteq.catslovers.view.adapters.FeedstationCatsAdapter;
 import com.varteq.catslovers.view.adapters.GroupPartnersAdapter;
 import com.varteq.catslovers.view.adapters.PhotosAdapter;
 import com.varteq.catslovers.view.dialog.EditTextDialog;
@@ -99,11 +100,17 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
     LinearLayout uploadImageLinearLayout;
     @BindView(R.id.photo_count_textView)
     TextView photoCountTextView;
+    @BindView(R.id.cats_textView)
+    TextView catsTextView;
 
     @BindView(R.id.expand_partners_button)
     Button expandPartnersButton;
+    @BindView(R.id.expand_cats_button)
+    Button expandCatsButton;
     @BindView(R.id.group_partners_RecyclerView)
     RecyclerView groupPartnersRecyclerView;
+    @BindView(R.id.cats_RecyclerView)
+    RecyclerView catsRecyclerView;
 
     /*@BindView(R.id.reset_time_to_eat1_button)
     Button resetTimeToEat1Button;
@@ -115,6 +122,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
     TextView timeToEat2TextView;
     @BindView(R.id.time_to_feed_layout)
     ConstraintLayout timeToFeedLayout;
+
 
     public static final String FEEDSTATION_KEY = "feed_key";
     public static final String LOCATION_KEY = "loc_key";
@@ -133,9 +141,11 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
     private List<PhotoWithPreview> photoList;
     private List<PhotoWithPreview> pagerPhotoList;
     private List<GroupPartner> groupPartnersList = new ArrayList<>();
+    private List<CatProfile> catProfileList;
 
     private PhotosAdapter photosAdapter;
     private GroupPartnersAdapter groupPartnersAdapter;
+    private FeedstationCatsAdapter feedstationCatsAdapter;
     private Feedstation feedstation;
 
     FeedstationPresenter presenter;
@@ -232,6 +242,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
             descriptionEditText.setText(feedstation.getDescription());
             photoList = feedstation.getPhotos();
             pagerPhotoList = new ArrayList<>();
+            catProfileList = new ArrayList<>();
             stationNamePhotosTextView.setText(feedstation.getName() != null ? feedstation.getName() : getString(R.string.new_cat_profile_screen_title));
             timeToEat1TextView.setText(TimeUtils.getDateAsHHmm(feedstation.getTimeToEat1()));
             timeToEat2TextView.setText(TimeUtils.getDateAsHHmm(feedstation.getTimeToEat2()));
@@ -263,6 +274,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
         photosRecyclerView.setAdapter(photosAdapter);
         photosRecyclerView.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+
 
         pagerAdapter = new HeaderPhotosViewPagerAdapter(this);
         viewPager = findViewById(R.id.header_photo_viewPager);
@@ -300,9 +312,19 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
                 });
         groupPartnersRecyclerView.setAdapter(groupPartnersAdapter);
 
+        feedstationCatsAdapter = new FeedstationCatsAdapter(catProfileList, new FeedstationCatsAdapter.OnCatClickListener() {
+            @Override
+            public void onCatClicked(CatProfile catProfile) {
+               
+            }
+        });
+        catsRecyclerView.setAdapter(feedstationCatsAdapter);
+        catsRecyclerView.setLayoutManager(
+                new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+
         if (!currentMode.equals(FeedstationScreenMode.CREATE_MODE)) {
             presenter.getGroupPartners(feedstation.getId());
-            presenter.getCatsImages(feedstation.getId());
+            presenter.getCats(feedstation.getId());
         }
 
         groupPartnersRecyclerView.setLayoutManager(
@@ -328,6 +350,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
         if (addressTextView.getText().toString().equals(ADDRESS_DEFAULT_VALUE))
             addressTextView.setText("");
         setToolbarTitle(stationNameTextView.getText().toString());
+        setFeedstationCatsTitle(stationNameTextView.getText().toString());
 
         stationNameTextView.setEnabled(false);
 
@@ -349,6 +372,10 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
 
         timeToFeedLayout.setVisibility(View.GONE);
         initAvatarCatBackground(feedstation);
+    }
+
+    private void setFeedstationCatsTitle(String title) {
+        catsTextView.setText(title);
     }
 
     private void setupEditMode() {
@@ -447,18 +474,16 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
 
     public void initAvatarCatBackground(Feedstation feedstation) {
         int resourceId = R.drawable.location_blue;
-        if (feedstation.getFeedStatus()!=null) {
+        if (feedstation.getFeedStatus() != null) {
             if (feedstation.getFeedStatus().equals(Feedstation.FeedStatus.STARVING)) {
                 resourceId = R.drawable.location_red;
                 hungryRelativeLayout.setVisibility(View.VISIBLE);
-            }
-            else {
+            } else {
                 if (feedstation.getFeedStatus().equals(Feedstation.FeedStatus.HUNGRY))
                     resourceId = R.drawable.location_orange;
                 hungryRelativeLayout.setVisibility(View.INVISIBLE);
             }
-        }
-        else {
+        } else {
             hungryRelativeLayout.setVisibility(View.INVISIBLE);
         }
         avatarCatBackgroundImageView.setImageDrawable(getResources().getDrawable(resourceId));
@@ -672,6 +697,17 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
         }
     }
 
+    @OnClick(R.id.expand_cats_button)
+    void expandCollapseCats() {
+        if (catsRecyclerView.getVisibility() == View.VISIBLE) {
+            expandCatsButton.setBackgroundResource(R.drawable.ic_expand_more_24dp);
+            catsRecyclerView.setVisibility(View.GONE);
+        } else {
+            expandCatsButton.setBackgroundResource(R.drawable.ic_expand_less_24dp);
+            catsRecyclerView.setVisibility(View.VISIBLE);
+        }
+    }
+
     public void savedSuccessfully() {
         currentMode = FeedstationScreenMode.VIEW_MODE;
         setupUIMode();
@@ -809,6 +845,10 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
             }
             photosAdapter.notifyDataSetChanged();
             photoCountTextView.setText(String.valueOf(photoList.size()));
+
+            catProfileList.clear();
+            catProfileList.addAll(list);
+            feedstationCatsAdapter.notifyDataSetChanged();
         }
     }
 

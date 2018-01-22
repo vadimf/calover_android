@@ -164,7 +164,7 @@ public class FeedstationPresenter {
         }
     }
 
-    public void getCatsImages(Integer feedstationId) {
+    public void getCats(Integer feedstationId) {
         Call<BaseResponse<List<RCat>>> call;
         call = ServiceGenerator.getApiServiceWithToken().getFeedstatisonCats(feedstationId);
         call.enqueue(new Callback<BaseResponse<List<RCat>>>() {
