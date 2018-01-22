@@ -34,6 +34,22 @@ public class StorageUtils {
         return dataDirectoryFile;
     }
 
+    private static String getImagePickerDirectoryPath() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(getAppExternalDataDirectoryPath())
+                .append("ImagePicker")
+                .append(File.separator);
+
+        return sb.toString();
+    }
+
+    public static File getImagePickerDirectoryFile() {
+        File dataDirectoryFile = new File(getImagePickerDirectoryPath());
+        dataDirectoryFile.mkdirs();
+
+        return dataDirectoryFile;
+    }
+
     public static void writeStringToFile(String string, File file) {
         FileOutputStream fos = null;
         try {
@@ -92,5 +108,12 @@ public class StorageUtils {
         }
 
         return object;
+    }
+
+    public static void clearDirectory(File directory) {
+        if (directory.isDirectory())
+            for (File file : directory.listFiles())
+                if (!file.isDirectory())
+                    file.delete();
     }
 }

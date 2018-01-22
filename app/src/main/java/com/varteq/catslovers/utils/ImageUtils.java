@@ -51,17 +51,28 @@ public class ImageUtils {
 
         InputStream inputStream = new FileInputStream(fileDescriptor);
 
-        return saveStreamToFile(inputStream, parcelFileDescriptor, null).getAbsolutePath();
+        String contentType = AppController.getInstance().getContentResolver().getType(uri);
+        if (contentType != null && contentType.contains("/"))
+            contentType = contentType.substring(contentType.indexOf("/") + 1, contentType.length());
+        else contentType = null;
+
+        return saveStreamToFile(inputStream, parcelFileDescriptor, null, contentType).getAbsolutePath();
     }
 
-    public static File saveStreamToFile(InputStream inputStream, ParcelFileDescriptor parcelFileDescriptor, String fileName) throws Exception {
+    public static File saveStreamToFile(InputStream inputStream, String fileName) throws Exception {
+        return saveStreamToFile(inputStream, null, fileName, null);
+    }
+
+    public static File saveStreamToFile(InputStream inputStream, ParcelFileDescriptor parcelFileDescriptor, String fileName, String extension) throws Exception {
         BufferedInputStream bis = new BufferedInputStream(inputStream);
 
-        File parentDir = StorageUtils.getAppExternalDataDirectoryFile();
-        if (fileName == null)
+        File parentDir = StorageUtils.getImagePickerDirectoryFile();
+        if (fileName == null || fileName.isEmpty())
             fileName = String.valueOf(System.currentTimeMillis());
-        if (parcelFileDescriptor != null)
-            fileName += IMAGE_FILE_EXTENSION;
+        if (extension == null || extension.isEmpty())
+            extension = IMAGE_FILE_EXTENSION;
+
+        fileName += "." + extension;
         /*if (isImageFile(uri.getPath()))
             fileName += IMAGE_FILE_EXTENSION;
         if (isVideoFile(uri.getPath()))
@@ -91,7 +102,7 @@ public class ImageUtils {
 
     public static File saveBitmapToFile(Bitmap bitmap, String fileName) throws Exception {
 
-        File parentDir = StorageUtils.getAppExternalDataDirectoryFile();
+        File parentDir = StorageUtils.getImagePickerDirectoryFile();
         if (fileName == null)
             fileName = String.valueOf(System.currentTimeMillis());
 
@@ -160,7 +171,7 @@ public class ImageUtils {
     }
 
     public static File getTemporaryCameraFile() {
-        File storageDir = StorageUtils.getAppExternalDataDirectoryFile();
+        File storageDir = StorageUtils.getImagePickerDirectoryFile();
         File file = new File(storageDir, getTemporaryCameraFileName());
         try {
             file.createNewFile();
@@ -171,7 +182,7 @@ public class ImageUtils {
     }
 
     public static File getLastUsedCameraFile() {
-        File dataDir = StorageUtils.getAppExternalDataDirectoryFile();
+        File dataDir = StorageUtils.getImagePickerDirectoryFile();
         File[] files = dataDir.listFiles();
         List<File> filteredFiles = new ArrayList<>();
         for (File file : files) {

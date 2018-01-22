@@ -30,6 +30,7 @@ import net.gotev.uploadservice.UploadNotificationConfig;
 import net.gotev.uploadservice.UploadStatusDelegate;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -249,6 +250,15 @@ public class CatProfilePresenter {
                         }
                     })
                     .setNotificationConfig(config);
+
+            List<String> photosToDelete = new ArrayList<>();
+            for (PhotoWithPreview photo : cat.getPhotos()) {
+                if (photo.getExpectedAction() != null && photo.getExpectedAction().equals(PhotoWithPreview.Action.DELETE))
+                    photosToDelete.add(String.valueOf(photo.getId()));
+            }
+            if (!photosToDelete.isEmpty()) {
+                uploadCatRequest.addParameter("images_delete", Arrays.toString(photosToDelete.toArray(new String[0])));
+            }
 
             int i = 0;
             int currIndex = 0;

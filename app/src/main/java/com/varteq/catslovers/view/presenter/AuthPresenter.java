@@ -289,7 +289,6 @@ public class AuthPresenter {
                         protected void onSuccess(AuthToken data) {
                             if (data.getToken() != null) {
                                 Log.i(TAG, "getApiService().auth success");
-                                Log.i(TAG, data.getToken());
                                 Profile.setAuthToken(view, data.getToken());
                                 Profile.setUserId(view, data.getUserId());
                                 ServiceGenerator.setToken(data.getToken());
@@ -545,7 +544,7 @@ public class AuthPresenter {
             //Log.e(TAG, "Profile Success");
             CognitoAuthHelper.setCurrSession(cognitoUserSession);
             CognitoAuthHelper.newDevice(device);
-            Log.i(TAG, "cognitoUserSession.getAccessToken " + cognitoUserSession.getAccessToken().getJWTToken());
+            Log.i(TAG, "authenticationHandler onSuccess");
             //closeWaitDialog();
             Profile.setUserPhone(view, username);
             if (isPasswordReseted)

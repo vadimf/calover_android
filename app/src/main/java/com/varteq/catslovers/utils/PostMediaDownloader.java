@@ -74,7 +74,7 @@ public class PostMediaDownloader {
             @Override
             protected File doInBackground(Void... voids) {
                 try {
-                    return ImageUtils.saveStreamToFile(inputStream, null, fileName);
+                    return ImageUtils.saveStreamToFile(inputStream, fileName);
                 } catch (Exception e) {
                 }
                 return null;

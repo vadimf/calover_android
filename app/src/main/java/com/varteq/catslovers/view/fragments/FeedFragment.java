@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.model.FeedPost;
+import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.view.adapters.FeedAdapter;
 import com.varteq.catslovers.view.presenter.FeedPresenter;
 
@@ -23,6 +24,8 @@ import butterknife.ButterKnife;
 
 
 public class FeedFragment extends Fragment {
+
+    private String TAG = FeedFragment.class.getSimpleName();
 
     RecyclerView feedRecyclerView;
     RecyclerView.Adapter adapter;
@@ -48,7 +51,7 @@ public class FeedFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        Log.d(TAG, "onViewCreated");
         feedList = new ArrayList<>();
 
         feedRecyclerView = view.findViewById(R.id.feedRecyclerView);

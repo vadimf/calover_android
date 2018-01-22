@@ -1,5 +1,7 @@
 package com.varteq.catslovers.api;
 
+import com.varteq.catslovers.utils.Log;
+
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -12,11 +14,14 @@ public class ServiceGenerator {
     private static final int WRITE_TIMEOUT = 60;
     private static final int TIMEOUT = 60;
 
-    private static HttpLoggingInterceptor logging = new HttpLoggingInterceptor()
-            .setLevel(HttpLoggingInterceptor.Level.BODY);
+    private static OkHttpClient.Builder httpClient;
 
-    private static OkHttpClient.Builder httpClient = new OkHttpClient.Builder()
-            .addInterceptor(logging);
+    static {
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor(message -> Log.d("Retrofit", message))
+                .setLevel(HttpLoggingInterceptor.Level.BODY);
+        httpClient = new OkHttpClient.Builder()
+                .addInterceptor(logging);
+    }
 
     /*
     static {

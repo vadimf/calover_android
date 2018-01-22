@@ -55,6 +55,7 @@ public class FeedPresenter {
         QBCustomObjects.getObjects(QBFeedPost.CLASS_NAME, requestBuilder).performAsync(new QBEntityCallback<ArrayList<QBCustomObject>>() {
             @Override
             public void onSuccess(ArrayList<QBCustomObject> customObjects, Bundle params) {
+                Log.d(TAG, "QBCustomObjects.getObjects onSuccess count: " + (customObjects != null ? customObjects.size() : "null"));
                 /*int skip = params.getInt(Consts.SKIP);
                 int limit = params.getInt(Consts.LIMIT);*/
                 loadUsers(customObjects);
@@ -89,6 +90,7 @@ public class FeedPresenter {
                 new QBEntityCallback<ArrayList<QBUser>>() {
                     @Override
                     public void onSuccess(ArrayList<QBUser> result, Bundle params) {
+                        Log.d(TAG, "QBUsers.getUsersByIDs onSuccess count: " + (result != null ? result.size() : "null"));
                         view.feedsLoaded(from(customObjects, result));
                     }
 
@@ -112,12 +114,14 @@ public class FeedPresenter {
                         @Override
                         protected void onSuccess(List<RFeedstation> data) {
                             //view.feedstationsLoaded(from(data));
+                            Log.d(TAG, "getFeedstationIds onSuccess count: " + data.size());
                             List<String> ids = new ArrayList<>();
                             for (Feedstation feedstation : MapPresenter.from(data)) {
                                 if (!feedstation.getIsPublic() && feedstation.getStatus() != null
                                         && feedstation.getStatus().equals(GroupPartner.Status.JOINED))
                                     ids.add(String.valueOf(feedstation.getId()));
                             }
+                            Log.d(TAG, "getFeedstationIds onSuccess joined stations count: " + ids.size());
                             getFeeds(ids);
                         }
 

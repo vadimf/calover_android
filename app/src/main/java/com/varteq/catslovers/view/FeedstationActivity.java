@@ -53,6 +53,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -122,6 +123,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
     private MenuItem saveMenu;
     private MenuItem editMenu;
     private int countOfSelectedPhotos = 0;
+    private List<PhotoWithPreview> photosToRemove;
 
     public enum FeedstationScreenMode {
         EDIT_MODE,
@@ -253,13 +255,24 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
 
         if (photoList == null)
             photoList = new ArrayList<>();
+
+        for (Iterator<PhotoWithPreview> i = photoList.iterator(); i.hasNext(); ) {
+            PhotoWithPreview photo = i.next();
+            if (photo.getExpectedAction() != null && photo.getExpectedAction().equals(PhotoWithPreview.Action.DELETE)) {
+                if (photosToRemove == null)
+                    photosToRemove = new ArrayList<>();
+                photosToRemove.add(photo);
+                i.remove();
+            }
+        }
+
         if (pagerPhotoList == null)
             pagerPhotoList = new ArrayList<>();
         pagerPhotoList.addAll(photoList);
 
         photoCountTextView.setText(String.valueOf(photoList.size()));
 
-        photosAdapter = new PhotosAdapter(photoList, this::showImage);
+        photosAdapter = new PhotosAdapter(photoList, this::showImage, this::deleteImage);
         photosRecyclerView.setAdapter(photosAdapter);
         photosRecyclerView.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -341,6 +354,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
         descriptionEditText.setEnabled(false);
 
         groupPartnersAdapter.switchToViewMode();
+        photosAdapter.switchToViewMode();
 
         if (saveMenu != null)
             saveMenu.setVisible(false);
@@ -375,6 +389,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
 
         if (currentMode.equals(FeedstationScreenMode.EDIT_MODE))
             groupPartnersAdapter.switchToEditMode();
+        photosAdapter.switchToEditMode();
 
         if (saveMenu != null)
             saveMenu.setVisible(true);
@@ -487,6 +502,8 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
         feedstation.setName(stationName);
         feedstation.setAddress(address);
         feedstation.setDescription(description);
+        if (photosToRemove != null)
+            photoList.addAll(photosToRemove);
         feedstation.setPhotos(photoList);
 
         return feedstation;
@@ -526,6 +543,33 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
         }
     }
 
+    private void deleteImage(Integer position) {
+        if (position == null) return;
+
+        new AlertDialog.Builder(this)
+                .setTitle("Delete picture?")
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
+                    if (photoList.get(position).getExpectedAction() != null && photoList.get(position).getExpectedAction().equals(PhotoWithPreview.Action.ADD))
+                        countOfSelectedPhotos--;
+                    else {
+                        if (photosToRemove == null)
+                            photosToRemove = new ArrayList<>();
+                        photosToRemove.add(photoList.get(position));
+                        photosToRemove.get(photosToRemove.size() - 1)
+                                .setExpectedAction(PhotoWithPreview.Action.DELETE);
+                    }
+
+                    photoList.remove(position.intValue());
+                    photosAdapter.notifyItemRemoved(position);
+                    pagerPhotoList.remove(position.intValue());
+                    pagerAdapter.notifyDataSetChanged();
+                    photoCountTextView.setText(String.valueOf(photoList.size()));
+                    Log.d(TAG, "deleteImage " + position);
+                })
+                .create()
+                .show();
+    }
 
     private void showImage(String path) {
         if (path == null || path.isEmpty()) return;

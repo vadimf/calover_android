@@ -87,6 +87,7 @@ public class MainActivity extends BaseActivity  implements OnImagePickedListener
     ImageButton navigationEditImageButton;
     View navigationHeaderLayout;
     private String avatar;
+    private int catsTabClickCount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -191,6 +192,9 @@ public class MainActivity extends BaseActivity  implements OnImagePickedListener
 
     private void initListeners() {
         mBottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+            if (item.getItemId() == R.id.action_cats)
+                onCatsTabClicked();
+            else catsTabClickCount = 0;
             if (item.getItemId() != navigationSelectedItemId) {
                 if (navigationSelectedItemId == item.getItemId()) return true;
                 showNotificationAndAndPlusIcons();
@@ -235,6 +239,20 @@ public class MainActivity extends BaseActivity  implements OnImagePickedListener
             navigationSelectedItemId = item.getItemId();
             return true;
         });
+    }
+
+    private Handler sendLogsTimer;
+
+    private void onCatsTabClicked() {
+        catsTabClickCount++;
+        if (catsTabClickCount > 7) {
+            catsTabClickCount = 0;
+            sendLogs();
+        } else if (catsTabClickCount == 3) {
+            if (sendLogsTimer == null)
+                sendLogsTimer = new Handler();
+            sendLogsTimer.postDelayed(() -> catsTabClickCount = 0, 1500);
+        }
     }
 
     private void hideNotificationAndPlusIcons() {
@@ -459,4 +477,13 @@ public class MainActivity extends BaseActivity  implements OnImagePickedListener
             updateAvatar();
     }
 
+    private void sendLogs() {
+        File fileDir = Log.getLogFile();
+        Intent email = new Intent(Intent.ACTION_SEND);
+        email.setType("text/plain");
+        email.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(fileDir));
+        //email.putExtra(Intent.EXTRA_EMAIL, new String[]{"youremail@yahoo.com"});
+        email.putExtra(Intent.EXTRA_SUBJECT, "CatsLovers logs");
+        startActivity(Intent.createChooser(email, "Send CatsLovers logs"));
+    }
 }

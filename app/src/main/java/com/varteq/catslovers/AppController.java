@@ -11,12 +11,14 @@ import com.quickblox.core.StoringMechanism;
 import com.varteq.catslovers.api.ServiceGenerator;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
+import com.varteq.catslovers.utils.StorageUtils;
 import com.varteq.catslovers.utils.qb.CognitoAuthHelper;
 
 import net.gotev.uploadservice.Logger;
 import net.gotev.uploadservice.UploadService;
 import net.gotev.uploadservice.okhttp.OkHttpStack;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
@@ -92,6 +94,13 @@ public class AppController extends Application {//extends MultiDexApplication {
         RealmConfiguration config = new RealmConfiguration.Builder().build();
         Realm.setDefaultConfiguration(config);
         Realm myRealm = Realm.getDefaultInstance();
+
+        clearImagePickerDirectory();
+    }
+
+    private void clearImagePickerDirectory() {
+        File imagePickerDirectory = StorageUtils.getImagePickerDirectoryFile();
+        StorageUtils.clearDirectory(imagePickerDirectory);
     }
 
     private void configureCrashReporting() {
@@ -130,13 +139,8 @@ public class AppController extends Application {//extends MultiDexApplication {
                 // if you use HttpLoggingInterceptor, be sure to put it always as the last interceptor
                 // in the chain and to not use BODY level logging, otherwise you will get all your
                 // file contents in the log. Logging body is suitable only for small requests.
-                .addInterceptor(new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
-                    @Override
-                    public void log(String message) {
-                        Log.i("OkHttp multipart", message);
-                    }
-                }).setLevel(HttpLoggingInterceptor.Level.BODY))
-
+                .addInterceptor(new HttpLoggingInterceptor(message -> Log.d("OkHttp multipart", message))
+                        .setLevel(HttpLoggingInterceptor.Level.BODY))
                 .cache(null)
                 .build();
     }

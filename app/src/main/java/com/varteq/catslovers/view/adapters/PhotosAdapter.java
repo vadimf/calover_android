@@ -17,6 +17,7 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.PhotoViewH
 
     private final int THUMBSIZE = 250;
     private OnImageClickListener externalClickListener;
+    private OnImageLongClickListener externalLongClickListener;
     private List<PhotoWithPreview> photoList;
     private View.OnClickListener internalClickListener = new View.OnClickListener() {
         @Override
@@ -27,10 +28,31 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.PhotoViewH
                 externalClickListener.onImageClicked(photoList.get(itemPosition).getPhoto());
         }
     };
+    private View.OnLongClickListener internalLongClickListener = new View.OnLongClickListener() {
+        @Override
+        public boolean onLongClick(View view) {
+            RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) view.getLayoutParams();
+            int itemPosition = lp.getViewLayoutPosition();
+            if (externalLongClickListener != null && isEditMode)
+                externalLongClickListener.onImageClicked(itemPosition);
+            return true;
+        }
+    };
+    private boolean isEditMode;
 
-    public PhotosAdapter(List<PhotoWithPreview> photoList, OnImageClickListener externalClickListener) {
+    public PhotosAdapter(List<PhotoWithPreview> photoList, OnImageClickListener externalClickListener,
+                         OnImageLongClickListener externalLongClickListener) {
         this.externalClickListener = externalClickListener;
+        this.externalLongClickListener = externalLongClickListener;
         this.photoList = photoList;
+    }
+
+    public void switchToEditMode() {
+        isEditMode = true;
+    }
+
+    public void switchToViewMode() {
+        isEditMode = false;
     }
 
     @Override
@@ -67,6 +89,7 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.PhotoViewH
                 inflate(R.layout.card_cat_photo, viewGroup, false);
 
         itemView.setOnClickListener(internalClickListener);
+        itemView.setOnLongClickListener(internalLongClickListener);
         return new PhotoViewHolder(itemView);
     }
 
@@ -81,6 +104,10 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.PhotoViewH
 
     public interface OnImageClickListener {
         void onImageClicked(String imagePath);
+    }
+
+    public interface OnImageLongClickListener {
+        void onImageClicked(int position);
     }
 
     public List<PhotoWithPreview> getPhotoList(){

@@ -50,7 +50,7 @@ public class DialogsAdapter extends BaseSelectableListAdapter<QBChatDialog> {
         QBChatDialog dialog = getItem(position);
         if (dialog.getType().equals(QBDialogType.PRIVATE)) {
             QBUser user = ChatHelper.getInstance().getInterlocutorUserFromDialog(dialog);
-            if (user != null && user.getCustomData() != null)
+            if (user != null && user.getCustomData() != null && !user.getCustomData().isEmpty())
                 Glide.with(holder.rootLayout)
                         .load(user.getCustomData())
                         .into(holder.dialogImageView);
