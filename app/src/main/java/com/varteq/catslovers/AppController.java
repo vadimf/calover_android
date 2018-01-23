@@ -9,6 +9,7 @@ import com.crashlytics.android.core.CrashlyticsCore;
 import com.quickblox.auth.session.QBSettings;
 import com.quickblox.core.StoringMechanism;
 import com.varteq.catslovers.api.ServiceGenerator;
+import com.varteq.catslovers.utils.ChatHelper;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.utils.StorageUtils;
@@ -96,6 +97,7 @@ public class AppController extends Application {//extends MultiDexApplication {
         Realm myRealm = Realm.getDefaultInstance();
 
         clearImagePickerDirectory();
+        ChatHelper.getInstance().loginToQuickBlox(this);
     }
 
     private void clearImagePickerDirectory() {

@@ -432,7 +432,7 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
 
     private void loadDialogsFromQb(final boolean silentUpdate, final boolean clearDialogHolder) {
         isProcessingResultInProgress = true;
-        if (!silentUpdate) {
+        if (!silentUpdate && !swipyRefreshLayoutFriends.isRefreshing() && !swipyRefreshLayoutGroups.isRefreshing()) {
             progressBar.setVisibility(View.VISIBLE);
         }
 
@@ -495,8 +495,7 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
         updateDialogsAdapters();
     }
 
-    public void showError(String message) {
-        Toaster.longToast(message);
+    public void stopRefreshing() {
         isProcessingResultInProgress = false;
         progressBar.setVisibility(View.GONE);
         swipyRefreshLayoutFriends.setRefreshing(false);
@@ -505,8 +504,10 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
 
     @Override
     public void onRefresh(SwipyRefreshLayoutDirection direction) {
-        requestBuilder.setSkip(skipRecords += ChatHelper.DIALOG_ITEMS_PER_PAGE);
-        loadDialogsFromQb(true, false);
+        if (incomingMessagesManager != null) {
+            requestBuilder.setSkip(skipRecords += ChatHelper.DIALOG_ITEMS_PER_PAGE);
+            loadDialogsFromQb(true, false);
+        } else presenter.checkQBLogin();
     }
 
     private class DeleteActionModeCallback implements ActionMode.Callback {
