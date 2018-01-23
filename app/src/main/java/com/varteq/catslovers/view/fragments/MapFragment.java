@@ -4,19 +4,23 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -60,7 +64,9 @@ import com.varteq.catslovers.utils.SystemPermissionHelper;
 import com.varteq.catslovers.utils.TimeUtils;
 import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.utils.Utils;
+import com.varteq.catslovers.view.BusinessActivity;
 import com.varteq.catslovers.view.FeedstationActivity;
+import com.varteq.catslovers.view.adapters.info_window_adapter.BusinessInfoWindowAdapter;
 import com.varteq.catslovers.view.adapters.info_window_adapter.EventInfoWindowAdapter;
 import com.varteq.catslovers.view.presenter.MapPresenter;
 
@@ -68,11 +74,13 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 import static com.varteq.catslovers.utils.SystemPermissionHelper.PERMISSIONS_ACCESS_LOCATION_REQUEST;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
+    public static final int BUSINESS_PERMISSIONS_REQUEST_CALL_PHONE = 10;
     private final String TAG = MapFragment.class.getSimpleName();
     private final int DEFAULT_ZOOM = 5;
     private GoogleMap googleMap;
@@ -88,6 +96,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     RoundedImageView avatarImageView;
     @BindView(R.id.bottom_sheet_feedstation)
     FrameLayout bottomSheetFeedstationFrameLayout;
+    @BindView(R.id.bottom_sheet_business)
+    FrameLayout bottomSheetBusinessFrameLayout;
     @BindView(R.id.station_name_textView)
     TextView stationNameTextView;
     @BindView(R.id.address_textView)
@@ -107,7 +117,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @BindView(R.id.relativeLayout_hungry)
     RelativeLayout hungryRelativeLayout;
 
+    @BindView(R.id.textView_business_name)
+    TextView businessNameTextView;
+    @BindView(R.id.textView_business_address)
+    TextView businessAddressTextView;
+    @BindView(R.id.textView_business_webLink)
+    TextView businessWeblinkTextView;
+    @BindView(R.id.textView_business_phone)
+    TextView businessPhoneTextView;
+
     BottomSheetBehavior bottomSheetBehaviorFeedstation;
+    BottomSheetBehavior bottomSheetBehaviorBusiness;
     BottomSheetBehavior bottomSheetBehaviorEventsWarnings;
     BottomSheetBehavior bottomSheetBehaviorEventsEmergencies;
     @BindView(R.id.bottom_sheet_other_view)
@@ -129,7 +149,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private Marker clickedMarker;
     private LatLng clickedMarkerLocation;
+    private Business clickedBusiness;
     private EventInfoWindowAdapter eventInfoWindowAdapter;
+    private BusinessInfoWindowAdapter businessInfoWindowAdapter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -156,6 +178,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         initBottomBehaviors();
         initLocation();
         initListeners();
+
+        businessPhoneTextView.setPaintFlags(businessPhoneTextView.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+        businessWeblinkTextView.setPaintFlags(businessWeblinkTextView.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
 
         // Obtain the SupportMapFragment and get notified when the googleMap is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
@@ -273,6 +298,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         bottomSheetBehaviorEventsWarnings.setState(BottomSheetBehavior.STATE_HIDDEN);
         bottomSheetBehaviorEventsEmergencies = BottomSheetBehavior.from(bottomSheetEventsEmergenciesFrameLayout);
         bottomSheetBehaviorEventsEmergencies.setState(BottomSheetBehavior.STATE_HIDDEN);
+        bottomSheetBehaviorBusiness = BottomSheetBehavior.from(bottomSheetBusinessFrameLayout);
+        bottomSheetBehaviorBusiness.setState(BottomSheetBehavior.STATE_HIDDEN);
     }
 
 
@@ -295,7 +322,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     public void initAvatarCatBackground(Feedstation feedstation) {
         int resourceId = R.drawable.location_blue;
-        if (feedstation.getFeedStatus()!=null) {
+        if (feedstation.getFeedStatus() != null) {
             if (feedstation.getFeedStatus().equals(Feedstation.FeedStatus.STARVING))
                 resourceId = R.drawable.location_red;
             else if (feedstation.getFeedStatus().equals(Feedstation.FeedStatus.HUNGRY))
@@ -358,7 +385,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
         eventInfoWindowAdapter = new EventInfoWindowAdapter(getContext());
-        googleMap.setInfoWindowAdapter(eventInfoWindowAdapter);
+        businessInfoWindowAdapter = new BusinessInfoWindowAdapter(getContext());
 
         setUserPosition();
 
@@ -373,7 +400,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             return false;
         });
 
-        googleMap.setOnMapLongClickListener(latLng -> {
+        this.googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                presenter.onInfoWindowClicked(marker.getTag());
+            }
+        });
+
+        this.googleMap.setOnMapLongClickListener(latLng -> {
             /*Location selectedLocation = new Location("");
             selectedLocation.setLatitude(latLng.latitude);
             selectedLocation.setLongitude(latLng.longitude);*/
@@ -417,25 +451,44 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     public void showEventMarkerDialog(Event event) {
-        clickedMarkerLocation = event.getLatLng();
-        if (event != null)
-            showMarkerInfoWindow(event.getAddress(), TimeUtils.getDateAsddMMMyyyy(event.getDate()), event.getTypeName(), event.getType());
+        if (event != null) {
+            clickedMarkerLocation = event.getLatLng();
+            showEventMarkerInfoWindow(event.getAddress(), TimeUtils.getDateAsddMMMyyyy(event.getDate()), event.getTypeName(), event.getType());
+        }
     }
 
-    private void showMarkerInfoWindow(String address, String date, String eventTypeName, Event.Type type) {
+    public void showBusinessMarkerDialog(Business business) {
+        if (business != null) {
+            clickedMarkerLocation = business.getLocation();
+            showBusinessMarkerInfoWindow(business.getName(), business.getAddress(), business.getDescription());
+        }
+    }
+
+    private void showEventMarkerInfoWindow(String address, String date, String eventTypeName, Event.Type type) {
         if (clickedMarker != null) {
+            googleMap.setInfoWindowAdapter(eventInfoWindowAdapter);
             eventInfoWindowAdapter.setShowWindow(true);
             eventInfoWindowAdapter.setValues(address, date, eventTypeName, type);
             clickedMarker.showInfoWindow();
         }
     }
 
-    public void releaseClickedLocation(){
+    private void showBusinessMarkerInfoWindow(String name, String address, String description) {
+        if (clickedMarker != null) {
+            googleMap.setInfoWindowAdapter(businessInfoWindowAdapter);
+            businessInfoWindowAdapter.setShowWindow(true);
+            businessInfoWindowAdapter.setValues(name, address, description);
+            clickedMarker.showInfoWindow();
+        }
+    }
+
+    public void releaseClickedLocation() {
         clickedMarkerLocation = null;
     }
 
-    public void hideEventMarkerDialog() {
+    public void hideMarkerDialogs() {
         eventInfoWindowAdapter.setShowWindow(false);
+        businessInfoWindowAdapter.setShowWindow(false);
         clickedMarker.showInfoWindow();
     }
 
@@ -459,10 +512,24 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void fillFeedstationBottomSheet(Feedstation feedstation) {
         stationNameTextView.setText(feedstation.getName());
         addressTextView.setText(feedstation.getAddress());
-        if (feedstation.getFeedStatus()!=null && feedstation.getFeedStatus().equals(Feedstation.FeedStatus.STARVING)) {
+        if (feedstation.getFeedStatus() != null && feedstation.getFeedStatus().equals(Feedstation.FeedStatus.STARVING)) {
             hungryRelativeLayout.setVisibility(View.VISIBLE);
         } else
             hungryRelativeLayout.setVisibility(View.INVISIBLE);
+    }
+
+    public void showBusinessMarkerBottomSheet(Business business) {
+        bottomSheetBehaviorBusiness.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        fillBusinessBottomSheet(business);
+    }
+
+
+    public void fillBusinessBottomSheet(Business business) {
+        this.clickedBusiness = business;
+        businessNameTextView.setText(business.getName());
+        businessAddressTextView.setText(business.getAddress());
+        businessWeblinkTextView.setText(business.getLink());
+        businessPhoneTextView.setText(business.getPhone());
     }
 
     public void setBottomSheetFeedstationTag(Object tag) {
@@ -470,6 +537,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     public void hideBottomSheets() {
+        bottomSheetBehaviorBusiness.setState(BottomSheetBehavior.STATE_HIDDEN);
         bottomSheetBehaviorEventsEmergencies.setState(BottomSheetBehavior.STATE_HIDDEN);
         bottomSheetBehaviorEventsWarnings.setState(BottomSheetBehavior.STATE_HIDDEN);
         bottomSheetBehaviorFeedstation.setState(BottomSheetBehavior.STATE_HIDDEN);
@@ -662,6 +730,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         .position(business.getLocation())
                 );
                 marker.setTag(business);
+                if (clickedMarkerLocation != null
+                        && business.getLocation().latitude == clickedMarkerLocation.latitude
+                        && business.getLocation().longitude == clickedMarkerLocation.longitude) {
+                    clickedMarker = marker;
+                    showBusinessMarkerDialog(business);
+                }
             }
 
         addUserLocationMarker();
@@ -745,11 +819,57 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (requestCode == PERMISSIONS_ACCESS_LOCATION_REQUEST) {
-            if (permissions[0].equals(Manifest.permission.ACCESS_FINE_LOCATION)
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                checkLocationAvailability();
+        switch (requestCode) {
+            case PERMISSIONS_ACCESS_LOCATION_REQUEST:
+                if (permissions[0].equals(Manifest.permission.ACCESS_FINE_LOCATION)
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    checkLocationAvailability();
+                }
+                break;
+            case BUSINESS_PERMISSIONS_REQUEST_CALL_PHONE:
+                if (permissions[0].equals(Manifest.permission.CALL_PHONE)
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    callPhone(businessPhoneTextView.getText().toString());
+                }
+                break;
+        }
+    }
+
+    @OnClick(R.id.textView_business_webLink)
+    public void onBusinessWeblinkClick(View view) {
+        String url = ((TextView) view).getText().toString();
+        if (!url.isEmpty()) {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(url));
+            startActivity(intent);
+        }
+    }
+
+    @OnClick(R.id.button_business_more)
+    public void onMoreButtonClicked() {
+        Intent intent = new Intent(getActivity(), BusinessActivity.class);
+        intent.putExtra("business", this.clickedBusiness);
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.textView_business_phone)
+    public void onBusinessPhoneClick(View view) {
+        String phone = ((TextView) view).getText().toString();
+        if (!phone.isEmpty()) {
+
+            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.CALL_PHONE}, BUSINESS_PERMISSIONS_REQUEST_CALL_PHONE);
+            } else {
+                callPhone(phone);
             }
+        }
+    }
+
+
+    private void callPhone(String phone) {
+        if (phone != null && !phone.isEmpty()) {
+            Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + phone));
+            startActivity(intent);
         }
     }
 
