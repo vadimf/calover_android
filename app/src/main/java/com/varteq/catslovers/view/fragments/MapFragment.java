@@ -575,9 +575,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 } else if (feedstation.getStatus() != null && feedstation.getStatus().equals(GroupPartner.Status.JOINED)) {
                     if (feedstation.getFeedStatus() != null) {
                         if (feedstation.getFeedStatus().equals(Feedstation.FeedStatus.HUNGRY))
-                            return R.drawable.location_icon_2;
+                            return R.drawable.foodstation_copy_14;
                         else if (feedstation.getFeedStatus().equals(Feedstation.FeedStatus.STARVING))
-                            return R.drawable.foodstation_copy_9;
+                            return R.drawable.foodstation_copy_15;
                     }
                     return R.drawable.foodstation_copy_4;
                 }

@@ -51,6 +51,7 @@ import com.varteq.catslovers.view.qb.dialog.ProgressDialogFragment;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import butterknife.BindView;
@@ -351,7 +352,7 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
             if (currentActionMode == null) {
                 ChatActivity.startForResult(getActivity(), REQUEST_DIALOG_ID_FOR_UPDATE, selectedDialog);
             } else {
-                friendsDialogsAdapter.toggleSelection(selectedDialog);
+                groupsDialogsAdapter.toggleSelection(selectedDialog);
             }
         });
 
@@ -542,7 +543,10 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
         @Override
         public void onDestroyActionMode(ActionMode mode) {
             currentActionMode = null;
-            friendsDialogsAdapter.clearSelection();
+            if (isFriendsChat)
+                friendsDialogsAdapter.clearSelection();
+            else
+                groupsDialogsAdapter.clearSelection();
             //fab.show();
         }
 
@@ -552,6 +556,19 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
                 selectedDialogs = friendsDialogsAdapter.getSelectedItems();
             else
                 selectedDialogs = groupsDialogsAdapter.getSelectedItems();
+
+            int startSize = selectedDialogs.size();
+            for (Iterator<QBChatDialog> i = selectedDialogs.iterator(); i.hasNext(); ) {
+                QBChatDialog photo = i.next();
+                if (photo.getType().equals(QBDialogType.PUBLIC_GROUP))
+                    i.remove();
+            }
+            if (startSize != selectedDialogs.size())
+                Toaster.shortToast("You cann't delete stations dialogs");
+            if (selectedDialogs.isEmpty()) {
+                //updateDialogsAdapters();
+                return;
+            }
 
             ChatHelper.getInstance().deleteDialogs(selectedDialogs, new QBEntityCallback<ArrayList<String>>() {
                 @Override
