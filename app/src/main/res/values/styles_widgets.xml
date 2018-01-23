@@ -77,10 +77,9 @@
     </style>
 
     <style name="MessageAuthorStyle" parent="WrapContent">
-        <item name="android:layout_marginLeft">@dimen/chat_message_username_margin</item>
-        <item name="android:layout_marginRight">@dimen/chat_message_username_margin</item>
+        <item name="android:layout_marginRight">@dimen/padding_common_twice</item>
         <item name="android:gravity">left</item>
-        <item name="android:textColor">@color/text_color_dark_grey</item>
+        <item name="android:textColor">@color/text_color_white</item>
         <item name="android:textSize">@dimen/chat_author_text_size</item>
         <item name="android:textStyle">bold</item>
     </style>

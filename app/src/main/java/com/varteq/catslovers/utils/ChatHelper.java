@@ -1,5 +1,7 @@
 package com.varteq.catslovers.utils;
 
+import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -23,6 +25,7 @@ import com.quickblox.core.request.QBPagedRequestBuilder;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
+import com.varteq.catslovers.AppController;
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.api.BaseParser;
 import com.varteq.catslovers.api.ServiceGenerator;
@@ -151,6 +154,54 @@ public class ChatHelper {
         }
 
         qbChatService.login(user, callback);
+    }
+
+    private AsyncTask<Void, Void, Void> loginTask;
+
+    public void loginToQuickBlox(Context context) {
+        if (!Profile.isUserLoggedIn(context) ||
+                (loginTask != null && loginTask.getStatus().equals(AsyncTask.Status.RUNNING)))
+            return;
+        int qbUserId = Profile.getQBUserId(context);
+        final QBUser qbUser = new QBUser();
+        qbUser.setId(qbUserId);
+        qbUser.setPassword(AppController.USER_PASS);
+
+        /*if (qbUserId<0){
+            String id = Profile.getUserId(this);
+            qbUser.setLogin(id);
+
+            ChatHelper.getInstance().login(qbUser, new QBEntityCallback<Void>() {
+                @Override
+                public void onSuccess(Void aVoid, Bundle bundle) {
+                    Profile.setQBUserId(getApplicationContext(), ChatHelper.getCurrentUser().getId());
+                }
+
+                @Override
+                public void onError(QBResponseException e) {}
+            }, null);
+            return;
+        }*/
+
+        try {
+            loginTask = new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... voids) {
+                    loginToChat(qbUser, new QBEntityCallback<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid, Bundle bundle) {
+                        }
+
+                        @Override
+                        public void onError(QBResponseException e) {
+                        }
+                    });
+                    return null;
+                }
+            };
+            loginTask.execute();
+        } catch (Exception e) {
+        }
     }
 
     public void join(QBChatDialog chatDialog, final QBEntityCallback<Void> callback) {

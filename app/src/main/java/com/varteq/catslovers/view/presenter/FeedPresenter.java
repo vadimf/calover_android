@@ -1,6 +1,7 @@
 package com.varteq.catslovers.view.presenter;
 
 import android.os.Bundle;
+import android.os.Handler;
 
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
@@ -18,6 +19,7 @@ import com.varteq.catslovers.model.FeedPost;
 import com.varteq.catslovers.model.Feedstation;
 import com.varteq.catslovers.model.GroupPartner;
 import com.varteq.catslovers.model.QBFeedPost;
+import com.varteq.catslovers.utils.ChatHelper;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.view.fragments.FeedFragment;
 
@@ -50,6 +52,18 @@ public class FeedPresenter {
             view.onError();
             return;
         }
+
+        if (!ChatHelper.getInstance().isLogged()) {
+            ChatHelper.getInstance().loginToQuickBlox(view.getContext());
+            new Handler().postDelayed(() -> {
+                        if (ChatHelper.getInstance().isLogged())
+                            getFeeds(ids);
+                        else view.onError();
+                    },
+                    3500);
+            return;
+        }
+
         QBRequestGetBuilder requestBuilder = QBFeedPost.getRequestBuilder(ids);
 
         QBCustomObjects.getObjects(QBFeedPost.CLASS_NAME, requestBuilder).performAsync(new QBEntityCallback<ArrayList<QBCustomObject>>() {

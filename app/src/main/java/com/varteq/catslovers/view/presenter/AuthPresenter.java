@@ -348,6 +348,7 @@ public class AuthPresenter {
             public void onSuccess(Void aVoid, Bundle bundle) {
                 Log.i(TAG, "chat login success");
                 getCats();
+                Profile.setQBUserId(view, ChatHelper.getCurrentUser().getId());
                 /*String path = Profile.getUserAvatar(view);
                 if (!path.isEmpty()) {
                     try {

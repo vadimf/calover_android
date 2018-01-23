@@ -87,7 +87,7 @@ public class ChatAdapter extends BaseListAdapter<QBChatMessage> {
         if (chatMessage.getSenderId() != null)
             user = QbUsersHolder.getInstance().getUserById(chatMessage.getSenderId());
         else user = ChatHelper.getCurrentUser();
-        if (user != null && user.getCustomData() != null) {
+        if (user != null && user.getCustomData() != null && !user.getCustomData().isEmpty()) {
             Glide.with(convertView)
                     .load(user.getCustomData())
                     .into(holder.avatarImageView);
@@ -97,7 +97,7 @@ public class ChatAdapter extends BaseListAdapter<QBChatMessage> {
         setIncomingOrOutgoingMessageAttributes(holder, chatMessage);
         setMessageBody(holder, chatMessage);
         setMessageInfo(chatMessage, holder);
-        //setMessageAuthor(holder, chatMessage);
+        setMessageAuthor(holder, chatMessage);
 
 
         holder.messageContainerLayout.setOnClickListener(new View.OnClickListener() {
@@ -233,10 +233,10 @@ public class ChatAdapter extends BaseListAdapter<QBChatMessage> {
 
             if (hasAttachments(chatMessage)) {
                 holder.messageAuthorTextView.setBackgroundResource(R.drawable.shape_rectangle_semi_transparent);
-                holder.messageAuthorTextView.setTextColor(ResourceUtils.getColor(R.color.text_color_white));
+                //holder.messageAuthorTextView.setTextColor(ResourceUtils.getColor(R.color.text_color_white));
             } else {
                 holder.messageAuthorTextView.setBackgroundResource(0);
-                holder.messageAuthorTextView.setTextColor(ResourceUtils.getColor(R.color.text_color_dark_grey));
+                //holder.messageAuthorTextView.setTextColor(ResourceUtils.getColor(R.color.text_color_white));
             }
         } else {
             holder.messageAuthorTextView.setVisibility(View.GONE);
@@ -268,7 +268,7 @@ public class ChatAdapter extends BaseListAdapter<QBChatMessage> {
         RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) holder.messageAuthorTextView.getLayoutParams();
         if (isIncoming && hasAttachments(chatMessage)) {
             lp.leftMargin = ResourceUtils.getDimen(R.dimen.chat_message_attachment_username_margin);
-            lp.topMargin = ResourceUtils.getDimen(R.dimen.chat_message_attachment_username_margin);
+            lp.topMargin = ResourceUtils.getDimen(R.dimen.chat_message_attachment_username_top_margin);
         } else if (isIncoming) {
             lp.leftMargin = ResourceUtils.getDimen(R.dimen.chat_message_username_margin);
             lp.topMargin = 0;

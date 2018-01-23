@@ -12,6 +12,7 @@ public class Profile {
     private static String USER_AVATAR_KEY = "user_avatar";
     private static String USER_PHONE = "user_phone";
     private static String USER_ID = "user_id";
+    private static String QB_USER_ID = "qb_user_id";
     private static String USER_STATION = "user_station";
 
     private static String USER_LOCATION_PROVIDER = "user_location_provider";
@@ -117,6 +118,14 @@ public class Profile {
 
     public static String getUserId(Context context) {
         return getDefaultSharedPreferences(context).getString(USER_ID, "");
+    }
+
+    public static void setQBUserId(Context context, int userId) {
+        getDefaultSharedPreferences(context).edit().putInt(QB_USER_ID, userId).apply();
+    }
+
+    public static int getQBUserId(Context context) {
+        return getDefaultSharedPreferences(context).getInt(QB_USER_ID, -1);
     }
 
     public static void setUserStation(Context context, String stationId) {

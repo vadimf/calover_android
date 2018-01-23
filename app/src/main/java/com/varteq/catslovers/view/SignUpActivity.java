@@ -15,6 +15,7 @@ import com.makeramen.roundedimageview.RoundedImageView;
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
+import com.varteq.catslovers.utils.StorageUtils;
 import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.utils.Utils;
 import com.varteq.catslovers.utils.qb.imagepick.ImagePickHelper;
@@ -106,13 +107,18 @@ public class SignUpActivity extends BaseActivity implements OnImagePickedListene
 
     final int THUMBSIZE = 250;
     private void updateAvatar() {
-        if (avatar != null && !avatar.isEmpty())
-            Glide.with(this)
-                    .load(avatar)
-                    .apply(new RequestOptions().override(THUMBSIZE, THUMBSIZE))
-                    .into(avatarImageView);
-        else
-            avatarImageView.setImageBitmap(Utils.getBitmapWithColor(getResources().getColor(R.color.transparent)));
+        if (avatar != null && !avatar.isEmpty()) {
+            File image = new File(StorageUtils.getImagePickerDirectoryFile() +
+                    avatar.substring(avatar.lastIndexOf("/"), avatar.length()));
+            if (image.exists()) {
+                Glide.with(this)
+                        .load(image)
+                        .apply(new RequestOptions().override(THUMBSIZE, THUMBSIZE))
+                        .into(avatarImageView);
+                return;
+            } else Profile.saveUserAvatar(this, "");
+        }
+        avatarImageView.setImageBitmap(Utils.getBitmapWithColor(getResources().getColor(R.color.transparent)));
     }
 
     @Override
