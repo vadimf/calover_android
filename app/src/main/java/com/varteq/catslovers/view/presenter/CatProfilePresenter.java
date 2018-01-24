@@ -197,8 +197,17 @@ public class CatProfilePresenter {
             if (lastLocation != null) {
                 uploadCatRequest.addParameter("lat", String.valueOf(lastLocation.getLatitude()))
                         .addParameter("lng", String.valueOf(lastLocation.getLongitude()));
-                uploadCatRequest.addParameter("address",
-                        Utils.getAddressByLocation(lastLocation.getLatitude(), lastLocation.getLongitude(), view));
+                String address = Utils.getAddressByLocation(lastLocation.getLatitude(), lastLocation.getLongitude(), view);
+                if (address != null)
+                    uploadCatRequest.addParameter("address", address);
+                else
+                {
+                    Toaster.longToast("Google play services error. Please, reboot your phone!");
+                    Log.e("uploadCatWithPhotos", "Address is null");
+                    view.hideWaitDialog();
+                    isCatUploading = false;
+                    return;
+                }
                 Profile.setLocation(view, lastLocation);
             }
 
