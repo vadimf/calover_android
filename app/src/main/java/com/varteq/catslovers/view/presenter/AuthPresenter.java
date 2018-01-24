@@ -80,13 +80,15 @@ public class AuthPresenter {
     private long RESEND_INTERVAL = 90 * 1000;
     private boolean isPasswordReseted;
     private QBUser qbUser;
+    private boolean isSigningIn;
 
     public AuthPresenter(String username, ValidateNumberActivity view) {
         this.username = username;
         this.view = view;
     }
 
-    public void resetPassword() {
+    public void resetPassword(boolean isSigningIn) {
+        this.isSigningIn = isSigningIn;
         startResetCall();
         //fakeLogin();
         //fakeLogin2();
@@ -109,7 +111,7 @@ public class AuthPresenter {
         Profile.setUserPetCount(view, 0);
         view.onSuccessSignIn();
         Profile.setUserPhone(view, "+380935772102");
-        Profile.saveUser(view, "RObert", "r@r.com");
+        Profile.saveUser(view, "RObert");
         Profile.setUserLogin(view, true);
         Profile.setUserId(view, String.valueOf(6));
         Profile.setUserStation(view, "38");
@@ -268,6 +270,7 @@ public class AuthPresenter {
                 Log.e(TAG, "updateUserAttributes onFailure " + exception.getMessage());
             }
         });
+
     }
 
     private void getAuthToken(String token) {
@@ -336,7 +339,8 @@ public class AuthPresenter {
             return;
         }
         qbUser = new QBUser(id, AppController.USER_PASS);
-        qbUser.setFullName(Profile.getUserName(view));
+        if (!isSigningIn())
+            qbUser.setFullName(Profile.getUserName(view));
         //qbUser.setExternalId(profile.getUserId());
         //qbUser.setWebsite(profile.getPicture());
         //qbUser.setFullName(profile.getFirstName() + " " + profile.getLastName());
@@ -383,6 +387,10 @@ public class AuthPresenter {
                     qbUser.setFileId(user.getFileId());
                     qbUser.setOldPassword(user.getOldPassword());
                     qbUser.setId(user.getId());
+                    if (isSigningIn()) {
+                        Profile.saveUser(AppController.getInstance(), user.getFullName());
+                        qbUser.setFullName(user.getFullName());
+                    }
                 }
             }
 
@@ -511,7 +519,11 @@ public class AuthPresenter {
                                     break;
                                 }
                             }
-                            uploadAvatar();
+                            if (!isSigningIn())
+                                uploadAvatar();
+                            else
+                                updateQBUser(qbUser);
+
                         }
 
                         @Override
@@ -548,9 +560,13 @@ public class AuthPresenter {
             Log.i(TAG, "authenticationHandler onSuccess");
             //closeWaitDialog();
             Profile.setUserPhone(view, username);
-            if (isPasswordReseted)
-                updateUserAttributes();
-            else getAuthToken(CognitoAuthHelper.getCurrSession().getAccessToken().getJWTToken());
+            if (isPasswordReseted) {
+                if (!isSigningIn())
+                    updateUserAttributes();
+                else
+                    getAuthToken(CognitoAuthHelper.getCurrSession().getAccessToken().getJWTToken());
+            } else
+                getAuthToken(CognitoAuthHelper.getCurrSession().getAccessToken().getJWTToken());
         }
 
         @Override
@@ -573,7 +589,7 @@ public class AuthPresenter {
             if (checkNetworkErrAndShowSnackbar(e))
                 return;
             if (e instanceof NotAuthorizedException) {
-                resetPassword();
+                resetPassword(isSigningIn());
                 Toast.makeText(view, "Verification code sent. Please confirm you number again", Toast.LENGTH_LONG).show();
             }
             view.showDialogMessage("Sign-in failed", CognitoAuthHelper.formatException(e));
@@ -649,6 +665,10 @@ public class AuthPresenter {
             forgotPasswordContinuation.setVerificationCode(code);
             forgotPasswordContinuation.continueTask();
         };
+    }
+
+    private boolean isSigningIn() {
+        return isSigningIn;
     }
 
     public void resendCode() {

@@ -8,12 +8,13 @@ import android.preference.PreferenceManager;
 public class Profile {
 
     private static String USER_NAME_KEY = "user_name";
-    private static String USER_EMAIL_KEY = "user_email";
+    //private static String USER_EMAIL_KEY = "user_email";
     private static String USER_AVATAR_KEY = "user_avatar";
     private static String USER_PHONE = "user_phone";
     private static String USER_ID = "user_id";
     private static String QB_USER_ID = "qb_user_id";
     private static String USER_STATION = "user_station";
+    private static String USER_SIGN_IN = "user_is_sign_in";
 
     private static String USER_LOCATION_PROVIDER = "user_location_provider";
     private static String USER_LOCATION_LAT = "user_location_lat";
@@ -27,10 +28,10 @@ public class Profile {
     public static SharedPreferences getDefaultSharedPreferences(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context);
     }
-    
-    public static void saveUser(Context context, String name, String email) {
+
+    public static void saveUser(Context context, String name) {
         getDefaultSharedPreferences(context).edit().putString(USER_NAME_KEY, name)
-                .putString(USER_EMAIL_KEY, email)
+                //  .putString(USER_EMAIL_KEY, email)
                 .apply();
     }
 
@@ -51,7 +52,8 @@ public class Profile {
     }
 
     public static String getEmail(Context context) {
-        return getDefaultSharedPreferences(context).getString(USER_EMAIL_KEY, "");
+        // return getDefaultSharedPreferences(context).getString(USER_EMAIL_KEY, "");
+        return "test@mail.com";
     }
 
     public static String getUserAvatar(Context context) {
@@ -81,6 +83,16 @@ public class Profile {
 
     public static String getUserPhone(Context context) {
         return getDefaultSharedPreferences(context).getString(USER_PHONE, "");
+    }
+
+
+    public static void setIsUserSigningIn(Context context, boolean isUserSignIn) {
+        getDefaultSharedPreferences(context).edit().putBoolean(USER_SIGN_IN, isUserSignIn).apply();
+    }
+
+
+    public static boolean getIsUserSigningIn(Context context) {
+        return getDefaultSharedPreferences(context).getBoolean(USER_SIGN_IN, false);
     }
 
     public static void setLocation(Context context, Location location) {

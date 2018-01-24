@@ -79,7 +79,7 @@ public class ValidateNumberActivity extends BaseActivity implements TextWatcher 
             username = getIntent().getStringExtra(PHONE_NUMBER_KEY);
 
         presenter = new AuthPresenter(username, this);
-        presenter.resetPassword();
+        presenter.resetPassword(Profile.getIsUserSigningIn(this));
 
         editText1.addTextChangedListener(this);
         editText2.addTextChangedListener(this);
@@ -129,6 +129,8 @@ public class ValidateNumberActivity extends BaseActivity implements TextWatcher 
         Profile.setUserLogin(this, true);
 
         Intent intent = new Intent(this, SuccessLoginActivity.class);
+        if (Profile.getIsUserSigningIn(this))
+            intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finishAffinity();
     }
