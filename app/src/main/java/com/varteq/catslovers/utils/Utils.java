@@ -81,8 +81,10 @@ public class Utils {
                 if (i != partsCount - 1)
                     splitAddress.append(", ");
             }
+            return splitAddress.toString();
+        } else {
+            return fullAddress;
         }
-        return splitAddress.toString();
     }
 
     public static String getAddressByLocation(double latitute, double longitute, Context context) {

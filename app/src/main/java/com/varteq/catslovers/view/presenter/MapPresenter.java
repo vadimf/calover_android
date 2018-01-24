@@ -91,6 +91,13 @@ public class MapPresenter {
         startUpdateFeedstationWithDelay(lat, lng, 20);
     }
 
+    public void onInfoWindowClicked(Object markerTag) {
+        if (markerTag != null && markerTag instanceof Business) {
+            Business business = (Business) markerTag;
+            view.showBusinessMarkerBottomSheet(business);
+        }
+    }
+
     public void onViewPaused() {
         stopUpdateFeedstationWithDelay();
     }
@@ -113,6 +120,18 @@ public class MapPresenter {
             leaveFeedstation(feedstation.getId());
         else
             followFeedstation(feedstation.getId());
+    }
+
+    private Business getBusinessMock(LatLng location) {
+        Business business = new Business();
+        business.setAddress("my address");
+        business.setName("my name");
+        business.setDescription("my description");
+        business.setLink("https://google.com");
+        business.setOpenHours("12");
+        business.setPhone("+380121234567");
+        business.setLocation(location);
+        return business;
     }
 
     public void leaveFeedstation(Integer feedstationId) {
@@ -202,7 +221,6 @@ public class MapPresenter {
 
     public void onMarkerClicked(Object markerTag) {
         if (markerTag == null) return;
-
         if (markerTag instanceof Feedstation) {
             if (!view.isFeedstationBottomSheetShowed())
                 view.hideBottomSheets();
@@ -210,13 +228,17 @@ public class MapPresenter {
             view.showFeedstationMarkerBottomSheet(feedstation);
             view.setBottomSheetFeedstationTag(feedstation);
             view.initStationAction(feedstation);
-            view.hideEventMarkerDialog();
+            view.hideMarkerDialogs();
             view.initAvatarCatBackground(feedstation);
             view.releaseClickedLocation();
         } else if (markerTag instanceof Event) {
             view.hideBottomSheets();
             Event event = (Event) markerTag;
             view.showEventMarkerDialog(event);
+        } else if (markerTag instanceof Business) {
+            view.hideBottomSheets();
+            Business business = (Business) markerTag;
+            view.showBusinessMarkerDialog(business);
         }
 
     }

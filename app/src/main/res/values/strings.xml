@@ -3,6 +3,8 @@
     <string name="ComingSoon">Coming soon</string>
     <string name="title_activity_start">StartActivity</string>
     <string name="continue_button_title">Continue</string>
+    <string name="sign_up_button_title">Sign Up</string>
+    <string name="sign_in_button_title">Sign In</string>
     <string name="confirm_phone_number">Please confirm your country code\n Enter your Mobile #</string>
     <string name="approve_button_title">Approve</string>
     <string name="confirm_your_number">Code sent.\n confirm your number</string>
@@ -180,5 +182,6 @@
     <string name="about">About</string>
     <string name="settings">Settings</string>
     <string name="no_email">No email</string>
+    <string name="business">Business</string>
 
 </resources>

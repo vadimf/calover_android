@@ -3,7 +3,6 @@ package com.varteq.catslovers.view;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,7 +32,7 @@ public class SignUpActivity extends BaseActivity implements OnImagePickedListene
     private String TAG = SignUpActivity.class.getSimpleName();
     @BindView(R.id.avatar)
     RoundedImageView avatarImageView;
-    @BindView(R.id.continue_button)
+    @BindView(R.id.sign_up_button)
     Button continueButton;
     @BindView(R.id.twitter_linearLayout)
     LinearLayout twitterButton;
@@ -59,16 +58,6 @@ public class SignUpActivity extends BaseActivity implements OnImagePickedListene
 
         avatar = Profile.getUserAvatar(this);
         updateAvatar();
-
-        findViewById(R.id.continue_button).setOnClickListener(
-                view -> {
-                    if (isInputValid()) {
-                        Log.d(TAG, "continue_button OnClick");
-                        Profile.saveUser(this, nameEditText.getText().toString(),
-                                emailEditText.getText().toString());
-                        startActivity(new Intent(SignUpActivity.this, ConfirmNumberActivity.class));
-                    }
-                });
     }
 
     @Override
@@ -80,13 +69,34 @@ public class SignUpActivity extends BaseActivity implements OnImagePickedListene
     void uploadPhoto() {
         new ImagePickHelper().pickAnImage(this, 0);
     }
+
     @OnClick(R.id.facebook_linearLayout)
     void facebookSignUp() {
         Toaster.shortToast(R.string.coming_soon);
     }
+
     @OnClick(R.id.twitter_linearLayout)
     void twitterSignUp() {
         Toaster.shortToast(R.string.coming_soon);
+    }
+
+    @OnClick(R.id.sign_up_button)
+    void signUpButtonClicked() {
+        if (isInputValid()) {
+            Log.d(TAG, "sign_up_button OnClick");
+            Profile.setIsUserSigningIn(this, false);
+            Profile.saveUser(this, nameEditText.getText().toString());
+            Intent intent = new Intent(SignUpActivity.this, ConfirmNumberActivity.class);
+            startActivity(intent);
+        }
+    }
+
+    @OnClick(R.id.sign_in_button)
+    void signInButtonClicked() {
+        Log.d(TAG, "sign_in_button OnClick");
+        Profile.setIsUserSigningIn(this, true);
+        Intent intent = new Intent(SignUpActivity.this, ConfirmNumberActivity.class);
+        startActivity(intent);
     }
 
     private boolean isInputValid() {
@@ -94,18 +104,19 @@ public class SignUpActivity extends BaseActivity implements OnImagePickedListene
                 nameEditText.getText().toString().isEmpty()) {
             nameEditText.setError("Name should not be empty");
             return false;
-        } else if (emailEditText.getText() == null ||
+        }/*  else if (emailEditText.getText() == null ||
                 emailEditText.getText().toString().isEmpty()) {
             emailEditText.setError("Email should not be empty");
             return false;
         } else if (!Patterns.EMAIL_ADDRESS.matcher(emailEditText.getText()).matches()) {
             emailEditText.setError("Email is incorrect");
             return false;
-        }
+        }*/
         return true;
     }
 
     final int THUMBSIZE = 250;
+
     private void updateAvatar() {
         if (avatar != null && !avatar.isEmpty()) {
             File image = new File(StorageUtils.getImagePickerDirectoryFile() +
