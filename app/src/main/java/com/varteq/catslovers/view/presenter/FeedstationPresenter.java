@@ -148,10 +148,11 @@ public class FeedstationPresenter {
                         String.valueOf(TimeUtils.getUtcFromLocal(feedstation.getLastFeeding().getTime())));
 
             int j = 0;
-            for (PhotoWithPreview photo : feedstation.getPhotos()) {
-                if (photo.getExpectedAction() != null && photo.getExpectedAction().equals(PhotoWithPreview.Action.DELETE))
-                    uploadCatRequest.addParameter("images_delete[" + j++ + "]", String.valueOf(photo.getId()));
-            }
+            if (feedstation.getPhotosToRemove() != null)
+                for (PhotoWithPreview photo : feedstation.getPhotosToRemove()) {
+                    if (photo.getExpectedAction() != null && photo.getExpectedAction().equals(PhotoWithPreview.Action.DELETE))
+                        uploadCatRequest.addParameter("images_delete[" + j++ + "]", String.valueOf(photo.getId()));
+                }
 
             int i = 0;
             int currIndex = 0;

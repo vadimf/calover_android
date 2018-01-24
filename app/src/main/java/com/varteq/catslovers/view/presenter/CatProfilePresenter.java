@@ -253,10 +253,11 @@ public class CatProfilePresenter {
                     .setNotificationConfig(config);
 
             int j = 0;
-            for (PhotoWithPreview photo : cat.getPhotos()) {
-                if (photo.getExpectedAction() != null && photo.getExpectedAction().equals(PhotoWithPreview.Action.DELETE))
-                    uploadCatRequest.addParameter("images_delete[" + j++ + "]", String.valueOf(photo.getId()));
-            }
+            if (cat.getPhotosToRemove() != null)
+                for (PhotoWithPreview photo : cat.getPhotosToRemove()) {
+                    if (photo.getExpectedAction() != null && photo.getExpectedAction().equals(PhotoWithPreview.Action.DELETE))
+                        uploadCatRequest.addParameter("images_delete[" + j++ + "]", String.valueOf(photo.getId()));
+                }
 
             int i = 0;
             int currIndex = 0;

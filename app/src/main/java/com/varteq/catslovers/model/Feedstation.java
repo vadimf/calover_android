@@ -35,6 +35,7 @@ public class Feedstation implements Parcelable {
     private String createdUserId;
     private UserRole userRole;
     private List<PhotoWithPreview> photos = null;
+    private List<PhotoWithPreview> photosToRemove = null;
     private GroupPartner.Status status;
 
     public Integer getId() {
@@ -157,6 +158,13 @@ public class Feedstation implements Parcelable {
         this.lastFeeding = lastFeeding;
     }
 
+    public List<PhotoWithPreview> getPhotosToRemove() {
+        return photosToRemove;
+    }
+
+    public void setPhotosToRemove(List<PhotoWithPreview> photosToRemove) {
+        this.photosToRemove = photosToRemove;
+    }
 
     @Override
     public int describeContents() {
@@ -179,6 +187,7 @@ public class Feedstation implements Parcelable {
         dest.writeString(this.createdUserId);
         dest.writeInt(this.userRole == null ? -1 : this.userRole.ordinal());
         dest.writeTypedList(this.photos);
+        dest.writeTypedList(this.photosToRemove);
         dest.writeInt(this.status == null ? -1 : this.status.ordinal());
     }
 
@@ -206,6 +215,7 @@ public class Feedstation implements Parcelable {
         int tmpUserRole = in.readInt();
         this.userRole = tmpUserRole == -1 ? null : UserRole.values()[tmpUserRole];
         this.photos = in.createTypedArrayList(PhotoWithPreview.CREATOR);
+        this.photosToRemove = in.createTypedArrayList(PhotoWithPreview.CREATOR);
         int tmpStatus = in.readInt();
         this.status = tmpStatus == -1 ? null : GroupPartner.Status.values()[tmpStatus];
     }
