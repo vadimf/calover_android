@@ -52,6 +52,7 @@ public class CatsFragment extends Fragment {
     private List<CatProfile> myCatsList = new ArrayList<>();
     private boolean listUpdated;
     private CatsPresenter presenter;
+    private int selectedCatsSection;
 
     final private int SEEKBAR_STEPS_COUNT = 3;
     @BindView(R.id.seekBar)
@@ -65,6 +66,8 @@ public class CatsFragment extends Fragment {
 
         catsHashMap = new HashMap<>();
 
+        clearSliderButtonSelection();
+        selectButton(privateSliderButton);
         presenter.getCats(CATS_SECTION_PRIVATE);
         listUpdated = true;
 
@@ -132,7 +135,23 @@ public class CatsFragment extends Fragment {
     public void onResume() {
         super.onResume();
         if (!listUpdated) {
-            presenter.getCats(seekBar.getProgress());
+            clearSliderButtonSelection();
+            switch (selectedCatsSection){
+                case CatsFragment.CATS_SECTION_PRIVATE:
+                    selectButton(privateSliderButton);
+                    break;
+                case CatsFragment.CATS_SECTION_PUBLIC:
+                    selectButton(publicSliderButton);
+                    break;
+                case CatsFragment.CATS_SECTION_FRIENDS:
+                    selectButton(friendsSliderButton);
+                    break;
+                case CatsFragment.CATS_SECTION_EXPLORE:
+                    selectButton(exploreSliderButton);
+                    break;
+            }
+
+            presenter.getCats(selectedCatsSection);
             listUpdated = true;
         }
     }
@@ -142,28 +161,32 @@ public class CatsFragment extends Fragment {
     void publicSliderButtonClicked(View view) {
         clearSliderButtonSelection();
         selectButton((Button) view);
-        presenter.getCats(CATS_SECTION_PUBLIC);
+        selectedCatsSection = CATS_SECTION_PUBLIC;
+        presenter.getCats( selectedCatsSection);
     }
 
     @OnClick(R.id.button_slider_private)
     void privateSliderButtonClicked(View view) {
         clearSliderButtonSelection();
         selectButton((Button) view);
-        presenter.getCats(CATS_SECTION_PRIVATE);
+        selectedCatsSection = CATS_SECTION_PRIVATE;
+        presenter.getCats( selectedCatsSection);
     }
 
     @OnClick(R.id.button_slider_friends)
     void friendsSliderButtonClicked(View view) {
         clearSliderButtonSelection();
         selectButton((Button) view);
-        presenter.getCats(CATS_SECTION_FRIENDS);
+        selectedCatsSection = CATS_SECTION_FRIENDS;
+        presenter.getCats( selectedCatsSection);
     }
 
     @OnClick(R.id.button_slider_explore)
     void exploreSliderButtonClicked(View view) {
         clearSliderButtonSelection();
         selectButton((Button) view);
-        presenter.getCats(CATS_SECTION_EXPLORE);
+        selectedCatsSection = CATS_SECTION_EXPLORE;
+        presenter.getCats( selectedCatsSection);
     }
 
     private void selectButton(Button button) {

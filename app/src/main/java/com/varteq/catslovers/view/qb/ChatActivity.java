@@ -148,6 +148,8 @@ public class ChatActivity extends QBBaseActivity implements OnImagePickedListene
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        if (qbChatDialog.getType().equals(QBDialogType.PUBLIC_GROUP))
+            return true;
         getMenuInflater().inflate(R.menu.activity_chat, menu);
 
         MenuItem menuItemLeave = menu.findItem(R.id.menu_chat_action_leave);

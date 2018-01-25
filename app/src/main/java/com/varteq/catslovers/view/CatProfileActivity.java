@@ -65,7 +65,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import butterknife.BindView;
@@ -405,6 +404,7 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
             descriptionEditText.setText(catProfile.getDescription());
             avatar = catProfile.getAvatar();
             photoList = catProfile.getPhotos();
+            photosToRemove = catProfile.getPhotosToRemove();
             petNamePhotosTextView.setText(catProfile.getPetName());
         } else {
             colorsList = new ArrayList<>();
@@ -427,15 +427,6 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
 
         if (photoList == null)
             photoList = new ArrayList<>();
-        for (Iterator<PhotoWithPreview> i = photoList.iterator(); i.hasNext(); ) {
-            PhotoWithPreview photo = i.next();
-            if (photo.getExpectedAction() != null && photo.getExpectedAction().equals(PhotoWithPreview.Action.DELETE)) {
-                if (photosToRemove == null)
-                    photosToRemove = new ArrayList<>();
-                photosToRemove.add(photo);
-                i.remove();
-            }
-        }
 
         photoCountTextView.setText(String.valueOf(photoList.size()));
 
@@ -870,8 +861,7 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
         catProfile.setDescription(description);
         catProfile.setType(catType);
         catProfile.setFleaTreatmentDate(nextFleaTreatment);
-        if (photosToRemove != null)
-            photoList.addAll(photosToRemove);
+        catProfile.setPhotosToRemove(photosToRemove);
         catProfile.setPhotos(photoList);
         catProfile.setAvatar(avatar);
 
@@ -993,6 +983,9 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
             startActivity(new Intent(CatProfileActivity.this, MainActivity.class));
         } else {
             currentMode = CatProfileScreenMode.VIEW_MODE;
+            photosToRemove = null;
+            for (PhotoWithPreview photo : photoList)
+                photo.setExpectedAction(null);
             setupUIMode();
         }
     }

@@ -54,7 +54,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -243,6 +242,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
             addressTextView.setText(feedstation.getAddress());
             descriptionEditText.setText(feedstation.getDescription());
             photoList = feedstation.getPhotos();
+            photosToRemove = feedstation.getPhotosToRemove();
             stationNamePhotosTextView.setText(feedstation.getName() != null ? feedstation.getName() : getString(R.string.new_cat_profile_screen_title));
             timeToEat1TextView.setText(TimeUtils.getDateAsHHmm(feedstation.getTimeToEat1()));
             timeToEat2TextView.setText(TimeUtils.getDateAsHHmm(feedstation.getTimeToEat2()));
@@ -266,16 +266,6 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
 
         if (photoList == null)
             photoList = new ArrayList<>();
-
-        for (Iterator<PhotoWithPreview> i = photoList.iterator(); i.hasNext(); ) {
-            PhotoWithPreview photo = i.next();
-            if (photo.getExpectedAction() != null && photo.getExpectedAction().equals(PhotoWithPreview.Action.DELETE)) {
-                if (photosToRemove == null)
-                    photosToRemove = new ArrayList<>();
-                photosToRemove.add(photo);
-                i.remove();
-            }
-        }
 
         if (pagerPhotoList == null)
             pagerPhotoList = new ArrayList<>();
@@ -527,8 +517,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
         feedstation.setName(stationName);
         feedstation.setAddress(address);
         feedstation.setDescription(description);
-        if (photosToRemove != null)
-            photoList.addAll(photosToRemove);
+        feedstation.setPhotosToRemove(photosToRemove);
         feedstation.setPhotos(photoList);
 
         return feedstation;
@@ -754,6 +743,9 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
 
     public void savedSuccessfully() {
         currentMode = FeedstationScreenMode.VIEW_MODE;
+        photosToRemove = null;
+        for (PhotoWithPreview photo : photoList)
+            photo.setExpectedAction(null);
         setupUIMode();
         /*if (currentMode.equals(FeedstationScreenMode.CREATE_MODE)) {
             FeedstationActivity.this.finishAffinity();

@@ -330,7 +330,7 @@ public class MainActivity extends BaseActivity  implements OnImagePickedListener
     }
 
     public void onPrivateFeedstationNotFound() {
-        Toaster.shortToast("You should create own cat");
+        Toaster.shortToast("Please create first pet cat to make posts");
     }
 
     public void invitationsLoaded(List<Feedstation> invitations) {

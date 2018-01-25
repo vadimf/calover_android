@@ -27,6 +27,7 @@ public class CatProfile implements Serializable {
     private Feedstation.UserRole userRole;
     private GroupPartner.Status status;
     private List<PhotoWithPreview> photos = null;
+    private List<PhotoWithPreview> photosToRemove = null;
 
     public enum Status {
         PET,
@@ -189,8 +190,12 @@ public class CatProfile implements Serializable {
         this.photos = photos;
     }
 
-    public Boolean getCastrated() {
-        return isCastrated;
+    public List<PhotoWithPreview> getPhotosToRemove() {
+        return photosToRemove;
+    }
+
+    public void setPhotosToRemove(List<PhotoWithPreview> photosToRemove) {
+        this.photosToRemove = photosToRemove;
     }
 
     public void setFeedstationId(Integer feedstationId) {
@@ -212,4 +217,5 @@ public class CatProfile implements Serializable {
     public void setUserId(Integer userId) {
         this.userId = userId;
     }
+
 }

@@ -43,9 +43,10 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
         fragment.show(fm, ImageSourcePickDialogFragment.class.getSimpleName());
     }
 
-    public static void showImageAndVideoPicker(Fragment resultFragment, FragmentManager fm) {
+    public static void showImageAndVideoPicker(Fragment resultFragment, FragmentManager fm, OnImageSourcePickedListener onImageSourcePickedListener) {
         ImageSourcePickDialogFragment fragment = new ImageSourcePickDialogFragment();
         fragment.setShowImageAndVideoPickerWithoutChoose(true);
+        fragment.setOnImageSourcePickedListener(onImageSourcePickedListener);
         fragment.setFragment(resultFragment);
         fragment.setCancelable(false);
         fragment.show(fm, ImageSourcePickDialogFragment.class.getSimpleName());
@@ -81,13 +82,32 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
             });
             return alertDialog;
         } else {
-            if (!systemPermissionHelper.isSaveImagePermissionGranted()) {
-                systemPermissionHelper.requestPermissionsForSaveFileImage();
-            } else {
-                ImageUtils.startImageAndVideoPicker(fragment);
-                dismiss();
-            }
-            return builder.create();
+            builder.setTitle(R.string.dlg_choose_image_from);
+            builder.setItems(R.array.dlg_image_pick, null);
+            AlertDialog alertDialog = builder.create();
+            alertDialog.getListView().setOnItemClickListener((adapterView, view, i, l) -> {
+                switch (i) {
+                    case POSITION_GALLERY:
+                        if (!systemPermissionHelper.isSaveImagePermissionGranted()) {
+                            systemPermissionHelper.requestPermissionsForSaveFileImage();
+                            return;
+                        } else {
+                            ImageUtils.startImageAndVideoPicker(fragment);
+                            dismiss();
+                        }
+                        dismiss();
+                        break;
+                    case POSITION_CAMERA:
+                        if (!systemPermissionHelper.isCameraPermissionGranted()) {
+                            systemPermissionHelper.requestPermissionsTakePhoto();
+                            return;
+                        }
+                        onImageSourcePickedListener.onImageSourcePicked(ImageSource.CAMERA, isMultiselect);
+                        dismiss();
+                        break;
+                }
+            });
+            return alertDialog;
         }
     }
 

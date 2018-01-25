@@ -100,6 +100,9 @@ public class Utils {
         }
         if (addresses != null && !addresses.isEmpty())
             address = addresses.get(0).getAddressLine(0);
+        else
+            return null;
+
         return Utils.splitAddress(address, 3);
     }
 

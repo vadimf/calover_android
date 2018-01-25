@@ -197,8 +197,17 @@ public class CatProfilePresenter {
             if (lastLocation != null) {
                 uploadCatRequest.addParameter("lat", String.valueOf(lastLocation.getLatitude()))
                         .addParameter("lng", String.valueOf(lastLocation.getLongitude()));
-                uploadCatRequest.addParameter("address",
-                        Utils.getAddressByLocation(lastLocation.getLatitude(), lastLocation.getLongitude(), view));
+                String address = Utils.getAddressByLocation(lastLocation.getLatitude(), lastLocation.getLongitude(), view);
+                if (address != null)
+                    uploadCatRequest.addParameter("address", address);
+                else
+                {
+                    Toaster.longToast("Google play services error. Please, reboot your phone!");
+                    Log.e("uploadCatWithPhotos", "Address is null");
+                    view.hideWaitDialog();
+                    isCatUploading = false;
+                    return;
+                }
                 Profile.setLocation(view, lastLocation);
             }
 
@@ -253,10 +262,11 @@ public class CatProfilePresenter {
                     .setNotificationConfig(config);
 
             int j = 0;
-            for (PhotoWithPreview photo : cat.getPhotos()) {
-                if (photo.getExpectedAction() != null && photo.getExpectedAction().equals(PhotoWithPreview.Action.DELETE))
-                    uploadCatRequest.addParameter("images_delete[" + j++ + "]", String.valueOf(photo.getId()));
-            }
+            if (cat.getPhotosToRemove() != null)
+                for (PhotoWithPreview photo : cat.getPhotosToRemove()) {
+                    if (photo.getExpectedAction() != null && photo.getExpectedAction().equals(PhotoWithPreview.Action.DELETE))
+                        uploadCatRequest.addParameter("images_delete[" + j++ + "]", String.valueOf(photo.getId()));
+                }
 
             int i = 0;
             int currIndex = 0;
