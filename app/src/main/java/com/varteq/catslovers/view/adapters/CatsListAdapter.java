@@ -11,7 +11,6 @@ import com.varteq.catslovers.R;
 import com.varteq.catslovers.model.CatProfile;
 import com.varteq.catslovers.utils.ResourceUtils;
 import com.varteq.catslovers.utils.UiUtils;
-import com.varteq.catslovers.view.fragments.CatsFragment;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,17 +44,11 @@ public class CatsListAdapter extends RecyclerView.Adapter<CatsListAdapter.CatsLi
 
     @Override
     public void onBindViewHolder(CatsListViewHolder catsListViewHolder, int i) {
-        if (keysList.get(i).equals(CatsFragment.MY_CATS_KEY)) {
-            catsListViewHolder.innerRecyclerView.setBackgroundColor(
-                    catsListViewHolder.itemView.getContext().getResources().getColor(R.color.greyishBlueLight));
-            catsListViewHolder.letterTextView.setVisibility(View.GONE);
-            ((CatsListSameLetterAdapter) catsListViewHolder.innerRecyclerView.getAdapter()).setMyCats(true);
-        } else {
-            catsListViewHolder.innerRecyclerView.setBackgroundColor(
-                    catsListViewHolder.itemView.getContext().getResources().getColor(R.color.transparent));
-            catsListViewHolder.letterTextView.setVisibility(View.VISIBLE);
-            ((CatsListSameLetterAdapter) catsListViewHolder.innerRecyclerView.getAdapter()).setMyCats(false);
-        }
+
+        catsListViewHolder.innerRecyclerView.setBackgroundColor(
+                catsListViewHolder.itemView.getContext().getResources().getColor(R.color.transparent));
+        catsListViewHolder.letterTextView.setVisibility(View.VISIBLE);
+        ((CatsListSameLetterAdapter) catsListViewHolder.innerRecyclerView.getAdapter()).setMyCats(false);
 
         List<CatProfile> catsSameLetterList = catsList.get(keysList.get(i));
         catsListViewHolder.personList.clear();
@@ -78,10 +71,6 @@ public class CatsListAdapter extends RecyclerView.Adapter<CatsListAdapter.CatsLi
         keysList.clear();
         keysList.addAll(catsList.keySet());
         Collections.sort(keysList);
-        if (keysList.contains(CatsFragment.MY_CATS_KEY)) {
-            keysList.remove(CatsFragment.MY_CATS_KEY);
-            keysList.add(0, CatsFragment.MY_CATS_KEY);
-        }
     }
 
     public class CatsListViewHolder extends RecyclerView.ViewHolder {

@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.SeekBar;
 
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.model.CatProfile;
@@ -34,7 +33,6 @@ public class CatsFragment extends Fragment {
     public final static int CATS_SECTION_FRIENDS = 2;
     public final static int CATS_SECTION_EXPLORE = 3;
 
-    public static final String MY_CATS_KEY = "my_cats";
     private String TAG = CatsFragment.class.getSimpleName();
 
     @BindView(R.id.cats_RecyclerView)
@@ -49,14 +47,10 @@ public class CatsFragment extends Fragment {
     Button exploreSliderButton;
     private HashMap<String, List<CatProfile>> catsHashMap;
     private CatsListAdapter catsListAdapter;
-    private List<CatProfile> myCatsList = new ArrayList<>();
     private boolean listUpdated;
     private CatsPresenter presenter;
     private int selectedCatsSection;
 
-    final private int SEEKBAR_STEPS_COUNT = 3;
-    @BindView(R.id.seekBar)
-    SeekBar seekBar;
 
     @Nullable
     @Override
@@ -66,9 +60,7 @@ public class CatsFragment extends Fragment {
 
         catsHashMap = new HashMap<>();
 
-        clearSliderButtonSelection();
-        selectButton(privateSliderButton);
-        presenter.getCats(CATS_SECTION_PRIVATE);
+        getCats(CATS_SECTION_PRIVATE);
         listUpdated = true;
 
         catsListAdapter = new CatsListAdapter(catsHashMap, this::onCatClicked);
@@ -86,37 +78,6 @@ public class CatsFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
-
-        seekBar.setMax(SEEKBAR_STEPS_COUNT);
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                switch (i) {
-                    case 0:
-                        presenter.getCats(CATS_SECTION_PRIVATE);
-                        break;
-                    case 1:
-                        presenter.getCats(CATS_SECTION_PUBLIC);
-                        break;
-                    case 2:
-                        presenter.getCats(CATS_SECTION_FRIENDS);
-                        break;
-                    case 3:
-                        presenter.getCats(CATS_SECTION_EXPLORE);
-                        break;
-                }
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
     }
 
     @Override
@@ -135,73 +96,80 @@ public class CatsFragment extends Fragment {
     public void onResume() {
         super.onResume();
         if (!listUpdated) {
-            clearSliderButtonSelection();
-            switch (selectedCatsSection){
-                case CatsFragment.CATS_SECTION_PRIVATE:
-                    selectButton(privateSliderButton);
-                    break;
-                case CatsFragment.CATS_SECTION_PUBLIC:
-                    selectButton(publicSliderButton);
-                    break;
-                case CatsFragment.CATS_SECTION_FRIENDS:
-                    selectButton(friendsSliderButton);
-                    break;
-                case CatsFragment.CATS_SECTION_EXPLORE:
-                    selectButton(exploreSliderButton);
-                    break;
-            }
-
-            presenter.getCats(selectedCatsSection);
+            getCats(selectedCatsSection);
             listUpdated = true;
         }
     }
 
 
     @OnClick(R.id.button_slider_public)
-    void publicSliderButtonClicked(View view) {
-        clearSliderButtonSelection();
-        selectButton((Button) view);
+    void publicSliderButtonClicked() {
         selectedCatsSection = CATS_SECTION_PUBLIC;
-        presenter.getCats( selectedCatsSection);
+        getCats(selectedCatsSection);
     }
 
     @OnClick(R.id.button_slider_private)
-    void privateSliderButtonClicked(View view) {
-        clearSliderButtonSelection();
-        selectButton((Button) view);
+    void privateSliderButtonClicked() {
         selectedCatsSection = CATS_SECTION_PRIVATE;
-        presenter.getCats( selectedCatsSection);
+        getCats(selectedCatsSection);
     }
 
     @OnClick(R.id.button_slider_friends)
-    void friendsSliderButtonClicked(View view) {
-        clearSliderButtonSelection();
-        selectButton((Button) view);
+    void friendsSliderButtonClicked() {
         selectedCatsSection = CATS_SECTION_FRIENDS;
-        presenter.getCats( selectedCatsSection);
+        getCats(selectedCatsSection);
     }
 
     @OnClick(R.id.button_slider_explore)
-    void exploreSliderButtonClicked(View view) {
-        clearSliderButtonSelection();
-        selectButton((Button) view);
+    void exploreSliderButtonClicked() {
         selectedCatsSection = CATS_SECTION_EXPLORE;
-        presenter.getCats( selectedCatsSection);
+        getCats(selectedCatsSection);
+    }
+
+    private void getCats(int section) {
+        clearSliderButtonSelection();
+        switch (section) {
+            case CatsFragment.CATS_SECTION_PRIVATE:
+                selectButton(privateSliderButton);
+                break;
+            case CatsFragment.CATS_SECTION_PUBLIC:
+                selectButton(publicSliderButton);
+                break;
+            case CatsFragment.CATS_SECTION_FRIENDS:
+                selectButton(friendsSliderButton);
+                break;
+            case CatsFragment.CATS_SECTION_EXPLORE:
+                selectButton(exploreSliderButton);
+                break;
+        }
+        presenter.getCats(section);
     }
 
     private void selectButton(Button button) {
         button.setTextColor(getResources().getColor(R.color.white));
-        button.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+        int backgroundResource;
+        switch (button.getId()) {
+            case R.id.button_slider_private:
+                backgroundResource = R.drawable.shape_border_primary_color_button_left_selected;
+                break;
+            case R.id.button_slider_explore:
+                backgroundResource = R.drawable.shape_border_primary_color_button_right_selected;
+                break;
+            default:
+                backgroundResource = R.drawable.shape_border_primary_color_button_selected;
+                break;
+        }
+        button.setBackground(getResources().getDrawable(backgroundResource));
     }
 
     private void clearSliderButtonSelection() {
-        publicSliderButton.setBackgroundColor(getResources().getColor(R.color.white));
-        publicSliderButton.setTextColor(getResources().getColor(R.color.colorPrimary));
-        privateSliderButton.setBackgroundColor(getResources().getColor(R.color.white));
+        privateSliderButton.setBackground(getResources().getDrawable(R.drawable.shape_border_primary_color_button_left_unselected));
         privateSliderButton.setTextColor(getResources().getColor(R.color.colorPrimary));
-        friendsSliderButton.setBackgroundColor(getResources().getColor(R.color.white));
+        publicSliderButton.setBackground(getResources().getDrawable(R.drawable.shape_border_primary_color_button_unselected));
+        publicSliderButton.setTextColor(getResources().getColor(R.color.colorPrimary));
+        friendsSliderButton.setBackground(getResources().getDrawable(R.drawable.shape_border_primary_color_button_unselected));
         friendsSliderButton.setTextColor(getResources().getColor(R.color.colorPrimary));
-        exploreSliderButton.setBackgroundColor(getResources().getColor(R.color.white));
+        exploreSliderButton.setBackground(getResources().getDrawable(R.drawable.shape_border_primary_color_button_right_unselected));
         exploreSliderButton.setTextColor(getResources().getColor(R.color.colorPrimary));
     }
 
@@ -209,17 +177,14 @@ public class CatsFragment extends Fragment {
 
         listUpdated = true;
         catsHashMap.clear();
-        myCatsList.clear();
 
         char letter = Character.toUpperCase(catProfiles.get(0).getPetName().charAt(0));
         ArrayList<CatProfile> list = new ArrayList<>();
 
-        Integer userId = Integer.parseInt(Profile.getUserId(getContext()));
         switch (catsSection) {
             case CatsFragment.CATS_SECTION_PRIVATE:
                 for (CatProfile cat : catProfiles) {
-                    if (cat.getType() != null && cat.getUserRole() != null &&
-                            cat.getType().equals(CatProfile.Status.PET) && cat.getUserRole().equals(Feedstation.UserRole.ADMIN)) {
+                    if (isCatInPrivateSection(cat)) {
                         if (letter == Character.toUpperCase(cat.getPetName().charAt(0)))
                             list.add(cat);
                         else {
@@ -234,8 +199,7 @@ public class CatsFragment extends Fragment {
                 break;
             case CatsFragment.CATS_SECTION_PUBLIC:
                 for (CatProfile cat : catProfiles) {
-                    if (cat.getUserId() != null
-                            && cat.getUserId().equals(userId)) {
+                    if (isCatInPublicSection(cat)) {
                         if (letter == Character.toUpperCase(cat.getPetName().charAt(0)))
                             list.add(cat);
                         else {
@@ -250,10 +214,7 @@ public class CatsFragment extends Fragment {
                 break;
             case CatsFragment.CATS_SECTION_FRIENDS:
                 for (CatProfile cat : catProfiles) {
-                    if ((cat.getUserId() == null || (cat.getUserId() != null && !cat.getUserId().equals(userId)))
-                            && cat.getFeedStationStatus() != null
-                            && cat.getFeedStationStatus().equals("joined")
-                            ) {
+                    if (isCatInFriendSection(cat)) {
                         if (letter == Character.toUpperCase(cat.getPetName().charAt(0)))
                             list.add(cat);
                         else {
@@ -283,8 +244,28 @@ public class CatsFragment extends Fragment {
         if (!list.isEmpty())
             catsHashMap.put(String.valueOf(letter), list);
 
-        if (myCatsList.size() > 0)
-            catsHashMap.put(MY_CATS_KEY, myCatsList);
         catsListAdapter.onDataChanged();
     }
+
+    private boolean isCatInPrivateSection(CatProfile cat) {
+        return cat.getType() != null && cat.getUserRole() != null &&
+                cat.getType().equals(CatProfile.Status.PET) && cat.getUserRole().equals(Feedstation.UserRole.ADMIN);
+    }
+
+    private boolean isCatInPublicSection(CatProfile cat) {
+        if (isCatInPrivateSection(cat))
+            return false;
+        Integer userId = Integer.parseInt(Profile.getUserId(getContext()));
+        return cat.getUserId() != null && cat.getUserId().equals(userId)
+                && cat.getFeedStationStatus() != null && cat.getFeedStationStatus().equals("joined");
+    }
+
+    private boolean isCatInFriendSection(CatProfile cat) {
+        Integer userId = Integer.parseInt(Profile.getUserId(getContext()));
+        return (cat.getUserId() == null || (cat.getUserId() != null && !cat.getUserId().equals(userId)))
+                && cat.getFeedStationStatus() != null
+                && cat.getFeedStationStatus().equals("joined");
+
+    }
+
 }

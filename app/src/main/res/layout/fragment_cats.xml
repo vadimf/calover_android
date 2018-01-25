@@ -5,82 +5,48 @@
               android:background="@color/white"
               android:orientation="vertical">
 
-    <RelativeLayout
-        android:visibility="gone"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:id="@+id/textView1"
-            style="@style/PrimarySmallTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:gravity="left"
-            android:paddingStart="19dp"
-            android:text="@string/my_cats"
-            android:textColor="@color/colorPrimary"/>
-
-        <SeekBar
-            android:id="@+id/seekBar"
-            android:layout_width="match_parent"
-            android:layout_height="25dp"
-            android:layout_centerVertical="true"
-            android:layout_toEndOf="@+id/textView1"
-            android:layout_toStartOf="@+id/textView2"
-            android:theme="@style/SeekBarTheme"/>
-
-        <TextView
-            android:id="@+id/textView2"
-            style="@style/PrimarySmallTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:paddingEnd="19dp"
-            android:text="@string/explore"
-            android:textColor="@color/colorPrimary"/>
-    </RelativeLayout>
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingBottom="4dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp">
 
         <Button
             android:id="@+id/button_slider_private"
-            style="@style/BorderlessImageButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="70dp"
+            android:layout_height="30dp"
+            android:background="@drawable/shape_border_primary_color_button_left_unselected"
             android:text="Private"
+
             android:textAllCaps="false"
             />
 
         <Button
             android:id="@+id/button_slider_public"
-            style="@style/BorderlessImageButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="70dp"
+            android:layout_height="30dp"
+            android:background="@drawable/shape_border_primary_color_button_unselected"
             android:text="Public"
             android:textAllCaps="false"
             />
 
         <Button
             android:id="@+id/button_slider_friends"
-            style="@style/BorderlessImageButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="70dp"
+            android:layout_height="30dp"
+            android:background="@drawable/shape_border_primary_color_button_unselected"
             android:text="Friends"
             android:textAllCaps="false"
             />
 
         <Button
             android:id="@+id/button_slider_explore"
-            style="@style/BorderlessImageButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="70dp"
+            android:layout_height="30dp"
+            android:background="@drawable/shape_border_primary_color_button_right_unselected"
             android:text="Explore"
             android:textAllCaps="false"
             />
