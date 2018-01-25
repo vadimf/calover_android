@@ -7,6 +7,8 @@ import com.varteq.catslovers.api.ServiceGenerator;
 import com.varteq.catslovers.api.entity.BaseResponse;
 import com.varteq.catslovers.api.entity.ErrorResponse;
 import com.varteq.catslovers.api.entity.RCat;
+import com.varteq.catslovers.api.entity.RFeedstation;
+import com.varteq.catslovers.api.entity.RFeedstationPermissions;
 import com.varteq.catslovers.api.entity.RPhoto;
 import com.varteq.catslovers.model.CatProfile;
 import com.varteq.catslovers.model.Feedstation;
@@ -27,6 +29,7 @@ import retrofit2.Response;
 
 public class CatsPresenter {
 
+
     private String TAG = CatsPresenter.class.getSimpleName();
 
     private CatsFragment view;
@@ -35,43 +38,82 @@ public class CatsPresenter {
         this.view = view;
     }
 
-    public void getCats(boolean inRadius) {
-
+    public void getCats(int catsSection) {
         Call<BaseResponse<List<RCat>>> call;
-        if (inRadius) {
-            Location location = Profile.getLocation(view.getContext());
+        Location location = Profile.getLocation(view.getContext());
+
+        if (catsSection == CatsFragment.CATS_SECTION_EXPLORE) {
             if (location == null) return;
             call = ServiceGenerator.getApiServiceWithToken().getCatsInRadius(location.getLatitude(), location.getLongitude(), 20);
-        } else
+            call.enqueue(new Callback<BaseResponse<List<RCat>>>() {
+                @Override
+                public void onResponse(Call<BaseResponse<List<RCat>>> call, Response<BaseResponse<List<RCat>>> response) {
+                    new BaseParser<List<RCat>>(response) {
+                        @Override
+                        protected void onSuccess(List<RCat> data) {
+                            onCatsInRadiusLoaded(data, catsSection);
+                        }
+
+                        @Override
+                        protected void onFail(ErrorResponse error) {
+                            if (error != null)
+                                Log.d(TAG, error.getMessage() + error.getCode());
+                        }
+                    };
+                }
+
+                @Override
+                public void onFailure(Call<BaseResponse<List<RCat>>> call, Throwable t) {
+                    Log.e(TAG, "getCats onFailure " + t.getMessage());
+                }
+            });
+
+
+        } else {
+
             call = ServiceGenerator.getApiServiceWithToken().getCats();
-        call.enqueue(new Callback<BaseResponse<List<RCat>>>() {
-            @Override
-            public void onResponse(Call<BaseResponse<List<RCat>>> call, Response<BaseResponse<List<RCat>>> response) {
-                new BaseParser<List<RCat>>(response) {
+            call.enqueue(new Callback<BaseResponse<List<RCat>>>() {
+                @Override
+                public void onResponse(Call<BaseResponse<List<RCat>>> call, Response<BaseResponse<List<RCat>>> response) {
+                    new BaseParser<List<RCat>>(response) {
+                        @Override
+                        protected void onSuccess(List<RCat> data) {
+                            onMyCatsLoaded(data, catsSection);
+                        }
 
-                    @Override
-                    protected void onSuccess(List<RCat> data) {
-                        Log.i(TAG, String.valueOf(data.size()));
-                        if (data.size() < 1) return;
-                        List<CatProfile> catProfiles = getCatProfiles(data);
-                        Collections.sort(catProfiles, (catProfile, t1) -> catProfile.getPetName().toUpperCase().compareTo(t1.getPetName().toUpperCase()));
-                        view.catsLoaded(catProfiles);
-                    }
+                        @Override
+                        protected void onFail(ErrorResponse error) {
+                            if (error != null)
+                                Log.d(TAG, error.getMessage() + error.getCode());
+                        }
+                    };
+                }
 
-                    @Override
-                    protected void onFail(ErrorResponse error) {
-                        if (error != null)
-                            Log.d(TAG, error.getMessage() + error.getCode());
-                    }
-                };
-            }
+                @Override
+                public void onFailure(Call<BaseResponse<List<RCat>>> call, Throwable t) {
+                    Log.e(TAG, "getCats onFailure " + t.getMessage());
+                }
+            });
+        }
 
-            @Override
-            public void onFailure(Call<BaseResponse<List<RCat>>> call, Throwable t) {
-                Log.e(TAG, "getCats onFailure " + t.getMessage());
-            }
-        });
     }
+
+    private void onMyCatsLoaded(List<RCat> data, int catsSection) {
+        Log.i(TAG, String.valueOf(data.size()));
+        if (data.size() < 1) return;
+        List<CatProfile> catProfiles = getCatProfiles(data);
+        Collections.sort(catProfiles, (catProfile, t1) -> catProfile.getPetName().toUpperCase().compareTo(t1.getPetName().toUpperCase()));
+        view.catsLoaded(catProfiles, catsSection);
+    }
+
+    private void onCatsInRadiusLoaded(List<RCat> data, int catsSection) {
+        Log.i(TAG, String.valueOf(data.size()));
+        if (data.size() < 1) return;
+        List<CatProfile> catProfiles = getCatProfiles(data);
+        Collections.sort(catProfiles, (catProfile, t1) -> catProfile.getPetName().toUpperCase().compareTo(t1.getPetName().toUpperCase()));
+        view.catsLoaded(catProfiles, catsSection);
+    }
+
 
     private List<CatProfile> getCatProfiles(List<RCat> data) {
         List<CatProfile> list = new ArrayList<>();
@@ -89,6 +131,11 @@ public class CatsPresenter {
             catProfile.setFleaTreatmentDate(TimeUtils.getLocalDateFromUtc(rCat.getNextFleaTreatment()));
 
             if (rCat.getPermissions() != null) {
+                Integer userId = null;
+                if (rCat.getPermissions().getUserId() != null)
+                    userId = rCat.getPermissions().getUserId();
+                catProfile.setUserId(userId);
+
                 if (rCat.getPermissions().getRole() != null) {
                     if (rCat.getPermissions().getRole().equals("admin"))
                         catProfile.setUserRole(Feedstation.UserRole.ADMIN);
@@ -122,8 +169,19 @@ public class CatsPresenter {
                 catProfile.setPhotos(photos);
             }
 
-            if (rCat.getFeedstation() != null)
+            if (rCat.getFeedstation() != null) {
                 catProfile.setFeedstationId(rCat.getFeedstation().getId());
+                RFeedstation rFeedstation = rCat.getFeedstation();
+                RFeedstationPermissions rPermissions = rFeedstation.getPermissions();
+                if (rPermissions != null) {
+                    String status = null;
+                    if (rPermissions.getStatus() != null)
+                        status = rPermissions.getStatus();
+                    catProfile.setFeedStationStatus(status);
+                }
+
+            }
+
 
             if (rCat.getAvatarUrl() != null)
                 catProfile.setAvatar(new PhotoWithPreview(null, rCat.getAvatarUrl(), rCat.getAvatarUrlThumbnail()));

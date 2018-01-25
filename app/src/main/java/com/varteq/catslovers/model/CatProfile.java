@@ -18,6 +18,8 @@ public class CatProfile implements Serializable {
     private Boolean isCastrated;
     private Date fleaTreatmentDate;
     private Integer feedstationId;
+    private String feedStationStatus;
+    private Integer userId;
 
     private List<GroupPartner> groupPartnersList;
     private List<Integer> colorsList;
@@ -185,5 +187,29 @@ public class CatProfile implements Serializable {
 
     public void setPhotos(List<PhotoWithPreview> photos) {
         this.photos = photos;
+    }
+
+    public Boolean getCastrated() {
+        return isCastrated;
+    }
+
+    public void setFeedstationId(Integer feedstationId) {
+        this.feedstationId = feedstationId;
+    }
+
+    public String getFeedStationStatus() {
+        return feedStationStatus;
+    }
+
+    public void setFeedStationStatus(String feedStationStatus) {
+        this.feedStationStatus = feedStationStatus;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 }

@@ -6,6 +6,7 @@
               android:orientation="vertical">
 
     <RelativeLayout
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -41,6 +42,50 @@
             android:text="@string/explore"
             android:textColor="@color/colorPrimary"/>
     </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/button_slider_private"
+            style="@style/BorderlessImageButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Private"
+            android:textAllCaps="false"
+            />
+
+        <Button
+            android:id="@+id/button_slider_public"
+            style="@style/BorderlessImageButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Public"
+            android:textAllCaps="false"
+            />
+
+        <Button
+            android:id="@+id/button_slider_friends"
+            style="@style/BorderlessImageButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Friends"
+            android:textAllCaps="false"
+            />
+
+        <Button
+            android:id="@+id/button_slider_explore"
+            style="@style/BorderlessImageButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Explore"
+            android:textAllCaps="false"
+            />
+
+    </LinearLayout>
 
 
     <android.support.v7.widget.RecyclerView
