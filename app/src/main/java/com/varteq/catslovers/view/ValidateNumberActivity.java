@@ -120,11 +120,11 @@ public class ValidateNumberActivity extends BaseActivity implements TextWatcher 
     public void onSuccessSignIn() {
         Log.d(TAG, "onSuccessSignIn");
         onCodeValidate(true);
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        /*InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         try {
             imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
         } catch (Exception e) {
-        }
+        }*/
 
         Profile.setUserLogin(this, true);
 
