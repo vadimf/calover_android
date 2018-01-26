@@ -651,6 +651,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 }
             } else if (feedstation.getUserRole().equals(Feedstation.UserRole.ADMIN)) {
                 return R.drawable.foodstation_copy_3;
+            } else if (feedstation.getStatus() != null && feedstation.getStatus().equals(GroupPartner.Status.JOINED)) {
+                return R.drawable.foodstation_copy_4;
             }
         }
         if (feedstation.getFeedStatus() != null) {
