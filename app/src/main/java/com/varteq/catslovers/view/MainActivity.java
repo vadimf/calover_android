@@ -50,7 +50,7 @@ import butterknife.ButterKnife;
 import static com.varteq.catslovers.utils.SystemPermissionHelper.REQUEST_CHECK_SETTINGS;
 
 
-public class MainActivity extends BaseActivity  implements OnImagePickedListener {
+public class MainActivity extends BaseActivity implements OnImagePickedListener {
 
     private String TAG = MainActivity.class.getSimpleName();
     View view;
@@ -87,7 +87,9 @@ public class MainActivity extends BaseActivity  implements OnImagePickedListener
     ImageButton navigationEditImageButton;
     View navigationHeaderLayout;
     private String avatar;
+
     private int catsTabClickCount = 0;
+    boolean doubleBackToExitPressedOnce = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -356,7 +358,7 @@ public class MainActivity extends BaseActivity  implements OnImagePickedListener
         changeAvatarButton.setOnClickListener(view -> new ImagePickHelper().pickAnImage(MainActivity.this, 0));
         drawerBackButton.setOnClickListener(view -> drawerLayout.closeDrawer(Gravity.LEFT));
         navigationView.setNavigationItemSelectedListener(item -> {
-            switch (item.getItemId()){
+            switch (item.getItemId()) {
                 case R.id.navigation_menu_add_business:
                     String addBusinessUrl = "http://catslovers-web.clients.in.ua/partners";
                     Intent i = new Intent(Intent.ACTION_VIEW);
@@ -485,5 +487,22 @@ public class MainActivity extends BaseActivity  implements OnImagePickedListener
         //email.putExtra(Intent.EXTRA_EMAIL, new String[]{"youremail@yahoo.com"});
         email.putExtra(Intent.EXTRA_SUBJECT, "CatsLovers logs");
         startActivity(Intent.createChooser(email, "Send CatsLovers logs"));
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (doubleBackToExitPressedOnce) {
+            super.onBackPressed();
+            return;
+        }
+
+        this.doubleBackToExitPressedOnce = true;
+        Toaster.shortToast("Press back again to exit");
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                doubleBackToExitPressedOnce = false;
+            }
+        }, 2500);
     }
 }
