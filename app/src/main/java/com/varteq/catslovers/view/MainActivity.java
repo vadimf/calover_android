@@ -50,7 +50,7 @@ import butterknife.ButterKnife;
 import static com.varteq.catslovers.utils.SystemPermissionHelper.REQUEST_CHECK_SETTINGS;
 
 
-public class MainActivity extends BaseActivity  implements OnImagePickedListener {
+public class MainActivity extends BaseActivity implements OnImagePickedListener {
 
     private String TAG = MainActivity.class.getSimpleName();
     View view;
@@ -87,7 +87,9 @@ public class MainActivity extends BaseActivity  implements OnImagePickedListener
     ImageButton navigationEditImageButton;
     View navigationHeaderLayout;
     private String avatar;
+
     private int catsTabClickCount = 0;
+    boolean doubleBackToExitPressedOnce = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -356,19 +358,28 @@ public class MainActivity extends BaseActivity  implements OnImagePickedListener
         changeAvatarButton.setOnClickListener(view -> new ImagePickHelper().pickAnImage(MainActivity.this, 0));
         drawerBackButton.setOnClickListener(view -> drawerLayout.closeDrawer(Gravity.LEFT));
         navigationView.setNavigationItemSelectedListener(item -> {
-            switch (item.getItemId()){
+            switch (item.getItemId()) {
                 case R.id.navigation_menu_add_business:
                     String addBusinessUrl = "http://catslovers-web.clients.in.ua/partners";
                     Intent i = new Intent(Intent.ACTION_VIEW);
                     i.setData(Uri.parse(addBusinessUrl));
                     startActivity(i);
                     break;
-                case R.id.navigation_menu_clear_history:
-                    break;
+               /* case R.id.navigation_menu_clear_history:
+                    break;*/
                 case R.id.navigation_menu_share:
+                    try {
+                        Intent intent = new Intent(Intent.ACTION_SEND);
+                        intent.setType("text/plain");
+                        intent.putExtra(Intent.EXTRA_SUBJECT, "CatLovers");
+                        intent.putExtra(Intent.EXTRA_TEXT, "I recommend you that app:\nhttps://play.google.com/store/apps/details?id=com.varteq.catslovers");
+                        startActivity(Intent.createChooser(intent, "choose one"));
+                    } catch(Exception e) {
+                        //e.toString();
+                    }
                     break;
-                case R.id.navigation_menu_info:
-                    break;
+                /*case R.id.navigation_menu_info:
+                    break;*/
             }
             return false;
         });
@@ -485,5 +496,22 @@ public class MainActivity extends BaseActivity  implements OnImagePickedListener
         //email.putExtra(Intent.EXTRA_EMAIL, new String[]{"youremail@yahoo.com"});
         email.putExtra(Intent.EXTRA_SUBJECT, "CatsLovers logs");
         startActivity(Intent.createChooser(email, "Send CatsLovers logs"));
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (doubleBackToExitPressedOnce) {
+            super.onBackPressed();
+            return;
+        }
+
+        this.doubleBackToExitPressedOnce = true;
+        Toaster.shortToast("Press back again to exit");
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                doubleBackToExitPressedOnce = false;
+            }
+        }, 2500);
     }
 }
