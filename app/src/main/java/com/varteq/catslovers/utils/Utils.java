@@ -72,6 +72,8 @@ public class Utils {
     }
 
     public static String splitAddress(String fullAddress, int partsCount) {
+        if (fullAddress == null)
+            return "";
         String[] parts = fullAddress.split(",");
         StringBuilder splitAddress = new StringBuilder();
 

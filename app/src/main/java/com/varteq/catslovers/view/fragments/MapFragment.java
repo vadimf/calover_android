@@ -839,6 +839,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void onBusinessWeblinkClick(View view) {
         String url = ((TextView) view).getText().toString();
         if (!url.isEmpty()) {
+            if (!url.startsWith("http://") && !url.startsWith("https://"))
+                url = "http://" + url;
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setData(Uri.parse(url));
             startActivity(intent);
