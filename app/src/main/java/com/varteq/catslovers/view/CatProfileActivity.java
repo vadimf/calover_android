@@ -173,6 +173,8 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
     RecyclerView viewColorsRecyclerView;
     @BindView(R.id.flea_treatment_value_textView)
     TextView fleaTreatmentValueTextView;
+    @BindView(R.id.dialogTextView)
+    TextView followTextView;
 
     @BindView(R.id.upload_image_LinearLayout)
     LinearLayout uploadImageLinearLayout;
@@ -380,6 +382,8 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
 
     private void fillUI() {
         if (catProfile != null) {
+            fillFollowAction();
+
             if (catProfile.getType() != null && catProfile.getType().equals(CatProfile.Status.STRAY))
                 setupAnimalType(CatProfile.Status.STRAY);
             else selectAnimalTypePet();
@@ -467,6 +471,33 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
     }
 
+    public void fillFollowAction() {
+        String status = catProfile.getFeedStationStatus();
+        followButton.setVisibility(View.VISIBLE);
+        followTextView.setText("follow cat");
+        if (status != null && status.equals("joined")) {
+            followButton.setVisibility(View.GONE);
+            followTextView.setText("you follow this cat");
+        }
+        if (status != null && status.equals("invited")) {
+            followButton.setVisibility(View.VISIBLE);
+            followTextView.setText("follow cat (you invited)");
+        }
+        if (status != null && status.equals("requested")) {
+            followButton.setVisibility(View.GONE);
+            followTextView.setText("follow request has been sent");
+        }
+    }
+
+    public void setStatusFollowed() {
+        catProfile.setFeedStationStatus("requested");
+        fillFollowAction();
+    }
+
+    public void setStatusJoined() {
+        catProfile.setFeedStationStatus("joined");
+        fillFollowAction();
+    }
 
     public void refreshGroupPartners(List<GroupPartner> partners) {
         if (partners == null || partners.isEmpty() || groupPartnersRecyclerView == null) return;
@@ -482,6 +513,7 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
     }
 
     final int THUMBSIZE = 250;
+
     private void updateAvatar() {
         if (avatar != null)
             Glide.with(this)
@@ -1027,8 +1059,17 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
 
     @OnClick(R.id.follow_button)
     void onFollowClick() {
-        Toaster.shortToast(getString(R.string.coming_soon));
+        presenter.onFollowCatClicked(catProfile);
     }
+
+    public void showSuccessFollowMessage() {
+        Toaster.shortToast(R.string.you_have_successfully_joined);
+    }
+
+    public void showNoFeedstationMessage() {
+        Toaster.shortToast(R.string.no_feedstation);
+    }
+
 
     @Override
     public void onImagePicked(int requestCode, File file) {

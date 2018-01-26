@@ -100,16 +100,22 @@ public class CatsPresenter {
 
     private void onMyCatsLoaded(List<RCat> data, int catsSection) {
         Log.i(TAG, String.valueOf(data.size()));
-        if (data.size() < 1) return;
         List<CatProfile> catProfiles = getCatProfiles(data);
+        if (data.size() < 1) {
+            view.catsLoaded(catProfiles, catsSection);
+            return;
+        }
         Collections.sort(catProfiles, (catProfile, t1) -> catProfile.getPetName().toUpperCase().compareTo(t1.getPetName().toUpperCase()));
         view.catsLoaded(catProfiles, catsSection);
     }
 
     private void onCatsInRadiusLoaded(List<RCat> data, int catsSection) {
         Log.i(TAG, String.valueOf(data.size()));
-        if (data.size() < 1) return;
         List<CatProfile> catProfiles = getCatProfiles(data);
+        if (data.size() < 1) {
+            view.catsLoaded(catProfiles, catsSection);
+            return;
+        }
         Collections.sort(catProfiles, (catProfile, t1) -> catProfile.getPetName().toUpperCase().compareTo(t1.getPetName().toUpperCase()));
         view.catsLoaded(catProfiles, catsSection);
     }

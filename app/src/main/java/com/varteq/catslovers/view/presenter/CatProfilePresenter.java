@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 import com.varteq.catslovers.api.BaseParser;
 import com.varteq.catslovers.api.ServiceGenerator;
 import com.varteq.catslovers.api.entity.BaseResponse;
+import com.varteq.catslovers.api.entity.ErrorData;
 import com.varteq.catslovers.api.entity.ErrorResponse;
 import com.varteq.catslovers.api.entity.RCat;
 import com.varteq.catslovers.api.entity.RFeedstation;
@@ -153,6 +154,78 @@ public class CatProfilePresenter {
         return age;
     }
 
+    public void onFollowCatClicked(CatProfile catProfile) {
+        String status = catProfile.getFeedStationStatus();
+        Integer feedstationId = catProfile.getFeedstationId();
+        if (feedstationId != null) {
+            if (status != null && status.equals("joined"))
+                joinCatsFeedstation(catProfile);
+            else
+                followCatsFeedstation(catProfile);
+        } else
+            view.showNoFeedstationMessage();
+    }
+
+    public void followCatsFeedstation(CatProfile catProfile) {
+        Integer feedstationId = catProfile.getFeedstationId();
+        Call<BaseResponse<ErrorData>> call1 = ServiceGenerator.getApiServiceWithToken().followFeedstation(feedstationId);
+        call1.enqueue(new Callback<BaseResponse<ErrorData>>() {
+            @Override
+            public void onResponse(Call<BaseResponse<ErrorData>> call, Response<BaseResponse<ErrorData>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    new BaseParser<ErrorData>(response) {
+
+                        @Override
+                        protected void onSuccess(ErrorData data) {
+                            view.showSuccessFollowMessage();
+                            view.setStatusFollowed();
+                        }
+
+                        @Override
+                        protected void onFail(ErrorResponse error) {
+                            if (error != null)
+                                Log.d(TAG, error.getMessage() + error.getCode());
+                        }
+                    };
+                }
+            }
+            @Override
+            public void onFailure(Call<BaseResponse<ErrorData>> call, Throwable t) {
+                com.varteq.catslovers.utils.Log.e(TAG, "followFeedstation onFailure " + t.getMessage());
+            }
+        });
+
+    }
+
+    public void joinCatsFeedstation(CatProfile catProfile) {
+        Integer feedstationId = catProfile.getFeedstationId();
+        Call<BaseResponse<RUser>> call1 = ServiceGenerator.getApiServiceWithToken().joinFeedstation(feedstationId);
+        call1.enqueue(new Callback<BaseResponse<RUser>>() {
+            @Override
+            public void onResponse(Call<BaseResponse<RUser>> call, Response<BaseResponse<RUser>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    new BaseParser<RUser>(response) {
+
+                        @Override
+                        protected void onSuccess(RUser data) {
+                            view.showSuccessFollowMessage();
+                            view.setStatusJoined();
+                        }
+                        @Override
+                        protected void onFail(ErrorResponse error) {
+                            if (error != null)
+                                Log.d(TAG, error.getMessage() + error.getCode());
+                        }
+                    };
+                }
+            }
+            @Override
+            public void onFailure(Call<BaseResponse<RUser>> call, Throwable t) {
+                com.varteq.catslovers.utils.Log.e(TAG, "joinFeedstation onFailure " + t.getMessage());
+            }
+        });
+    }
+
     public void uploadCatWithPhotos(CatProfile cat, Location lastLocation) {
         if (isCatUploading) return;
         isCatUploading = true;
@@ -200,8 +273,7 @@ public class CatProfilePresenter {
                 String address = Utils.getAddressByLocation(lastLocation.getLatitude(), lastLocation.getLongitude(), view);
                 if (address != null)
                     uploadCatRequest.addParameter("address", address);
-                else
-                {
+                else {
                     Toaster.longToast("Google play services error. Please, reboot your phone!");
                     Log.e("uploadCatWithPhotos", "Address is null");
                     view.hideWaitDialog();

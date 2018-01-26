@@ -151,6 +151,8 @@
     <string name="group_join_invited">You invited to this group. Join</string>
     <string name="group_admin">You are admin of group</string>
     <string name="photos">photos</string>
+    <string name="you_have_successfully_joined">You have successfully joined</string>
+    <string name="no_feedstation">No feedstation</string>
 
     <!--New feed-->
     <string name="add_photo">Add photo</string>

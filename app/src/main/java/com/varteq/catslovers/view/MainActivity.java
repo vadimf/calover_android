@@ -338,7 +338,7 @@ public class MainActivity extends BaseActivity  implements OnImagePickedListener
     }
 
     public void onSuccessJoin() {
-        Toaster.shortToast("You have successfully joined");
+        Toaster.shortToast(R.string.you_have_successfully_joined);
     }
 
     private void initNavigationDrawer() {

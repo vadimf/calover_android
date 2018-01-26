@@ -177,14 +177,58 @@ public class CatsFragment extends Fragment {
 
         listUpdated = true;
         catsHashMap.clear();
+        if (!catProfiles.isEmpty()) {
+            char letter = Character.toUpperCase(catProfiles.get(0).getPetName().charAt(0));
+            ArrayList<CatProfile> list = new ArrayList<>();
 
-        char letter = Character.toUpperCase(catProfiles.get(0).getPetName().charAt(0));
-        ArrayList<CatProfile> list = new ArrayList<>();
-
-        switch (catsSection) {
-            case CatsFragment.CATS_SECTION_PRIVATE:
-                for (CatProfile cat : catProfiles) {
-                    if (isCatInPrivateSection(cat)) {
+            switch (catsSection) {
+                case CatsFragment.CATS_SECTION_PRIVATE:
+                    for (CatProfile cat : catProfiles) {
+                        if (isCatInPrivateSection(cat)) {
+                            if (letter == Character.toUpperCase(cat.getPetName().charAt(0)))
+                                list.add(cat);
+                            else {
+                                if (!list.isEmpty())
+                                    catsHashMap.put(String.valueOf(letter), list);
+                                letter = Character.toUpperCase(cat.getPetName().charAt(0));
+                                list = new ArrayList<>();
+                                list.add(cat);
+                            }
+                        }
+                    }
+                    break;
+                case CatsFragment.CATS_SECTION_PUBLIC:
+                    for (CatProfile cat : catProfiles) {
+                        if (isCatInPublicSection(cat)) {
+                            if (letter == Character.toUpperCase(cat.getPetName().charAt(0)))
+                                list.add(cat);
+                            else {
+                                if (!list.isEmpty())
+                                    catsHashMap.put(String.valueOf(letter), list);
+                                letter = Character.toUpperCase(cat.getPetName().charAt(0));
+                                list = new ArrayList<>();
+                                list.add(cat);
+                            }
+                        }
+                    }
+                    break;
+                case CatsFragment.CATS_SECTION_FRIENDS:
+                    for (CatProfile cat : catProfiles) {
+                        if (isCatInFriendSection(cat)) {
+                            if (letter == Character.toUpperCase(cat.getPetName().charAt(0)))
+                                list.add(cat);
+                            else {
+                                if (!list.isEmpty())
+                                    catsHashMap.put(String.valueOf(letter), list);
+                                letter = Character.toUpperCase(cat.getPetName().charAt(0));
+                                list = new ArrayList<>();
+                                list.add(cat);
+                            }
+                        }
+                    }
+                    break;
+                case CatsFragment.CATS_SECTION_EXPLORE:
+                    for (CatProfile cat : catProfiles) {
                         if (letter == Character.toUpperCase(cat.getPetName().charAt(0)))
                             list.add(cat);
                         else {
@@ -195,55 +239,11 @@ public class CatsFragment extends Fragment {
                             list.add(cat);
                         }
                     }
-                }
-                break;
-            case CatsFragment.CATS_SECTION_PUBLIC:
-                for (CatProfile cat : catProfiles) {
-                    if (isCatInPublicSection(cat)) {
-                        if (letter == Character.toUpperCase(cat.getPetName().charAt(0)))
-                            list.add(cat);
-                        else {
-                            if (!list.isEmpty())
-                                catsHashMap.put(String.valueOf(letter), list);
-                            letter = Character.toUpperCase(cat.getPetName().charAt(0));
-                            list = new ArrayList<>();
-                            list.add(cat);
-                        }
-                    }
-                }
-                break;
-            case CatsFragment.CATS_SECTION_FRIENDS:
-                for (CatProfile cat : catProfiles) {
-                    if (isCatInFriendSection(cat)) {
-                        if (letter == Character.toUpperCase(cat.getPetName().charAt(0)))
-                            list.add(cat);
-                        else {
-                            if (!list.isEmpty())
-                                catsHashMap.put(String.valueOf(letter), list);
-                            letter = Character.toUpperCase(cat.getPetName().charAt(0));
-                            list = new ArrayList<>();
-                            list.add(cat);
-                        }
-                    }
-                }
-                break;
-            case CatsFragment.CATS_SECTION_EXPLORE:
-                for (CatProfile cat : catProfiles) {
-                    if (letter == Character.toUpperCase(cat.getPetName().charAt(0)))
-                        list.add(cat);
-                    else {
-                        if (!list.isEmpty())
-                            catsHashMap.put(String.valueOf(letter), list);
-                        letter = Character.toUpperCase(cat.getPetName().charAt(0));
-                        list = new ArrayList<>();
-                        list.add(cat);
-                    }
-                }
-                break;
+                    break;
+            }
+            if (!list.isEmpty())
+                catsHashMap.put(String.valueOf(letter), list);
         }
-        if (!list.isEmpty())
-            catsHashMap.put(String.valueOf(letter), list);
-
         catsListAdapter.onDataChanged();
     }
 
