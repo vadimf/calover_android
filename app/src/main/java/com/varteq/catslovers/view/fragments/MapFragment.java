@@ -668,7 +668,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         googleMap.clear();
         if (stations != null)
             for (Feedstation feedstation : stations) {
-                if (feedstation.getLocation() == null) continue;
+                LatLng feedstationLocation = feedstation.getLocation();
+                if (feedstationLocation == null) continue;
+
+                if (userLocation != null && isMarkersBeside(feedstationLocation, userLocation)) {
+                    LatLng newUserMarkerLocation = new LatLng(feedstationLocation.latitude + 0.0002, feedstationLocation.longitude);
+                    userLocationMarkerOptions.position(newUserMarkerLocation);
+                    addUserLocationMarker();
+                }
+
                 int resourceId = getFeedstationMarkerId(feedstation);
                 if (!isAdded()) return;
                 Marker marker = googleMap.addMarker(new MarkerOptions()
@@ -739,6 +747,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             }
 
         addUserLocationMarker();
+    }
+
+    private boolean isMarkersBeside(LatLng firstMarkerLocation, LatLng secondMarkerLocation) {
+        double firstRoundedLat = Utils.roundDouble(firstMarkerLocation.latitude, 4);
+        double firstRoundedLng = Utils.roundDouble(firstMarkerLocation.longitude, 4);
+        double secondRoundedLat = Utils.roundDouble(secondMarkerLocation.latitude, 4);
+        double secondRoundedLng = Utils.roundDouble(secondMarkerLocation.longitude, 4);
+        return firstRoundedLat == secondRoundedLat && firstRoundedLng == secondRoundedLng;
     }
 
     private void addUserLocationMarker() {

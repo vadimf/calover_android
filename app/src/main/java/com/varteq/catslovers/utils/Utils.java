@@ -132,4 +132,11 @@ public class Utils {
         return originalBitmap;
     }
 
+    public static double roundDouble(double d, int precise) {
+        precise = 10 ^ precise;
+        d = d * precise;
+        int i = (int) Math.round(d);
+        return (double) i / precise;
+    }
+
 }

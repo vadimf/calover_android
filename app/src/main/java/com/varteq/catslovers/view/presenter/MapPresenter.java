@@ -1,5 +1,6 @@
 package com.varteq.catslovers.view.presenter;
 
+import android.location.Location;
 import android.os.Handler;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -19,6 +20,7 @@ import com.varteq.catslovers.model.Feedstation;
 import com.varteq.catslovers.model.GroupPartner;
 import com.varteq.catslovers.model.PhotoWithPreview;
 import com.varteq.catslovers.utils.Log;
+import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.utils.TimeUtils;
 import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.utils.Utils;
@@ -48,6 +50,7 @@ public class MapPresenter {
     private boolean isWaitingUpdateFeedstations;
     Runnable updateFeedstationsWithDelayRunnable;
     Handler updateFeedstationsWithDelayHandler;
+    private boolean isTesting = false;
 
     public MapPresenter(MapFragment view) {
         this.view = view;
@@ -55,34 +58,58 @@ public class MapPresenter {
         updateFeedstationsWithDelayHandler = new Handler();
     }
 
+    public void getFeedstationsMock(double lat, double lng, Integer distance) {
+        Location userLocation = Profile.getLocation(view.getContext());
+        List<Feedstation> feedstations = new ArrayList<>();
+        List<Event> events = new ArrayList<>();
+        List<Business> businesses = new ArrayList<>();
+
+        Feedstation feedstation = new Feedstation();
+        feedstation.setLocation(new LatLng(userLocation.getLatitude(), userLocation.getLongitude()));
+        feedstation.setId(73);
+        feedstation.setIsPublic(false);
+        feedstation.setUserRole(Feedstation.UserRole.ADMIN);
+        feedstations.add(feedstation);
+
+        Business business = new Business();
+        business.setLocation(new LatLng(51.526197, 31.279616));
+        business.setAddress("");
+        business.setLink("google.com");
+        businesses.add(business);
+
+        view.feedstationsLoaded(feedstations, events, businesses);
+    }
+
     public void getFeedstations(double lat, double lng, Integer distance) {
+        if (!isTesting) {
+            Call<BaseResponse<RGeoSearch>> call = ServiceGenerator.getApiServiceWithToken().getGeoFeedstations(lat, lng, distance);
+            call.enqueue(new Callback<BaseResponse<RGeoSearch>>() {
+                @Override
+                public void onResponse(Call<BaseResponse<RGeoSearch>> call, Response<BaseResponse<RGeoSearch>> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        new BaseParser<RGeoSearch>(response) {
 
-        Call<BaseResponse<RGeoSearch>> call = ServiceGenerator.getApiServiceWithToken().getGeoFeedstations(lat, lng, distance);
-        call.enqueue(new Callback<BaseResponse<RGeoSearch>>() {
-            @Override
-            public void onResponse(Call<BaseResponse<RGeoSearch>> call, Response<BaseResponse<RGeoSearch>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    new BaseParser<RGeoSearch>(response) {
+                            @Override
+                            protected void onSuccess(RGeoSearch data) {
+                                view.feedstationsLoaded(from(data.getFeedstations()), fromEvents(data.getEvents()), fromBusiness(data.getBusinesses()));
+                            }
 
-                        @Override
-                        protected void onSuccess(RGeoSearch data) {
-                            view.feedstationsLoaded(from(data.getFeedstations()), fromEvents(data.getEvents()), fromBusiness(data.getBusinesses()));
-                        }
-
-                        @Override
-                        protected void onFail(ErrorResponse error) {
-                            if (error != null)
-                                Log.d(TAG, error.getMessage() + error.getCode());
-                        }
-                    };
+                            @Override
+                            protected void onFail(ErrorResponse error) {
+                                if (error != null)
+                                    Log.d(TAG, error.getMessage() + error.getCode());
+                            }
+                        };
+                    }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<BaseResponse<RGeoSearch>> call, Throwable t) {
-                Log.e(TAG, "getFeedstations onFailure " + t.getMessage());
-            }
-        });
+                @Override
+                public void onFailure(Call<BaseResponse<RGeoSearch>> call, Throwable t) {
+                    Log.e(TAG, "getFeedstations onFailure " + t.getMessage());
+                }
+            });
+        } else
+            getFeedstationsMock(lat, lng, distance);
     }
 
     public void onCameraMoved(double lat, double lng) {
