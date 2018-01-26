@@ -365,12 +365,21 @@ public class MainActivity extends BaseActivity implements OnImagePickedListener 
                     i.setData(Uri.parse(addBusinessUrl));
                     startActivity(i);
                     break;
-                case R.id.navigation_menu_clear_history:
-                    break;
+               /* case R.id.navigation_menu_clear_history:
+                    break;*/
                 case R.id.navigation_menu_share:
+                    try {
+                        Intent intent = new Intent(Intent.ACTION_SEND);
+                        intent.setType("text/plain");
+                        intent.putExtra(Intent.EXTRA_SUBJECT, "CatLovers");
+                        intent.putExtra(Intent.EXTRA_TEXT, "I recommend you that app:\nhttps://play.google.com/store/apps/details?id=com.varteq.catslovers");
+                        startActivity(Intent.createChooser(intent, "choose one"));
+                    } catch(Exception e) {
+                        //e.toString();
+                    }
                     break;
-                case R.id.navigation_menu_info:
-                    break;
+                /*case R.id.navigation_menu_info:
+                    break;*/
             }
             return false;
         });
