@@ -69,7 +69,7 @@ public class MainActivity extends BaseActivity implements OnImagePickedListener 
     FrameLayout mainLayout;
     RoundedImageView avatarImageView;
     Button changeAvatarButton;
-    TextView emailTextView;
+    TextView usernameTextView;
     ImageButton drawerBackButton;
 
     CatsFragment catsFragment;
@@ -351,7 +351,7 @@ public class MainActivity extends BaseActivity implements OnImagePickedListener 
         navigationEditImageButton = navigationHeaderLayout.findViewById(R.id.imageButton_edit);
         avatarImageView = navigationHeaderLayout.findViewById(R.id.imageView_avatar);
         changeAvatarButton = navigationHeaderLayout.findViewById(R.id.button_change_avatar);
-        emailTextView = navigationHeaderLayout.findViewById(R.id.textView_email);
+        usernameTextView = navigationHeaderLayout.findViewById(R.id.textView_email);
         drawerBackButton = navigationHeaderLayout.findViewById(R.id.button_navigation_drawer_back);
 
         navigationEditImageButton.setOnClickListener(view -> startActivity(new Intent(MainActivity.this, SettingsActivity.class)));
@@ -385,15 +385,9 @@ public class MainActivity extends BaseActivity implements OnImagePickedListener 
         });
     }
 
-    public void setNavigationEmail(String email) {
-        if (email != null)
-            emailTextView.setText(email);
-        else
-            emailTextView.setText(R.string.no_email);
-    }
-
-    public void setNavigationUsername(String name) {
-
+    public void setNavigationUsername(String username) {
+        if (username != null)
+            usernameTextView.setText(username);
     }
 
     public void updateNavigationAvatar(String url) {

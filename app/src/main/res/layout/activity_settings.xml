@@ -13,7 +13,8 @@
         tools:context="com.varteq.catslovers.view.SettingsActivity">
 
         <TextView
-            android:id="@+id/textView8"
+            android:gravity="center_vertical"
+            android:id="@+id/textView_change_username"
             style="@style/PrimarySmallTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -27,6 +28,7 @@
             app:layout_constraintVertical_bias="1.0"/>
 
         <TextView
+            android:visibility="gone"
             android:id="@+id/textView5"
             style="@style/PrimarySmallTextView"
             android:layout_width="wrap_content"
@@ -66,6 +68,7 @@
             app:layout_constraintTop_toBottomOf="@+id/avatar"/>
 
         <TextView
+            android:visibility="gone"
             android:id="@+id/textView_email"
             style="@style/PrimarySmallTextView"
             android:layout_width="wrap_content"
@@ -75,6 +78,7 @@
             app:layout_constraintTop_toBottomOf="@+id/textView6"/>
 
         <TextView
+            android:visibility="gone"
             android:id="@+id/textView6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -88,7 +92,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
             android:text="Username"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView_email"/>

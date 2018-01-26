@@ -127,6 +127,11 @@ public class SettingsActivity extends BaseActivity implements OnImagePickedListe
 
     }
 
+    @OnClick(R.id.textView_change_username)
+    void changeUsernameClicked(){
+
+    }
+
     public void setEmail(String email){
         emailTextView.setText(email);
     }
