@@ -4,7 +4,7 @@
     <item android:drawable="@color/white" />
     <item>
         <bitmap
-            android:src="@drawable/app_title2" />
+            android:src="@drawable/bg_splash" />
     </item>
 
 </layer-list>
