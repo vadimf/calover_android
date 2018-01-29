@@ -2,21 +2,25 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:title="Map"
         android:id="@+id/action_map"
         android:enabled="true"
         android:icon="@drawable/ic_navigation_bar_map_unselected"
         app:showAsAction="ifRoom" />
     <item
+        android:title="Feed"
         android:id="@+id/action_feed"
         android:enabled="true"
         android:icon="@drawable/ic_navigation_bar_feed_unselected"
         app:showAsAction="ifRoom" />
     <item
+        android:title="Chat"
         android:id="@+id/action_chat"
         android:enabled="true"
         android:icon="@drawable/ic_navigation_bar_chat_unselected"
         app:showAsAction="ifRoom" />
     <item
+        android:title="Cat"
         android:id="@+id/action_cats"
         android:enabled="true"
         android:icon="@drawable/ic_navigation_bar_cat_unselected"
