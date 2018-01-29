@@ -37,7 +37,7 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
 
     public static void show(FragmentManager fm, OnImageSourcePickedListener onImageSourcePickedListener, boolean isMultiselect) {
         ImageSourcePickDialogFragment fragment = new ImageSourcePickDialogFragment();
-        fragment.setCancelable(false);
+        fragment.setCancelable(true);
         fragment.setOnImageSourcePickedListener(onImageSourcePickedListener);
         fragment.setMultiselect(isMultiselect);
         fragment.show(fm, ImageSourcePickDialogFragment.class.getSimpleName());
@@ -48,7 +48,7 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
         fragment.setShowImageAndVideoPickerWithoutChoose(true);
         fragment.setOnImageSourcePickedListener(onImageSourcePickedListener);
         fragment.setFragment(resultFragment);
-        fragment.setCancelable(false);
+        fragment.setCancelable(true);
         fragment.show(fm, ImageSourcePickDialogFragment.class.getSimpleName());
     }
 
