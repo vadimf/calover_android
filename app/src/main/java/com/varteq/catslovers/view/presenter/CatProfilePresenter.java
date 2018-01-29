@@ -5,6 +5,7 @@ import android.location.Location;
 import android.support.v7.widget.RecyclerView;
 
 import com.google.gson.Gson;
+import com.varteq.catslovers.R;
 import com.varteq.catslovers.api.BaseParser;
 import com.varteq.catslovers.api.ServiceGenerator;
 import com.varteq.catslovers.api.entity.BaseResponse;
@@ -14,10 +15,12 @@ import com.varteq.catslovers.api.entity.RCat;
 import com.varteq.catslovers.api.entity.RFeedstation;
 import com.varteq.catslovers.api.entity.RUser;
 import com.varteq.catslovers.model.CatProfile;
+import com.varteq.catslovers.model.Feedstation;
 import com.varteq.catslovers.model.GroupPartner;
 import com.varteq.catslovers.model.PhotoWithPreview;
 import com.varteq.catslovers.utils.GenericOf;
 import com.varteq.catslovers.utils.Log;
+import com.varteq.catslovers.utils.NetworkUtils;
 import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.utils.TimeUtils;
 import com.varteq.catslovers.utils.Toaster;
@@ -99,6 +102,53 @@ public class CatProfilePresenter {
                 Log.e(TAG, "getGroupPartners onFailure " + t.getMessage());
             }
         });
+    }
+
+    public void onDeleteCatClicked(CatProfile catProfile) {
+        if (catProfile.getUserRole() != null && catProfile.getUserRole().equals(Feedstation.UserRole.ADMIN))
+            deleteCat(catProfile.getId());
+        else {
+            Toaster.longToast(R.string.only_admins_can_delete_cats);
+        }
+    }
+
+    private void deleteCat(Integer id) {
+        view.showWaitDialog();
+        if (id != null) {
+            Call<BaseResponse<ErrorData>> call = ServiceGenerator.getApiServiceWithToken().deleteCat(id);
+            call.enqueue(new Callback<BaseResponse<ErrorData>>() {
+                @Override
+                public void onResponse(Call<BaseResponse<ErrorData>> call, Response<BaseResponse<ErrorData>> response) {
+                    view.hideWaitDialog();
+                    if (response.isSuccessful() && response.body() != null) {
+                        new BaseParser<ErrorData>(response) {
+                            @Override
+                            protected void onSuccess(ErrorData data) {
+                                Toaster.shortToast(R.string.cat_deleted);
+                                view.forceClose();
+                            }
+
+                            @Override
+                            protected void onFail(ErrorResponse error) {
+                                if (error != null)
+                                    Log.d(TAG, error.getMessage() + error.getCode());
+                                Toaster.shortToast(R.string.server_error);
+                            }
+                        };
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<BaseResponse<ErrorData>> call, Throwable t) {
+                    Log.e(TAG, "deleteCat onFailure " + t.getMessage());
+                    view.hideWaitDialog();
+                    if (NetworkUtils.isNetworkErr(t.getMessage()))
+                        Toaster.shortToast(R.string.network_error);
+                    else
+                        Toaster.shortToast(R.string.server_error);
+                }
+            });
+        }
     }
 
     private GroupPartner from(RUser user) {
@@ -189,6 +239,7 @@ public class CatProfilePresenter {
                     };
                 }
             }
+
             @Override
             public void onFailure(Call<BaseResponse<ErrorData>> call, Throwable t) {
                 com.varteq.catslovers.utils.Log.e(TAG, "followFeedstation onFailure " + t.getMessage());
@@ -196,6 +247,7 @@ public class CatProfilePresenter {
         });
 
     }
+
 
     public void joinCatsFeedstation(CatProfile catProfile) {
         Integer feedstationId = catProfile.getFeedstationId();
@@ -211,6 +263,7 @@ public class CatProfilePresenter {
                             view.showSuccessFollowMessage();
                             view.setStatusJoined();
                         }
+
                         @Override
                         protected void onFail(ErrorResponse error) {
                             if (error != null)
@@ -219,6 +272,7 @@ public class CatProfilePresenter {
                     };
                 }
             }
+
             @Override
             public void onFailure(Call<BaseResponse<RUser>> call, Throwable t) {
                 com.varteq.catslovers.utils.Log.e(TAG, "joinFeedstation onFailure " + t.getMessage());
