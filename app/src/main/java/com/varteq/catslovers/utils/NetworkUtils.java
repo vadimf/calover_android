@@ -32,7 +32,7 @@ public class NetworkUtils {
 
     public static boolean isNetworkErr(String e) {
         return e.contains("UnknownHost") || e.contains("Network is unreachable") || e.contains("HttpHostConnectException")
-                || e.contains("Timeout") || e.contains("Unable to execute HTTP request");
+                || e.contains("Timeout") || e.contains("Unable to execute HTTP request") || e.contains("Unable to resolve host");
     }
 
     public static boolean isNetworkErr(Exception e) {

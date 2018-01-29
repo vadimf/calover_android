@@ -142,7 +142,7 @@ public interface ApiService {
     Call<BaseResponse<List<RUser>>> getCatUsers(@Path("id") int catId);
 
     @DELETE("cats/{id}")
-    Call<BaseResponse<ErrorData>> deleteCat(@Path("id") int catId);
+    Call<BaseResponse<Object>> deleteCat(@Path("id") int catId);
 
     @GET("feedstations/users/joined")
     Call<BaseResponse<List<RUser>>> getAllowedUsers();

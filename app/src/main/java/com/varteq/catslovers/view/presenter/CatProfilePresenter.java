@@ -115,15 +115,15 @@ public class CatProfilePresenter {
     private void deleteCat(Integer id) {
         view.showWaitDialog();
         if (id != null) {
-            Call<BaseResponse<ErrorData>> call = ServiceGenerator.getApiServiceWithToken().deleteCat(id);
-            call.enqueue(new Callback<BaseResponse<ErrorData>>() {
+            Call<BaseResponse<Object>> call = ServiceGenerator.getApiServiceWithToken().deleteCat(id);
+            call.enqueue(new Callback<BaseResponse<Object>>() {
                 @Override
-                public void onResponse(Call<BaseResponse<ErrorData>> call, Response<BaseResponse<ErrorData>> response) {
+                public void onResponse(Call<BaseResponse<Object>> call, Response<BaseResponse<Object>> response) {
                     view.hideWaitDialog();
-                    if (response.isSuccessful() && response.body() != null) {
-                        new BaseParser<ErrorData>(response) {
+                    if (response.isSuccessful()) {
+                        new BaseParser<Object>(response) {
                             @Override
-                            protected void onSuccess(ErrorData data) {
+                            protected void onSuccess(Object data) {
                                 Toaster.shortToast(R.string.cat_deleted);
                                 view.forceClose();
                             }
@@ -139,7 +139,7 @@ public class CatProfilePresenter {
                 }
 
                 @Override
-                public void onFailure(Call<BaseResponse<ErrorData>> call, Throwable t) {
+                public void onFailure(Call<BaseResponse<Object>> call, Throwable t) {
                     Log.e(TAG, "deleteCat onFailure " + t.getMessage());
                     view.hideWaitDialog();
                     if (NetworkUtils.isNetworkErr(t.getMessage()))
