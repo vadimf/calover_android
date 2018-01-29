@@ -12,6 +12,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
@@ -435,6 +436,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
 
             dialog.setContentView(mapOptionsDialogLayout);
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+            dialog.getWindow().setDimAmount(0);
             dialog.show();
             Log.d(TAG, "OnMapLongClick " + latLng.latitude + " / " + latLng.longitude + "]");
         });
