@@ -186,10 +186,8 @@ public class MainPresenter {
                 if (response.isSuccessful()) {
                     RUserSimple user = response.body().getData();
                     if (user != null) {
-                        if (user.getName() != null)
-                            view.setNavigationUsername(user.getName());
-                        if (user.getAvatarUrlThumbnail() != null)
-                            view.updateNavigationAvatar(user.getAvatarUrlThumbnail());
+                        view.setNavigationUsername(user.getName());
+                        view.updateNavigationAvatar(user.getAvatarUrlThumbnail());
                     }
                 }
             }
