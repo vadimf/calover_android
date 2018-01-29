@@ -185,6 +185,7 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
     private CatProfilePresenter presenter;
     private MenuItem saveMenu;
     private MenuItem editMenu;
+    private MenuItem deleteMenu;
     private Location lastLocation;
     private FusedLocationProviderClient mFusedLocationClient;
     private SystemPermissionHelper permissionHelper;
@@ -693,6 +694,7 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
 
         saveMenu = menu.findItem(R.id.app_bar_save);
         editMenu = menu.findItem(R.id.app_bar_edit);
+        deleteMenu = menu.findItem(R.id.app_bar_delete);
 
         if (saveMenu != null && editMenu != null) {
             if (currentMode.equals(CatProfileScreenMode.VIEW_MODE)) {
@@ -729,12 +731,24 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
                 }
                 Toaster.longToast("Only admins can modify cats");
                 return true;
+            case R.id.app_bar_delete:
+                Log.d(TAG, "app_bar_delete");
+                showDeleteCatDialog();
+                return true;
             case android.R.id.home:
                 onBackPressed();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void showDeleteCatDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.delete_cat_question);
+        builder.setPositiveButton("Delete", (dialogInterface, i) -> presenter.onDeleteCatClicked(catProfile));
+        builder.setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss());
+        builder.show();
     }
 
     private boolean isProfileValid() {
@@ -898,6 +912,10 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
         catProfile.setAvatar(avatar);
 
         return catProfile;
+    }
+
+    public void forceClose() {
+        finish();
     }
 
     @OnClick(R.id.flea_treatment_picker_button)
