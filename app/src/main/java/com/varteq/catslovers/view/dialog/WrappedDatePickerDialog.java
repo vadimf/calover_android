@@ -21,6 +21,7 @@ public class WrappedDatePickerDialog {
         // Create a new instance of DatePickerDialog and return it
         //AlertDialog.THEME_HOLO_LIGHT android.R.style.Theme_DeviceDefault_Light_Dialog
         DatePickerDialog dialog = new DatePickerDialog(context, R.style.PrimaryDialog, listener, year, month, day);
+        dialog.getDatePicker().setMaxDate(System.currentTimeMillis());
         dialog.show();
     }
 }
