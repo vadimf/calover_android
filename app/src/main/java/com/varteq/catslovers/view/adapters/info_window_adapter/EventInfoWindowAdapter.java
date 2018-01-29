@@ -31,11 +31,6 @@ public class EventInfoWindowAdapter implements InfoWindowAdapter {
 
     @Override
     public View getInfoWindow(Marker marker) {
-        return null;
-    }
-
-    @Override
-    public View getInfoContents(Marker marker) {
         if (show) {
             switch (type) {
                 case WARNING:
@@ -48,6 +43,11 @@ public class EventInfoWindowAdapter implements InfoWindowAdapter {
             return eventMarkerDialogView;
         } else
             return null;
+    }
+
+    @Override
+    public View getInfoContents(Marker marker) {
+        return null;
     }
 
     public void setShowWindow(boolean show) {
