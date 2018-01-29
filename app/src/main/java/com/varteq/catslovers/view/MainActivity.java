@@ -102,7 +102,7 @@ public class MainActivity extends BaseActivity implements OnImagePickedListener 
 
         mBottomNavigationView = findViewById(R.id.bottom_navigation);
         BottomNavigationViewHelper.disableShiftMode(mBottomNavigationView);
-        drawNavigationBar();
+        //drawNavigationBar();
 
         presenter = new MainPresenter(this);
         presenter.loadUserInfo();
@@ -290,7 +290,7 @@ public class MainActivity extends BaseActivity implements OnImagePickedListener 
         FrameLayout.LayoutParams layoutParams1 = (FrameLayout.LayoutParams) menuView.getLayoutParams();
         layoutParams1.bottomMargin = Utils.convertDpToPx(3, this);
         menuView.setLayoutParams(layoutParams1);
-        /*for (int i = 0; i < menuView.getChildCount(); i++) {
+        for (int i = 0; i < menuView.getChildCount(); i++) {
             final ImageView iconView = menuView.getChildAt(i).findViewById(android.support.design.R.id.icon);
             iconView.setScaleType(ImageView.ScaleType.FIT_CENTER);
             final FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) iconView.getLayoutParams();
@@ -305,7 +305,7 @@ public class MainActivity extends BaseActivity implements OnImagePickedListener 
                 layoutParams.width = Utils.convertDpToPx(50, this);
             }
             iconView.setLayoutParams(layoutParams);
-        }*/
+        }
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
