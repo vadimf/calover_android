@@ -28,6 +28,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -38,9 +40,12 @@ public class FeedPresenter {
     private String TAG = FeedPresenter.class.getSimpleName();
 
     private FeedFragment view;
-
+    private Timer timer;
+    private final int TIMER_DELAY = 60*1000;//in seconds
+    private boolean isNeedScrollDown = true;
     public FeedPresenter(FeedFragment view) {
         this.view = view;
+        setupUpdateTimerTask();
     }
 
     public void loadFeeds() {
@@ -105,7 +110,8 @@ public class FeedPresenter {
                     @Override
                     public void onSuccess(ArrayList<QBUser> result, Bundle params) {
                         Log.d(TAG, "QBUsers.getUsersByIDs onSuccess count: " + (result != null ? result.size() : "null"));
-                        view.feedsLoaded(from(customObjects, result));
+                        view.feedsLoaded(from(customObjects, result), isNeedScrollDown);
+                        isNeedScrollDown = true;
                     }
 
                     @Override
@@ -179,4 +185,22 @@ public class FeedPresenter {
             }
         });
     }
+
+    private void setupUpdateTimerTask() {
+        if (timer != null) {
+            timer.cancel();
+        }
+
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                isNeedScrollDown = false;
+                loadFeeds();
+                Log.d(TAG, "Go to feeds update");
+            }
+
+        }, 0, TIMER_DELAY);
+    }
+
 }
