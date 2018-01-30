@@ -449,6 +449,7 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
                     @Override
                     public void onPersonClicked(GroupPartner groupPartner) {
                         Log.d(TAG, "onPersonClicked " + groupPartner.getName());
+                        presenter.onGroupPartnerClicked(groupPartner);
                     }
 
                     @Override

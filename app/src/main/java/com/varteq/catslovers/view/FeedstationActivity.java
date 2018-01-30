@@ -288,6 +288,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
 
                     @Override
                     public void onPersonClicked(GroupPartner groupPartner) {
+                        presenter.onGroupPartnerClicked(groupPartner);
                         if (feedstation.getUserRole() != null && feedstation.getUserRole().equals(Feedstation.UserRole.ADMIN)) {
                             Log.d(TAG, "onPersonClicked " + groupPartner.getName());
                             if (groupPartner.getStatus().equals(GroupPartner.Status.INVITED))

@@ -2,9 +2,16 @@ package com.varteq.catslovers.view.presenter;
 
 import android.content.Context;
 import android.location.Location;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 
 import com.google.gson.Gson;
+import com.quickblox.chat.QBRestChatService;
+import com.quickblox.chat.model.QBChatDialog;
+import com.quickblox.core.QBEntityCallback;
+import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.users.QBUsers;
+import com.quickblox.users.model.QBUser;
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.api.BaseParser;
 import com.varteq.catslovers.api.ServiceGenerator;
@@ -25,7 +32,12 @@ import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.utils.TimeUtils;
 import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.utils.Utils;
+import com.varteq.catslovers.utils.qb.QbDialogHolder;
+import com.varteq.catslovers.utils.qb.QbDialogUtils;
+import com.varteq.catslovers.utils.qb.QbUsersHolder;
+import com.varteq.catslovers.utils.qb.callback.QbEntityCallbackWrapper;
 import com.varteq.catslovers.view.CatProfileActivity;
+import com.varteq.catslovers.view.qb.ChatActivity;
 
 import net.gotev.uploadservice.MultipartUploadRequest;
 import net.gotev.uploadservice.ServerResponse;
@@ -149,6 +161,97 @@ public class CatProfilePresenter {
                 }
             });
         }
+    }
+
+    public void onGroupPartnerClicked(GroupPartner groupPartner) {
+        String login = String.valueOf(groupPartner.getUserId());
+        if (login.equals(Profile.getUserId(view)))
+            return;
+        if (groupPartner.getStatus().equals(GroupPartner.Status.JOINED)) {
+            createChatIfUserAllowed(login);
+        } else {
+            Toaster.shortToast(R.string.user_should_be_joined_the_feedstation);
+        }
+    }
+
+    private void createChatIfUserAllowed(String login) {
+        view.showWaitDialog();
+        Call<BaseResponse<List<RUser>>> call = ServiceGenerator.getApiServiceWithToken().getAllowedUsers();
+        call.enqueue(new Callback<BaseResponse<List<RUser>>>() {
+            @Override
+            public void onResponse(Call<BaseResponse<List<RUser>>> call, Response<BaseResponse<List<RUser>>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    new BaseParser<List<RUser>>(response) {
+                        @Override
+                        protected void onSuccess(List<RUser> data) {
+                            boolean userAllowed = false;
+                            for (RUser user : data) {
+                                if (login.equals(String.valueOf(user.getUserId()))) {
+                                    userAllowed = true;
+                                    createChat(login);
+                                }
+                            }
+                            if (!userAllowed) {
+                                view.hideWaitDialog();
+                                Toaster.shortToast(R.string.user_should_be_in_same_feedstation_with_you);
+                            }
+                        }
+
+                        @Override
+                        protected void onFail(ErrorResponse error) {
+                            if (error != null)
+                                com.varteq.catslovers.utils.Log.d(TAG, error.getMessage() + error.getCode());
+                        }
+                    };
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseResponse<List<RUser>>> call, Throwable t) {
+                com.varteq.catslovers.utils.Log.e(TAG, "createChatIfUserAllowed onFailure " + t.getMessage());
+            }
+        });
+    }
+
+    private void createChat(String login) {
+        QBUsers.getUserByLogin(login).performAsync(new QBEntityCallback<QBUser>() {
+            @Override
+            public void onSuccess(QBUser qbUser, Bundle bundle) {
+                createChatDialog(qbUser, new QBEntityCallback<QBChatDialog>() {
+                    @Override
+                    public void onSuccess(QBChatDialog qbChatDialog, Bundle bundle) {
+                        ChatActivity.startActivity(view, qbChatDialog);
+                        view.hideWaitDialog();
+                    }
+
+                    @Override
+                    public void onError(QBResponseException e) {
+                        Toaster.shortToast("Error creating dialog");
+                        view.hideWaitDialog();
+                    }
+                });
+            }
+
+            @Override
+            public void onError(QBResponseException e) {
+                view.hideWaitDialog();
+            }
+        });
+    }
+
+    private void createChatDialog(final QBUser user,
+                                  final QBEntityCallback<QBChatDialog> callback) {
+        List<QBUser> users = new ArrayList<>();
+        users.add(user);
+        QBRestChatService.createChatDialog(QbDialogUtils.createDialog(users)).performAsync(
+                new QbEntityCallbackWrapper<QBChatDialog>(callback) {
+                    @Override
+                    public void onSuccess(QBChatDialog dialog, Bundle args) {
+                        QbDialogHolder.getInstance().addDialog(dialog);
+                        QbUsersHolder.getInstance().putUsers(users);
+                        super.onSuccess(dialog, args);
+                    }
+                });
     }
 
     private GroupPartner from(RUser user) {

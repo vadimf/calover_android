@@ -88,6 +88,13 @@ public class ChatActivity extends QBBaseActivity implements OnImagePickedListene
         activity.startActivityForResult(intent, code);
     }
 
+    public static void startActivity(Activity activity, QBChatDialog dialogId) {
+        Intent intent = new Intent(activity, ChatActivity.class);
+        intent.putExtra(ChatActivity.EXTRA_DIALOG_ID, dialogId);
+        activity.startActivity(intent);
+    }
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

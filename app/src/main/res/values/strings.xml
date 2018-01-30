@@ -105,6 +105,9 @@
     <string name="chat_info">Chat info</string>
     <string name="chat_info_add_people_error">Add people errors</string>
 
+    <string name="user_should_be_in_same_feedstation_with_you">User should be in the same feedstation with you</string>
+    <string name="user_should_be_joined_the_feedstation">User should be joined the feedstation</string>
+
     <string name="group_chat_join_error">Could not join chat, errors:</string>
     <string name="public_group_chat_cannot_be_deleted">Public Group chat can be deleted only by owner</string>
     <string name="error_leave_chat">Error leaving room</string>
