@@ -43,7 +43,7 @@ public class QbUsersHolder {
         ArrayList<QBUser> updateInRealm = new ArrayList<>();
         for (QBUser user : users) {
             if (qbUserSparseArray.get(user.getId()) == null ||
-                    qbUserSparseArray.get(user.getId()).getUpdatedAt().before(user.getUpdatedAt()))
+                    (user.getUpdatedAt() != null && qbUserSparseArray.get(user.getId()).getUpdatedAt().before(user.getUpdatedAt())))
                 updateInRealm.add(user);
             putUser(user);
         }
