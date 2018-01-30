@@ -228,8 +228,10 @@ public class ChatAdapter extends BaseListAdapter<QBChatMessage> {
     private void setMessageAuthor(ViewHolder holder, QBChatMessage chatMessage) {
         if (isIncoming(chatMessage)) {
             QBUser sender = QbUsersHolder.getInstance().getUserById(chatMessage.getSenderId());
-            holder.messageAuthorTextView.setText(sender.getFullName());
-            holder.messageAuthorTextView.setVisibility(View.VISIBLE);
+            if (sender != null) {
+                holder.messageAuthorTextView.setText(sender.getFullName());
+                holder.messageAuthorTextView.setVisibility(View.VISIBLE);
+            }
 
             if (hasAttachments(chatMessage)) {
                 holder.messageAuthorTextView.setBackgroundResource(R.drawable.shape_rectangle_semi_transparent);
