@@ -1,8 +1,10 @@
 package com.varteq.catslovers.view;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.location.Address;
@@ -53,6 +55,7 @@ import com.varteq.catslovers.view.qb.AttachmentImageActivity;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -120,6 +123,8 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
     TextView timeToEat1TextView;
     @BindView(R.id.time_to_eat2_textView)
     TextView timeToEat2TextView;
+    @BindView(R.id.time_to_next_feeding)
+    TextView timeToNextFeeding;
     @BindView(R.id.time_to_feed_layout)
     ConstraintLayout timeToFeedLayout;
 
@@ -154,6 +159,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
     HeaderPhotosViewPagerAdapter pagerAdapter;
     private int[] headerPhotos = {R.drawable.cat2, R.drawable.cat3, R.drawable.cat1};
     Geocoder geocoder;
+    BroadcastReceiver tickReceiver;
 
     public static void startInViewMode(Activity activity, Feedstation feedstation) {
         Intent intent = new Intent(activity, FeedstationActivity.class);
@@ -196,7 +202,14 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
         }
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+        tickReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().compareTo(Intent.ACTION_TIME_TICK) == 0) {
+                    updateTimeToNextFeeding();
+                }
+            }
+        };
         /*Glide.with(this)
                 .load(getResources().getDrawable(R.drawable.cat2))
                 .into(avatarImageView);*/
@@ -236,6 +249,11 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
 
     }
 
+    private void updateTimeToNextFeeding() {
+        if (null != feedstation)
+            setTimeToNextFeeding();
+    }
+
     private void fillUI() {
         if (feedstation != null) {
             stationNameTextView.setText(feedstation.getName());
@@ -246,7 +264,10 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
             stationNamePhotosTextView.setText(feedstation.getName() != null ? feedstation.getName() : getString(R.string.new_cat_profile_screen_title));
             timeToEat1TextView.setText(TimeUtils.getDateAsHHmm(feedstation.getTimeToEat1()));
             timeToEat2TextView.setText(TimeUtils.getDateAsHHmm(feedstation.getTimeToEat2()));
+            setTimeToNextFeeding();
             initStationAction();
+
+            registerReceiver(tickReceiver, new IntentFilter(Intent.ACTION_TIME_TICK)); // register the broadcast receiver to receive TIME_TICK
         }
         /*scrollView.setOnTouchListener((v, event) -> {
             if (mainLayout.getDescendantFocusability() != ViewGroup.FOCUS_BLOCK_DESCENDANTS)
@@ -319,7 +340,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
         feedstationCatsAdapter = new FeedstationCatsAdapter(catProfileList, new FeedstationCatsAdapter.OnCatClickListener() {
             @Override
             public void onCatClicked(CatProfile catProfile) {
-               
+
             }
         });
         catsRecyclerView.setAdapter(feedstationCatsAdapter);
@@ -333,6 +354,54 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
 
         groupPartnersRecyclerView.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+    }
+
+    private void setTimeToNextFeeding() {
+        Date nearestDate;
+        Date currentDate = Calendar.getInstance().getTime();
+        Date date1 = feedstation.getTimeToEat1();
+        Date date2 = feedstation.getTimeToEat2();
+        Date finalDate = new Date();
+
+        final int MILLI_TO_HOUR = 1000 * 60 * 60;
+        if (null != date1 && null != date2) {
+            if (currentDate.after(date1)) {
+                if (currentDate.after(date2)) {
+                    if (date1.before(date2))
+                        nearestDate = date1;
+                    else
+                        nearestDate = date2;
+                } else {
+                    nearestDate = date2;
+                }
+            } else {
+                if (currentDate.after(date2)) {
+                    nearestDate = date1;
+                } else {
+                    if (date1.before(date2))
+                        nearestDate = date1;
+                    else
+                        nearestDate = date2;
+                }
+            }
+        } else {
+            if (null != date1)
+                nearestDate = date1;
+            else if (null != date2)
+                nearestDate = date2;
+            else
+                return;
+        }
+        if (nearestDate.before(currentDate)) {
+            Calendar c = Calendar.getInstance();
+            c.setTime(nearestDate);
+            c.add(Calendar.DATE, 1);
+            nearestDate = c.getTime();
+        }
+        long time = (nearestDate.getTime() - currentDate.getTime());
+        int offset = finalDate.getTimezoneOffset();
+        finalDate.setTime(time);
+        timeToNextFeeding.setText(TimeUtils.getDateAsHHmmInUTC(finalDate));
     }
 
     public void setStationActionName(String name) {
@@ -950,5 +1019,13 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
             feedstation.setTimeToEat2(TimeUtils.getTimeInMillis(i, i1));
             timeToEat2TextView.setText(TimeUtils.getDateAsHHmm(feedstation.getTimeToEat2()));
         });
+    }
+
+    @Override
+    protected void onStop() {
+        // unregister broadcast receiver, will get an error otherwise
+        if (tickReceiver != null)
+            unregisterReceiver(tickReceiver);
+        super.onStop();
     }
 }

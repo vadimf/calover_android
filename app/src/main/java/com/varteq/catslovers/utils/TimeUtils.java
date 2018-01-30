@@ -53,6 +53,14 @@ public class TimeUtils {
         return dateFormat.format(date);
     }
 
+    public static String getDateAsHHmmInUTC(Date date) {
+        if (date == null) return "";
+        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        return dateFormat.format(date);
+    }
+
     public static long getTimeInMillis(int year, int month, int monthDay) {
         Calendar birthday = Calendar.getInstance();
         birthday.set(Calendar.YEAR, year);

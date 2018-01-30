@@ -112,13 +112,14 @@ public class FeedFragment extends Fragment {
         listUpdated = false;
     }
 
-    public void feedsLoaded(List<FeedPost> feeds) {
+    public void feedsLoaded(List<FeedPost> feeds, boolean isNeedScrollDown) {
         listUpdated = true;
         feedList.clear();
         feedList.addAll(feeds);
         adapter.notifyDataSetChanged();
         feedRefreshLayout.setRefreshing(false);
-        feedRecyclerView.scrollToPosition(feeds.size() - 1);
+        if (isNeedScrollDown)
+            feedRecyclerView.scrollToPosition(feeds.size() - 1);
     }
 
     public void onError() {
