@@ -16,7 +16,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -33,8 +32,6 @@ import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.utils.Utils;
-import com.varteq.catslovers.utils.qb.imagepick.ImagePickHelper;
-import com.varteq.catslovers.utils.qb.imagepick.OnImagePickedListener;
 import com.varteq.catslovers.view.fragments.CatsFragment;
 import com.varteq.catslovers.view.fragments.FeedFragment;
 import com.varteq.catslovers.view.fragments.MapFragment;
@@ -50,7 +47,7 @@ import butterknife.ButterKnife;
 import static com.varteq.catslovers.utils.SystemPermissionHelper.REQUEST_CHECK_SETTINGS;
 
 
-public class MainActivity extends BaseActivity implements OnImagePickedListener {
+public class MainActivity extends BaseActivity {
 
     private String TAG = MainActivity.class.getSimpleName();
     View view;
@@ -68,7 +65,6 @@ public class MainActivity extends BaseActivity implements OnImagePickedListener 
     @BindView(R.id.frameLayout)
     FrameLayout mainLayout;
     RoundedImageView avatarImageView;
-    Button changeAvatarButton;
     TextView usernameTextView;
     ImageButton drawerBackButton;
 
@@ -350,12 +346,10 @@ public class MainActivity extends BaseActivity implements OnImagePickedListener 
         navigationHeaderLayout = navigationView.getHeaderView(0);
         navigationEditImageButton = navigationHeaderLayout.findViewById(R.id.imageButton_edit);
         avatarImageView = navigationHeaderLayout.findViewById(R.id.imageView_avatar);
-        changeAvatarButton = navigationHeaderLayout.findViewById(R.id.button_change_avatar);
         usernameTextView = navigationHeaderLayout.findViewById(R.id.textView_email);
         drawerBackButton = navigationHeaderLayout.findViewById(R.id.button_navigation_drawer_back);
 
         navigationEditImageButton.setOnClickListener(view -> startActivity(new Intent(MainActivity.this, SettingsActivity.class)));
-        changeAvatarButton.setOnClickListener(view -> new ImagePickHelper().pickAnImage(MainActivity.this, 0));
         drawerBackButton.setOnClickListener(view -> drawerLayout.closeDrawer(Gravity.LEFT));
         navigationView.setNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
@@ -374,7 +368,7 @@ public class MainActivity extends BaseActivity implements OnImagePickedListener 
                         intent.putExtra(Intent.EXTRA_SUBJECT, "CatLovers");
                         intent.putExtra(Intent.EXTRA_TEXT, "I recommend you that app:\nhttps://play.google.com/store/apps/details?id=com.varteq.catslovers");
                         startActivity(Intent.createChooser(intent, "choose one"));
-                    } catch(Exception e) {
+                    } catch (Exception e) {
                         //e.toString();
                     }
                     break;
@@ -419,67 +413,6 @@ public class MainActivity extends BaseActivity implements OnImagePickedListener 
                     });
         else
             avatarImageView.setImageBitmap(Utils.getBitmapWithColor(getResources().getColor(R.color.transparent)));
-    }
-
-    @Override
-    public void onImagePicked(int requestCode, File file) {
-        if (null != file) {
-            avatar = file.getPath();
-            Profile.saveUserAvatar(this, avatar);
-            updateAvatar();
-            presenter.uploadAvatar();
-        }
-    }
-
-    @Override
-    public void onImagesPicked(int requestCode, List<File> file) {
-
-    }
-
-    @Override
-    public void onVideoPicked(int requestCode, File file, Bitmap preview) {
-
-    }
-
-    @Override
-    public void onImagePickError(int requestCode, Exception e) {
-
-    }
-
-    @Override
-    public void onImagePickClosed(int requestCode) {
-
-    }
-
-    private void updateAvatar() {
-        if (avatar != null)
-            Glide.with(this)
-                    .asBitmap()
-                    .load(avatar)
-                    .into(new SimpleTarget<Bitmap>() {
-                        final int THUMBSIZE = 250;
-
-                        @Override
-                        public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
-                            if (resource.getWidth() > THUMBSIZE)
-                                avatarImageView.setImageBitmap(ThumbnailUtils.extractThumbnail(resource,
-                                        THUMBSIZE, THUMBSIZE));
-                            else
-                                avatarImageView.setImageBitmap(resource);
-                        }
-                    });
-        else
-            avatarImageView.setImageBitmap(Utils.getBitmapWithColor(getResources().getColor(R.color.transparent)));
-    }
-
-    public void updateAvatar(String url) {
-        if (url != null)
-            Glide.with(this)
-                    .asBitmap()
-                    .load(url)
-                    .into(avatarImageView);
-        else
-            updateAvatar();
     }
 
     private void sendLogs() {

@@ -38,6 +38,7 @@
         android:layout_marginTop="20dp"
         android:scaleType="centerCrop"
         android:src="@drawable/cat1"
+        android:layout_marginBottom="16dp"
         app:riv_oval="true"/>
 
     <TextView
@@ -52,14 +53,6 @@
         android:textStyle="bold"
         android:visibility="gone"/>
 
-    <Button
-        android:id="@+id/button_change_avatar"
-        style="@style/PrimaryBorderlessButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/imageView_avatar"
-        android:text="Change"
-        android:textColor="@color/white"/>
 
     <TextView
         android:id="@+id/textView_email"
@@ -77,9 +70,8 @@
         android:id="@+id/imageButton_edit"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:layout_alignBottom="@+id/button_change_avatar"
+        android:layout_alignBottom="@+id/imageView_avatar"
         android:layout_alignParentEnd="true"
-        android:layout_alignTop="@+id/button_change_avatar"
         android:layout_marginRight="16dp"
         android:background="@color/transparent"
         app:srcCompat="@drawable/ic_edit_white_24dp"/>
