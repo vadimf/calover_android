@@ -117,10 +117,14 @@ public class CatProfilePresenter {
     }
 
     public void onDeleteCatClicked(CatProfile catProfile) {
-        if (catProfile.getUserRole() != null && catProfile.getUserRole().equals(Feedstation.UserRole.ADMIN))
-            deleteCat(catProfile.getId());
-        else {
-            Toaster.longToast(R.string.only_admins_can_delete_cats);
+        if (null != catProfile) {
+            if (catProfile.getUserRole() != null && catProfile.getUserRole().equals(Feedstation.UserRole.ADMIN))
+                deleteCat(catProfile.getId());
+            else {
+                Toaster.longToast(R.string.only_admins_can_delete_cats);
+            }
+        }else{
+            view.forceClose();
         }
     }
 
