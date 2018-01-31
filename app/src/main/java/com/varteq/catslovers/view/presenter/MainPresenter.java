@@ -187,6 +187,7 @@ public class MainPresenter {
                     RUserSimple user = response.body().getData();
                     if (user != null) {
                         view.setNavigationUsername(user.getName());
+                        Profile.saveUser(view, user.getName());
                         view.updateNavigationAvatar(user.getAvatarUrlThumbnail());
                     }
                 }
