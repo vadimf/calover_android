@@ -150,6 +150,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private Marker clickedMarker;
     private LatLng clickedMarkerLocation;
+    private Marker newActionMarker;
+    private MarkerOptions newActionMarkerOptions;
     private Business clickedBusiness;
     private EventInfoWindowAdapter eventInfoWindowAdapter;
     private BusinessInfoWindowAdapter businessInfoWindowAdapter;
@@ -196,7 +198,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             googleMap.animateCamera(CameraUpdateFactory.zoomTo(getZoomMapForRadius(radiusKm)), null);
     }
 
-    public float getZoomMapForRadius(int radiusKm) {
+    public float getZoomMapForRadius(double radiusKm) {
         if (userLocation != null && googleMap != null) {
             double radiusM = radiusKm * 1000;
             double zoomLevel;
@@ -401,18 +403,20 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             return false;
         });
 
-        this.googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
-            @Override
-            public void onInfoWindowClick(Marker marker) {
-                presenter.onInfoWindowClicked(marker.getTag());
-            }
-        });
+        this.googleMap.setOnInfoWindowClickListener(marker -> presenter.onInfoWindowClicked(marker.getTag()));
 
         this.googleMap.setOnMapLongClickListener(latLng -> {
-            /*Location selectedLocation = new Location("");
-            selectedLocation.setLatitude(latLng.latitude);
-            selectedLocation.setLongitude(latLng.longitude);*/
             final Dialog dialog = new Dialog(getContext());
+            dialog.setOnDismissListener(dialogInterface -> deleteNewActionMarker());
+            dialog.setOnCancelListener(dialogInterface -> deleteNewActionMarker());
+
+            moveCameraToSelectAction(latLng);
+            newActionMarkerOptions = new MarkerOptions()
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin_purple)) // insert image from request
+                    .anchor(markerPositionX, markerPositionY)
+                    .position(latLng);
+            newActionMarker = googleMap.addMarker(newActionMarkerOptions);
+
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
             RelativeLayout mapOptionsDialogLayout = (RelativeLayout) LayoutInflater.from(getContext()).inflate(R.layout.dialog_map_options, null);
@@ -434,7 +438,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 dialog.dismiss();
             });
 
-
             dialog.setContentView(mapOptionsDialogLayout);
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
             dialog.getWindow().setDimAmount(0);
@@ -451,6 +454,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             listUpdated = true;
             presenter.getFeedstations(userLocation.latitude, userLocation.longitude, 20);
         }
+    }
+
+    private void deleteNewActionMarker() {
+        newActionMarkerOptions = null;
+        if (newActionMarker != null)
+            newActionMarker.remove();
     }
 
     public void showEventMarkerDialog(Event event) {
@@ -474,6 +483,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             eventInfoWindowAdapter.setValues(address, date, eventTypeName, type);
             clickedMarker.showInfoWindow();
         }
+    }
+
+    private void moveCameraToSelectAction(LatLng latLng) {
+        LatLng selectedLocation = new LatLng(latLng.latitude - 0.00022, latLng.longitude);
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(selectedLocation)
+                .zoom(getZoomMapForRadius(0.2))
+                .build();
+        this.googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
     private void showBusinessMarkerInfoWindow(String name, String address, String description) {
@@ -668,90 +686,121 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     public void feedstationsLoaded(List<Feedstation> stations, List<Event> events, List<Business> businesses) {
-
         listUpdated = true;
         googleMap.clear();
+
+        restoreNewActionMarker();
+
         if (stations != null)
-            for (Feedstation feedstation : stations) {
-                LatLng feedstationLocation = feedstation.getLocation();
-                if (feedstationLocation == null) continue;
-
-                if (userLocation != null && isMarkersBeside(feedstationLocation, userLocation)) {
-                    LatLng newUserMarkerLocation = new LatLng(feedstationLocation.latitude + 0.0002, feedstationLocation.longitude);
-                    userLocationMarkerOptions.position(newUserMarkerLocation);
-                    addUserLocationMarker();
-                }
-
-                int resourceId = getFeedstationMarkerId(feedstation);
-                if (!isAdded()) return;
-                Marker marker = googleMap.addMarker(new MarkerOptions()
-                        .title(feedstation.getName())
-                        .icon(BitmapDescriptorFactory.fromResource(resourceId)) // insert image from request
-                        //.icon(BitmapDescriptorFactory.fromBitmap(resizeMarkerIcon(resourceId))) // insert image from request
-                        //.icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(R.drawable.ic_star))) // insert image from request
-                        .anchor(markerPositionX, markerPositionY)
-                        .position(feedstation.getLocation()));
-                marker.setTag(feedstation);
-
-                if (bottomSheetBehaviorFeedstation.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
-                    if (feedstation.getId().equals(((Feedstation) bottomSheetFeedstationFrameLayout.getTag()).getId())) {
-                        bottomSheetFeedstationFrameLayout.setTag(marker.getTag());
-                        initStationAction(feedstation);
-                        fillFeedstationBottomSheet(feedstation);
-                        initAvatarCatBackground(feedstation);
-                    }
-                }
-            }
-
+            drawFeedstationsMarkers(stations);
         if (events != null)
-            for (Event event : events) {
-                if (event.getLatLng() == null) continue;
-                int resourceId = R.drawable.event_orange;
-                if (event.getType().equals(Event.Type.EMERGENCY))
-                    resourceId = R.drawable.event_red;
-
-                if (!isAdded()) return;
-
-                Marker marker = googleMap.addMarker(new MarkerOptions()
-                        .title(event.getName())
-                        .icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory.decodeResource(getResources(), resourceId)))
-                        .anchor(markerPositionX, markerPositionY)
-                        .position(event.getLatLng())
-                );
-                marker.setTag(event);
-                if (clickedMarkerLocation != null
-                        && event.getLatLng().latitude == clickedMarkerLocation.latitude
-                        && event.getLatLng().longitude == clickedMarkerLocation.longitude) {
-                    clickedMarker = marker;
-                    showEventMarkerDialog(event);
-                }
-            }
-
+            drawEventsMarkers(events);
         if (businesses != null)
-            for (Business business : businesses) {
-                if (business.getLocation() == null) continue;
-                int resourceId = R.drawable.food_business;
-                if (business.getCategory() != null && business.getCategory().equals(Business.Category.VETERINARY))
-                    resourceId = R.drawable.veterinary_business;
-
-                if (!isAdded()) return;
-
-                Marker marker = googleMap.addMarker(new MarkerOptions()
-                        .title(business.getName())
-                        .icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory.decodeResource(getResources(), resourceId)))
-                        .anchor(markerPositionX, markerPositionY)
-                        .position(business.getLocation())
-                );
-                marker.setTag(business);
-                if (clickedMarkerLocation != null
-                        && business.getLocation().latitude == clickedMarkerLocation.latitude
-                        && business.getLocation().longitude == clickedMarkerLocation.longitude) {
-                    clickedMarker = marker;
-                    showBusinessMarkerDialog(business);
-                }
-            }
+            drawBusinessMarkers(businesses);
 
         addUserLocationMarker();
+    }
+
+    private void drawFeedstationsMarkers(List<Feedstation> stations) {
+        for (Feedstation feedstation : stations) {
+            LatLng feedstationLocation = feedstation.getLocation();
+            if (feedstationLocation == null)
+                continue;
+            improveUserMarkerPosition(feedstationLocation);
+
+            int resourceId = getFeedstationMarkerId(feedstation);
+            if (!isAdded()) return;
+            Marker marker = googleMap.addMarker(new MarkerOptions()
+                    .title(feedstation.getName())
+                    .icon(BitmapDescriptorFactory.fromResource(resourceId)) // insert image from request
+                    //.icon(BitmapDescriptorFactory.fromBitmap(resizeMarkerIcon(resourceId))) // insert image from request
+                    //.icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(R.drawable.ic_star))) // insert image from request
+                    .anchor(markerPositionX, markerPositionY)
+                    .position(feedstation.getLocation()));
+            marker.setTag(feedstation);
+
+            restoreClickedFeedstationMarker(marker, feedstation);
+        }
+    }
+
+    private void drawEventsMarkers(List<Event> events) {
+        for (Event event : events) {
+            if (event.getLatLng() == null) continue;
+            int resourceId = R.drawable.event_orange;
+            if (event.getType().equals(Event.Type.EMERGENCY))
+                resourceId = R.drawable.event_red;
+
+            if (!isAdded()) return;
+
+            Marker marker = googleMap.addMarker(new MarkerOptions()
+                    .title(event.getName())
+                    .icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory.decodeResource(getResources(), resourceId)))
+                    .anchor(markerPositionX, markerPositionY)
+                    .position(event.getLatLng())
+            );
+            marker.setTag(event);
+            restoreClickedEventMarker(marker, event);
+        }
+    }
+
+    private void drawBusinessMarkers(List<Business> businesses) {
+        for (Business business : businesses) {
+            if (business.getLocation() == null) continue;
+            int resourceId = R.drawable.food_business;
+            if (business.getCategory() != null && business.getCategory().equals(Business.Category.VETERINARY))
+                resourceId = R.drawable.veterinary_business;
+
+            if (!isAdded()) return;
+
+            Marker marker = googleMap.addMarker(new MarkerOptions()
+                    .title(business.getName())
+                    .icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory.decodeResource(getResources(), resourceId)))
+                    .anchor(markerPositionX, markerPositionY)
+                    .position(business.getLocation())
+            );
+            marker.setTag(business);
+            if (clickedMarkerLocation != null
+                    && business.getLocation().latitude == clickedMarkerLocation.latitude
+                    && business.getLocation().longitude == clickedMarkerLocation.longitude) {
+                clickedMarker = marker;
+                showBusinessMarkerDialog(business);
+            }
+        }
+    }
+
+    private void improveUserMarkerPosition(LatLng feedstationLocation) {
+        if (userLocation != null && isMarkersBeside(feedstationLocation, userLocation)) {
+            LatLng newUserMarkerLocation = new LatLng(feedstationLocation.latitude + 0.0002, feedstationLocation.longitude);
+            userLocationMarkerOptions.position(newUserMarkerLocation);
+            addUserLocationMarker();
+        }
+    }
+
+
+    private void restoreClickedFeedstationMarker(Marker marker, Feedstation feedstation) {
+        if (bottomSheetBehaviorFeedstation.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
+            if (feedstation.getId().equals(((Feedstation) bottomSheetFeedstationFrameLayout.getTag()).getId())) {
+                bottomSheetFeedstationFrameLayout.setTag(marker.getTag());
+                initStationAction(feedstation);
+                fillFeedstationBottomSheet(feedstation);
+                initAvatarCatBackground(feedstation);
+            }
+        }
+    }
+
+    private void restoreClickedEventMarker(Marker marker, Event event) {
+        if (clickedMarkerLocation != null
+                && event.getLatLng().latitude == clickedMarkerLocation.latitude
+                && event.getLatLng().longitude == clickedMarkerLocation.longitude) {
+            clickedMarker = marker;
+            showEventMarkerDialog(event);
+        }
+    }
+
+    private void restoreNewActionMarker() {
+        if (newActionMarkerOptions != null) {
+            newActionMarker = googleMap.addMarker(newActionMarkerOptions);
+        }
     }
 
     private boolean isMarkersBeside(LatLng firstMarkerLocation, LatLng secondMarkerLocation) {
