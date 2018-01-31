@@ -105,6 +105,8 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
     TextView photoCountTextView;
     @BindView(R.id.cats_textView)
     TextView catsTextView;
+    @BindView(R.id.cats_list_textView)
+    TextView catsListNumberTextView;
 
     @BindView(R.id.expand_partners_button)
     Button expandPartnersButton;
@@ -545,6 +547,10 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void setCatsListNumber(String catsListNumber){
+        catsListNumberTextView.setText(catsListNumber);
     }
 
     public void initAvatarCatBackground(Feedstation feedstation) {

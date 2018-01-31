@@ -191,9 +191,13 @@ public class FeedstationPresenter {
                     @Override
                     protected void onSuccess(List<RCat> data) {
                         Log.i(TAG, String.valueOf(data.size()));
-                        if (data.size() < 1) return;
+                        if (data.size() < 1) {
+                            view.setCatsListNumber("0");
+                            return;
+                        }
                         List<CatProfile> catProfiles = getCatProfiles(data);
                         view.catsLoaded(catProfiles);
+                        view.setCatsListNumber(String.valueOf(catProfiles.size()));
                     }
 
                     @Override

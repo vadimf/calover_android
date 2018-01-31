@@ -168,7 +168,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="30dp"
                 android:paddingBottom="8dp"
-                android:text="1-4"
+                tools:text="0"
                 app:layout_constraintStart_toEndOf="@+id/cats_list_label_textView"
                 app:layout_constraintTop_toTopOf="@+id/cats_list_label_textView" />
 
