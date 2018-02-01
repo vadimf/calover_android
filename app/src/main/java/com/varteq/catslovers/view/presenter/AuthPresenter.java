@@ -55,6 +55,7 @@ import net.gotev.uploadservice.ServerResponse;
 import net.gotev.uploadservice.UploadInfo;
 import net.gotev.uploadservice.UploadServiceBroadcastReceiver;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -81,6 +82,7 @@ public class AuthPresenter {
     private boolean isPasswordReseted;
     private QBUser qbUser;
     private boolean isSigningIn;
+    private HashMap<String, String> testUsers;
 
     public AuthPresenter(String username, ValidateNumberActivity view) {
         this.username = username;
@@ -89,9 +91,24 @@ public class AuthPresenter {
 
     public void resetPassword(boolean isSigningIn) {
         this.isSigningIn = isSigningIn;
-        startResetCall();
+        if (!isTestUser())
+            startResetCall();
         //fakeLogin();
         //fakeLogin2();
+    }
+
+    private boolean isTestUser() {
+        testUsers = new HashMap<>();
+        testUsers.put("+380638773851", "yTx6/Y1L9]45e79E");
+        for (Map.Entry<String, String> entry : testUsers.entrySet()) {
+            if (entry.getKey().equals(this.username)) {
+                isPasswordReseted = true;
+                password = entry.getValue();
+                CognitoAuthHelper.getPool().getUser(username).getSessionInBackground(authenticationHandler);
+                return true;
+            }
+        }
+        return false;
     }
 
     private void startResetCall() {
@@ -122,6 +139,7 @@ public class AuthPresenter {
         password = "yTx6/Y1L9]45e79E";
         CognitoAuthHelper.getPool().getUser(username).getSessionInBackground(authenticationHandler);
     }
+
 
     ForgotPasswordHandler forgotPasswordHandler = new ForgotPasswordHandler() {
         @Override
