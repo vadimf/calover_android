@@ -753,6 +753,9 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
     }
 
     private boolean isProfileValid() {
+        /*lastLocation = new Location("fused");
+        lastLocation.setLatitude(51.5016225);
+        lastLocation.setLongitude(31.2924888);*/
         if (currentMode.equals(CatProfileScreenMode.CREATE_MODE) && catType.equals(CatProfile.Status.PET) && lastLocation == null) {
             Toaster.longToast("We need location to display your cat on the map");
             checkLocationAvailability();

@@ -51,7 +51,7 @@ public class NewFeedPostActivity extends BaseActivity implements OnImagePickedLi
         ButterKnife.bind(this);
 
         presenter = new NewFeedPostPresenter(this);
-        progressBar.setVisibility(View.GONE);
+        //progressBar.setVisibility(View.GONE);
 
         //set back button
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -79,7 +79,8 @@ public class NewFeedPostActivity extends BaseActivity implements OnImagePickedLi
                 return true;
             case R.id.app_bar_save:
                 Log.d(TAG, "app_bar_save");
-                progressBar.setVisibility(View.VISIBLE);
+                //progressBar.setVisibility(View.VISIBLE);
+                showWaitDialog();
                 presenter.createFeed(postEditText.getText().toString(), mediaFile, preview, mediaType);
                 return true;
             case android.R.id.home:
@@ -134,7 +135,8 @@ public class NewFeedPostActivity extends BaseActivity implements OnImagePickedLi
     }
 
     public void createdSuccessfully(){
-        progressBar.setVisibility(View.GONE);
+        //progressBar.setVisibility(View.GONE);
+        hideWaitDialog();
         finish();
     }
 }
