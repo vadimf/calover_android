@@ -125,7 +125,7 @@
 
         <meta-data
             android:name="io.fabric.ApiKey"
-            android:value="4297a273107d8d9d043a63c18f8140a4fa3d0194"/>
+            android:value="225160e3ad8c6fee73871e48fe2dc1f0f7cb2167" />
 
         <activity
             android:name=".view.SuccessLoginActivity"
