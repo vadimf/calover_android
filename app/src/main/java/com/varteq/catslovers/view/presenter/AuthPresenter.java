@@ -100,6 +100,7 @@ public class AuthPresenter {
     private boolean isTestUser() {
         testUsers = new HashMap<>();
         testUsers.put("+380638773851", "yTx6/Y1L9]45e79E");
+        testUsers.put("+380638773851", "CatTest123_");
         for (Map.Entry<String, String> entry : testUsers.entrySet()) {
             if (entry.getKey().equals(this.username)) {
                 isPasswordReseted = true;
