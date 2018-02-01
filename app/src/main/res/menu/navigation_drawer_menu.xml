@@ -1,5 +1,4 @@
-<menu xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:checkableBehavior="single">
 
         <item
@@ -14,6 +13,9 @@
             android:id="@+id/navigation_menu_share"
             android:title="@string/share_this_app"
             android:icon="@drawable/ic_share_primary_24dp" />
+        <item
+            android:id="@+id/navigation_menu_send_logs"
+            android:title="@string/send_logs" />
         <!--<item
             android:id="@+id/navigation_menu_info"
             android:icon="@drawable/ic_info_24_px"

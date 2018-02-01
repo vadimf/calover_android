@@ -581,8 +581,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         if (location == null) {
             return;
             /*location = new Location("fused");
-            location.setLatitude(50.4437);
-            location.setLongitude(30.5008);
+            location.setLatitude(51.5016225);
+            location.setLongitude(31.2924888);
             Profile.setLocation(getContext(), location);*/
         }
 

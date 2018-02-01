@@ -190,9 +190,9 @@ public class MainActivity extends BaseActivity {
 
     private void initListeners() {
         mBottomNavigationView.setOnNavigationItemSelectedListener(item -> {
-            if (item.getItemId() == R.id.action_cats)
+            /*if (item.getItemId() == R.id.action_cats)
                 onCatsTabClicked();
-            else catsTabClickCount = 0;
+            else catsTabClickCount = 0;*/
             if (item.getItemId() != navigationSelectedItemId) {
                 if (navigationSelectedItemId == item.getItemId()) return true;
                 showNotificationAndAndPlusIcons();
@@ -241,17 +241,17 @@ public class MainActivity extends BaseActivity {
 
     private Handler sendLogsTimer;
 
-    private void onCatsTabClicked() {
-        catsTabClickCount++;
-        if (catsTabClickCount > 7) {
-            catsTabClickCount = 0;
-            sendLogs();
-        } else if (catsTabClickCount == 3) {
-            if (sendLogsTimer == null)
-                sendLogsTimer = new Handler();
-            sendLogsTimer.postDelayed(() -> catsTabClickCount = 0, 1500);
-        }
-    }
+//    private void onCatsTabClicked() {
+//        catsTabClickCount++;
+//        if (catsTabClickCount > 7) {
+//            catsTabClickCount = 0;
+//            sendLogs();
+//        } else if (catsTabClickCount == 3) {
+//            if (sendLogsTimer == null)
+//                sendLogsTimer = new Handler();
+//            sendLogsTimer.postDelayed(() -> catsTabClickCount = 0, 1500);
+//        }
+//    }
 
     private void hideNotificationAndPlusIcons() {
         catsNotificationButton.setVisibility(View.GONE);
@@ -373,6 +373,9 @@ public class MainActivity extends BaseActivity {
                     } catch (Exception e) {
                         //e.toString();
                     }
+                    break;
+                case R.id.navigation_menu_send_logs:
+                    sendLogs();
                     break;
                 /*case R.id.navigation_menu_info:
                     break;*/

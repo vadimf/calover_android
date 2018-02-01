@@ -30,7 +30,7 @@ public class ServiceGenerator {
         CLIENT.setReadTimeout(TIMEOUT, TimeUnit.SECONDS);
     }*/
 
-    public static String apiBaseUrl = "http://catslovers.clients.in.ua/";
+    public static String apiBaseUrl = "http://54.93.35.199/";//catslovers.clients.in.ua/";
 
     private static Retrofit.Builder builder =
             new Retrofit.Builder()
