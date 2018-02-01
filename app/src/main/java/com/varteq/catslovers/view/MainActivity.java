@@ -310,8 +310,10 @@ public class MainActivity extends BaseActivity {
             case REQUEST_CHECK_SETTINGS:
                 switch (resultCode) {
                     case Activity.RESULT_OK:
-                        if (mapFragment != null)
+                        if (mapFragment != null) {
                             mapFragment.onLocationAvailable();
+                            mapFragment.enableMyLocation();
+                        }
                         break;
                     default:
                         break;

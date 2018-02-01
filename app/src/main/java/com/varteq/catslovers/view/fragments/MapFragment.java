@@ -836,7 +836,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
         permissionHelper.checkLocationSettings(getActivity(), locationRequest, locationSettingsResponse -> {
             getLastLocation();
+            enableMyLocation();
         });
+    }
+
+    @SuppressLint("MissingPermission")
+    public void enableMyLocation(){
+        this.googleMap.setMyLocationEnabled(true);
+        this.googleMap.getUiSettings().setMyLocationButtonEnabled(true);
     }
 
     @SuppressLint("MissingPermission")
