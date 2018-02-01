@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
+import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.view.presenter.AuthPresenter;
 
 import net.gotev.uploadservice.UploadServiceBroadcastReceiver;
@@ -282,5 +283,11 @@ public class ValidateNumberActivity extends BaseActivity implements TextWatcher 
 
     public void unregisterUploadAvatarReceiver(UploadServiceBroadcastReceiver broadcastReceiver) {
         broadcastReceiver.unregister(this);
+    }
+
+    public void userNotFound() {
+        Toaster.shortToast("You are not registered");
+        startActivity(new Intent(this, SignUpActivity.class));
+        finishAffinity();
     }
 }

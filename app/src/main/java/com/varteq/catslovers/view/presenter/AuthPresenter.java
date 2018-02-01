@@ -171,7 +171,9 @@ public class AuthPresenter {
             if (checkNetworkErrAndShowSnackbar(e))
                 return;
             if (e instanceof UserNotFoundException) {
-                signUp();
+                if (isSigningIn)
+                    view.userNotFound();
+                else signUp();
             } else if (e instanceof CodeMismatchException) {
                 view.onCodeValidate(false);
                 getForgotPasswordCode(forgotPasswordContinuation);
