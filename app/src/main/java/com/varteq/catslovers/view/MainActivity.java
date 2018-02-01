@@ -425,7 +425,7 @@ public class MainActivity extends BaseActivity {
         Intent email = new Intent(Intent.ACTION_SEND);
         email.setType("text/plain");
         email.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(fileDir));
-        //email.putExtra(Intent.EXTRA_EMAIL, new String[]{"youremail@yahoo.com"});
+        email.putExtra(Intent.EXTRA_EMAIL, new String[]{"amakhovyk@varteq.com"});
         email.putExtra(Intent.EXTRA_SUBJECT, "CatsLovers logs");
         startActivity(Intent.createChooser(email, "Send CatsLovers logs"));
     }
