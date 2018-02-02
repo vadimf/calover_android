@@ -458,7 +458,7 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
                         presenter.addGroupPartner(groupPartnersList, groupPartnersAdapter);
                         groupPartnersRecyclerView.scrollToPosition(0);
                     }
-                });
+                }, null);
         groupPartnersRecyclerView.setAdapter(groupPartnersAdapter);
 
         if (!currentMode.equals(CatProfileScreenMode.CREATE_MODE))
@@ -589,6 +589,8 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
             saveMenu.setVisible(false);
         if (editMenu != null)
             editMenu.setVisible(true);
+        if (deleteMenu != null)
+            deleteMenu.setVisible(true);
 
         informationTextView.setVisibility(View.VISIBLE);
 
@@ -645,6 +647,8 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
             saveMenu.setVisible(true);
         if (editMenu != null)
             editMenu.setVisible(false);
+        if (deleteMenu != null)
+            deleteMenu.setVisible(false);
 
         informationTextView.setVisibility(View.GONE);
 
@@ -701,9 +705,11 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
             if (currentMode.equals(CatProfileScreenMode.VIEW_MODE)) {
                 saveMenu.setVisible(false);
                 editMenu.setVisible(true);
+                deleteMenu.setVisible(true);
             } else {
                 saveMenu.setVisible(true);
                 editMenu.setVisible(false);
+                deleteMenu.setVisible(false);
             }
         }
         return true;

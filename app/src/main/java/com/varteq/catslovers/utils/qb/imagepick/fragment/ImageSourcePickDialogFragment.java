@@ -22,6 +22,7 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
 
     private static final int POSITION_GALLERY = 0;
     private static final int POSITION_CAMERA = 1;
+    private static final int POSITION_CANCEL = 2;
 
     private SystemPermissionHelper systemPermissionHelper;
 
@@ -78,6 +79,9 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
                         onImageSourcePickedListener.onImageSourcePicked(ImageSource.CAMERA, isMultiselect);
                         dismiss();
                         break;
+                    case POSITION_CANCEL:
+                        dismiss();
+                        break;
                 }
             });
             return alertDialog;
@@ -103,6 +107,9 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
                             return;
                         }
                         onImageSourcePickedListener.onImageSourcePicked(ImageSource.CAMERA, isMultiselect);
+                        dismiss();
+                        break;
+                    case POSITION_CANCEL:
                         dismiss();
                         break;
                 }

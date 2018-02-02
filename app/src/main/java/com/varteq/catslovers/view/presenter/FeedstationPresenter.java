@@ -126,7 +126,7 @@ public class FeedstationPresenter {
 
                                 BaseResponse<RFeedstation> station = gson.fromJson(serverResponse.getBodyAsString(), new GenericOf<>(BaseResponse.class, RFeedstation.class));
                                 if (station != null && station.getSuccess()) {
-                                    view.savedSuccessfully();
+                                    view.savedSuccessfully(station);
                                     if (uploadInfo.getUploadId().contains(CREATE_FEEDSTATION_TAG))
                                         createChat(station.getData().getId(), station.getData().getName());
                                 } else Toaster.longToast("An error occurred while saving");
@@ -434,7 +434,6 @@ public class FeedstationPresenter {
 
             @Override
             public void onError(QBResponseException e) {
-                int i = 0;
             }
         });
     }

@@ -610,7 +610,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 //.icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(R.drawable.ic_star))) // insert image from request
                 .anchor(markerPositionX, markerPositionY)
                 .position(userLocation);
-        addUserLocationMarker();
+        //addUserLocationMarker();
 
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(userLocation)      // Sets the center of the map to Mountain View
@@ -715,7 +715,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         if (businesses != null)
             drawBusinessMarkers(businesses);
 
-        addUserLocationMarker();
+        //addUserLocationMarker();
     }
 
     private void drawFeedstationsMarkers(List<Feedstation> stations) {
@@ -789,7 +789,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         if (userLocation != null && isMarkersBeside(feedstationLocation, userLocation)) {
             LatLng newUserMarkerLocation = new LatLng(feedstationLocation.latitude + 0.0002, feedstationLocation.longitude);
             userLocationMarkerOptions.position(newUserMarkerLocation);
-            addUserLocationMarker();
+            //addUserLocationMarker();
         }
     }
 
@@ -851,6 +851,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             permissionHelper.requestPermissionsAccessLocation();
             return;
         }
+
+        if (getActivity() == null) return;
         permissionHelper.checkLocationSettings(getActivity(), locationRequest, locationSettingsResponse -> {
             getLastLocation();
             enableMyLocation();
@@ -865,9 +867,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     @SuppressLint("MissingPermission")
     public void getLastLocation() {
-        if (mFusedLocationClient == null)
+        if (mFusedLocationClient == null && getActivity() != null)
             mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
+        if (getActivity() == null) return;
         mFusedLocationClient.getLastLocation()
                 .addOnSuccessListener(getActivity(), location -> {
                     // Got last known location. In some rare situations this can be null.
@@ -878,7 +881,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void setUserPosition(Activity activity, Location lastLocation) {
-        if (lastLocation != null) {
+        if (lastLocation != null && activity != null) {
             Profile.setLocation(activity, lastLocation);
             setUserPosition();
             if (!listUpdated && userLocation != null) {

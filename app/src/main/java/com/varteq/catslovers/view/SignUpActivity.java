@@ -93,6 +93,10 @@ public class SignUpActivity extends BaseActivity implements OnImagePickedListene
 
     @OnClick(R.id.sign_in_button)
     void signInButtonClicked() {
+        if (true) {
+            Toaster.longToast("Now we are migrating, so use signUp");
+            return;
+        }
         Log.d(TAG, "sign_in_button OnClick");
         Profile.setIsUserSigningIn(this, true);
         Intent intent = new Intent(SignUpActivity.this, ConfirmNumberActivity.class);
