@@ -35,6 +35,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.varteq.catslovers.R;
+import com.varteq.catslovers.api.entity.BaseResponse;
+import com.varteq.catslovers.api.entity.RFeedstation;
 import com.varteq.catslovers.model.CatProfile;
 import com.varteq.catslovers.model.Feedstation;
 import com.varteq.catslovers.model.GroupPartner;
@@ -268,8 +270,6 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
             timeToEat2TextView.setText(TimeUtils.getDateAsHHmm(feedstation.getTimeToEat2()));
             setTimeToNextFeeding();
             initStationAction();
-
-            registerReceiver(tickReceiver, new IntentFilter(Intent.ACTION_TIME_TICK)); // register the broadcast receiver to receive TIME_TICK
         }
         /*scrollView.setOnTouchListener((v, event) -> {
             if (mainLayout.getDescendantFocusability() != ViewGroup.FOCUS_BLOCK_DESCENDANTS)
@@ -312,22 +312,6 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
                     @Override
                     public void onPersonClicked(GroupPartner groupPartner) {
                         presenter.onGroupPartnerClicked(groupPartner);
-                        if (feedstation.getUserRole() != null && feedstation.getUserRole().equals(Feedstation.UserRole.ADMIN)) {
-                            Log.d(TAG, "onPersonClicked " + groupPartner.getName());
-                            if (groupPartner.getStatus().equals(GroupPartner.Status.INVITED))
-                                Toaster.shortToast("user invited");
-                            else if (groupPartner.getStatus().equals(GroupPartner.Status.REQUESTED)) {
-                                new AlertDialog.Builder(FeedstationActivity.this)
-                                        .setTitle("Allow the user to become a member")
-                                        .setNeutralButton(android.R.string.cancel, null)
-                                        .setNegativeButton(R.string.no, (dialogInterface, i) ->
-                                                presenter.deleteGroupPartner(feedstation.getId(), groupPartner.getUserId()))
-                                        .setPositiveButton(android.R.string.ok, (dialogInterface, i) ->
-                                                presenter.addGroupPartner(feedstation.getId(), groupPartner.getPhone()))
-                                        .create()
-                                        .show();
-                            }
-                        }
                     }
 
                     @Override
@@ -335,6 +319,32 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
                         Log.d(TAG, "onAddPerson");
                         if (feedstation.getUserRole() != null && feedstation.getUserRole().equals(Feedstation.UserRole.ADMIN))
                             pickContact();
+                    }
+                },
+                groupPartner -> {
+                    if (feedstation.getUserRole() != null && feedstation.getUserRole().equals(Feedstation.UserRole.ADMIN)) {
+                        Log.d(TAG, "onPersonClicked " + groupPartner.getName());
+                        if (groupPartner.getStatus().equals(GroupPartner.Status.INVITED))
+                            Toaster.shortToast("user invited");
+                        else if (groupPartner.getStatus().equals(GroupPartner.Status.REQUESTED)) {
+                            new AlertDialog.Builder(FeedstationActivity.this)
+                                    .setTitle("Allow the user to become a member")
+                                    .setNeutralButton(android.R.string.cancel, null)
+                                    .setNegativeButton(R.string.no, (dialogInterface, i) ->
+                                            presenter.deleteGroupPartner(feedstation.getId(), groupPartner.getUserId()))
+                                    .setPositiveButton(android.R.string.ok, (dialogInterface, i) ->
+                                            presenter.addGroupPartner(feedstation.getId(), groupPartner.getPhone()))
+                                    .create()
+                                    .show();
+                        } else if (!groupPartner.isAdmin() && groupPartner.getStatus().equals(GroupPartner.Status.JOINED)) {
+                            new AlertDialog.Builder(FeedstationActivity.this)
+                                    .setTitle("Delete user?")
+                                    .setNegativeButton(R.string.no, null)
+                                    .setPositiveButton(android.R.string.ok, (dialogInterface, i) ->
+                                            presenter.deleteGroupPartner(feedstation.getId(), groupPartner.getUserId()))
+                                    .create()
+                                    .show();
+                        }
                     }
                 });
         groupPartnersRecyclerView.setAdapter(groupPartnersAdapter);
@@ -497,7 +507,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_edit_cat_profile_activity, menu);
+        inflater.inflate(R.menu.menu_edit_station_activity, menu);
 
         saveMenu = menu.findItem(R.id.app_bar_save);
         editMenu = menu.findItem(R.id.app_bar_edit);
@@ -817,9 +827,10 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
         }
     }
 
-    public void savedSuccessfully() {
+    public void savedSuccessfully(BaseResponse<RFeedstation> station) {
         currentMode = FeedstationScreenMode.VIEW_MODE;
         photosToRemove = null;
+        feedstation.setId(station.getData().getId());
         for (PhotoWithPreview photo : photoList)
             photo.setExpectedAction(null);
         setupUIMode();
@@ -1025,6 +1036,13 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
             feedstation.setTimeToEat2(TimeUtils.getTimeInMillis(i, i1));
             timeToEat2TextView.setText(TimeUtils.getDateAsHHmm(feedstation.getTimeToEat2()));
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (tickReceiver != null)
+            registerReceiver(tickReceiver, new IntentFilter(Intent.ACTION_TIME_TICK)); // register the broadcast receiver to receive TIME_TICK
     }
 
     @Override

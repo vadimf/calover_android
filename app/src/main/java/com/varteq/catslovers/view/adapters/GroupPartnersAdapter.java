@@ -21,6 +21,7 @@ import butterknife.ButterKnife;
 public class GroupPartnersAdapter extends RecyclerView.Adapter<GroupPartnersAdapter.GroupPartnerViewHolder> {
 
     private OnPersonClickListener externalClickListener;
+    private OnPersonLongClickListener externalLongClickListener;
     private List<GroupPartner> personList;
     private String addNewPartnerString = "addNewPartnerString";
     private final GroupPartner addNewPartnerView = new GroupPartner(addNewPartnerString, "", GroupPartner.Status.JOINED, false);
@@ -37,9 +38,21 @@ public class GroupPartnersAdapter extends RecyclerView.Adapter<GroupPartnersAdap
             }
         }
     };
+    private View.OnLongClickListener internalLongClickListener = new View.OnLongClickListener() {
+        @Override
+        public boolean onLongClick(View view) {
+            RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) view.getLayoutParams();
+            int itemPosition = lp.getViewLayoutPosition();
+            if (externalLongClickListener != null && !personList.get(itemPosition).getAvatar().equals(addNewPartnerString))
+                externalLongClickListener.onPersonClicked(personList.get(itemPosition));
+            return true;
+        }
+    };
 
-    public GroupPartnersAdapter(List<GroupPartner> personList, boolean isEditMode, OnPersonClickListener externalClickListener) {
+    public GroupPartnersAdapter(List<GroupPartner> personList, boolean isEditMode, OnPersonClickListener externalClickListener,
+                                OnPersonLongClickListener onPersonLongClickListener) {
         this.externalClickListener = externalClickListener;
+        this.externalLongClickListener = onPersonLongClickListener;
         this.personList = personList;
 
         if (isEditMode)
@@ -100,6 +113,7 @@ public class GroupPartnersAdapter extends RecyclerView.Adapter<GroupPartnersAdap
                 inflate(R.layout.card_group_partner, viewGroup, false);
 
         itemView.setOnClickListener(internalClickListener);
+        itemView.setOnLongClickListener(internalLongClickListener);
         return new GroupPartnerViewHolder(itemView);
     }
 
@@ -121,5 +135,9 @@ public class GroupPartnersAdapter extends RecyclerView.Adapter<GroupPartnersAdap
     public interface OnPersonClickListener {
         void onPersonClicked(GroupPartner groupPartner);
         void onAddPerson();
+    }
+
+    public interface OnPersonLongClickListener {
+        void onPersonClicked(GroupPartner position);
     }
 }

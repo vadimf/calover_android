@@ -3,5 +3,6 @@
     <string-array name="dlg_image_pick">
         <item>Gallery</item>
         <item>Camera</item>
+        <item>Cancel</item>
     </string-array>
 </resources>
