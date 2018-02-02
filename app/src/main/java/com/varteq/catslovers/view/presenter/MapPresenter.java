@@ -293,6 +293,7 @@ public class MapPresenter {
         for (REvent rEvent : data) {
             Event event = new Event();
             event.setId(rEvent.getId());
+            if (rEvent.getEventType() == null) continue;
             event.setTypeName(rEvent.getEventType().getName());
             switch (rEvent.getId()) {
                 case EVENT_TYPE_WARNING_NEWBORN_KITTENS:
