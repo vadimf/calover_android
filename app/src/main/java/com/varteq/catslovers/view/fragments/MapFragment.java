@@ -593,7 +593,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 //.icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(R.drawable.ic_star))) // insert image from request
                 .anchor(markerPositionX, markerPositionY)
                 .position(userLocation);
-        addUserLocationMarker();
+        //addUserLocationMarker();
 
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(userLocation)      // Sets the center of the map to Mountain View
@@ -698,7 +698,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         if (businesses != null)
             drawBusinessMarkers(businesses);
 
-        addUserLocationMarker();
+        //addUserLocationMarker();
     }
 
     private void drawFeedstationsMarkers(List<Feedstation> stations) {
@@ -772,7 +772,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         if (userLocation != null && isMarkersBeside(feedstationLocation, userLocation)) {
             LatLng newUserMarkerLocation = new LatLng(feedstationLocation.latitude + 0.0002, feedstationLocation.longitude);
             userLocationMarkerOptions.position(newUserMarkerLocation);
-            addUserLocationMarker();
+            //addUserLocationMarker();
         }
     }
 

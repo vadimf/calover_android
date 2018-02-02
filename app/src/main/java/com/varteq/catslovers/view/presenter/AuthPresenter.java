@@ -99,7 +99,7 @@ public class AuthPresenter {
 
     private boolean isTestUser() {
         testUsers = new HashMap<>();
-        testUsers.put("+380638773851", "yTx6/Y1L9]45e79E");
+        testUsers.put("+380938315207", "09g@I9O%9!0?M!2l");
         testUsers.put("+380638773851", "CatTest123_");
         for (Map.Entry<String, String> entry : testUsers.entrySet()) {
             if (entry.getKey().equals(this.username)) {
@@ -756,15 +756,18 @@ public class AuthPresenter {
         };
 
         String path = Profile.getUserAvatar(view);
-        if (path.isEmpty()) {
+        /*if (path.isEmpty()) {
             updateQBUser(qbUser);
             return;
-        }
+        }*/
         try {
             view.registerUploadAvatarReceiver(broadcastReceiver);
             MultipartUploadRequest uploadCatRequest = new MultipartUploadRequest(view, ServiceGenerator.apiBaseUrl + "user")
                     .setMethod("PUT")
-                    .addFileToUpload(path, "avatar");
+                    .addParameter("name", Profile.getUserName(view));
+
+            if (!path.isEmpty())
+                uploadCatRequest.addFileToUpload(path, "avatar");
 
             String uploadId = uploadCatRequest.startUpload();
         } catch (Exception exc) {

@@ -434,7 +434,6 @@ public class FeedstationPresenter {
 
             @Override
             public void onError(QBResponseException e) {
-                int i = 0;
             }
         });
     }
