@@ -834,6 +834,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             permissionHelper.requestPermissionsAccessLocation();
             return;
         }
+
+        if (getActivity() == null) return;
         permissionHelper.checkLocationSettings(getActivity(), locationRequest, locationSettingsResponse -> {
             getLastLocation();
             enableMyLocation();
@@ -848,9 +850,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     @SuppressLint("MissingPermission")
     public void getLastLocation() {
-        if (mFusedLocationClient == null)
+        if (mFusedLocationClient == null && getActivity() != null)
             mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
+        if (getActivity() == null) return;
         mFusedLocationClient.getLastLocation()
                 .addOnSuccessListener(getActivity(), location -> {
                     // Got last known location. In some rare situations this can be null.
@@ -861,7 +864,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void setUserPosition(Activity activity, Location lastLocation) {
-        if (lastLocation != null) {
+        if (lastLocation != null && activity != null) {
             Profile.setLocation(activity, lastLocation);
             setUserPosition();
             if (!listUpdated && userLocation != null) {
