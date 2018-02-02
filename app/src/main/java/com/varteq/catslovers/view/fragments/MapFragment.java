@@ -11,6 +11,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -23,10 +24,12 @@ import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -44,6 +47,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
@@ -410,7 +414,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             dialog.setOnDismissListener(dialogInterface -> deleteNewActionMarker());
             dialog.setOnCancelListener(dialogInterface -> deleteNewActionMarker());
 
-            moveCameraToSelectAction(latLng);
+            moveDialogToMapPosition(dialog, latLng);
+
             newActionMarkerOptions = new MarkerOptions()
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin_purple)) // insert image from request
                     .anchor(markerPositionX, markerPositionY)
@@ -454,6 +459,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             listUpdated = true;
             presenter.getFeedstations(userLocation.latitude, userLocation.longitude, 20);
         }
+    }
+
+    private void moveDialogToMapPosition(Dialog dialog, LatLng latLng) {
+        Projection projection = googleMap.getProjection();
+        Point screenPosition = projection.toScreenLocation(latLng);
+
+        int screenWidth = Utils.getScreenWidthPx(getActivity());
+        int departure = (screenWidth / 2) - screenPosition.x;
+        WindowManager.LayoutParams wmlp = dialog.getWindow().getAttributes();
+        wmlp.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
+        wmlp.x = wmlp.x - departure;
+        wmlp.y = screenPosition.y + Utils.convertDpToPx(20, getContext());
     }
 
     private void deleteNewActionMarker() {
@@ -841,7 +858,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     @SuppressLint("MissingPermission")
-    public void enableMyLocation(){
+    public void enableMyLocation() {
         this.googleMap.setMyLocationEnabled(true);
         this.googleMap.getUiSettings().setMyLocationButtonEnabled(true);
     }

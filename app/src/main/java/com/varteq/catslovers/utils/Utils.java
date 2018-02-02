@@ -1,5 +1,6 @@
 package com.varteq.catslovers.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -8,6 +9,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.location.Address;
 import android.location.Geocoder;
+import android.util.DisplayMetrics;
 
 import com.varteq.catslovers.AppController;
 
@@ -139,4 +141,17 @@ public class Utils {
         return (double) i / precise;
     }
 
+    public static int getScreenWidthPx(Activity activity) {
+        return getDisplayMetrics(activity).widthPixels;
+    }
+
+    public static int getScreenHeightPx(Activity activity) {
+        return getDisplayMetrics(activity).heightPixels;
+    }
+
+    private static DisplayMetrics getDisplayMetrics(Activity activity) {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        activity.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        return displayMetrics;
+    }
 }
