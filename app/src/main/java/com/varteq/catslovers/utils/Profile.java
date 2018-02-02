@@ -96,7 +96,7 @@ public class Profile {
     }
 
     public static void setLocation(Context context, Location location) {
-        if (getLocation(context) != null) return;
+        //if (getLocation(context) != null) return;
         getDefaultSharedPreferences(context).edit().putString(USER_LOCATION_PROVIDER, location.getProvider()).apply();
         putDouble(context, USER_LOCATION_LAT, location.getLatitude());
         putDouble(context, USER_LOCATION_LNG, location.getLongitude());
