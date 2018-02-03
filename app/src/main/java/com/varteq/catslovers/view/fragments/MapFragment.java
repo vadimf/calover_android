@@ -90,6 +90,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private final int DEFAULT_ZOOM = 5;
     private GoogleMap googleMap;
 
+    private final String MY_LOCATION_BUTTON_TAG = "GoogleMapMyLocationButton";
+
     final private float markerPositionX = 0.5f; // Anchors the marker on center vertical
     final private float markerPositionY = 1.0f; // Anchors the marker on the bottom
 
@@ -174,14 +176,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         View view = inflater.inflate(R.layout.fragment_map, container, false);
 
-        View locationButton = ((View) view.findViewById(1).getParent()).findViewById(2);
+        View locationButton = view.findViewWithTag(MY_LOCATION_BUTTON_TAG);
 
         RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
 
         // Position location button on bottom right
         rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
         rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-        rlp.setMargins(0, 0, 30, 30);
+        rlp.setMargins(0, 0, 0, 30);
 
         return view;
     }
