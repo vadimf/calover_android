@@ -176,7 +176,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         View view = inflater.inflate(R.layout.fragment_map, container, false);
 
-        View locationButton = view.findViewWithTag(MY_LOCATION_BUTTON_TAG);
+        ImageView locationButton = view.findViewWithTag(MY_LOCATION_BUTTON_TAG);
+
+        locationButton.setImageDrawable(getResources().getDrawable(R.drawable.my_location_button));
 
         RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
 
