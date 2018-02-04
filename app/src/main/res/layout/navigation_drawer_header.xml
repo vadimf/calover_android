@@ -37,7 +37,7 @@
         android:layout_below="@+id/button_navigation_drawer_back"
         android:layout_marginTop="20dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/cat1"
+        android:src="@drawable/user_avatar_plug_img"
         android:layout_marginBottom="16dp"
         app:riv_oval="true"/>
 
