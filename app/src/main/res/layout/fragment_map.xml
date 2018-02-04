@@ -19,7 +19,9 @@
             android:layout_height="25dp"
             android:background="@color/white"
             android:theme="@style/SeekBarTheme"
-            android:visibility="gone"/>
+            android:min="2"
+            android:max="21"
+            android:rotation="180"/>
 
         <RelativeLayout
             android:layout_width="match_parent"
