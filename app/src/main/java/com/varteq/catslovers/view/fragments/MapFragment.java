@@ -95,7 +95,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     @BindView(R.id.seekBar)
     SeekBar seekBar;
-    final private int SEEKBAR_STEPS_COUNT = 4;
+    final private int SEEKBAR_STEPS_COUNT = 7;
+    final private float SEEKBAR_MAX_VALUE = 21.0f;
 
     @BindView(R.id.avatar_imageView)
     RoundedImageView avatarImageView;
@@ -197,9 +198,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 .into(avatarImageView);
     }
 
-    public void zoomMapForRadius(int radiusKm) {
-        if (userLocation != null && googleMap != null)
-            googleMap.animateCamera(CameraUpdateFactory.zoomTo(getZoomMapForRadius(radiusKm)), null);
+    private void zoomMapForLevel(float zoomLvl) {
+        if (userLocation != null && googleMap != null) {
+            googleMap.animateCamera(CameraUpdateFactory.zoomTo(zoomLvl));
+        }
     }
 
     public float getZoomMapForRadius(double radiusKm) {
@@ -243,9 +245,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         seekBar.setMax(SEEKBAR_STEPS_COUNT - 1);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                int radius = (i + 1) * (SEEKBAR_STEPS_COUNT + 1);
-                zoomMapForRadius(radius);
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    float zoomLvl = ((SEEKBAR_MAX_VALUE / SEEKBAR_STEPS_COUNT) * (progress + 1));
+                    zoomMapForLevel(zoomLvl);
+                }
             }
 
             @Override
@@ -453,6 +457,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         this.googleMap.setOnCameraMoveListener(() -> {
             LatLng centerCoords = googleMap.getCameraPosition().target;
             presenter.onCameraMoved(centerCoords.latitude, centerCoords.longitude);
+
+            // Update zoom seekbar when user changes zoom with gesture
+            CameraPosition cameraPosition = googleMap.getCameraPosition();
+            float zoomLvl = cameraPosition.zoom;
+            int seekerZoomLvl = (int) (zoomLvl * (SEEKBAR_STEPS_COUNT / SEEKBAR_MAX_VALUE)) - 1;
+            seekBar.setProgress(seekerZoomLvl);
         });
 
         if (!listUpdated && userLocation != null) {
