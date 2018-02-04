@@ -90,6 +90,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private final int DEFAULT_ZOOM = 5;
     private GoogleMap googleMap;
 
+    private final String MY_LOCATION_BUTTON_TAG = "GoogleMapMyLocationButton";
+
     final private float markerPositionX = 0.5f; // Anchors the marker on center vertical
     final private float markerPositionY = 1.0f; // Anchors the marker on the bottom
 
@@ -172,7 +174,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_map, container, false);
+
+        View view = inflater.inflate(R.layout.fragment_map, container, false);
+
+        applyCustomMyLocationButton(view);
+
+        return view;
     }
 
     @Override
@@ -1003,5 +1010,31 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     public void onSuccessJoin() {
         Toaster.shortToast("You have successfully joined");
+    }
+
+    private void applyCustomMyLocationButton(View mapView) {
+
+        ImageView locationButton = mapView.findViewWithTag(MY_LOCATION_BUTTON_TAG);
+
+        // Set custom icon
+        locationButton.setImageDrawable(getResources().getDrawable(R.drawable.my_location_button));
+
+        // Set location button size
+        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
+        layoutParams.width = 150;
+        layoutParams.height = 150;
+
+        // Position location button on bottom right
+        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+        locationButton.setLayoutParams(layoutParams);
+
+        // Set margins
+        ViewGroup.MarginLayoutParams marginLayoutParams = (ViewGroup.MarginLayoutParams) locationButton.getLayoutParams();
+        marginLayoutParams.rightMargin = 50;
+        marginLayoutParams.bottomMargin = 100;
+        locationButton.setLayoutParams(marginLayoutParams);
+
+        locationButton.requestLayout();
     }
 }
