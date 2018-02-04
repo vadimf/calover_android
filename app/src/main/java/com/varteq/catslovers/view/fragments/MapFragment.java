@@ -176,16 +176,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         View view = inflater.inflate(R.layout.fragment_map, container, false);
 
-        ImageView locationButton = view.findViewWithTag(MY_LOCATION_BUTTON_TAG);
-
-        locationButton.setImageDrawable(getResources().getDrawable(R.drawable.my_location_button));
-
-        RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
-
-        // Position location button on bottom right
-        rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
-        rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-        rlp.setMargins(0, 0, 0, 30);
+        applyCustomMyLocationButton(view);
 
         return view;
     }
@@ -1009,5 +1000,31 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     public void onSuccessJoin() {
         Toaster.shortToast("You have successfully joined");
+    }
+
+    private void applyCustomMyLocationButton(View mapView) {
+
+        ImageView locationButton = mapView.findViewWithTag(MY_LOCATION_BUTTON_TAG);
+
+        // Set custom icon
+        locationButton.setImageDrawable(getResources().getDrawable(R.drawable.my_location_button));
+
+        // Set location button size
+        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
+        layoutParams.width = 150;
+        layoutParams.height = 150;
+
+        // Position location button on bottom right
+        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+        locationButton.setLayoutParams(layoutParams);
+
+        // Set margins
+        ViewGroup.MarginLayoutParams marginLayoutParams = (ViewGroup.MarginLayoutParams) locationButton.getLayoutParams();
+        marginLayoutParams.rightMargin = 50;
+        marginLayoutParams.bottomMargin = 100;
+        locationButton.setLayoutParams(marginLayoutParams);
+
+        locationButton.requestLayout();
     }
 }
