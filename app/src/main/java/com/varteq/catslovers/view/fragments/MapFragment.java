@@ -1019,10 +1019,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         // Set custom icon
         locationButton.setImageDrawable(getResources().getDrawable(R.drawable.my_location_button));
 
+        // Get device screen size
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int deviceScreenHeight = displayMetrics.heightPixels;
+        int deviceScreenWidth = displayMetrics.widthPixels;
+
         // Set location button size
         RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
-        layoutParams.width = 150;
-        layoutParams.height = 150;
+        layoutParams.width = (int) Math.round(deviceScreenWidth * 0.1);
+        layoutParams.height = (int) Math.round(deviceScreenWidth * 0.1);
 
         // Position location button on bottom right
         layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
@@ -1031,8 +1037,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         // Set margins
         ViewGroup.MarginLayoutParams marginLayoutParams = (ViewGroup.MarginLayoutParams) locationButton.getLayoutParams();
-        marginLayoutParams.rightMargin = 50;
-        marginLayoutParams.bottomMargin = 100;
+        marginLayoutParams.rightMargin = (int) Math.round(deviceScreenWidth * 0.03);
+        marginLayoutParams.bottomMargin = (int) Math.round(deviceScreenHeight * 0.04);
         locationButton.setLayoutParams(marginLayoutParams);
 
         locationButton.requestLayout();
