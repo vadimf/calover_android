@@ -79,6 +79,8 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
     private String TAG = CatProfileActivity.class.getSimpleName();
     public static final String CAT_KEY = "cat_key";
     public static final String MODE_KEY = "mode_key";
+    public static final String CAT_NAME_KEY = "cat_name_key";
+    public static final String CAT_AVATAR_KEY = "cat_avatar_key";
 
     private String DEFAULT_VALUE = "setup";
     private String PET_DEFAULT_NAME = "Pet Name";
@@ -231,8 +233,16 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
     }
 
     public static void startInCreateMode(Activity activity) {
+        startInCreateMode(activity, null, null);
+    }
+
+    public static void startInCreateMode(Activity activity, String name, File avatar) {
         Intent intent = new Intent(activity, CatProfileActivity.class);
         intent.putExtra(MODE_KEY, CatProfileScreenMode.CREATE_MODE);
+        if (name != null)
+            intent.putExtra(CAT_NAME_KEY, name);
+        if (avatar != null)
+            intent.putExtra(CAT_AVATAR_KEY, avatar);
         activity.startActivity(intent);
     }
 
@@ -254,6 +264,10 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
         } else if (getIntent() != null) {
             if (getIntent().hasExtra(CAT_KEY))
                 catProfile = (CatProfile) getIntent().getSerializableExtra(CAT_KEY);
+            if (getIntent().hasExtra(CAT_NAME_KEY))
+                petNameTextView.setText(getIntent().getStringExtra(CAT_NAME_KEY));
+            if (getIntent().hasExtra(CAT_AVATAR_KEY))
+                onImagePicked(REQUEST_CODE_GET_AVATAR, (File) getIntent().getSerializableExtra(CAT_AVATAR_KEY));
 
             currentMode = (CatProfileScreenMode) getIntent().getSerializableExtra(MODE_KEY);
         }
