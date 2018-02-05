@@ -423,6 +423,10 @@ public class MainActivity extends BaseActivity {
             avatarImageView.setImageBitmap(Utils.getBitmapWithColor(getResources().getColor(R.color.transparent)));
     }
 
+    public Toolbar getToolbar(){
+        return toolbar;
+    }
+
     private void sendLogs() {
         File fileDir = Log.getLogFile();
         Intent email = new Intent(Intent.ACTION_SEND);
