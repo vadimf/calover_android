@@ -13,7 +13,7 @@
         android:id="@+id/dialog_event_background"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@drawable/shape_map_options_background_oval"
+        android:background="@drawable/shape_map_options_background_img"
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
