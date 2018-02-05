@@ -20,6 +20,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -435,7 +436,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-            RelativeLayout mapOptionsDialogLayout = (RelativeLayout) LayoutInflater.from(getContext()).inflate(R.layout.dialog_map_options, null);
+            ConstraintLayout mapOptionsDialogLayout = (ConstraintLayout) LayoutInflater.from(getContext()).inflate(R.layout.dialog_map_options, null);
+            ImageView backgroundImageView = mapOptionsDialogLayout.findViewById(R.id.dialog_options_background);
             Button openFeedStationButton = mapOptionsDialogLayout.findViewById(R.id.button_open_feedstation);
             Button warningsButton = mapOptionsDialogLayout.findViewById(R.id.button_warnings);
             Button emergenciesButton = mapOptionsDialogLayout.findViewById(R.id.button_emergencies);
@@ -453,6 +455,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 showCreateEmergenciesEventBottomSheet();
                 dialog.dismiss();
             });
+            backgroundImageView.setOnClickListener(view -> dialog.dismiss());
 
             dialog.setContentView(mapOptionsDialogLayout);
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
@@ -487,7 +490,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         WindowManager.LayoutParams wmlp = dialog.getWindow().getAttributes();
         wmlp.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
         wmlp.x = wmlp.x - departure;
-        wmlp.y = screenPosition.y + Utils.convertDpToPx(20, getContext());
+        wmlp.y = screenPosition.y + Utils.convertDpToPx(50, getContext());
     }
 
     private void deleteNewActionMarker() {
