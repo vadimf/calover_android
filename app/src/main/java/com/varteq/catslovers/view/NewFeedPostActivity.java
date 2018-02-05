@@ -29,7 +29,7 @@ public class NewFeedPostActivity extends BaseActivity implements OnImagePickedLi
 
     private final int THUMBSIZE = 500;
     private final int REQUEST_CODE_ATTACHMENT = 1;
-    private String TAG = CatProfileActivity.class.getSimpleName();
+    private String TAG = NewFeedPostActivity.class.getSimpleName();
 
     @BindView(R.id.post_editText)
     EditText postEditText;

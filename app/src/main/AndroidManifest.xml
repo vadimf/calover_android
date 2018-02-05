@@ -132,6 +132,7 @@
 
         <activity
             android:name=".view.SuccessLoginActivity"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".view.NewFeedPostActivity"
