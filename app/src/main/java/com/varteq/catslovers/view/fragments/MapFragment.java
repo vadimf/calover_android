@@ -437,6 +437,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
             ConstraintLayout mapOptionsDialogLayout = (ConstraintLayout) LayoutInflater.from(getContext()).inflate(R.layout.dialog_map_options, null);
+            ImageView backgroundImageView = mapOptionsDialogLayout.findViewById(R.id.dialog_options_background);
             Button openFeedStationButton = mapOptionsDialogLayout.findViewById(R.id.button_open_feedstation);
             Button warningsButton = mapOptionsDialogLayout.findViewById(R.id.button_warnings);
             Button emergenciesButton = mapOptionsDialogLayout.findViewById(R.id.button_emergencies);
@@ -454,6 +455,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 showCreateEmergenciesEventBottomSheet();
                 dialog.dismiss();
             });
+            backgroundImageView.setOnClickListener(view -> dialog.dismiss());
 
             dialog.setContentView(mapOptionsDialogLayout);
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));

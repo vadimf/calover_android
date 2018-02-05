@@ -10,6 +10,7 @@
                                              tools:background="@color/black">
 
     <ImageView
+        android:id="@+id/dialog_options_background"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@drawable/shape_map_options_background_oval"
