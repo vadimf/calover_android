@@ -240,6 +240,7 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cat_profile);
+        getSupportActionBar().setElevation(0);
 
         Log.d(TAG, "onCreate");
 

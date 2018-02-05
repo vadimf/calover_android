@@ -47,6 +47,7 @@ public class NewFeedPostActivity extends BaseActivity implements OnImagePickedLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_feed_post);
+        getSupportActionBar().setElevation(0);
 
         ButterKnife.bind(this);
 

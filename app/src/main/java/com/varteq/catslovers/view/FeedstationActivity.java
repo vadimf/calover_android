@@ -184,6 +184,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feedstation);
         ButterKnife.bind(this);
+        getSupportActionBar().setElevation(0);
 
         presenter = new FeedstationPresenter(this);
 

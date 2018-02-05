@@ -99,6 +99,7 @@ public class ChatActivity extends QBBaseActivity implements OnImagePickedListene
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+        getSupportActionBar().setElevation(0);
 
         Log.v(TAG, "onCreate ChatActivity on Thread ID = " + Thread.currentThread().getId());
 
