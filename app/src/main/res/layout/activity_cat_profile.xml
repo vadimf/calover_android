@@ -95,7 +95,7 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="32dp"
                 android:scaleType="centerCrop"
-                android:src="@color/transparent"
+                android:src="@drawable/cat_cover_avatar"
                 app:layout_constraintDimensionRatio="w,1:1"
                 app:layout_constraintEnd_toStartOf="@+id/avatar_end_guideline"
                 app:layout_constraintStart_toStartOf="@+id/avatar_start_guideline"

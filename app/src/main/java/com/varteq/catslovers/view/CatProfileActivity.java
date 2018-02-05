@@ -531,13 +531,10 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
     final int THUMBSIZE = 250;
 
     private void updateAvatar() {
-        if (avatar != null)
-            Glide.with(this)
-                    .load(avatar.getThumbnail())
-                    .apply(new RequestOptions().override(THUMBSIZE, THUMBSIZE))
-                    .into(avatarImageView);
-        else
-            avatarImageView.setImageBitmap(Utils.getBitmapWithColor(getResources().getColor(R.color.transparent)));
+        Glide.with(this)
+                .load(avatar != null ? avatar.getThumbnail() : R.drawable.cat_cover_avatar)
+                .apply(new RequestOptions().override(THUMBSIZE, THUMBSIZE))
+                .into(avatarImageView);
     }
 
     private void setupColorPickersColors() {
