@@ -258,10 +258,9 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
             currentMode = (CatProfileScreenMode) getIntent().getSerializableExtra(MODE_KEY);
         }
 
-        if (!currentMode.equals(CatProfileScreenMode.CREATE_MODE))
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        else {
-            permissionHelper = new SystemPermissionHelper(this);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (currentMode.equals(CatProfileScreenMode.CREATE_MODE)) {
+            permissionHelper = new SystemPermissionHelper( this);
             initLocation();
         }
 

@@ -764,6 +764,7 @@ public class AuthPresenter {
             view.registerUploadAvatarReceiver(broadcastReceiver);
             MultipartUploadRequest uploadCatRequest = new MultipartUploadRequest(view, ServiceGenerator.apiBaseUrl + "user")
                     .setMethod("PUT")
+                    .setUtf8Charset()
                     .addParameter("name", Profile.getUserName(view));
 
             if (!path.isEmpty())
