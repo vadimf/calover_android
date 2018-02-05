@@ -3,6 +3,7 @@ package com.varteq.catslovers.view.fragments;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -32,6 +33,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
@@ -77,6 +79,7 @@ import com.varteq.catslovers.view.adapters.info_window_adapter.BusinessInfoWindo
 import com.varteq.catslovers.view.adapters.info_window_adapter.EventInfoWindowAdapter;
 import com.varteq.catslovers.view.presenter.MapPresenter;
 
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -277,40 +280,79 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         warningsRadioGroup.setOnCheckedChangeListener((radioGroup, i) -> {
             switch (radioGroup.getCheckedRadioButtonId()) {
                 case R.id.radioButton_warnings_newborn_kittens:
-                    presenter.onCreateEventChoosed(MapPresenter.EVENT_TYPE_WARNING_NEWBORN_KITTENS, selectedLocation.latitude, selectedLocation.longitude);
+                    presenter.onCreateEventChoosed(MapPresenter.EVENT_TYPE_WARNING_NEWBORN_KITTENS, selectedLocation.latitude, selectedLocation.longitude, null);
                     hideBottomSheets();
+                    deleteNewActionMarker();
                     break;
                 case R.id.radioButton_warnings_municipality_inspector:
-                    presenter.onCreateEventChoosed(MapPresenter.EVENT_TYPE_WARNING_MUNICIPALITY_INSPECTOR, selectedLocation.latitude, selectedLocation.longitude);
+                    presenter.onCreateEventChoosed(MapPresenter.EVENT_TYPE_WARNING_MUNICIPALITY_INSPECTOR, selectedLocation.latitude, selectedLocation.longitude, null);
                     hideBottomSheets();
+                    deleteNewActionMarker();
                     break;
                 case R.id.radioButton_warnings_cat_in_heat:
-                    presenter.onCreateEventChoosed(MapPresenter.EVENT_TYPE_WARNING_CAT_IN_HEAT, selectedLocation.latitude, selectedLocation.longitude);
+                    presenter.onCreateEventChoosed(MapPresenter.EVENT_TYPE_WARNING_CAT_IN_HEAT, selectedLocation.latitude, selectedLocation.longitude, null);
                     hideBottomSheets();
+                    deleteNewActionMarker();
                     break;
                 case R.id.radioButton_warnings_stray_cat:
-                    presenter.onCreateEventChoosed(MapPresenter.EVENT_TYPE_WARNING_STRAY_CAT, selectedLocation.latitude, selectedLocation.longitude);
+                    presenter.onCreateEventChoosed(MapPresenter.EVENT_TYPE_WARNING_STRAY_CAT, selectedLocation.latitude, selectedLocation.longitude, null);
                     hideBottomSheets();
+                    deleteNewActionMarker();
                     break;
             }
         });
         emergenciesRadioGroup.setOnCheckedChangeListener((radioGroup, i) -> {
             switch (radioGroup.getCheckedRadioButtonId()) {
                 case R.id.radioButton_emergencies_poison:
-                    presenter.onCreateEventChoosed(MapPresenter.EVENT_TYPE_EMERGENCY_POISON, selectedLocation.latitude, selectedLocation.longitude);
+                    showNewEventNameDialog(MapPresenter.EVENT_TYPE_EMERGENCY_POISON);
                     hideBottomSheets();
+                    deleteNewActionMarker();
                     break;
                 case R.id.radioButton_emergencies_missing_cat:
-                    presenter.onCreateEventChoosed(MapPresenter.EVENT_TYPE_EMERGENCY_MISSING_CAT, selectedLocation.latitude, selectedLocation.longitude);
+                    presenter.onCreateEventChoosed(MapPresenter.EVENT_TYPE_EMERGENCY_MISSING_CAT, selectedLocation.latitude, selectedLocation.longitude, null);
                     hideBottomSheets();
+                    deleteNewActionMarker();
                     break;
                 case R.id.radioButton_emergencies_carcass:
-                    presenter.onCreateEventChoosed(MapPresenter.EVENT_TYPE_EMERGENCY_CARCASS, selectedLocation.latitude, selectedLocation.longitude);
+                    presenter.onCreateEventChoosed(MapPresenter.EVENT_TYPE_EMERGENCY_CARCASS, selectedLocation.latitude, selectedLocation.longitude, null);
                     hideBottomSheets();
+                    deleteNewActionMarker();
                     break;
             }
 
         });
+    }
+
+    private void showNewEventNameDialog(int eventType) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+
+        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_event_create_window, null);
+        String address = Utils.getAddressByLocation(selectedLocation.latitude, selectedLocation.longitude, getContext());
+        EditText nameEditText = dialogView.findViewById(R.id.editText_dialog_name);
+        TextView dateTextView = dialogView.findViewById(R.id.textView_dialog_date);
+        TextView eventTypeTextView = dialogView.findViewById(R.id.textView_dialog_event);
+        nameEditText.setText(address);
+        dateTextView.setText(TimeUtils.getDateAsddMMMyyyy(new Date()));
+        eventTypeTextView.setText(R.string.poison);
+
+        builder.setView(dialogView);
+        builder.setPositiveButton("Create", null);
+        builder.setNegativeButton("Cancel", (dialogInterface, i1) -> dialogInterface.dismiss());
+        AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(dialogInterface -> {
+            Button button = (dialog.getButton(AlertDialog.BUTTON_POSITIVE));
+            button.setOnClickListener(view -> {
+                String name = nameEditText.getText().toString();
+                if (name.length() < 3)
+                    Toaster.shortToast("Poison name length must be greater than 2");
+                else {
+                    presenter.onCreateEventChoosed(eventType, selectedLocation.latitude, selectedLocation.longitude, name);
+                    dialog.dismiss();
+                }
+            });
+        });
+
+        dialog.show();
     }
 
     private void initBottomBehaviors() {
@@ -572,7 +614,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void showEventMarkerDialog(Event event) {
         if (event != null) {
             clickedMarkerLocation = event.getLatLng();
-            showEventMarkerInfoWindow(event.getAddress(), TimeUtils.getDateAsddMMMyyyy(event.getDate()), event.getTypeName(), event.getType());
+            String name = event.getName();
+            if (name == null)
+                name = event.getAddress();
+            showEventMarkerInfoWindow(name, TimeUtils.getDateAsddMMMyyyy(event.getDate()), event.getTypeName(), event.getType());
         }
     }
 
