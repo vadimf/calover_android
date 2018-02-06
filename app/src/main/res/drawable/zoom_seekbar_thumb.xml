@@ -5,8 +5,8 @@
     android:layout_height="match_parent">
 
     <item
-        android:width="21dp"
-        android:height="21dp"
+        android:width="28dp"
+        android:height="28dp"
         android:drawable="@drawable/seekbar_thumb"
         android:gravity="center_vertical|center_horizontal" />
 
