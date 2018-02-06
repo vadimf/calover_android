@@ -191,8 +191,6 @@
 
 
     <style name="SeekBarTheme" parent="Widget.AppCompat.SeekBar.Discrete">
-        <item name="android:progressBackgroundTint">#422895</item>
-        <item name="android:progressTint">@color/colorPrimary</item>
         <item name="colorAccent">#eeeeee</item>
     </style>
 
