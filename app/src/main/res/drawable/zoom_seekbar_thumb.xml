@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <item
+        android:width="21dp"
+        android:height="21dp"
+        android:drawable="@drawable/seekbar_thumb"
+        android:gravity="center_vertical|center_horizontal" />
+
+</layer-list>
