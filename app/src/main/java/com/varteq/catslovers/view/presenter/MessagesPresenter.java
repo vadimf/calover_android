@@ -25,6 +25,8 @@ public class MessagesPresenter {
             ChatHelper.getInstance().loginToQuickBlox(view.getContext());
             handler = new Handler();
             handler.postDelayed(() -> {
+                        if (view.getContext() == null)
+                            return;
                         if (ChatHelper.getInstance().isLogged())
                             view.registerQbChatListenersLoadDialogs();
                         else view.stopRefreshing();

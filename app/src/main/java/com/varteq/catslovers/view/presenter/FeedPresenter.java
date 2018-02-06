@@ -61,6 +61,8 @@ public class FeedPresenter {
         if (!ChatHelper.getInstance().isLogged()) {
             ChatHelper.getInstance().loginToQuickBlox(view.getContext());
             new Handler().postDelayed(() -> {
+                        if (view.getContext() == null)
+                            return;
                         if (ChatHelper.getInstance().isLogged())
                             getFeeds(ids);
                         else view.onError();

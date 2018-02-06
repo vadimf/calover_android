@@ -5,7 +5,7 @@ apply plugin: 'realm-android'
 repositories {
     maven { url 'https://maven.fabric.io/public' }
 }
-
+final BUILD_DATE = new Date().format('dd.MM.yy')
 android {
     compileSdkVersion 26
     buildToolsVersion '27.0.1'
@@ -13,8 +13,9 @@ android {
         applicationId "com.varteq.catslovers"
         minSdkVersion 19
         targetSdkVersion 26
-        versionCode 19
-        versionName "1.8.12"
+        versionCode 20
+        versionName "1.8.13"
+        setProperty("archivesBaseName", "catsLovers-$BUILD_DATE-v$versionName-c$versionCode")
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         //multiDexEnabled true

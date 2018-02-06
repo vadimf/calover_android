@@ -100,6 +100,7 @@ public class AuthPresenter {
     private boolean isTestUser() {
         testUsers = new HashMap<>();
         testUsers.put("+380938315207", "09g@I9O%9!0?M!2l");
+        testUsers.put("+380679847970", "J2VG_tpw8f>4*#2y");
         //testUsers.put("+380638773851", "CatTest123_");
         for (Map.Entry<String, String> entry : testUsers.entrySet()) {
             if (entry.getKey().equals(this.username)) {
