@@ -3,6 +3,7 @@ package com.varteq.catslovers.view.fragments;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -20,6 +21,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -31,6 +33,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
@@ -71,10 +74,12 @@ import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.utils.Utils;
 import com.varteq.catslovers.view.BusinessActivity;
 import com.varteq.catslovers.view.FeedstationActivity;
+import com.varteq.catslovers.view.MainActivity;
 import com.varteq.catslovers.view.adapters.info_window_adapter.BusinessInfoWindowAdapter;
 import com.varteq.catslovers.view.adapters.info_window_adapter.EventInfoWindowAdapter;
 import com.varteq.catslovers.view.presenter.MapPresenter;
 
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -154,6 +159,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private FusedLocationProviderClient mFusedLocationClient;
     private LocationCallback locationCallback;
     private Marker userLocationMarker;
+    private Dialog newActionDialog;
 
     private Marker clickedMarker;
     private LatLng clickedMarkerLocation;
@@ -162,6 +168,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private Business clickedBusiness;
     private EventInfoWindowAdapter eventInfoWindowAdapter;
     private BusinessInfoWindowAdapter businessInfoWindowAdapter;
+    private Point clickedCoordinate;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -273,40 +280,79 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         warningsRadioGroup.setOnCheckedChangeListener((radioGroup, i) -> {
             switch (radioGroup.getCheckedRadioButtonId()) {
                 case R.id.radioButton_warnings_newborn_kittens:
-                    presenter.onCreateEventChoosed(MapPresenter.EVENT_TYPE_WARNING_NEWBORN_KITTENS, selectedLocation.latitude, selectedLocation.longitude);
+                    presenter.onCreateEventChoosed(MapPresenter.EVENT_TYPE_WARNING_NEWBORN_KITTENS, selectedLocation.latitude, selectedLocation.longitude, null);
                     hideBottomSheets();
+                    deleteNewActionMarker();
                     break;
                 case R.id.radioButton_warnings_municipality_inspector:
-                    presenter.onCreateEventChoosed(MapPresenter.EVENT_TYPE_WARNING_MUNICIPALITY_INSPECTOR, selectedLocation.latitude, selectedLocation.longitude);
+                    presenter.onCreateEventChoosed(MapPresenter.EVENT_TYPE_WARNING_MUNICIPALITY_INSPECTOR, selectedLocation.latitude, selectedLocation.longitude, null);
                     hideBottomSheets();
+                    deleteNewActionMarker();
                     break;
                 case R.id.radioButton_warnings_cat_in_heat:
-                    presenter.onCreateEventChoosed(MapPresenter.EVENT_TYPE_WARNING_CAT_IN_HEAT, selectedLocation.latitude, selectedLocation.longitude);
+                    presenter.onCreateEventChoosed(MapPresenter.EVENT_TYPE_WARNING_CAT_IN_HEAT, selectedLocation.latitude, selectedLocation.longitude, null);
                     hideBottomSheets();
+                    deleteNewActionMarker();
                     break;
                 case R.id.radioButton_warnings_stray_cat:
-                    presenter.onCreateEventChoosed(MapPresenter.EVENT_TYPE_WARNING_STRAY_CAT, selectedLocation.latitude, selectedLocation.longitude);
+                    presenter.onCreateEventChoosed(MapPresenter.EVENT_TYPE_WARNING_STRAY_CAT, selectedLocation.latitude, selectedLocation.longitude, null);
                     hideBottomSheets();
+                    deleteNewActionMarker();
                     break;
             }
         });
         emergenciesRadioGroup.setOnCheckedChangeListener((radioGroup, i) -> {
             switch (radioGroup.getCheckedRadioButtonId()) {
                 case R.id.radioButton_emergencies_poison:
-                    presenter.onCreateEventChoosed(MapPresenter.EVENT_TYPE_EMERGENCY_POISON, selectedLocation.latitude, selectedLocation.longitude);
+                    showNewEventNameDialog(MapPresenter.EVENT_TYPE_EMERGENCY_POISON);
                     hideBottomSheets();
+                    deleteNewActionMarker();
                     break;
                 case R.id.radioButton_emergencies_missing_cat:
-                    presenter.onCreateEventChoosed(MapPresenter.EVENT_TYPE_EMERGENCY_MISSING_CAT, selectedLocation.latitude, selectedLocation.longitude);
+                    presenter.onCreateEventChoosed(MapPresenter.EVENT_TYPE_EMERGENCY_MISSING_CAT, selectedLocation.latitude, selectedLocation.longitude, null);
                     hideBottomSheets();
+                    deleteNewActionMarker();
                     break;
                 case R.id.radioButton_emergencies_carcass:
-                    presenter.onCreateEventChoosed(MapPresenter.EVENT_TYPE_EMERGENCY_CARCASS, selectedLocation.latitude, selectedLocation.longitude);
+                    presenter.onCreateEventChoosed(MapPresenter.EVENT_TYPE_EMERGENCY_CARCASS, selectedLocation.latitude, selectedLocation.longitude, null);
                     hideBottomSheets();
+                    deleteNewActionMarker();
                     break;
             }
 
         });
+    }
+
+    private void showNewEventNameDialog(int eventType) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+
+        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_event_create_window, null);
+        String address = Utils.getAddressByLocation(selectedLocation.latitude, selectedLocation.longitude, getContext());
+        EditText nameEditText = dialogView.findViewById(R.id.editText_dialog_name);
+        TextView dateTextView = dialogView.findViewById(R.id.textView_dialog_date);
+        TextView eventTypeTextView = dialogView.findViewById(R.id.textView_dialog_event);
+        nameEditText.setText(address);
+        dateTextView.setText(TimeUtils.getDateAsddMMMyyyy(new Date()));
+        eventTypeTextView.setText(R.string.poison);
+
+        builder.setView(dialogView);
+        builder.setPositiveButton("Create", null);
+        builder.setNegativeButton("Cancel", (dialogInterface, i1) -> dialogInterface.dismiss());
+        AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(dialogInterface -> {
+            Button button = (dialog.getButton(AlertDialog.BUTTON_POSITIVE));
+            button.setOnClickListener(view -> {
+                String name = nameEditText.getText().toString();
+                if (name.length() < 3)
+                    Toaster.shortToast("Poison name length must be greater than 2");
+                else {
+                    presenter.onCreateEventChoosed(eventType, selectedLocation.latitude, selectedLocation.longitude, name);
+                    dialog.dismiss();
+                }
+            });
+        });
+
+        dialog.show();
     }
 
     private void initBottomBehaviors() {
@@ -408,6 +454,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         setUserPosition();
 
         this.googleMap.setOnMapClickListener(latLng -> {
+            cancelNewActionDialog();
             hideBottomSheets();
             releaseClickedLocation();
         });
@@ -421,44 +468,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         this.googleMap.setOnInfoWindowClickListener(marker -> presenter.onInfoWindowClicked(marker.getTag()));
 
         this.googleMap.setOnMapLongClickListener(latLng -> {
-            final Dialog dialog = new Dialog(getContext());
-            dialog.setOnDismissListener(dialogInterface -> deleteNewActionMarker());
-            dialog.setOnCancelListener(dialogInterface -> deleteNewActionMarker());
-
-            moveDialogToMapPosition(dialog, latLng);
-
-            newActionMarkerOptions = new MarkerOptions()
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin_purple)) // insert image from request
-                    .anchor(markerPositionX, markerPositionY)
-                    .position(latLng);
-            newActionMarker = googleMap.addMarker(newActionMarkerOptions);
-
-            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-            RelativeLayout mapOptionsDialogLayout = (RelativeLayout) LayoutInflater.from(getContext()).inflate(R.layout.dialog_map_options, null);
-            Button openFeedStationButton = mapOptionsDialogLayout.findViewById(R.id.button_open_feedstation);
-            Button warningsButton = mapOptionsDialogLayout.findViewById(R.id.button_warnings);
-            Button emergenciesButton = mapOptionsDialogLayout.findViewById(R.id.button_emergencies);
-
-            openFeedStationButton.setOnClickListener(view -> {
-                FeedstationActivity.startInCreateMode(getActivity(), latLng);
-                dialog.dismiss();
-            });
-            selectedLocation = latLng;
-            warningsButton.setOnClickListener(view -> {
-                showCreateWarningsEventBottomSheet();
-                dialog.dismiss();
-            });
-            emergenciesButton.setOnClickListener(view -> {
-                showCreateEmergenciesEventBottomSheet();
-                dialog.dismiss();
-            });
-
-            dialog.setContentView(mapOptionsDialogLayout);
-            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-            dialog.getWindow().setDimAmount(0);
-            dialog.show();
             Log.d(TAG, "OnMapLongClick " + latLng.latitude + " / " + latLng.longitude + "]");
+            initNewActionDialog(latLng);
         });
 
         this.googleMap.setOnCameraMoveListener(() -> {
@@ -478,16 +489,120 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    private void moveDialogToMapPosition(Dialog dialog, LatLng latLng) {
-        Projection projection = googleMap.getProjection();
-        Point screenPosition = projection.toScreenLocation(latLng);
+    private void cancelNewActionDialog() {
+        if (newActionDialog != null && newActionDialog.isShowing())
+            newActionDialog.cancel();
+    }
 
-        int screenWidth = Utils.getScreenWidthPx(getActivity());
-        int departure = (screenWidth / 2) - screenPosition.x;
+    private void initNewActionDialog(LatLng latLng) {
+        selectedLocation = latLng;
+
+        if (newActionDialog == null) {
+            createNewActionDialog();
+        } else if (newActionDialog.isShowing())
+            newActionDialog.dismiss();
+
+        moveDialogToMapPosition(newActionDialog, latLng);
+        addNewActionMarker(latLng);
+
+        // allow custom dialog background
+        Window window = newActionDialog.getWindow();
+        window.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        window.setDimAmount(0);
+
+        // make dialog modal
+        window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+
+        newActionDialog.show();
+    }
+
+    private void createNewActionDialog() {
+        newActionDialog = new Dialog(getContext());
+        newActionDialog.setOnCancelListener(dialogInterface -> deleteNewActionMarker());
+
+        newActionDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+        // init dialog ui and set listeners
+        ConstraintLayout mapOptionsDialogLayout = (ConstraintLayout) LayoutInflater.from(getContext()).inflate(R.layout.dialog_map_options, null);
+        ImageView backgroundImageView = mapOptionsDialogLayout.findViewById(R.id.dialog_options_background);
+        Button openFeedStationButton = mapOptionsDialogLayout.findViewById(R.id.button_open_feedstation);
+        Button warningsButton = mapOptionsDialogLayout.findViewById(R.id.button_warnings);
+        Button emergenciesButton = mapOptionsDialogLayout.findViewById(R.id.button_emergencies);
+        View.OnTouchListener onTouchListener = (view, motionEvent) -> {
+            clickedCoordinate = new Point((int) motionEvent.getX(), (int) motionEvent.getY());
+            return false;
+        };
+        View.OnLongClickListener onLongClickListener = view -> {
+            if (clickedCoordinate != null) {
+                // calculate screen coordinate
+                int[] viewLocationInScreen = new int[2];
+                view.getLocationOnScreen(viewLocationInScreen);
+                int x = viewLocationInScreen[0] + clickedCoordinate.x;
+                int y = viewLocationInScreen[1] + clickedCoordinate.y;
+                // convert screen coordinate to map coordinate
+                LatLng clickedMapPosition = getLatLngByScreenPosition(new Point(x, y));
+                initNewActionDialog(clickedMapPosition);
+            }
+            return true;
+        };
+        openFeedStationButton.setOnClickListener(view -> {
+            FeedstationActivity.startInCreateMode(getActivity(), selectedLocation);
+            newActionDialog.dismiss();
+        });
+        openFeedStationButton.setOnTouchListener(onTouchListener);
+        openFeedStationButton.setOnLongClickListener(onLongClickListener);
+        warningsButton.setOnClickListener(view -> {
+            showCreateWarningsEventBottomSheet();
+            newActionDialog.dismiss();
+        });
+        warningsButton.setOnTouchListener(onTouchListener);
+        warningsButton.setOnLongClickListener(onLongClickListener);
+        emergenciesButton.setOnClickListener(view -> {
+            showCreateEmergenciesEventBottomSheet();
+            newActionDialog.dismiss();
+        });
+        emergenciesButton.setOnTouchListener(onTouchListener);
+        emergenciesButton.setOnLongClickListener(onLongClickListener);
+
+        backgroundImageView.setOnTouchListener(onTouchListener);
+        backgroundImageView.setOnClickListener(view -> cancelNewActionDialog());
+        backgroundImageView.setOnLongClickListener(onLongClickListener);
+
+        newActionDialog.setContentView(mapOptionsDialogLayout);
+    }
+
+    private void addNewActionMarker(LatLng latLng) {
+        deleteNewActionMarker();
+        newActionMarkerOptions = new MarkerOptions()
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin_purple))
+                .anchor(markerPositionX, markerPositionY)
+                .position(latLng);
+        newActionMarker = googleMap.addMarker(newActionMarkerOptions);
+    }
+
+    private void moveDialogToMapPosition(Dialog dialog, LatLng latLng) {
+        Point screenPosition = getScreenLocationByLatLng(latLng);
+        moveCameraToSelectAction(latLng);
+
         WindowManager.LayoutParams wmlp = dialog.getWindow().getAttributes();
         wmlp.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
-        wmlp.x = wmlp.x - departure;
-        wmlp.y = screenPosition.y + Utils.convertDpToPx(20, getContext());
+        wmlp.y = screenPosition.y + Utils.convertDpToPx(70, getContext());
+    }
+
+    private Point getScreenLocationByLatLng(LatLng latLng) {
+        Projection projection = googleMap.getProjection();
+        return projection.toScreenLocation(latLng);
+    }
+
+    private LatLng getLatLngByScreenPosition(Point screenPosition) {
+        screenPosition.y -= seekBar.getHeight();
+        android.support.v7.widget.Toolbar toolbar = ((MainActivity) getActivity()).getToolbar();
+        if (toolbar != null)
+            screenPosition.y -= toolbar.getHeight();
+        Projection projection = googleMap.getProjection();
+        return projection.fromScreenLocation(screenPosition);
     }
 
     private void deleteNewActionMarker() {
@@ -499,7 +614,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void showEventMarkerDialog(Event event) {
         if (event != null) {
             clickedMarkerLocation = event.getLatLng();
-            showEventMarkerInfoWindow(event.getAddress(), TimeUtils.getDateAsddMMMyyyy(event.getDate()), event.getTypeName(), event.getType());
+            String name = event.getName();
+            if (name == null)
+                name = event.getAddress();
+            showEventMarkerInfoWindow(name, TimeUtils.getDateAsddMMMyyyy(event.getDate()), event.getTypeName(), event.getType());
         }
     }
 
@@ -520,12 +638,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void moveCameraToSelectAction(LatLng latLng) {
-        LatLng selectedLocation = new LatLng(latLng.latitude - 0.00022, latLng.longitude);
-        CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(selectedLocation)
-                .zoom(getZoomMapForRadius(0.2))
-                .build();
-        this.googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        LatLng selectedLocation = new LatLng(googleMap.getCameraPosition().target.latitude, latLng.longitude);
+        this.googleMap.moveCamera(CameraUpdateFactory.newLatLng(selectedLocation));
     }
 
     private void showBusinessMarkerInfoWindow(String name, String address, String description) {
@@ -1019,10 +1133,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         // Set custom icon
         locationButton.setImageDrawable(getResources().getDrawable(R.drawable.my_location_button));
 
+        // Get device screen size
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int deviceScreenHeight = displayMetrics.heightPixels;
+        int deviceScreenWidth = displayMetrics.widthPixels;
+
         // Set location button size
         RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
-        layoutParams.width = 150;
-        layoutParams.height = 150;
+        layoutParams.width = (int) Math.round(deviceScreenWidth * 0.1);
+        layoutParams.height = (int) Math.round(deviceScreenWidth * 0.1);
 
         // Position location button on bottom right
         layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
@@ -1031,8 +1151,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         // Set margins
         ViewGroup.MarginLayoutParams marginLayoutParams = (ViewGroup.MarginLayoutParams) locationButton.getLayoutParams();
-        marginLayoutParams.rightMargin = 50;
-        marginLayoutParams.bottomMargin = 100;
+        marginLayoutParams.rightMargin = (int) Math.round(deviceScreenWidth * 0.03);
+        marginLayoutParams.bottomMargin = (int) Math.round(deviceScreenHeight * 0.04);
         locationButton.setLayoutParams(marginLayoutParams);
 
         locationButton.requestLayout();

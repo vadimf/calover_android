@@ -7,24 +7,11 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:gravity="center_horizontal"
-    tools:background="@color/black">
+    android:paddingLeft="12dp"
+    android:paddingRight="12dp">
 
-    <ImageView
-        android:id="@+id/dialog_event_background"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="@drawable/shape_map_options_background_img"
-        android:scaleType="fitCenter"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <TextView
-        android:layout_marginLeft="12dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginRight="12dp"
-        android:id="@+id/textView_dialog_address"
+    <EditText
+        android:id="@+id/editText_dialog_name"
         style="@style/SecondaryTextView"
         android:layout_width="140dp"
         android:layout_height="wrap_content"
@@ -33,11 +20,9 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="text"/>
+        tools:text="Place name"/>
 
     <TextView
-        android:layout_marginLeft="12dp"
-        android:layout_marginRight="12dp"
         android:id="@+id/textView_dialog_date"
         style="@style/SecondaryTextView"
         android:layout_width="wrap_content"
@@ -45,23 +30,20 @@
         android:layout_marginTop="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_dialog_address"
-        tools:text="text"/>
+        app:layout_constraintTop_toBottomOf="@+id/editText_dialog_name"
+        tools:text="28 Oct 2017"/>
 
     <TextView
         android:id="@+id/textView_dialog_event"
         style="@style/PrimaryTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="12dp"
-        android:layout_marginRight="12dp"
         android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
         android:textColor="@color/rusty_red"
         android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView_dialog_date"
-        tools:text="text"/>
+        tools:text="Poison"/>
 </android.support.constraint.ConstraintLayout>

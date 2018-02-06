@@ -29,7 +29,7 @@ public class NewFeedPostActivity extends BaseActivity implements OnImagePickedLi
 
     private final int THUMBSIZE = 500;
     private final int REQUEST_CODE_ATTACHMENT = 1;
-    private String TAG = CatProfileActivity.class.getSimpleName();
+    private String TAG = NewFeedPostActivity.class.getSimpleName();
 
     @BindView(R.id.post_editText)
     EditText postEditText;
@@ -47,6 +47,7 @@ public class NewFeedPostActivity extends BaseActivity implements OnImagePickedLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_feed_post);
+        getSupportActionBar().setElevation(0);
 
         ButterKnife.bind(this);
 

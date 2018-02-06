@@ -135,7 +135,7 @@ public class MainActivity extends BaseActivity {
         catsSearchButton.setOnClickListener(view -> Toaster.shortToast(R.string.coming_soon));
         catsAddButton = findViewById(R.id.catsAddButton);
         catsAddButton.setOnClickListener(view -> {
-            if (navigationSelectedItemId == R.id.action_map)
+            if (navigationSelectedItemId == R.id.action_cats)
                 onPlusClick();
             else if (navigationSelectedItemId == R.id.action_chat && messagesFragment != null)
                 messagesFragment.onStartNewChatClick(null);
@@ -195,7 +195,7 @@ public class MainActivity extends BaseActivity {
             else catsTabClickCount = 0;*/
             if (item.getItemId() != navigationSelectedItemId) {
                 if (navigationSelectedItemId == item.getItemId()) return true;
-                showNotificationAndAndPlusIcons();
+                showAllowedIcons(item.getItemId());
                 switch (item.getItemId()) {
                     case R.id.action_map:
                         Log.d(TAG, "action_map");
@@ -224,7 +224,6 @@ public class MainActivity extends BaseActivity {
                         catsToolsRelativeLayout.setVisibility(View.VISIBLE);
                         break;
                     case R.id.action_cats:
-                        hideNotificationAndPlusIcons();
                         Log.d(TAG, "action_cats");
                         if (catsFragment == null)
                             catsFragment = new CatsFragment();
@@ -253,14 +252,18 @@ public class MainActivity extends BaseActivity {
 //        }
 //    }
 
-    private void hideNotificationAndPlusIcons() {
-        catsNotificationButton.setVisibility(View.GONE);
-        catsAddButton.setVisibility(View.GONE);
-    }
-
-    private void showNotificationAndAndPlusIcons() {
+    private void showAllowedIcons(int itemId) {
         catsNotificationButton.setVisibility(View.VISIBLE);
         catsAddButton.setVisibility(View.VISIBLE);
+
+        switch (itemId) {
+            case R.id.action_map:
+                catsAddButton.setVisibility(View.GONE);
+                break;
+            case R.id.action_cats:
+                catsNotificationButton.setVisibility(View.GONE);
+                break;
+        }
     }
 
     public void showChat() {
@@ -418,6 +421,10 @@ public class MainActivity extends BaseActivity {
                     });
         else
             avatarImageView.setImageBitmap(Utils.getBitmapWithColor(getResources().getColor(R.color.transparent)));
+    }
+
+    public Toolbar getToolbar(){
+        return toolbar;
     }
 
     private void sendLogs() {

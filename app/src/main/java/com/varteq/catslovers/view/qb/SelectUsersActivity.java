@@ -101,6 +101,7 @@ public class SelectUsersActivity extends QBBaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_users);
+        getSupportActionBar().setElevation(0);
 
         progressBar = _findViewById(R.id.progress_select_users);
         usersListView = _findViewById(R.id.list_select_users);

@@ -213,6 +213,7 @@ public class MainPresenter {
         try {
             MultipartUploadRequest uploadCatRequest = new MultipartUploadRequest(view, ServiceGenerator.apiBaseUrl + "user")
                     .setMethod("PUT")
+                    .setUtf8Charset()
                     .addFileToUpload(path, "avatar");
 
             uploadCatRequest.setDelegate(new UploadStatusDelegate() {

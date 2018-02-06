@@ -100,7 +100,7 @@ public class AuthPresenter {
     private boolean isTestUser() {
         testUsers = new HashMap<>();
         testUsers.put("+380938315207", "09g@I9O%9!0?M!2l");
-        testUsers.put("+380638773851", "CatTest123_");
+        //testUsers.put("+380638773851", "CatTest123_");
         for (Map.Entry<String, String> entry : testUsers.entrySet()) {
             if (entry.getKey().equals(this.username)) {
                 isPasswordReseted = true;
@@ -764,6 +764,7 @@ public class AuthPresenter {
             view.registerUploadAvatarReceiver(broadcastReceiver);
             MultipartUploadRequest uploadCatRequest = new MultipartUploadRequest(view, ServiceGenerator.apiBaseUrl + "user")
                     .setMethod("PUT")
+                    .setUtf8Charset()
                     .addParameter("name", Profile.getUserName(view));
 
             if (!path.isEmpty())
