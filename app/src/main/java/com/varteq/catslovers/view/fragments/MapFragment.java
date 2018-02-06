@@ -13,7 +13,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
@@ -25,12 +24,9 @@ import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -592,7 +588,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void moveCameraToSelectAction(LatLng latLng) {
-        this.googleMap.moveCamera(CameraUpdateFactory.newLatLng(selectedLocation));
+        this.googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
     }
 
     private void showBusinessMarkerInfoWindow(String name, String address, String description) {
