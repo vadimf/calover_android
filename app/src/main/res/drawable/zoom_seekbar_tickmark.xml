@@ -4,7 +4,7 @@
     android:shape="rectangle"
     android:tint="#ffffff">
     <size
-        android:width="3dp"
+        android:width="2dp"
         android:height="4dp" />
     <solid android:color="#ffffff" />
 </shape>

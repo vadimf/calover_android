@@ -16,10 +16,26 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="25dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="21dp"
             android:layout_marginBottom="10dp"
-            android:layout_marginLeft="14dp"
-            android:layout_marginRight="14dp">
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp">
+
+            <ImageView
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_marginTop="7dp"
+                android:layout_marginLeft="12dp"
+                android:layout_alignLeft="@id/seekBarLayout"
+                app:srcCompat="@drawable/zoom_plus_button" />
+
+            <ImageView
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_marginTop="7dp"
+                android:layout_marginRight="12dp"
+                android:layout_alignRight="@id/seekBarLayout"
+                app:srcCompat="@drawable/zoom_minus_button" />
 
             <RelativeLayout
                 android:id="@+id/seekBarLayout"
@@ -31,6 +47,8 @@
                     android:layout_gravity="center_vertical|center_horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
                     android:min="2"
                     android:max="21"
                     android:progressDrawable="@drawable/zoom_seekbar_progress"
@@ -39,23 +57,6 @@
                     android:splitTrack="false"
                     android:rotation="180" />
             </RelativeLayout>
-
-            <ImageView
-                android:layout_width="14dp"
-                android:layout_height="14dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginLeft="12dp"
-                android:layout_alignLeft="@id/seekBarLayout"
-                app:srcCompat="@drawable/zoom_plus_button" />
-
-            <ImageView
-                android:layout_gravity="center_vertical|center_horizontal"
-                android:layout_width="14dp"
-                android:layout_height="14dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginRight="12dp"
-                android:layout_alignRight="@id/seekBarLayout"
-                app:srcCompat="@drawable/zoom_minus_button" />
 
         </RelativeLayout>
 
