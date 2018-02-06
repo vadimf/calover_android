@@ -188,7 +188,7 @@
 
             <TextView
                 android:id="@+id/color_textView"
-                style="@style/PrimaryTextView"
+                style="@style/SecondaryTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -410,6 +410,7 @@
                 style="@style/PrimaryTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:paddingTop="4dp"
                 android:layout_marginTop="8dp"
                 android:text="@string/new_cat_profile_screen_title"
                 android:textStyle="bold"
@@ -425,7 +426,7 @@
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="@+id/pet_name_photos_textView"
                 app:layout_constraintStart_toEndOf="@+id/pet_name_photos_textView"
-                app:layout_constraintTop_toTopOf="@+id/pet_name_photos_textView"/>
+                />
 
             <TextView
                 android:id="@+id/photo_count_textView"
@@ -452,6 +453,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
+                android:layout_marginTop="4dp"
                 app:layout_constraintBottom_toBottomOf="@+id/photo_count_textView"
                 app:layout_constraintEnd_toStartOf="@+id/end_guideline"
                 app:layout_constraintTop_toTopOf="@+id/pet_name_photos_textView">

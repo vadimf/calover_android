@@ -5,12 +5,23 @@
        tools:showIn="@layout/activity_cat_profile"
    >
 
+    <View
+        android:id="@+id/description_background"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#19607c9c"
+        app:layout_constraintBottom_toTopOf="@+id/pet_name_photos_textView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/age_textView" />
+
     <TextView
         android:id="@+id/age_textView"
-        style="@style/PrimaryTextView"
+        style="@style/SecondaryTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
+        android:paddingTop="8dp"
         android:text="Age"
         app:layout_constraintStart_toStartOf="@+id/start_guideline"
         app:layout_constraintTop_toBottomOf="@+id/color_constraintLayout"/>
@@ -27,7 +38,7 @@
 
     <TextView
         android:id="@+id/weight_textView"
-        style="@style/PrimaryTextView"
+        style="@style/SecondaryTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -47,7 +58,7 @@
 
     <TextView
         android:id="@+id/castrated_textView"
-        style="@style/PrimaryTextView"
+        style="@style/SecondaryTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -68,7 +79,7 @@
 
     <TextView
         android:id="@+id/flea_treatment_textView"
-        style="@style/PrimaryTextView"
+        style="@style/SecondaryTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -97,6 +108,7 @@
         app:layout_constraintTop_toTopOf="@+id/flea_treatment_textView"/>
 
     <TextView
+        android:textStyle="bold"
         android:id="@+id/description_textView"
         style="@style/PrimaryTextView"
         android:layout_width="wrap_content"
@@ -122,6 +134,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:ems="10"
+        android:paddingBottom="16dp"
         android:maxLines="3"
         tools:text="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore sit amet."
         app:layout_constraintEnd_toStartOf="@+id/end_guideline"
