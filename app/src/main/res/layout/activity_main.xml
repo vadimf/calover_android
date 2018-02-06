@@ -31,6 +31,13 @@
 
         </FrameLayout>
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:layout_alignBottom="@+id/frameLayout"
+            android:alpha="0.9"
+            android:background="@drawable/gradient_bottom_main_activity_shape" />
+
         <android.support.design.widget.BottomNavigationView
             android:id="@+id/bottom_navigation"
             android:layout_width="match_parent"
