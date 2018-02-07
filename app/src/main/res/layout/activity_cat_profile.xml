@@ -2,11 +2,11 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
                                              xmlns:app="http://schemas.android.com/apk/res-auto"
                                              xmlns:tools="http://schemas.android.com/tools"
+                                             android:id="@+id/main_layout"
                                              android:layout_width="match_parent"
                                              android:layout_height="match_parent"
                                              android:background="@color/white"
-    android:id="@+id/main_layout"
-    android:descendantFocusability="blocksDescendants"
+                                             android:descendantFocusability="blocksDescendants"
                                              tools:context="com.varteq.catslovers.view.CatProfileActivity">
 
     <ScrollView
@@ -27,52 +27,52 @@
                 app:layout_constraintBottom_toBottomOf="@+id/cat_profile_avatar_roundedImageView"
                 app:layout_constraintStart_toEndOf="@+id/cat_profile_avatar_roundedImageView"
                 app:layout_constraintTop_toTopOf="@+id/cat_profile_avatar_roundedImageView"
-                app:srcCompat="@drawable/ic_add_a_photo_primary_24dp" />
+                app:srcCompat="@drawable/ic_add_a_photo_primary_24dp"/>
 
-            <FrameLayout
-                android:id="@+id/petLayout"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_marginEnd="12dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="24dp"
-                android:background="@drawable/cat_profile_animal_type_selected_shape"
-                app:layout_constraintEnd_toStartOf="@+id/strayLayout"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toStartOf="@+id/start_guideline"
-                app:layout_constraintTop_toTopOf="parent"
-                >
+            <LinearLayout
+                android:id="@+id/layout_cat_type"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="4dp"
+                app:layout_constraintDimensionRatio="w,1:1">
 
-                <TextView
-                    android:id="@+id/animal_type_pet_textView"
-                    style="@style/PrimaryTextView"
+                <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:text="PET"/>
-            </FrameLayout>
+                    android:layout_weight="1">
 
-            <FrameLayout
-                android:id="@+id/strayLayout"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginStart="12dp"
-                android:layout_marginTop="24dp"
-                android:background="@drawable/cat_profile_animal_type_unselected_shape"
-                app:layout_constraintEnd_toStartOf="@+id/end_guideline"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/petLayout"
-                app:layout_constraintTop_toTopOf="parent">
+                    <ImageView
+                        android:id="@+id/catTypePet"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginEnd="6dp"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/pet_selected"
+                        >
 
-                <TextView
-                    android:id="@+id/animal_type_stray_textView"
-                    style="@style/SecondaryTextView"
+                    </ImageView>
+                </FrameLayout>
+
+                <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:text="STRAY"/>
-            </FrameLayout>
+                    android:layout_weight="1">
+
+                    <ImageView
+                        android:id="@+id/catTypeStray"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginStart="6dp"
+                        android:background="@drawable/stray_non_selected">
+
+                    </ImageView>
+                </FrameLayout>
+            </LinearLayout>
+
 
             <android.support.constraint.Guideline
                 android:id="@+id/avatar_end_guideline"
@@ -99,7 +99,7 @@
                 app:layout_constraintDimensionRatio="w,1:1"
                 app:layout_constraintEnd_toStartOf="@+id/avatar_end_guideline"
                 app:layout_constraintStart_toStartOf="@+id/avatar_start_guideline"
-                app:layout_constraintTop_toBottomOf="@+id/petLayout"
+                app:layout_constraintTop_toBottomOf="@+id/layout_cat_type"
                 app:riv_border_color="@color/colorPrimary"
                 app:riv_border_width="2dp"
                 app:riv_corner_radius="29dp"
@@ -111,10 +111,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                tools:text="Pet name"
                 app:layout_constraintEnd_toEndOf="@+id/cat_profile_avatar_roundedImageView"
                 app:layout_constraintStart_toStartOf="@+id/cat_profile_avatar_roundedImageView"
-                app:layout_constraintTop_toBottomOf="@+id/cat_profile_avatar_roundedImageView"/>
+                app:layout_constraintTop_toBottomOf="@+id/cat_profile_avatar_roundedImageView"
+                tools:text="Pet name"/>
 
             <TextView
                 android:id="@+id/nickname_textView"
@@ -122,10 +122,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                tools:text="Nick Name"
                 app:layout_constraintEnd_toEndOf="@+id/pet_name_textView"
                 app:layout_constraintStart_toStartOf="@+id/pet_name_textView"
-                app:layout_constraintTop_toBottomOf="@+id/pet_name_textView"/>
+                app:layout_constraintTop_toBottomOf="@+id/pet_name_textView"
+                tools:text="Nick Name"/>
 
 
             <android.support.constraint.Guideline
@@ -410,8 +410,8 @@
                 style="@style/PrimaryTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingTop="4dp"
                 android:layout_marginTop="8dp"
+                android:paddingTop="4dp"
                 android:text="@string/new_cat_profile_screen_title"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
@@ -452,8 +452,8 @@
                 android:id="@+id/upload_image_LinearLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:layout_marginTop="4dp"
+                android:gravity="center"
                 app:layout_constraintBottom_toBottomOf="@+id/photo_count_textView"
                 app:layout_constraintEnd_toStartOf="@+id/end_guideline"
                 app:layout_constraintTop_toTopOf="@+id/pet_name_photos_textView">
