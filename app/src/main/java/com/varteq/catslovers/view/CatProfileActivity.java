@@ -563,7 +563,6 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
         if (weightValueTextView.getText().toString().equals(DEFAULT_VALUE))
             weightValueTextView.setText("");
 
-        viewColorsAdapter.notifyDataSetChanged();
         currentMode = CatProfileScreenMode.VIEW_MODE;
 
         infoLinearLayout.setVisibility(View.VISIBLE);
@@ -579,6 +578,8 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
         viewColorsRecyclerView.setVisibility(View.VISIBLE);
         expandColorsButton.setVisibility(View.GONE);
         colorConstraintLayout.setVisibility(View.GONE);
+
+        viewColorsAdapter.notifyDataSetChanged();
 
         castratedCheckBox.setEnabled(false);
 
@@ -899,7 +900,8 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
         c.addAll(colorsList);
         catProfile.setColorsList(c);
 
-        presenter.resizeColorsListWithEmptyValues(colorsList, colorPickers.size());
+        if (!currentMode.equals(CatProfileScreenMode.VIEW_MODE))
+            presenter.resizeColorsListWithEmptyValues(colorsList, colorPickers.size());
 
         String petName = petNameTextView.getText().toString();
         if (petNameTextView.getText().toString().equals(PET_DEFAULT_NAME))

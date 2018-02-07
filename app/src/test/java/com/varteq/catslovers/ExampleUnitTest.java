@@ -4,7 +4,9 @@ import com.varteq.catslovers.utils.TimeUtils;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -23,5 +25,18 @@ public class ExampleUnitTest {
         System.out.print(sec);
         Date date1 = TimeUtils.getLocalDateFromUtc(sec);
         assertEquals(date.getTime(), date1.getTime());
+    }
+
+    @Test
+    public void testParseInt() {
+        List<Integer> colors = new ArrayList<>();
+        String color = "1,rty,2";
+        for (String s : color.split(",")) {
+            try {
+                colors.add(Integer.parseInt(s));
+            } catch (Exception e) {
+            }
+        }
+        assertEquals(colors.get(1).intValue(), 2);
     }
 }
