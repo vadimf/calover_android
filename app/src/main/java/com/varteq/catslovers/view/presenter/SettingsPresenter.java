@@ -1,14 +1,20 @@
 package com.varteq.catslovers.view.presenter;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.view.View;
 
 import com.google.gson.Gson;
+import com.quickblox.core.QBEntityCallback;
+import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
+import com.varteq.catslovers.AppController;
 import com.varteq.catslovers.api.ServiceGenerator;
 import com.varteq.catslovers.api.entity.BaseResponse;
 import com.varteq.catslovers.api.entity.RUserInfo;
 import com.varteq.catslovers.api.entity.RUserSimple;
+import com.varteq.catslovers.model.PhotoWithPreview;
 import com.varteq.catslovers.utils.ChatHelper;
 import com.varteq.catslovers.utils.GenericOf;
 import com.varteq.catslovers.utils.Log;
@@ -47,10 +53,10 @@ public class SettingsPresenter {
             public void onResponse(Call<BaseResponse<RUserSimple>> call, Response<BaseResponse<RUserSimple>> response) {
                 if (response.isSuccessful()) {
                     RUserSimple user = response.body().getData();
-                    if (user != null) {
+                    if (user != null && view != null) {
                         view.setEmail(user.getEmail());
                         view.setUsername(user.getName());
-                        view.updateAvatar(user.getAvatarUrlThumbnail());
+                        view.setAvatar(new PhotoWithPreview(null, user.getAvatarUrl(), user.getAvatarUrlThumbnail()));
                     }
                 }
             }
@@ -62,24 +68,21 @@ public class SettingsPresenter {
         });
     }
 
-    public void uploadAvatar() {
-        String path = Profile.getUserAvatar(view);
-        if (path.isEmpty()) {
-            //  updateQBUser(qbUser);
-            return;
-        }
-
+    public void uploadUserSettings(String name, PhotoWithPreview avatar) {
+        view.showWaitDialog();
 
         try {
             MultipartUploadRequest uploadCatRequest = new MultipartUploadRequest(view, ServiceGenerator.apiBaseUrl + "user")
                     .setMethod("PUT")
                     .setUtf8Charset()
-                    .addFileToUpload(path, "avatar");
+                    .addParameter("name", name);
+
+            if (avatar != null && avatar.getExpectedAction() != null && avatar.getExpectedAction().equals(PhotoWithPreview.Action.CHANGE))
+                uploadCatRequest.addFileToUpload(avatar.getPhoto(), "avatar");
 
             uploadCatRequest.setDelegate(new UploadStatusDelegate() {
                 @Override
                 public void onProgress(Context context, UploadInfo uploadInfo) {
-                    view.setAvatarUploadingProgress(String.valueOf(uploadInfo.getProgressPercent()));
                 }
 
                 @Override
@@ -91,7 +94,8 @@ public class SettingsPresenter {
                         }
                     };
                     checkNetworkErrAndShowSnackbar(exception);
-                    view.setAvatarUploadingProgress("Uploading error");
+                    Toaster.longToast("An error occurred while saving");
+                    view.hideWaitDialog();
                 }
 
                 @Override
@@ -100,28 +104,66 @@ public class SettingsPresenter {
                         Gson gson = new Gson();
 
                         BaseResponse<RUserInfo> user = gson.fromJson(serverResponse.getBodyAsString(), new GenericOf<>(BaseResponse.class, RUserInfo.class));
-                        if (user != null && user.getSuccess() && user.getData() != null && user.getData().getAvatarUrlThumbnail() != null) {
-                            qbUser.setCustomData(user.getData().getAvatarUrlThumbnail());
-                            Toaster.shortToast("Avatar uploading completed");
+                        if (user != null && user.getSuccess()) {
+                            if (user.getData() != null && user.getData().getAvatarUrlThumbnail() != null) {
+                                qbUser.setCustomData(user.getData().getAvatarUrlThumbnail());
+                            }
+                            qbUser.setFullName(name);
+                            updateQBUser(qbUser);
+                            return;
                         }
                     } catch (Exception e) {
                     }
                     // updateQBUser(qbUser);
-                    view.setAvatarUploadingProgress("Uploading completed");
+                    Toaster.longToast("An error occurred while saving");
+                    view.hideWaitDialog();
                 }
 
                 @Override
                 public void onCancelled(Context context, UploadInfo uploadInfo) {
+                    view.hideWaitDialog();
                 }
             });
 
-
             String uploadId = uploadCatRequest.startUpload();
         } catch (Exception exc) {
-            Log.e("uploadAvatar", exc.getMessage(), exc);
+            Log.e("uploadUserSettings", exc.getMessage(), exc);
         }
     }
 
+    private void updateQBUser(QBUser user) {
+        errListener = new OneTimeOnClickListener() {
+            @Override
+            protected void onClick() {
+                view.showWaitDialog();
+                updateQBUser(user);
+            }
+        };
+
+        if (user.getOldPassword() == null)
+            user.setOldPassword(AppController.USER_PASS);
+
+        QBUsers.updateUser(user).performAsync(new QBEntityCallback<QBUser>() {
+
+            @Override
+            public void onSuccess(QBUser qbUser, Bundle bundle) {
+                Log.i(TAG, "updateQBUser success");
+                Profile.saveUserAvatar(view, qbUser.getCustomData());
+                view.onSavedSuccessfully();
+            }
+
+            @Override
+            public void onError(QBResponseException e) {
+                Log.e(TAG, "updateQBUser", e);
+                if (checkNetworkErrAndShowSnackbar(e)) {
+                    view.hideWaitDialog();
+                    return;
+                }
+                view.showIndefiniteError(e.getLocalizedMessage(), errListener);
+                view.hideWaitDialog();
+            }
+        });
+    }
 
     private boolean checkNetworkErrAndShowSnackbar(Exception exception) {
         return checkNetworkErrAndShowSnackbar(exception.toString());

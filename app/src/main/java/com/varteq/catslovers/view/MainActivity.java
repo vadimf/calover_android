@@ -86,6 +86,7 @@ public class MainActivity extends BaseActivity {
 
     private int catsTabClickCount = 0;
     boolean doubleBackToExitPressedOnce = false;
+    private boolean needCheckUserSettings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -354,7 +355,10 @@ public class MainActivity extends BaseActivity {
         usernameTextView = navigationHeaderLayout.findViewById(R.id.textView_email);
         drawerBackButton = navigationHeaderLayout.findViewById(R.id.button_navigation_drawer_back);
 
-        navigationEditImageButton.setOnClickListener(view -> startActivity(new Intent(MainActivity.this, SettingsActivity.class)));
+        navigationEditImageButton.setOnClickListener(view -> {
+            needCheckUserSettings = true;
+            startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+        });
         drawerBackButton.setOnClickListener(view -> drawerLayout.closeDrawer(Gravity.LEFT));
         navigationView.setNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
@@ -452,5 +456,14 @@ public class MainActivity extends BaseActivity {
                 doubleBackToExitPressedOnce = false;
             }
         }, 2500);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (needCheckUserSettings) {
+            presenter.loadUserInfo();
+            needCheckUserSettings = false;
+        }
     }
 }

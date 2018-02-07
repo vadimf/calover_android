@@ -18,6 +18,9 @@ public class PhotoWithPreview implements Serializable, Parcelable {
         DELETE
     }
 
+    public PhotoWithPreview() {
+    }
+
     public PhotoWithPreview(Integer id, String photo, String thumbnail) {
         this(photo, thumbnail, null);
         this.id = id;
