@@ -17,7 +17,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="25dp"
-            android:layout_marginTop="21dp"
+            android:layout_marginTop="11dp"
             android:layout_marginBottom="10dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp">
@@ -47,6 +47,41 @@
                 android:layout_marginRight="20dp"
                 app:srcCompat="@drawable/zoom_seekbar_progress" />
 
+            <ImageView
+                android:id="@+id/tick1"
+                android:layout_width="2dp"
+                android:layout_height="4dp"
+                android:layout_marginTop="10dp"
+                app:srcCompat="@drawable/zoom_seekbar_tickmark" />
+
+            <ImageView
+                android:id="@+id/tick2"
+                android:layout_width="2dp"
+                android:layout_height="4dp"
+                android:layout_marginTop="10dp"
+                app:srcCompat="@drawable/zoom_seekbar_tickmark" />
+
+            <ImageView
+                android:id="@+id/tick3"
+                android:layout_width="2dp"
+                android:layout_height="4dp"
+                android:layout_marginTop="10dp"
+                app:srcCompat="@drawable/zoom_seekbar_tickmark" />
+
+            <ImageView
+                android:id="@+id/tick4"
+                android:layout_width="2dp"
+                android:layout_height="4dp"
+                android:layout_marginTop="10dp"
+                app:srcCompat="@drawable/zoom_seekbar_tickmark" />
+
+            <ImageView
+                android:id="@+id/tick5"
+                android:layout_width="2dp"
+                android:layout_height="4dp"
+                android:layout_marginTop="10dp"
+                app:srcCompat="@drawable/zoom_seekbar_tickmark" />
+
             <RelativeLayout
                 android:id="@+id/seekBarLayout"
                 android:layout_width="match_parent"
@@ -64,7 +99,6 @@
                     android:backgroundTint="#00ffffff"
                     android:progressTint="#00ffffff"
                     android:thumb="@drawable/zoom_seekbar_thumb"
-                    android:tickMark="@drawable/zoom_seekbar_tickmark"
                     android:splitTrack="false"
                     android:background="#00ffffff"
                     android:rotation="180" />
