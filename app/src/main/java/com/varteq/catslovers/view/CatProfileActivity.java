@@ -24,8 +24,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -96,14 +96,10 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
     ConstraintLayout mainLayout;
     @BindView(R.id.main_scrollView)
     ScrollView scrollView;
-    @BindView(R.id.petLayout)
-    FrameLayout petLayout;
-    @BindView(R.id.strayLayout)
-    FrameLayout strayLayout;
-    @BindView(R.id.animal_type_pet_textView)
-    TextView animalTypePetTextView;
-    @BindView(R.id.animal_type_stray_textView)
-    TextView animalTypeStrayTextView;
+    @BindView(R.id.catTypePet)
+    ImageView catTypePetImageView;
+    @BindView(R.id.catTypeStray)
+    ImageView catTypeStrayImageView;
 
     @BindView(R.id.cat_profile_avatar_roundedImageView)
     RoundedImageView avatarImageView;
@@ -573,8 +569,8 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
         infoLinearLayout.setVisibility(View.VISIBLE);
         addPhotoButton.setVisibility(View.INVISIBLE);
 
-        petLayout.setEnabled(false);
-        strayLayout.setEnabled(false);
+        catTypePetImageView.setEnabled(false);
+        catTypeStrayImageView.setEnabled(false);
 
         petNameTextView.setEnabled(false);
 
@@ -628,8 +624,8 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
         addPhotoButton.setVisibility(View.VISIBLE);
 
         if (currentMode.equals(CatProfileScreenMode.CREATE_MODE)) {
-            petLayout.setEnabled(true);
-            strayLayout.setEnabled(true);
+            catTypePetImageView.setEnabled(true);
+            catTypeStrayImageView.setEnabled(true);
         }
 
         petNameTextView.setEnabled(true);
@@ -849,12 +845,12 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
         editTextDialog.show();
     }
 
-    @OnClick(R.id.petLayout)
+    @OnClick(R.id.catTypePet)
     void selectAnimalTypePet() {
         setupAnimalType(CatProfile.Status.PET);
     }
 
-    @OnClick(R.id.strayLayout)
+    @OnClick(R.id.catTypeStray)
     void selectAnimalTypeStray() {
         if (catType.equals(CatProfile.Status.PET) && currentMode.equals(CatProfileScreenMode.EDIT_MODE) && catProfile.getType().equals(CatProfile.Status.PET)) {
             Toaster.shortToast("Your cat can't be stray");
@@ -867,17 +863,13 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
     private void setupAnimalType(CatProfile.Status catType) {
         switch (catType) {
             case PET:
-                petLayout.setBackgroundResource(R.drawable.cat_profile_animal_type_selected_shape);
-                strayLayout.setBackgroundResource(R.drawable.cat_profile_animal_type_unselected_shape);
-                animalTypePetTextView.setTextAppearance(this, R.style.PrimaryTextView);
-                animalTypeStrayTextView.setTextAppearance(this, R.style.SecondaryTextView);
+                catTypePetImageView.setBackgroundResource(R.drawable.pet_selected);
+                catTypeStrayImageView.setBackgroundResource(R.drawable.stray_non_selected);
                 this.catType = CatProfile.Status.PET;
                 break;
             case STRAY:
-                petLayout.setBackgroundResource(R.drawable.cat_profile_animal_type_unselected_shape);
-                strayLayout.setBackgroundResource(R.drawable.cat_profile_animal_type_selected_shape);
-                animalTypePetTextView.setTextAppearance(this, R.style.SecondaryTextView);
-                animalTypeStrayTextView.setTextAppearance(this, R.style.PrimaryTextView);
+                catTypePetImageView.setBackgroundResource(R.drawable.pet_non_selected);
+                catTypeStrayImageView.setBackgroundResource(R.drawable.stray_selected);
                 this.catType = CatProfile.Status.STRAY;
                 break;
         }
