@@ -13,109 +13,40 @@
         tools:context="com.varteq.catslovers.view.SettingsActivity">
 
         <TextView
-            android:gravity="center_vertical"
             android:id="@+id/textView_change_username"
-            style="@style/PrimarySmallTextView"
+            style="@style/PrimaryBigTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
-            android:text="Change"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/textView_username"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            android:gravity="center_vertical"
+            tools:text="@string/Username"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/textView9"
-            app:layout_constraintVertical_bias="1.0"/>
-
-        <TextView
-            android:visibility="gone"
-            android:id="@+id/textView5"
-            style="@style/PrimarySmallTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginTop="8dp"
-            android:text="Change"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/textView_email"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/textView6"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/avatar" />
 
         <com.makeramen.roundedimageview.RoundedImageView
             android:id="@+id/avatar"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_width="100dp"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="32dp"
             android:scaleType="centerCrop"
-            android:src="@color/white"
+            android:src="@drawable/user_avatar_plug_img"
+            app:layout_constraintDimensionRatio="w,1:1"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:riv_oval="true"/>
+            app:riv_border_color="@color/colorPrimary"
+            app:riv_border_width="2dp"
+            app:riv_corner_radius="29dp"
+            app:riv_oval="true" />
 
-        <TextView
-            android:id="@+id/textView_uploading_avatar_progress"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="4dp"
-            tools:text="10%"
-            android:textSize="10sp"
-            app:layout_constraintEnd_toEndOf="@+id/avatar"
-            app:layout_constraintStart_toStartOf="@+id/avatar"
-            app:layout_constraintTop_toBottomOf="@+id/avatar"/>
-
-        <TextView
-            android:visibility="gone"
-            android:id="@+id/textView_email"
-            style="@style/PrimarySmallTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="username@yahoo.com"
-            app:layout_constraintStart_toStartOf="@+id/textView6"
-            app:layout_constraintTop_toBottomOf="@+id/textView6"/>
-
-        <TextView
-            android:visibility="gone"
-            android:id="@+id/textView6"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:text="Email"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/avatar"/>
-        <TextView
-            android:id="@+id/textView9"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
-            android:text="Username"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView_email"/>
-
-        <TextView
-            android:id="@+id/textView_username"
-            style="@style/PrimarySmallTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="username"
-            app:layout_constraintStart_toStartOf="@+id/textView9"
-            app:layout_constraintTop_toBottomOf="@+id/textView9"/>
-        <TextView
-            android:id="@+id/textView7"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:text="Account photo"
-            app:layout_constraintBottom_toBottomOf="@+id/avatar"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/avatar"/>
     </android.support.constraint.ConstraintLayout>
 </ScrollView>
 

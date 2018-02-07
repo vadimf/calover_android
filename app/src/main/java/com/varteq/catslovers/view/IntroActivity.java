@@ -4,17 +4,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
-import android.util.DisplayMetrics;
-import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageSwitcher;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.varteq.catslovers.R;
@@ -59,35 +55,15 @@ public class IntroActivity extends AppCompatActivity {
     }
 
     private void initUI() {
-        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-        float dpHeight = displayMetrics.heightPixels / displayMetrics.density;
-        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-
         for (int i = 0; i < imageSwitcherImages.length; i++) {
-            LinearLayout layout = new LinearLayout(getApplicationContext());
-            layout.setOrientation(LinearLayout.VERTICAL);
-            layout.setBackground(getResources().getDrawable(R.drawable.boarding_rounded));
-            int padding = Utils.convertDpToPx(12, this);
-            layout.setPadding(padding, padding, padding, padding);
+            int resId = R.layout.onbording_layout_1;
+            if (i == 1)
+                resId = R.layout.onbording_layout_2;
+            else if (i == 2)
+                resId = R.layout.onbording_layout_3;
 
-            ImageView imageView = new ImageView(getApplicationContext());
-            TableLayout.LayoutParams imageLayoutParams = new TableLayout.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.MATCH_PARENT, 1);
-            imageView.setLayoutParams(imageLayoutParams);
-            imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-            imageView.setImageResource(imageSwitcherImages[i]);
-            layout.addView(imageView);
-
-            TextView textView = new TextView(getApplicationContext());
-            TableLayout.LayoutParams textLayoutParams = new TableLayout.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.MATCH_PARENT, 1);
-            textView.setGravity(Gravity.CENTER_VERTICAL);
-            textView.setLayoutParams(textLayoutParams);
-            textView.setText(imageSwitcherTexts[i]);
-            textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-            textView.setTextColor(getResources().getColor(R.color.colorPrimary));
-            textView.setTextSize(30);
-            if (dpWidth <= 320)
-                textView.setTextSize(20);
-            layout.addView(textView);
+            View layout = LayoutInflater.from(getApplicationContext())
+                    .inflate(resId, null, false);
 
             layouts.add(layout);
         }
@@ -111,7 +87,7 @@ public class IntroActivity extends AppCompatActivity {
         viewPager.addOnPageChangeListener(viewPagerPageChangeListener);
         viewPager.setOffscreenPageLimit(2);
         viewPager.setClipToPadding(false);
-        viewPager.setPadding(Utils.convertDpToPx(46, this), 0, Utils.convertDpToPx(46, this), 0);
+        viewPager.setPadding(Utils.convertDpToPx(46, this), Utils.convertDpToPx(5, this), Utils.convertDpToPx(46, this), Utils.convertDpToPx(15, this));
         viewPager.setPageMargin(Utils.convertDpToPx(16.5f, this));
     }
 

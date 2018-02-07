@@ -2,7 +2,6 @@
 <android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 
@@ -11,12 +10,13 @@
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:background="#ffffff">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="25dp"
-            android:layout_marginTop="21dp"
+            android:layout_marginTop="11dp"
             android:layout_marginBottom="10dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp">
@@ -37,6 +37,50 @@
                 android:layout_alignRight="@id/seekBarLayout"
                 app:srcCompat="@drawable/zoom_minus_button" />
 
+            <!-- Set seekbar progress meter as separate image for consistent design among diff. devices -->
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                app:srcCompat="@drawable/zoom_seekbar_progress" />
+
+            <ImageView
+                android:id="@+id/tick1"
+                android:layout_width="2dp"
+                android:layout_height="4dp"
+                android:layout_marginTop="10dp"
+                app:srcCompat="@drawable/zoom_seekbar_tickmark" />
+
+            <ImageView
+                android:id="@+id/tick2"
+                android:layout_width="2dp"
+                android:layout_height="4dp"
+                android:layout_marginTop="10dp"
+                app:srcCompat="@drawable/zoom_seekbar_tickmark" />
+
+            <ImageView
+                android:id="@+id/tick3"
+                android:layout_width="2dp"
+                android:layout_height="4dp"
+                android:layout_marginTop="10dp"
+                app:srcCompat="@drawable/zoom_seekbar_tickmark" />
+
+            <ImageView
+                android:id="@+id/tick4"
+                android:layout_width="2dp"
+                android:layout_height="4dp"
+                android:layout_marginTop="10dp"
+                app:srcCompat="@drawable/zoom_seekbar_tickmark" />
+
+            <ImageView
+                android:id="@+id/tick5"
+                android:layout_width="2dp"
+                android:layout_height="4dp"
+                android:layout_marginTop="10dp"
+                app:srcCompat="@drawable/zoom_seekbar_tickmark" />
+
             <RelativeLayout
                 android:id="@+id/seekBarLayout"
                 android:layout_width="match_parent"
@@ -51,10 +95,10 @@
                     android:layout_marginRight="5dp"
                     android:min="2"
                     android:max="21"
-                    android:progressDrawable="@drawable/zoom_seekbar_progress"
+                    android:progressDrawable="@android:color/transparent"
                     android:thumb="@drawable/zoom_seekbar_thumb"
-                    android:tickMark="@drawable/zoom_seekbar_tickmark"
                     android:splitTrack="false"
+                    android:background="#00ffffff"
                     android:rotation="180" />
             </RelativeLayout>
 
@@ -65,12 +109,10 @@
             android:layout_height="match_parent">
 
             <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-                      xmlns:tools="http://schemas.android.com/tools"
-                      android:id="@+id/map"
-                      android:name="com.google.android.gms.maps.SupportMapFragment"
-                      android:layout_width="match_parent"
-                      android:layout_height="match_parent"
-                      tools:context="com.maps.maptest.MapsActivity"/>
+                android:id="@+id/map"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
             <LinearLayout
                 android:layout_width="match_parent"
