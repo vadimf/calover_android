@@ -11,7 +11,8 @@
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:background="#ffffff">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -55,6 +56,7 @@
                     android:thumb="@drawable/zoom_seekbar_thumb"
                     android:tickMark="@drawable/zoom_seekbar_tickmark"
                     android:splitTrack="false"
+                    android:background="#00ffffff"
                     android:rotation="180" />
             </RelativeLayout>
 
