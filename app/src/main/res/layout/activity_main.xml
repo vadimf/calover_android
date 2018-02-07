@@ -88,8 +88,16 @@
         app:headerLayout="@layout/navigation_drawer_header"
         app:itemTextColor="@color/colorPrimary"
         app:itemIconTint="@color/colorPrimary"
-        app:menu="@menu/navigation_drawer_menu"
-        />
+        app:menu="@menu/navigation_drawer_menu">
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_marginLeft="20dp"
+            android:layout_marginBottom="28dp"
+            android:layout_width="88dp"
+            android:layout_height="88dp"
+            android:layout_gravity="bottom"
+            app:srcCompat="@drawable/ic_logo" />
+    </android.support.design.widget.NavigationView>
 </android.support.v4.widget.DrawerLayout>
 
 
