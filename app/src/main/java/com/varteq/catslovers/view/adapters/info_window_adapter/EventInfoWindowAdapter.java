@@ -3,6 +3,7 @@ package com.varteq.catslovers.view.adapters.info_window_adapter;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter;
@@ -17,6 +18,7 @@ public class EventInfoWindowAdapter implements InfoWindowAdapter {
     private TextView addressTextView;
     private TextView eventTypeNameTextView;
     private TextView dateTextView;
+    private ImageView imageView;
     private boolean show;
     private Event.Type type;
     private Context context;
@@ -27,17 +29,21 @@ public class EventInfoWindowAdapter implements InfoWindowAdapter {
         addressTextView = eventMarkerDialogView.findViewById(R.id.textView_dialog_address);
         dateTextView = eventMarkerDialogView.findViewById(R.id.textView_dialog_date);
         eventTypeNameTextView = eventMarkerDialogView.findViewById(R.id.textView_dialog_event);
+        imageView = eventMarkerDialogView.findViewById(R.id.event_imageView);
     }
 
     @Override
     public View getInfoWindow(Marker marker) {
         if (show) {
+            imageView.setVisibility(View.GONE);
             switch (type) {
                 case WARNING:
                     eventTypeNameTextView.setTextColor(context.getResources().getColor(R.color.orange));
                     break;
                 case EMERGENCY:
                     eventTypeNameTextView.setTextColor(context.getResources().getColor(R.color.rusty_red));
+                    if (eventTypeNameTextView.getText().equals("Poison"))
+                        imageView.setVisibility(View.VISIBLE);
                     break;
             }
             return eventMarkerDialogView;

@@ -224,9 +224,11 @@ public class MapPresenter {
         });
     }
 
-    public void onCreateEventChoosed(int eventType, double latitude, double longitude) {
+    public void onCreateEventChoosed(int eventType, double latitude, double longitude, String name) {
         String address = Utils.getAddressByLocation(latitude, longitude, view.getContext());
-        Call<BaseResponse> call = ServiceGenerator.getApiServiceWithToken().createEvent(address, address, latitude, longitude, eventType);
+        if (name == null)
+            name = address;
+        Call<BaseResponse> call = ServiceGenerator.getApiServiceWithToken().createEvent(name, address, latitude, longitude, eventType);
         call.enqueue(new Callback<BaseResponse>() {
             @Override
             public void onResponse(Call<BaseResponse> call, Response<BaseResponse> response) {

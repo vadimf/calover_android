@@ -2,26 +2,63 @@
 <android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 
     >
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                  android:layout_width="match_parent"
-                  android:layout_height="match_parent"
-                  android:orientation="vertical">
-        <!-- Content Container -->
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <SeekBar
-            android:id="@+id/seekBar"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="25dp"
-            android:background="@color/white"
-            android:theme="@style/SeekBarTheme"
-            android:min="2"
-            android:max="21"
-            android:rotation="180"/>
+            android:layout_marginTop="21dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp">
+
+            <ImageView
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_marginTop="7dp"
+                android:layout_marginLeft="12dp"
+                android:layout_alignLeft="@id/seekBarLayout"
+                app:srcCompat="@drawable/zoom_plus_button" />
+
+            <ImageView
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_marginTop="7dp"
+                android:layout_marginRight="12dp"
+                android:layout_alignRight="@id/seekBarLayout"
+                app:srcCompat="@drawable/zoom_minus_button" />
+
+            <RelativeLayout
+                android:id="@+id/seekBarLayout"
+                android:layout_width="match_parent"
+                android:layout_height="25dp">
+
+                <SeekBar
+                    android:id="@+id/seekBar"
+                    android:layout_gravity="center_vertical|center_horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:min="2"
+                    android:max="21"
+                    android:progressDrawable="@drawable/zoom_seekbar_progress"
+                    android:thumb="@drawable/zoom_seekbar_thumb"
+                    android:tickMark="@drawable/zoom_seekbar_tickmark"
+                    android:splitTrack="false"
+                    android:rotation="180" />
+            </RelativeLayout>
+
+        </RelativeLayout>
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -34,6 +71,22 @@
                       android:layout_width="match_parent"
                       android:layout_height="match_parent"
                       tools:context="com.maps.maptest.MapsActivity"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="66dp"
+                android:layout_alignParentTop="true"
+                android:background="@drawable/map_top_gradient">
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="23dp"
+                android:layout_alignParentBottom="true"
+                android:background="@drawable/map_bottom_gradient">
+
+            </LinearLayout>
 
         </RelativeLayout>
     </LinearLayout>
@@ -88,5 +141,29 @@
         <include layout="@layout/bottom_sheet_emergencies"/>
     </FrameLayout>
 
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <include
+            layout="@layout/dialog_map_options"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/guideline" />
+
+        <android.support.constraint.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.48" />
+
+    </android.support.constraint.ConstraintLayout>
 
 </android.support.design.widget.CoordinatorLayout>

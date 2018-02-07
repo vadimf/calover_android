@@ -2,7 +2,7 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
                                              xmlns:app="http://schemas.android.com/apk/res-auto"
                                              xmlns:tools="http://schemas.android.com/tools"
-                                             android:id="@+id/relativeLayout2"
+    android:id="@+id/new_action_ConstraintLayout"
                                              android:layout_width="wrap_content"
                                              android:layout_height="wrap_content"
                                              android:layout_gravity="center"
@@ -13,7 +13,7 @@
         android:id="@+id/dialog_options_background"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@drawable/shape_map_options_background_oval"
+        android:background="@drawable/shape_map_options_background_img"
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -25,52 +25,46 @@
         style="@style/PrimarySmallTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="64dp"
-        android:layout_marginRight="64dp"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="32dp"
         android:text="@string/choose_option"
         android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintStart_toStartOf="@+id/button_open_feedstation"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/button_open_feedstation"
         style="@style/PrimaryColorButton"
         android:layout_width="wrap_content"
         android:layout_height="30dp"
-        android:layout_marginLeft="64dp"
-        android:layout_marginRight="64dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginStart="32dp"
         android:layout_marginTop="8dp"
         android:text="@string/open_feedstation"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView3"/>
+        app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
     <Button
         android:id="@+id/button_warnings"
         style="@style/OrangeColorButton"
         android:layout_width="wrap_content"
         android:layout_height="30dp"
-        android:layout_marginLeft="64dp"
-        android:layout_marginRight="64dp"
         android:layout_marginTop="8dp"
         android:text="@string/warnings"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_open_feedstation"/>
+        app:layout_constraintStart_toStartOf="@+id/button_open_feedstation"
+        app:layout_constraintTop_toBottomOf="@+id/button_open_feedstation" />
 
     <Button
         android:id="@+id/button_emergencies"
         style="@style/RedColorButton"
         android:layout_width="wrap_content"
         android:layout_height="30dp"
-        android:layout_marginBottom="64dp"
-        android:layout_marginLeft="64dp"
-        android:layout_marginRight="64dp"
+        android:layout_marginBottom="32dp"
         android:layout_marginTop="8dp"
         android:text="@string/emergencies"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_warnings"/>
+        app:layout_constraintStart_toStartOf="@+id/button_warnings"
+        app:layout_constraintTop_toBottomOf="@+id/button_warnings" />
 
 
 </android.support.constraint.ConstraintLayout>

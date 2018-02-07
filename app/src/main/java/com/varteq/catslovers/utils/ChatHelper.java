@@ -159,7 +159,7 @@ public class ChatHelper {
     private AsyncTask<Void, Void, Void> loginTask;
 
     public void loginToQuickBlox(Context context) {
-        if (!Profile.isUserLoggedIn(context) ||
+        if (context == null || !Profile.isUserLoggedIn(context) ||
                 (loginTask != null && loginTask.getStatus().equals(AsyncTask.Status.RUNNING)))
             return;
         int qbUserId = Profile.getQBUserId(context);
