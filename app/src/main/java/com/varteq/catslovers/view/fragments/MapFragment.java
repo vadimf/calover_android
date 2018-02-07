@@ -292,6 +292,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
+        seekBar.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+
+                if (v.getWidth() > 0) {
+                    applyCustomSeekbarTicks();
+                }
+            }
+        });
+
         warningsRadioGroup.setOnCheckedChangeListener((radioGroup, i) -> {
             switch (radioGroup.getCheckedRadioButtonId()) {
                 case R.id.radioButton_warnings_newborn_kittens:
@@ -1106,6 +1116,50 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         locationButton.setLayoutParams(marginLayoutParams);
 
         locationButton.requestLayout();
+    }
+
+    private void applyCustomSeekbarTicks() {
+
+        final int tickWidth = 2;
+        final int tickTopMargin = 20;
+        final int seekbarLeftMargin = 24;
+
+        int tickMargin = seekBar.getWidth() / (SEEKBAR_STEPS_COUNT - 1) - tickWidth;
+
+        View rootView = seekBar.getRootView();
+
+        /*
+         * Set ticks over seekbar
+         */
+        View tick1 = rootView.findViewById(R.id.tick1);
+        RelativeLayout.LayoutParams tick1Params = (RelativeLayout.LayoutParams) tick1.getLayoutParams();
+        tick1Params.setMargins(tickMargin + seekbarLeftMargin, tickTopMargin, 0, 0);
+        tick1.setLayoutParams(tick1Params);
+        tick1.requestLayout();
+
+        View tick2 = rootView.findViewById(R.id.tick2);
+        RelativeLayout.LayoutParams tick2Params = (RelativeLayout.LayoutParams) tick2.getLayoutParams();
+        tick2Params.setMargins(tickMargin * 2 + seekbarLeftMargin - 4, tickTopMargin, 0, 0);
+        tick2.setLayoutParams(tick2Params);
+        tick2.requestLayout();
+
+        View tick3 = rootView.findViewById(R.id.tick3);
+        RelativeLayout.LayoutParams tick3Params = (RelativeLayout.LayoutParams) tick3.getLayoutParams();
+        tick3Params.setMargins(tickMargin * 3 + seekbarLeftMargin - 8, tickTopMargin, 0, 0);
+        tick3.setLayoutParams(tick3Params);
+        tick3.requestLayout();
+
+        View tick4 = rootView.findViewById(R.id.tick4);
+        RelativeLayout.LayoutParams tick4Params = (RelativeLayout.LayoutParams) tick4.getLayoutParams();
+        tick4Params.setMargins(tickMargin * 4 + seekbarLeftMargin - 12, tickTopMargin, 0, 0);
+        tick4.setLayoutParams(tick4Params);
+        tick4.requestLayout();
+
+        View tick5 = rootView.findViewById(R.id.tick5);
+        RelativeLayout.LayoutParams tick5Params = (RelativeLayout.LayoutParams) tick5.getLayoutParams();
+        tick5Params.setMargins(tickMargin * 5 + seekbarLeftMargin - 16, tickTopMargin, 0, 0);
+        tick5.setLayoutParams(tick5Params);
+        tick5.requestLayout();
     }
 
     @Override
