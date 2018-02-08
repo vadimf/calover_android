@@ -818,14 +818,14 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
 
     @OnClick(R.id.weight_value_textView)
     void onWeightClick() {
-        EditTextDialog editTextDialog = new EditTextDialog(this, "Enter cat's weight", "For example: 5.350",
+        EditTextDialog editTextDialog = new EditTextDialog(this, "Enter cat's weight", "For example: 5.3",
                 new EditTextDialog.OnClickListener() {
                     @Override
                     public void onPositiveButtonClick() {
                         String enteredValue = getEditTextDialog().getEditText().getText().toString();
                         if (Utils.isStringNumericPositive(enteredValue)) {
                             if (Float.parseFloat(enteredValue) <= 20) {
-                                setWeight(enteredValue);
+                                setWeight(String.valueOf(Float.parseFloat(enteredValue)));
                                 dismiss();
                             } else {
                                 Toaster.shortToast("Weight should be no more than 20");
@@ -841,6 +841,7 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
                     }
                 }
         );
+        editTextDialog.setWeightFilter();
         editTextDialog.setEditTextText((weight > 0 && !weightValueTextView.getText().toString().equals(DEFAULT_VALUE)) ? String.valueOf(weight) : null);
         editTextDialog.setEditTextInputType(InputType.TYPE_CLASS_PHONE);
         editTextDialog.show();

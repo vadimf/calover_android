@@ -2,6 +2,7 @@ package com.varteq.catslovers.view.dialog;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.text.InputFilter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -67,6 +68,25 @@ public class EditTextDialog {
 
     public void setEditTextText(String editTextText) {
        editText.setText(editTextText);
+    }
+
+    public void setWeightFilter() {
+        InputFilter filter = (source, start, end, dest, dstart, dend) -> {
+            int dotIndex = dest.toString().indexOf(".");
+            int offset = dest.length();
+            for (int i = start; i < end; i++) {
+                if (source.charAt(i) == '.') {
+                    dotIndex = i + offset;
+                    if (i + offset == 0 || i + offset == 3)
+                        return "";
+                } else if (Character.isDigit(source.charAt(i))) {
+                    if (i + offset > 1 && (dotIndex < 0 || i + offset - dotIndex > 1))
+                        return "";
+                } else return "";
+            }
+            return null;
+        };
+        editText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(4), filter});
     }
 
 
