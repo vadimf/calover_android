@@ -4,14 +4,15 @@ import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.makeramen.roundedimageview.RoundedImageView;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.users.model.QBUser;
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.utils.ResourceUtils;
-import com.varteq.catslovers.utils.UiUtils;
 
 import java.util.List;
 
@@ -32,7 +33,7 @@ public class UsersAdapter extends BaseListAdapter<QBUser> {
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.list_item_user, parent, false);
             holder = new ViewHolder();
-            holder.userImageView = (ImageView) convertView.findViewById(R.id.image_user);
+            holder.userImageView = convertView.findViewById(R.id.image_user);
             holder.loginTextView = (TextView) convertView.findViewById(R.id.text_user_login);
             holder.userCheckBox = (CheckBox) convertView.findViewById(R.id.checkbox_user);
             convertView.setTag(holder);
@@ -52,7 +53,11 @@ public class UsersAdapter extends BaseListAdapter<QBUser> {
             holder.loginTextView.setTextColor(ResourceUtils.getColor(R.color.text_color_medium_grey));
         }
 
-        holder.userImageView.setBackgroundDrawable(UiUtils.getColorCircleDrawable(position));
+        boolean isAvatarExist = user.getCustomData() != null && !user.getCustomData().isEmpty();
+        Glide.with(convertView)
+                .load(isAvatarExist ? user.getCustomData() : R.drawable.user_avatar_default)
+                .apply(new RequestOptions().error(R.drawable.user_avatar_default))
+                .into(holder.userImageView);
         holder.userCheckBox.setVisibility(View.GONE);
 
         return convertView;
@@ -67,7 +72,7 @@ public class UsersAdapter extends BaseListAdapter<QBUser> {
     }
 
     protected static class ViewHolder {
-        ImageView userImageView;
+        RoundedImageView userImageView;
         TextView loginTextView;
         CheckBox userCheckBox;
     }

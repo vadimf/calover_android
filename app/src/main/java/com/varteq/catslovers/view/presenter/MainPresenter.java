@@ -28,6 +28,7 @@ import net.gotev.uploadservice.UploadStatusDelegate;
 
 import java.util.List;
 
+import io.realm.Realm;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -266,6 +267,22 @@ public class MainPresenter {
             Toaster.shortToast(view.getString(R.string.network_error_message));
             return true;
         } else return false;
+    }
+
+    public void signOut() {
+        // cancel all requests, realm, QuickBlox, shared prefs
+        ServiceGenerator.cancelAllRequests();
+
+        ChatHelper.getInstance().signOut();
+
+        Realm myRealm = Realm.getDefaultInstance();
+        myRealm.executeTransaction(realm -> {
+            myRealm.deleteAll();
+            myRealm.close();
+        });
+
+        Profile.clear(view);
+        view.onSignOutSuccess();
     }
 
     public abstract class OneTimeOnClickListener implements View.OnClickListener {

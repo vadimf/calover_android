@@ -15,7 +15,7 @@ public class FeedPost implements Serializable {
     private Date date;
     private Uri previewUri;
     private Uri mediaUri;
-    private Uri avatarUri;
+    private String avatar;
     private File previewFile;
     private String previewName;
     private String mediaName;
@@ -31,26 +31,26 @@ public class FeedPost implements Serializable {
         VIDEO
     }
 
-    public FeedPost(String id, Date date, Uri avatarUri, String name, String message, FeedPostType type) {
+    public FeedPost(String id, Date date, String avatar, String name, String message, FeedPostType type) {
         this.id = id;
         this.date = date;
-        this.avatarUri = avatarUri;
+        this.avatar = avatar;
         this.name = name;
         this.message = message;
         this.type = type;
     }
 
-    public FeedPost(String id, Date date, Uri avatarUri, String userName, String message, Uri mediaUri, FeedPostType type) {
-        this(id, date, avatarUri, userName, message, type);
+    public FeedPost(String id, Date date, String avatar, String userName, String message, Uri mediaUri, FeedPostType type) {
+        this(id, date, avatar, userName, message, type);
         this.mediaUri = mediaUri;
     }
 
-    public FeedPost(String id, Integer userId, Date date, Uri avatarUri, String userName, String message,
+    public FeedPost(String id, Integer userId, Date date, String avatar, String userName, String message,
                     String previewName, String mediaName, List<Integer> likes, Integer stationId, FeedPostType type) {
         this.id = id;
         this.userId = userId;
         this.date = date;
-        this.avatarUri = avatarUri;
+        this.avatar = avatar;
         this.previewName = previewName;
         this.mediaName = mediaName;
         this.name = userName;
@@ -60,12 +60,12 @@ public class FeedPost implements Serializable {
         this.stationId = stationId;
     }
 
-    public FeedPost(String id, Date date, Uri previewUri, Uri mediaUri, Uri avatarUri, String name, String message, List<Integer> likes, FeedPostType type) {
+    public FeedPost(String id, Date date, Uri previewUri, Uri mediaUri, String avatar, String name, String message, List<Integer> likes, FeedPostType type) {
         this.id = id;
         this.date = date;
         this.previewUri = previewUri;
         this.mediaUri = mediaUri;
-        this.avatarUri = avatarUri;
+        this.avatar = avatar;
         this.name = name;
         this.message = message;
         this.likes = likes;
@@ -96,12 +96,12 @@ public class FeedPost implements Serializable {
         this.previewUri = previewUri;
     }
 
-    public Uri getAvatarUri() {
-        return avatarUri;
+    public String getAvatar() {
+        return avatar;
     }
 
-    public void setAvatarUri(Uri avatarUri) {
-        this.avatarUri = avatarUri;
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 
     public String getName() {

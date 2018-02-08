@@ -21,6 +21,7 @@ import com.varteq.catslovers.model.GroupPartner;
 import com.varteq.catslovers.model.QBFeedPost;
 import com.varteq.catslovers.utils.ChatHelper;
 import com.varteq.catslovers.utils.Log;
+import com.varteq.catslovers.utils.qb.QbUsersHolder;
 import com.varteq.catslovers.view.fragments.FeedFragment;
 
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ public class FeedPresenter {
     private boolean isNeedScrollDown = true;
     public FeedPresenter(FeedFragment view) {
         this.view = view;
-        setupUpdateTimerTask();
+        //setupUpdateTimerTask();
     }
 
     public void loadFeeds() {
@@ -90,14 +91,14 @@ public class FeedPresenter {
         });
     }
 
-    private List<FeedPost> from(ArrayList<QBCustomObject> customObjects, ArrayList<QBUser> qbUsers) {
+    private List<FeedPost> from(ArrayList<QBCustomObject> customObjects, List<QBUser> qbUsers) {
         HashMap<Integer, QBUser> users = new HashMap<>();
         for (QBUser user : qbUsers)
             users.put(user.getId(), user);
 
         List<FeedPost> feeds = new ArrayList<>();
         for (QBCustomObject object : customObjects) {
-            FeedPost feed = QBFeedPost.toFeedPost(object, null, users.get(object.getUserId()).getFullName());
+            FeedPost feed = QBFeedPost.toFeedPost(object, users.get(object.getUserId()).getCustomData(), users.get(object.getUserId()).getFullName());
             feeds.add(feed);
         }
         return feeds;
@@ -105,13 +106,28 @@ public class FeedPresenter {
 
     private void loadUsers(ArrayList<QBCustomObject> customObjects) {
         Set<Integer> userIds = new HashSet<>();
-        for (QBCustomObject object : customObjects)
-            userIds.add(object.getUserId());
+        List<QBUser> existingUsers = new ArrayList<>();
+        for (QBCustomObject object : customObjects) {
+            QBUser user = QbUsersHolder.getInstance().getUserById(object.getUserId());
+            if (user != null)
+                existingUsers.add(user);
+            else
+                userIds.add(object.getUserId());
+        }
+
+        if (userIds.isEmpty()) {
+            view.feedsLoaded(from(customObjects, existingUsers), isNeedScrollDown);
+            isNeedScrollDown = true;
+            return;
+        }
+
         QBUsers.getUsersByIDs(userIds, null).performAsync(
                 new QBEntityCallback<ArrayList<QBUser>>() {
                     @Override
                     public void onSuccess(ArrayList<QBUser> result, Bundle params) {
                         Log.d(TAG, "QBUsers.getUsersByIDs onSuccess count: " + (result != null ? result.size() : "null"));
+                        if (result != null && !existingUsers.isEmpty())
+                            result.addAll(existingUsers);
                         view.feedsLoaded(from(customObjects, result), isNeedScrollDown);
                         isNeedScrollDown = true;
                     }
@@ -198,7 +214,8 @@ public class FeedPresenter {
             @Override
             public void run() {
                 isNeedScrollDown = false;
-                loadFeeds();
+                if (view != null)
+                    loadFeeds();
                 Log.d(TAG, "Go to feeds update");
             }
 

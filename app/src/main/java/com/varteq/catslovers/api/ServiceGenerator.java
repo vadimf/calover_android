@@ -2,6 +2,7 @@ package com.varteq.catslovers.api;
 
 import com.varteq.catslovers.utils.Log;
 
+import okhttp3.Dispatcher;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -15,11 +16,13 @@ public class ServiceGenerator {
     private static final int TIMEOUT = 60;
 
     private static OkHttpClient.Builder httpClient;
+    private static Dispatcher dispatcher = new Dispatcher();
 
     static {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor(message -> Log.d("Retrofit", message))
                 .setLevel(HttpLoggingInterceptor.Level.BODY);
         httpClient = new OkHttpClient.Builder()
+                .dispatcher(dispatcher)
                 .addInterceptor(logging);
     }
 
@@ -100,6 +103,10 @@ public class ServiceGenerator {
             apiServiceWithToken = retrofit.create(ApiService.class);
         }
         return apiServiceWithToken;
+    }
+
+    public static void cancelAllRequests() {
+        dispatcher.cancelAll();
     }
 
     /*public static <S> S createService(Class<S> serviceClass, AccessToken token) {

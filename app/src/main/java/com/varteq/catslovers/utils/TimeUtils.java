@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 public class TimeUtils {
 
@@ -104,5 +105,22 @@ public class TimeUtils {
 
     public static int getUtcFromLocal(long millis) {
         return (int) ((millis - TimeZone.getDefault().getOffset(millis)) / 1000L);
+    }
+
+    public static long calculatePassedMonths(Calendar fromDate, Calendar toDate) {
+        long timePassedDays = (TimeUnit.MILLISECONDS.toDays(toDate.getTimeInMillis() - fromDate.getTimeInMillis()));
+        long timePassedMonths = timePassedDays / 30;
+
+        // maximum approximate formula to calculate passed months
+        if (timePassedMonths > 1) {
+            int birthdayMonth = fromDate.get(Calendar.MONTH);
+            int currentMonth = toDate.get(Calendar.MONTH);
+            int birthdayYear = fromDate.get(Calendar.YEAR);
+            int currentYear = toDate.get(Calendar.YEAR);
+            timePassedMonths = (currentYear - birthdayYear) * 12 + (currentMonth - birthdayMonth);
+            if (toDate.get(Calendar.DAY_OF_MONTH) + (30 - fromDate.get(Calendar.DAY_OF_MONTH)) < 30)
+                timePassedMonths--;
+        }
+        return timePassedMonths;
     }
 }

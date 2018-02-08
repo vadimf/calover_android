@@ -20,12 +20,15 @@ import com.varteq.catslovers.utils.GenericOf;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.utils.Toaster;
+import com.varteq.catslovers.utils.qb.QbUsersHolder;
 import com.varteq.catslovers.view.SettingsActivity;
 
 import net.gotev.uploadservice.MultipartUploadRequest;
 import net.gotev.uploadservice.ServerResponse;
 import net.gotev.uploadservice.UploadInfo;
-import net.gotev.uploadservice.UploadStatusDelegate;
+import net.gotev.uploadservice.UploadServiceBroadcastReceiver;
+
+import java.util.Collections;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -47,31 +50,43 @@ public class SettingsPresenter {
     }
 
     public void loadUserInfo() {
+        view.showWaitDialog();
         Call<BaseResponse<RUserSimple>> call = ServiceGenerator.getApiServiceWithToken().getUserInfo();
         call.enqueue(new Callback<BaseResponse<RUserSimple>>() {
             @Override
             public void onResponse(Call<BaseResponse<RUserSimple>> call, Response<BaseResponse<RUserSimple>> response) {
+                if (view == null) return;
                 if (response.isSuccessful()) {
                     RUserSimple user = response.body().getData();
-                    if (user != null && view != null) {
+                    if (user != null) {
                         view.setEmail(user.getEmail());
                         view.setUsername(user.getName());
                         view.setAvatar(new PhotoWithPreview(null, user.getAvatarUrl(), user.getAvatarUrlThumbnail()));
+                        view.hideWaitDialog();
+                        return;
                     }
                 }
+                view.dataLoadingFailed();
             }
 
             @Override
             public void onFailure(Call<BaseResponse<RUserSimple>> call, Throwable t) {
-
+                view.dataLoadingFailed();
             }
         });
     }
 
     public void uploadUserSettings(String name, PhotoWithPreview avatar) {
+        errListener = new OneTimeOnClickListener() {
+            @Override
+            protected void onClick() {
+                uploadUserSettings(name, avatar);
+            }
+        };
         view.showWaitDialog();
 
         try {
+            view.registerUploadAvatarReceiver(broadcastReceiver);
             MultipartUploadRequest uploadCatRequest = new MultipartUploadRequest(view, ServiceGenerator.apiBaseUrl + "user")
                     .setMethod("PUT")
                     .setUtf8Charset()
@@ -80,56 +95,64 @@ public class SettingsPresenter {
             if (avatar != null && avatar.getExpectedAction() != null && avatar.getExpectedAction().equals(PhotoWithPreview.Action.CHANGE))
                 uploadCatRequest.addFileToUpload(avatar.getPhoto(), "avatar");
 
-            uploadCatRequest.setDelegate(new UploadStatusDelegate() {
-                @Override
-                public void onProgress(Context context, UploadInfo uploadInfo) {
-                }
-
-                @Override
-                public void onError(Context context, UploadInfo uploadInfo, ServerResponse serverResponse, Exception exception) {
-                    errListener = new OneTimeOnClickListener() {
-                        @Override
-                        protected void onClick() {
-                            uploadCatRequest.startUpload();
-                        }
-                    };
-                    checkNetworkErrAndShowSnackbar(exception);
-                    Toaster.longToast("An error occurred while saving");
-                    view.hideWaitDialog();
-                }
-
-                @Override
-                public void onCompleted(Context context, UploadInfo uploadInfo, ServerResponse serverResponse) {
-                    try {
-                        Gson gson = new Gson();
-
-                        BaseResponse<RUserInfo> user = gson.fromJson(serverResponse.getBodyAsString(), new GenericOf<>(BaseResponse.class, RUserInfo.class));
-                        if (user != null && user.getSuccess()) {
-                            if (user.getData() != null && user.getData().getAvatarUrlThumbnail() != null) {
-                                qbUser.setCustomData(user.getData().getAvatarUrlThumbnail());
-                            }
-                            qbUser.setFullName(name);
-                            updateQBUser(qbUser);
-                            return;
-                        }
-                    } catch (Exception e) {
-                    }
-                    // updateQBUser(qbUser);
-                    Toaster.longToast("An error occurred while saving");
-                    view.hideWaitDialog();
-                }
-
-                @Override
-                public void onCancelled(Context context, UploadInfo uploadInfo) {
-                    view.hideWaitDialog();
-                }
-            });
+            uploadCatRequest.setDelegate(broadcastReceiver);
 
             String uploadId = uploadCatRequest.startUpload();
         } catch (Exception exc) {
             Log.e("uploadUserSettings", exc.getMessage(), exc);
         }
     }
+
+    private UploadServiceBroadcastReceiver broadcastReceiver = new UploadServiceBroadcastReceiver() {
+        @Override
+        public void onProgress(Context context, UploadInfo uploadInfo) {
+        }
+
+        @Override
+        public void onError(Context context, UploadInfo uploadInfo, ServerResponse serverResponse, Exception exception) {
+            Log.e("uploadUserSettings ", exception.getMessage());
+            if (checkNetworkErrAndShowSnackbar(exception)) {
+                view.hideWaitDialog();
+                return;
+            }
+            Toaster.longToast("An error occurred while saving");
+            view.hideWaitDialog();
+            view.unregisterUploadAvatarReceiver(broadcastReceiver);
+        }
+
+        @Override
+        public void onCompleted(Context context, UploadInfo uploadInfo, ServerResponse serverResponse) {
+            Log.d("uploadUserSettings ", "onCompleted");
+
+            try {
+                Gson gson = new Gson();
+
+                BaseResponse<RUserInfo> user = gson.fromJson(serverResponse.getBodyAsString(), new GenericOf<>(BaseResponse.class, RUserInfo.class));
+                if (user != null && user.getSuccess()) {
+                    if (user.getData() != null && user.getData().getAvatarUrlThumbnail() != null) {
+                        qbUser.setCustomData(user.getData().getAvatarUrlThumbnail());
+                    }
+                    qbUser.setFullName(user.getData() != null ? user.getData().getName() : "");
+                    QbUsersHolder.getInstance().putUsers(Collections.singletonList(qbUser));
+                    updateQBUser(qbUser);
+                    view.unregisterUploadAvatarReceiver(broadcastReceiver);
+                    return;
+                }
+            } catch (Exception e) {
+            }
+            Toaster.longToast("An error occurred while saving");
+            view.hideWaitDialog();
+            view.unregisterUploadAvatarReceiver(broadcastReceiver);
+        }
+
+        @Override
+        public void onCancelled(Context context, UploadInfo uploadInfo) {
+            Log.d("uploadUserSettings ", "canceled");
+            Toaster.longToast("An error occurred while saving");
+            view.hideWaitDialog();
+            view.unregisterUploadAvatarReceiver(broadcastReceiver);
+        }
+    };
 
     private void updateQBUser(QBUser user) {
         errListener = new OneTimeOnClickListener() {

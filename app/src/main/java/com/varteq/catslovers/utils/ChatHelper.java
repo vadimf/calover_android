@@ -147,6 +147,21 @@ public class ChatHelper {
         });
     }
 
+    public void signOut() {
+        qbChatService.destroy();
+        QBUsers.signOut().performAsync(new QBEntityCallback<Void>() {
+            @Override
+            public void onSuccess(Void aVoid, Bundle bundle) {
+            }
+
+            @Override
+            public void onError(QBResponseException e) {
+            }
+        });
+        QbUsersHolder.getInstance().destroy();
+        QbDialogHolder.getInstance().clear();
+    }
+
     public void loginToChat(final QBUser user, final QBEntityCallback<Void> callback) {
         if (qbChatService.isLoggedIn()) {
             callback.onSuccess(null, null);

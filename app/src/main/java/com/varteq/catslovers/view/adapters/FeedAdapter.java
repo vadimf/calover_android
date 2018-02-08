@@ -13,16 +13,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.makeramen.roundedimageview.RoundedImageView;
-import com.quickblox.users.model.QBUser;
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.model.FeedPost;
 import com.varteq.catslovers.utils.NetworkUtils;
 import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.utils.TimeUtils;
-import com.varteq.catslovers.utils.UiUtils;
-import com.varteq.catslovers.utils.Utils;
-import com.varteq.catslovers.utils.qb.QbUsersHolder;
 import com.varteq.catslovers.view.MediaViewerActivity;
 
 import java.util.List;
@@ -69,13 +66,11 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         holder.nameTextView.setText(feed.getName());
         holder.likeImageButton.setLikes(feed.getIsUserLiked(currentUserId), feed.getLikes() != null ? feed.getLikes().size() : 0, position);
 
-        QBUser user = QbUsersHolder.getInstance().getUserById(feed.getUserId());
-        if (user != null && user.getCustomData() != null) {
-            Glide.with(holder.itemView)
-                    .load(user.getCustomData())
-                    .into(holder.avatarImageView);
-        } else
-            holder.avatarImageView.setImageBitmap(Utils.getBitmapWithColor(UiUtils.getCircleColorForPosition(feed.getUserId())));
+        boolean isAvatarExist = feed.getAvatar() != null && !feed.getAvatar().isEmpty();
+        Glide.with(holder.itemView)
+                .load(isAvatarExist ? feed.getAvatar() : R.drawable.user_avatar_default)
+                .apply(new RequestOptions().error(R.drawable.user_avatar_default))
+                .into(holder.avatarImageView);
 
         String message = feed.getMessage();
         if (message != null && !message.equals("null"))

@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBDialogType;
@@ -50,14 +51,11 @@ public class DialogsAdapter extends BaseSelectableListAdapter<QBChatDialog> {
         QBChatDialog dialog = getItem(position);
         if (dialog.getType().equals(QBDialogType.PRIVATE)) {
             QBUser user = ChatHelper.getInstance().getInterlocutorUserFromDialog(dialog);
-            if (user != null && user.getCustomData() != null && !user.getCustomData().isEmpty())
-                Glide.with(holder.rootLayout)
-                        .load(user.getCustomData())
-                        .into(holder.dialogImageView);
-            else {
-                holder.dialogImageView.setBackgroundDrawable(UiUtils.getColorCircleDrawable(position));
-                holder.dialogImageView.setImageDrawable(null);
-            }
+            boolean isAvatarExist = user != null && user.getCustomData() != null && !user.getCustomData().isEmpty();
+            Glide.with(holder.rootLayout)
+                    .load(isAvatarExist ? user.getCustomData() : R.drawable.user_avatar_default)
+                    .apply(new RequestOptions().error(R.drawable.user_avatar_default))
+                    .into(holder.dialogImageView);
 
         } else {
             holder.dialogImageView.setBackgroundDrawable(UiUtils.getGreyCircleDrawable());
