@@ -161,7 +161,6 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
     FeedstationPresenter presenter;
     ViewPager viewPager;
     HeaderPhotosViewPagerAdapter pagerAdapter;
-    private int[] headerPhotos = {R.drawable.cat2, R.drawable.cat3, R.drawable.cat1};
     Geocoder geocoder;
     BroadcastReceiver tickReceiver;
 
