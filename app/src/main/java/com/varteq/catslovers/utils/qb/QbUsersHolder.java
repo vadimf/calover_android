@@ -62,7 +62,8 @@ public class QbUsersHolder {
         qbUserSparseArray.put(user.getId(), user);
     }
 
-    public QBUser getUserById(int id) {
+    public QBUser getUserById(Integer id) {
+        if (id == null) return null;
         return qbUserSparseArray.get(id);
     }
 

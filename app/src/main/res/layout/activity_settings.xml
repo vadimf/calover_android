@@ -37,7 +37,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="32dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/user_avatar_plug_img"
+            android:src="@drawable/user_avatar_default"
             app:layout_constraintDimensionRatio="w,1:1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

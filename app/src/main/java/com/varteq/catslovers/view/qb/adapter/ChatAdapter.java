@@ -18,6 +18,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.quickblox.chat.model.QBAttachment;
@@ -29,8 +30,6 @@ import com.varteq.catslovers.R;
 import com.varteq.catslovers.utils.ChatHelper;
 import com.varteq.catslovers.utils.ResourceUtils;
 import com.varteq.catslovers.utils.TimeUtils;
-import com.varteq.catslovers.utils.UiUtils;
-import com.varteq.catslovers.utils.Utils;
 import com.varteq.catslovers.utils.qb.PaginationHistoryListener;
 import com.varteq.catslovers.utils.qb.QbUsersHolder;
 import com.varteq.catslovers.view.qb.AttachmentImageActivity;
@@ -50,6 +49,7 @@ public class ChatAdapter extends BaseListAdapter<QBChatMessage> {
     private OnItemInfoExpandedListener onItemInfoExpandedListener;
     private PaginationHistoryListener paginationListener;
     private int previousGetCount = 0;
+    private Integer currentUserId = ChatHelper.getCurrentUser().getId();
 
     public ChatAdapter(Context context, QBChatDialog chatDialog, List<QBChatMessage> chatMessages) {
         super(context, chatMessages);
@@ -83,16 +83,15 @@ public class ChatAdapter extends BaseListAdapter<QBChatMessage> {
 
         final QBChatMessage chatMessage = getItem(position);
 
-        QBUser user;
-        if (chatMessage.getSenderId() != null)
-            user = QbUsersHolder.getInstance().getUserById(chatMessage.getSenderId());
-        else user = ChatHelper.getCurrentUser();
-        if (user != null && user.getCustomData() != null && !user.getCustomData().isEmpty()) {
-            Glide.with(convertView)
-                    .load(user.getCustomData())
-                    .into(holder.avatarImageView);
-        } else
-            holder.avatarImageView.setImageBitmap(Utils.getBitmapWithColor(UiUtils.getCircleColorForPosition(user != null ? user.getId() : 0)));
+        Integer userId = chatMessage.getSenderId();
+        if (userId == null)
+            userId = currentUserId;
+        QBUser user = QbUsersHolder.getInstance().getUserById(userId);
+        boolean isAvatarExist = user != null && user.getCustomData() != null && !user.getCustomData().isEmpty();
+        Glide.with(convertView)
+                .load(isAvatarExist ? user.getCustomData() : R.drawable.user_avatar_default)
+                .apply(new RequestOptions().error(R.drawable.user_avatar_default))
+                .into(holder.avatarImageView);
 
         setIncomingOrOutgoingMessageAttributes(holder, chatMessage);
         setMessageBody(holder, chatMessage);

@@ -45,6 +45,7 @@ public class SettingsActivity extends BaseActivity implements OnImagePickedListe
     @BindView(R.id.textView_change_username)
     TextView usernameTextView;
     SettingsPresenter presenter;
+    private MenuItem saveMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,8 +74,8 @@ public class SettingsActivity extends BaseActivity implements OnImagePickedListe
 
     private void updateAvatar() {
         Glide.with(this)
-                .load(avatar != null ? avatar.getThumbnail() : R.drawable.user_avatar_plug_img)
-                .apply(new RequestOptions().override(THUMBSIZE, THUMBSIZE).error(R.drawable.user_avatar_plug_img))
+                .load(avatar != null ? avatar.getThumbnail() : R.drawable.user_avatar_default)
+                .apply(new RequestOptions().override(THUMBSIZE, THUMBSIZE).error(R.drawable.user_avatar_default))
                 .into(avatarImageView);
     }
 
@@ -140,6 +141,7 @@ public class SettingsActivity extends BaseActivity implements OnImagePickedListe
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_user_settings, menu);
+        saveMenu = menu.findItem(R.id.menu_select_action_done);
         return true;
     }
 
@@ -147,6 +149,7 @@ public class SettingsActivity extends BaseActivity implements OnImagePickedListe
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_select_action_done:
+                saveMenu.setEnabled(false);
                 presenter.uploadUserSettings(usernameTextView.getText().toString(), avatar);
                 return true;
             default:
@@ -188,5 +191,11 @@ public class SettingsActivity extends BaseActivity implements OnImagePickedListe
         super.onSaveInstanceState(outState);
         outState.putString(NAME_KEY, !usernameTextView.getText().toString().equals(DEFAULT_NAME) ? usernameTextView.getText().toString() : "");
         outState.putParcelable(AVATAR_KEY, avatar);
+    }
+
+    public void dataLoadingFailed() {
+        hideWaitDialog();
+        Toaster.longToast("Data loading failed");
+        onBackPressed();
     }
 }
