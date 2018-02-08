@@ -46,6 +46,7 @@ import net.gotev.uploadservice.UploadNotificationConfig;
 import net.gotev.uploadservice.UploadStatusDelegate;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -123,7 +124,7 @@ public class CatProfilePresenter {
             else {
                 Toaster.longToast(R.string.only_admins_can_delete_cats);
             }
-        }else{
+        } else {
             view.forceClose();
         }
     }
@@ -282,13 +283,16 @@ public class CatProfilePresenter {
     }
 
     public String getAgeInString(long petBirthdayMillis) {
+        Calendar birthdayCalendar = Calendar.getInstance();
+        birthdayCalendar.setTimeInMillis(petBirthdayMillis);
+        Calendar nowCalendar = Calendar.getInstance();
+
         long nowMillis = System.currentTimeMillis();
         long timePassedDays = (TimeUnit.MILLISECONDS.toDays(nowMillis - petBirthdayMillis));
-        long timePassedMonthes = timePassedDays / 30;
+        long timePassedMonths =  TimeUtils.calculatePassedMonths(birthdayCalendar, nowCalendar);
 
-        int years = ((int) timePassedMonthes) / 12;
-        int month = ((int) timePassedMonthes) - (years * 12);
-        int days = (int) timePassedDays;
+        int years = ((int) timePassedMonths) / 12;
+        int month = ((int) timePassedMonths) - (years * 12);
 
         String age = null;
         if (years > 0) {

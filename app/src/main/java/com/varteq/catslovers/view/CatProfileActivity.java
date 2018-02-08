@@ -43,6 +43,7 @@ import com.varteq.catslovers.model.CatProfile;
 import com.varteq.catslovers.model.Feedstation;
 import com.varteq.catslovers.model.GroupPartner;
 import com.varteq.catslovers.model.PhotoWithPreview;
+import com.varteq.catslovers.utils.Consts;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.utils.SystemPermissionHelper;
@@ -270,7 +271,7 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         if (currentMode.equals(CatProfileScreenMode.CREATE_MODE)) {
-            permissionHelper = new SystemPermissionHelper( this);
+            permissionHelper = new SystemPermissionHelper(this);
             initLocation();
         }
 
@@ -810,7 +811,10 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
 
     @OnClick(R.id.age_value_textView)
     void onAgeClick() {
-        new WrappedDatePickerDialog(CatProfileActivity.this, petBirthdayMillis, (datePicker, i, i1, i2) -> {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.YEAR, -Consts.CAT_MAX_YEARS_OLD);
+        Long minDate = calendar.getTimeInMillis();
+        new WrappedDatePickerDialog(CatProfileActivity.this, petBirthdayMillis, minDate, (datePicker, i, i1, i2) -> {
             petBirthdayMillis = TimeUtils.getTimeInMillis(i, i1, i2);
             ageValueTextView.setText(presenter.getAgeInString(petBirthdayMillis));
         });

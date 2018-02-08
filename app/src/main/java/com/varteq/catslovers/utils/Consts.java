@@ -9,4 +9,6 @@ public interface Consts {
 
     int PREFERRED_IMAGE_SIZE_PREVIEW = ResourceUtils.getDimen(R.dimen.chat_attachment_preview_size);
     int PREFERRED_IMAGE_SIZE_FULL = ResourceUtils.dpToPx(320);
+
+    int CAT_MAX_YEARS_OLD = 20;
 }
