@@ -147,4 +147,8 @@ public class Profile {
     public static String getUserStation(Context context) {
         return getDefaultSharedPreferences(context).getString(USER_STATION, "");
     }
+
+    public static void clear(Context context) {
+        getDefaultSharedPreferences(context).edit().clear().apply();
+    }
 }

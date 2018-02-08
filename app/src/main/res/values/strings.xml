@@ -195,5 +195,6 @@
     <string name="business">Business</string>
     <string name="server_error">Server error</string>
     <string name="network_error">Network error</string>
+    <string name="sign_out">Sign out</string>
 
 </resources>

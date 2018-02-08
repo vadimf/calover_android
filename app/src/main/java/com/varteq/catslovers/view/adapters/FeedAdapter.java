@@ -15,13 +15,11 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.makeramen.roundedimageview.RoundedImageView;
-import com.quickblox.users.model.QBUser;
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.model.FeedPost;
 import com.varteq.catslovers.utils.NetworkUtils;
 import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.utils.TimeUtils;
-import com.varteq.catslovers.utils.qb.QbUsersHolder;
 import com.varteq.catslovers.view.MediaViewerActivity;
 
 import java.util.List;
@@ -68,10 +66,9 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         holder.nameTextView.setText(feed.getName());
         holder.likeImageButton.setLikes(feed.getIsUserLiked(currentUserId), feed.getLikes() != null ? feed.getLikes().size() : 0, position);
 
-        QBUser user = QbUsersHolder.getInstance().getUserById(feed.getUserId());
-        boolean isAvatarExist = user != null && user.getCustomData() != null && !user.getCustomData().isEmpty();
+        boolean isAvatarExist = feed.getAvatar() != null && !feed.getAvatar().isEmpty();
         Glide.with(holder.itemView)
-                .load(isAvatarExist ? user.getCustomData() : R.drawable.user_avatar_default)
+                .load(isAvatarExist ? feed.getAvatar() : R.drawable.user_avatar_default)
                 .apply(new RequestOptions().error(R.drawable.user_avatar_default))
                 .into(holder.avatarImageView);
 

@@ -36,7 +36,7 @@ public class QBFeedPost extends QBCustomObject {
         setClassName(CLASS_NAME);
     }
 
-    public static FeedPost toFeedPost(QBCustomObject object, Uri avatarUri, String userName) {
+    public static FeedPost toFeedPost(QBCustomObject object, String avatar, String userName) {
         FeedPost.FeedPostType type = FeedPost.FeedPostType.TEXT;
         Uri mediaUri = null;
         String mediaName = null;
@@ -61,7 +61,7 @@ public class QBFeedPost extends QBCustomObject {
         }
 
         return new FeedPost(object.getCustomObjectId(), object.getUserId(), object.getCreatedAt(),
-                avatarUri,
+                avatar,
                 userName,
                 object.getString("description"), previewName, mediaName, usersIds, Integer.parseInt(object.getString(STATION_ID_FIELD)), type);
     }

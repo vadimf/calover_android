@@ -1,6 +1,7 @@
 package com.varteq.catslovers.view;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.ThumbnailUtils;
@@ -384,6 +385,9 @@ public class MainActivity extends BaseActivity {
                 case R.id.navigation_menu_send_logs:
                     sendLogs();
                     break;
+                case R.id.navigation_menu_sign_out:
+                    signOut();
+                    break;
                 /*case R.id.navigation_menu_info:
                     break;*/
             }
@@ -441,6 +445,19 @@ public class MainActivity extends BaseActivity {
         startActivity(Intent.createChooser(email, "Send CatsLovers logs"));
     }
 
+    private void signOut() {
+        new AlertDialog.Builder(this)
+                .setTitle("Are you sure you want to sign out?")
+                .setNegativeButton(android.R.string.no, null)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        presenter.signOut();
+                    }
+                })
+                .show();
+    }
+
     @Override
     public void onBackPressed() {
         if (doubleBackToExitPressedOnce) {
@@ -465,5 +482,10 @@ public class MainActivity extends BaseActivity {
             presenter.loadUserInfo();
             needCheckUserSettings = false;
         }
+    }
+
+    public void onSignOutSuccess() {
+        startActivity(new Intent(this, SplashActivity.class));
+        finishAffinity();
     }
 }

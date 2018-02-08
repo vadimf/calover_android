@@ -79,4 +79,8 @@ public class QbUsersHolder {
         return users;
     }
 
+    public void destroy() {
+        if (qbUserSparseArray != null)
+            qbUserSparseArray.clear();
+    }
 }
