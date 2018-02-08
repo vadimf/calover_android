@@ -95,8 +95,7 @@
             android:layout_marginBottom="28dp"
             android:layout_width="88dp"
             android:layout_height="88dp"
-            android:layout_gravity="bottom"
-            app:srcCompat="@drawable/ic_logo" />
+            android:layout_gravity="bottom"/>
     </android.support.design.widget.NavigationView>
 </android.support.v4.widget.DrawerLayout>
 
