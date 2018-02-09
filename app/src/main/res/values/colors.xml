@@ -21,6 +21,8 @@
     <color name="black_50">#80000000</color>
     <color name="light_blue_grey">#ccc3ec</color>
 
+    <color name="cat_color_border">#E7E7E7</color>
+
 
     <!-- QB -->
     <color name="black">#000000</color>
