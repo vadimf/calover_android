@@ -12,6 +12,7 @@ import android.location.Geocoder;
 import android.util.DisplayMetrics;
 
 import com.varteq.catslovers.AppController;
+import com.varteq.catslovers.BuildConfig;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -154,4 +155,22 @@ public class Utils {
         activity.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         return displayMetrics;
     }
+
+    public static String getAppInfo(Context context) {
+        return (BuildConfig.DEBUG ? "Debug " : "Release ") + getAppVersion(context);
+    }
+
+    public static String getAppVersion(Context context) {
+        String appVersion = "X.X";
+        try {
+            String versionName = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
+            if (versionName != null) {
+                appVersion = versionName;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return appVersion;
+    }
+
 }

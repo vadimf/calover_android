@@ -36,7 +36,7 @@
             android:layout_height="20dp"
             android:layout_alignBottom="@+id/frameLayout"
             android:alpha="0.9"
-            android:background="@drawable/gradient_bottom_main_activity_shape" />
+            android:background="@drawable/gradient_bottom_main_activity_shape"/>
 
         <android.support.design.widget.BottomNavigationView
             android:id="@+id/bottom_navigation"
@@ -80,24 +80,7 @@
     </RelativeLayout>
 
     <!--Drawer-->
-    <android.support.design.widget.NavigationView
-        android:id="@+id/navigation_view"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        app:headerLayout="@layout/navigation_drawer_header"
-        app:itemTextColor="@color/colorPrimary"
-        app:itemIconTint="@color/colorPrimary"
-        app:menu="@menu/navigation_drawer_menu">
-        <ImageView
-            android:id="@+id/imageView1"
-            android:layout_marginLeft="20dp"
-            android:layout_marginBottom="28dp"
-            android:layout_width="88dp"
-            android:layout_height="88dp"
-            android:layout_gravity="bottom"
-            android:drawable="@drawable/ic_logo"/>
-    </android.support.design.widget.NavigationView>
+    <include layout="@layout/navigation_drawer"/>
 </android.support.v4.widget.DrawerLayout>
 
 

@@ -64,6 +64,7 @@ public class MainActivity extends BaseActivity {
     RoundedImageView avatarImageView;
     TextView usernameTextView;
     ImageButton drawerBackButton;
+    TextView appVersionTextView;
 
     CatsFragment catsFragment;
     MapFragment mapFragment;
@@ -348,12 +349,14 @@ public class MainActivity extends BaseActivity {
         avatarImageView = navigationHeaderLayout.findViewById(R.id.imageView_avatar);
         usernameTextView = navigationHeaderLayout.findViewById(R.id.textView_email);
         drawerBackButton = navigationHeaderLayout.findViewById(R.id.button_navigation_drawer_back);
+        appVersionTextView = navigationView.findViewById(R.id.textView_version);
 
         navigationEditImageButton.setOnClickListener(view -> {
             startSettingsEdit();
         });
         navigationHeaderLayout.findViewById(R.id.change_button).setOnClickListener(view -> startSettingsEdit());
         drawerBackButton.setOnClickListener(view -> drawerLayout.closeDrawer(Gravity.LEFT));
+        appVersionTextView.setText(Utils.getAppInfo(this));
         navigationView.setNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.navigation_menu_add_business:
@@ -412,7 +415,7 @@ public class MainActivity extends BaseActivity {
                 .into(avatarImageView);
     }
 
-    public Toolbar getToolbar(){
+    public Toolbar getToolbar() {
         return toolbar;
     }
 
