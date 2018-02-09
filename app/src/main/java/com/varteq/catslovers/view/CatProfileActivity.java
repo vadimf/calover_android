@@ -536,14 +536,11 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
 
     private void setupColorPickersColors() {
         for (int i = 0; i < colorPickers.size(); i++) {
-            if (i < colorsList.size()) {
-                colorPickers.get(i).setImageBitmap(Utils.getBitmapWithColor(colorsList.get(i)));
-                if (colorsList.get(i) == getResources().getColor(R.color.white))
-                    colorPickers.get(i).setBorderWidth((float) Utils.convertDpToPx(2, this));
-            } else {
-                colorPickers.get(i).setImageBitmap(Utils.getBitmapWithColor(getResources().getColor(R.color.transparent)));
-                colorPickers.get(i).setBorderWidth((float) Utils.convertDpToPx(2, this));
-            }
+            if (i < colorsList.size())
+                setCatColorPickerColor(i, colorsList.get(i));
+            else
+                setCatColorPickerColor(i, getResources().getColor(R.color.transparent));
+
         }
     }
 
@@ -1025,19 +1022,38 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
                 }
 
             ColorPickerDialog colorPickerDialog = new ColorPickerDialog(this, initColor, color -> {
+                Log.d(TAG, "Pet color picked: " + color);
                 for (int i = 0; i < colorPickers.size(); i++)
                     if (colorPickers.get(i).getId() == clickedRoundViewId) {
-                        colorPickers.get(i).setImageBitmap(Utils.getBitmapWithColor(color));
-                        colorsList.set(i, color);
-                        if (color == 0)
-                            colorPickers.get(i).setBorderWidth((float) Utils.convertDpToPx(2, this));
-                        else
-                            colorPickers.get(i).setBorderWidth((float) Utils.convertDpToPx(0, this));
+                        setCatColorListColor(i, color);
+                        setCatColorPickerColor(i, color);
                     }
             });
             colorPickerDialog.show();
             clickedRoundViewId = view.getId();
         }
+    }
+
+    private void setCatColorListColor(int colorListNumber, int color) {
+        if (color == 0 || color == -1)
+            color = getResources().getColor(R.color.white);
+        colorsList.set(colorListNumber, color);
+    }
+
+    private void setCatColorPickerColor(int colorPickerNumber, int color) {
+        colorPickers.get(colorPickerNumber).setBorderWidth((float) Utils.convertDpToPx(2, this));
+        // set picker color
+        if (color == 0 || color == -1)
+            color = getResources().getColor(R.color.white);
+        colorPickers.get(colorPickerNumber).setImageBitmap(Utils.getBitmapWithColor(color));
+
+        // set picker border color
+        int borderColor = getResources().getColor(R.color.cat_color_border);
+        if (color != getResources().getColor(R.color.white) && color != getResources().getColor(R.color.transparent)) {
+            colorPickers.get(colorPickerNumber).setBorderWidth((float) Utils.convertDpToPx(0, this));
+            borderColor = color;
+        }
+        colorPickers.get(colorPickerNumber).setBorderColor(borderColor);
     }
 
     @Override

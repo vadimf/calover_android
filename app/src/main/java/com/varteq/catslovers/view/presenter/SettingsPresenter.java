@@ -92,8 +92,12 @@ public class SettingsPresenter {
                     .setUtf8Charset()
                     .addParameter("name", name);
 
-            if (avatar != null && avatar.getExpectedAction() != null && avatar.getExpectedAction().equals(PhotoWithPreview.Action.CHANGE))
-                uploadCatRequest.addFileToUpload(avatar.getPhoto(), "avatar");
+            if (avatar != null && avatar.getExpectedAction() != null) {
+                if (avatar.getExpectedAction().equals(PhotoWithPreview.Action.CHANGE))
+                    uploadCatRequest.addFileToUpload(avatar.getPhoto(), "avatar");
+                else if (avatar.getExpectedAction().equals(PhotoWithPreview.Action.DELETE))
+                    uploadCatRequest.addParameter("avatar_delete", "true");
+            }
 
             uploadCatRequest.setDelegate(broadcastReceiver);
 
@@ -131,6 +135,8 @@ public class SettingsPresenter {
                 if (user != null && user.getSuccess()) {
                     if (user.getData() != null && user.getData().getAvatarUrlThumbnail() != null) {
                         qbUser.setCustomData(user.getData().getAvatarUrlThumbnail());
+                    } else {
+                        qbUser.setCustomData("");
                     }
                     qbUser.setFullName(user.getData() != null ? user.getData().getName() : "");
                     QbUsersHolder.getInstance().putUsers(Collections.singletonList(qbUser));

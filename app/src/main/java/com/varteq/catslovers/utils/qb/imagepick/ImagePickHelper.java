@@ -3,6 +3,7 @@ package com.varteq.catslovers.utils.qb.imagepick;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.view.View;
 
 import com.varteq.catslovers.utils.qb.imagepick.fragment.ImagePickHelperFragment;
 import com.varteq.catslovers.utils.qb.imagepick.fragment.ImageSourcePickDialogFragment;
@@ -17,6 +18,13 @@ public class ImagePickHelper {
     public void pickAnImage(FragmentActivity activity, int requestCode) {
         ImagePickHelperFragment imagePickHelperFragment = ImagePickHelperFragment.start(activity, requestCode);
         showImageSourcePickerDialog(activity.getSupportFragmentManager(), imagePickHelperFragment, false);
+    }
+
+    public void pickAnImageWithRemoveOptions(FragmentActivity activity, int requestCode, View.OnClickListener removeListener) {
+        ImagePickHelperFragment imagePickHelperFragment = ImagePickHelperFragment.start(activity, requestCode);
+        ImageSourcePickDialogFragment.showWithRemoveOption(activity.getSupportFragmentManager(),
+                new ImageSourcePickDialogFragment.LoggableActivityImageSourcePickedListener(imagePickHelperFragment),
+                false, removeListener);
     }
 
     public void pickAnImages(FragmentActivity activity, int requestCode) {

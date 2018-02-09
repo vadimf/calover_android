@@ -22,6 +22,11 @@ public class TimeUtils {
         return dateFormat.format(new Date(milliseconds));
     }
 
+    public static String getDateAsddMMM(long milliseconds) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM", Locale.getDefault());
+        return dateFormat.format(new Date(milliseconds));
+    }
+
     public static long getDateAsHeaderId(long milliseconds) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyyyy", Locale.getDefault());
         return Long.parseLong(dateFormat.format(new Date(milliseconds)));

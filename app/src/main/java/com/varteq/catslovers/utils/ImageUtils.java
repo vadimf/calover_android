@@ -142,7 +142,6 @@ public class ImageUtils {
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType(MimeType.IMAGE_MIME);
         intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{MimeType.IMAGE_MIME, MimeType.VIDEO_MIME})
-                .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
                 .addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
                 .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         fragment.startActivityForResult(intent, IMAGE_OR_VIDEO_REQUEST_CODE);

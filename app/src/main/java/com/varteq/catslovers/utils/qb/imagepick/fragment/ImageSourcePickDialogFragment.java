@@ -10,6 +10,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
+import android.view.View;
 
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.utils.ImageUtils;
@@ -22,7 +23,14 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
 
     private static final int POSITION_GALLERY = 0;
     private static final int POSITION_CAMERA = 1;
-    private static final int POSITION_CANCEL = 2;
+    private static final int POSITION_CANCEL_OR_REMOVE = 2;
+    private static final int POSITION_CANCEL = 3;
+
+    enum Type {
+        DEFAULT,
+        IMAGE_OR_VIDEO,
+        DEFAULT_WITH_REMOVE
+    }
 
     private SystemPermissionHelper systemPermissionHelper;
 
@@ -31,25 +39,33 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
     private boolean showImageAndVideoPickerWithoutChoose = false;
     private Fragment fragment;
     private boolean isMultiselect;
+    private View.OnClickListener onRemovePhotoSelectedListener;
+    private Type type = Type.DEFAULT;
 
     public ImageSourcePickDialogFragment() {
         systemPermissionHelper = new SystemPermissionHelper(this);
     }
 
     public static void show(FragmentManager fm, OnImageSourcePickedListener onImageSourcePickedListener, boolean isMultiselect) {
-        ImageSourcePickDialogFragment fragment = new ImageSourcePickDialogFragment();
-        fragment.setCancelable(true);
-        fragment.setOnImageSourcePickedListener(onImageSourcePickedListener);
-        fragment.setMultiselect(isMultiselect);
-        fragment.show(fm, ImageSourcePickDialogFragment.class.getSimpleName());
+        showWithRemoveOption(fm, onImageSourcePickedListener, isMultiselect, null);
     }
 
     public static void showImageAndVideoPicker(Fragment resultFragment, FragmentManager fm, OnImageSourcePickedListener onImageSourcePickedListener) {
         ImageSourcePickDialogFragment fragment = new ImageSourcePickDialogFragment();
-        fragment.setShowImageAndVideoPickerWithoutChoose(true);
+        //fragment.setShowImageAndVideoPickerWithoutChoose(true);
+        fragment.setType(Type.IMAGE_OR_VIDEO);
         fragment.setOnImageSourcePickedListener(onImageSourcePickedListener);
         fragment.setFragment(resultFragment);
         fragment.setCancelable(true);
+        fragment.show(fm, ImageSourcePickDialogFragment.class.getSimpleName());
+    }
+
+    public static void showWithRemoveOption(FragmentManager fm, OnImageSourcePickedListener onImageSourcePickedListener, boolean isMultiselect, View.OnClickListener removePhotoSelectedListener) {
+        ImageSourcePickDialogFragment fragment = new ImageSourcePickDialogFragment();
+        fragment.setCancelable(true);
+        fragment.setOnRemovePhotoSelectedListener(removePhotoSelectedListener);
+        fragment.setOnImageSourcePickedListener(onImageSourcePickedListener);
+        fragment.setMultiselect(isMultiselect);
         fragment.show(fm, ImageSourcePickDialogFragment.class.getSimpleName());
     }
 
@@ -57,65 +73,45 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        if (!showImageAndVideoPickerWithoutChoose) {
+        if (type.equals(Type.DEFAULT_WITH_REMOVE))
+            builder.setItems(R.array.dlg_image_pick_with_remove, null);
+        else {
             builder.setTitle(R.string.dlg_choose_image_from);
             builder.setItems(R.array.dlg_image_pick, null);
-            AlertDialog alertDialog = builder.create();
-            alertDialog.getListView().setOnItemClickListener((adapterView, view, i, l) -> {
-                switch (i) {
-                    case POSITION_GALLERY:
-                        if (!systemPermissionHelper.isSaveImagePermissionGranted()) {
-                            systemPermissionHelper.requestPermissionsForSaveFileImage();
-                            return;
-                        }
-                        onImageSourcePickedListener.onImageSourcePicked(ImageSource.GALLERY, isMultiselect);
-                        dismiss();
-                        break;
-                    case POSITION_CAMERA:
-                        if (!systemPermissionHelper.isCameraPermissionGranted()) {
-                            systemPermissionHelper.requestPermissionsTakePhoto();
-                            return;
-                        }
-                        onImageSourcePickedListener.onImageSourcePicked(ImageSource.CAMERA, isMultiselect);
-                        dismiss();
-                        break;
-                    case POSITION_CANCEL:
-                        dismiss();
-                        break;
-                }
-            });
-            return alertDialog;
-        } else {
-            builder.setTitle(R.string.dlg_choose_image_from);
-            builder.setItems(R.array.dlg_image_pick, null);
-            AlertDialog alertDialog = builder.create();
-            alertDialog.getListView().setOnItemClickListener((adapterView, view, i, l) -> {
-                switch (i) {
-                    case POSITION_GALLERY:
-                        if (!systemPermissionHelper.isSaveImagePermissionGranted()) {
-                            systemPermissionHelper.requestPermissionsForSaveFileImage();
-                            return;
-                        } else {
-                            ImageUtils.startImageAndVideoPicker(fragment);
-                            dismiss();
-                        }
-                        dismiss();
-                        break;
-                    case POSITION_CAMERA:
-                        if (!systemPermissionHelper.isCameraPermissionGranted()) {
-                            systemPermissionHelper.requestPermissionsTakePhoto();
-                            return;
-                        }
-                        onImageSourcePickedListener.onImageSourcePicked(ImageSource.CAMERA, isMultiselect);
-                        dismiss();
-                        break;
-                    case POSITION_CANCEL:
-                        dismiss();
-                        break;
-                }
-            });
-            return alertDialog;
         }
+        AlertDialog alertDialog = builder.create();
+        alertDialog.getListView().setOnItemClickListener((adapterView, view, i, l) -> {
+            switch (i) {
+                case POSITION_GALLERY:
+                    if (!systemPermissionHelper.isSaveImagePermissionGranted()) {
+                        systemPermissionHelper.requestPermissionsForSaveFileImage();
+                        return;
+                    } else if (type.equals(Type.IMAGE_OR_VIDEO)) {
+                        ImageUtils.startImageAndVideoPicker(fragment);
+                    } else
+                        onImageSourcePickedListener.onImageSourcePicked(ImageSource.GALLERY, isMultiselect);
+                    dismiss();
+                    break;
+                case POSITION_CAMERA:
+                    if (!systemPermissionHelper.isCameraPermissionGranted()) {
+                        systemPermissionHelper.requestPermissionsTakePhoto();
+                        return;
+                    }
+                    onImageSourcePickedListener.onImageSourcePicked(ImageSource.CAMERA, isMultiselect);
+                    dismiss();
+                    break;
+                case POSITION_CANCEL_OR_REMOVE:
+                    if (type.equals(Type.DEFAULT_WITH_REMOVE) && onRemovePhotoSelectedListener != null) {
+                        onRemovePhotoSelectedListener.onClick(null);
+                    }
+                    dismiss();
+                    break;
+                case POSITION_CANCEL:
+                    dismiss();
+                    break;
+            }
+        });
+        return alertDialog;
     }
 
     /*@Override
@@ -130,8 +126,18 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
         }
     }*/
 
+    public void setType(Type type) {
+        this.type = type;
+    }
+
     public void setShowImageAndVideoPickerWithoutChoose(boolean showImageAndVideoPickerWithoutChoose) {
         this.showImageAndVideoPickerWithoutChoose = showImageAndVideoPickerWithoutChoose;
+    }
+
+    public void setOnRemovePhotoSelectedListener(View.OnClickListener onRemovePhotoSelectedListener) {
+        this.onRemovePhotoSelectedListener = onRemovePhotoSelectedListener;
+        if (onRemovePhotoSelectedListener != null)
+            type = Type.DEFAULT_WITH_REMOVE;
     }
 
     public void setFragment(Fragment fragment) {
@@ -150,7 +156,7 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
         if (requestCode == PERMISSIONS_FOR_SAVE_FILE_IMAGE_REQUEST) {
             if (permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                if (showImageAndVideoPickerWithoutChoose) {
+                if (type.equals(Type.IMAGE_OR_VIDEO)) {
                     ImageUtils.startImageAndVideoPicker(fragment);
                 } else
                     onImageSourcePickedListener.onImageSourcePicked(ImageSource.GALLERY, isMultiselect);

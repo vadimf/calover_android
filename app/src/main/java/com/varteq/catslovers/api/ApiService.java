@@ -160,4 +160,9 @@ public interface ApiService {
                                    @Field("lat") double lat,
                                    @Field("lng") double lng,
                                    @Field("type_id") int type_id);
+
+    @FormUrlEncoded
+    @POST("feedback")
+    Call<BaseResponse> sendFeedback(@Field("subject") String subject,
+                                    @Field("description") String description);
 }
