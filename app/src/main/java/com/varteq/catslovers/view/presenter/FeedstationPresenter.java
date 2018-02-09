@@ -46,6 +46,7 @@ import net.gotev.uploadservice.UploadNotificationConfig;
 import net.gotev.uploadservice.UploadStatusDelegate;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -125,13 +126,20 @@ public class FeedstationPresenter {
                                 Gson gson = new Gson();
 
                                 BaseResponse<RFeedstation> station = gson.fromJson(serverResponse.getBodyAsString(), new GenericOf<>(BaseResponse.class, RFeedstation.class));
-                                if (station != null && station.getSuccess()) {
-                                    view.savedSuccessfully(station);
-                                    if (uploadInfo.getUploadId().contains(CREATE_FEEDSTATION_TAG))
-                                        createChat(station.getData().getId(), station.getData().getName());
-                                } else Toaster.longToast("An error occurred while saving");
+                                if (station != null && station.getSuccess() && station.getData() != null) {
+                                    List<Feedstation> l = MapPresenter.from(Collections.singletonList(station.getData()));
+                                    if (l != null && !l.isEmpty()) {
+                                        view.savedSuccessfully(l.get(0));
+                                        isCatUploading = false;
+                                        view.hideWaitDialog();
+                                        if (uploadInfo.getUploadId().contains(CREATE_FEEDSTATION_TAG))
+                                            createChat(station.getData().getId(), station.getData().getName());
+                                        return;
+                                    }
+                                }
                             } catch (Exception e) {
                             }
+                            Toaster.longToast("An error occurred while saving");
                             view.hideWaitDialog();
                             isCatUploading = false;
                         }

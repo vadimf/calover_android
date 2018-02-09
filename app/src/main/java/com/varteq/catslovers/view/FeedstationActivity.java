@@ -35,8 +35,6 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.varteq.catslovers.R;
-import com.varteq.catslovers.api.entity.BaseResponse;
-import com.varteq.catslovers.api.entity.RFeedstation;
 import com.varteq.catslovers.model.CatProfile;
 import com.varteq.catslovers.model.Feedstation;
 import com.varteq.catslovers.model.GroupPartner;
@@ -129,8 +127,12 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
     TextView timeToEat2TextView;
     @BindView(R.id.time_to_next_feeding)
     TextView timeToNextFeeding;
+    @BindView(R.id.date_of_next_feeding_TextView)
+    TextView dateOfNextFeeding;
     @BindView(R.id.time_to_feed_layout)
     ConstraintLayout timeToFeedLayout;
+    @BindView(R.id.time_relativeLayout)
+    RelativeLayout timeToFeedTimerLayout;
 
 
     public static final String FEEDSTATION_KEY = "feed_key";
@@ -401,8 +403,10 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
                 nearestDate = date1;
             else if (null != date2)
                 nearestDate = date2;
-            else
+            else {
+                dateOfNextFeeding.setText("");
                 return;
+            }
         }
         if (nearestDate.before(currentDate)) {
             Calendar c = Calendar.getInstance();
@@ -413,6 +417,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
         long time = (nearestDate.getTime() - currentDate.getTime());
         int offset = finalDate.getTimezoneOffset();
         finalDate.setTime(time);
+        dateOfNextFeeding.setText(TimeUtils.getDateAsddMMM(System.currentTimeMillis() + time));
         timeToNextFeeding.setText(TimeUtils.getDateAsHHmmInUTC(finalDate));
     }
 
@@ -457,6 +462,9 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
             editMenu.setVisible(true);
 
         timeToFeedLayout.setVisibility(View.GONE);
+        if (feedstation.getIsPublic())
+            timeToFeedTimerLayout.setVisibility(View.VISIBLE);
+        else timeToFeedTimerLayout.setVisibility(View.GONE);
         initAvatarCatBackground(feedstation);
     }
 
@@ -495,6 +503,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
         if (editMenu != null)
             editMenu.setVisible(false);
 
+        timeToFeedTimerLayout.setVisibility(View.GONE);
         if (feedstation.getIsPublic())
             timeToFeedLayout.setVisibility(View.VISIBLE);
         initAvatarCatBackground(feedstation);
@@ -827,13 +836,14 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
         }
     }
 
-    public void savedSuccessfully(BaseResponse<RFeedstation> station) {
+    public void savedSuccessfully(Feedstation station) {
         currentMode = FeedstationScreenMode.VIEW_MODE;
         photosToRemove = null;
-        feedstation.setId(station.getData().getId());
+        feedstation = station;
         for (PhotoWithPreview photo : photoList)
             photo.setExpectedAction(null);
         setupUIMode();
+        updateTimeToNextFeeding();
         /*if (currentMode.equals(FeedstationScreenMode.CREATE_MODE)) {
             FeedstationActivity.this.finishAffinity();
             startActivity(new Intent(this, MainActivity.class));

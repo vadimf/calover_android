@@ -191,12 +191,13 @@
                     android:textColor="@color/colorPrimary" />
 
                 <TextView
+                    android:id="@+id/date_of_next_feeding_TextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="10dp"
                     android:layout_toRightOf="@+id/time_of_next_feeding_static_text"
-                    android:text="30 March"
+                    tools:text="30 March"
                     android:textColor="@color/colorPrimary" />
 
                 <LinearLayout
