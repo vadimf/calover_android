@@ -375,6 +375,9 @@ public class MainActivity extends BaseActivity {
                         //e.toString();
                     }
                     break;
+                case R.id.navigation_menu_send_feedback:
+                    sendFeedback();
+                    break;
                 case R.id.navigation_menu_send_logs:
                     sendLogs();
                     break;
@@ -386,6 +389,10 @@ public class MainActivity extends BaseActivity {
             }
             return false;
         });
+    }
+
+    private void sendFeedback() {
+        startActivity(new Intent(this, FeedbackActivity.class));
     }
 
     private void startSettingsEdit() {
