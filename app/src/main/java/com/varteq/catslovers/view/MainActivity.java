@@ -3,8 +3,6 @@ package com.varteq.catslovers.view;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,13 +22,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.SimpleTarget;
-import com.bumptech.glide.request.transition.Transition;
+import com.bumptech.glide.request.RequestOptions;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.model.Feedstation;
 import com.varteq.catslovers.utils.Log;
-import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.utils.Utils;
 import com.varteq.catslovers.view.fragments.CatsFragment;
@@ -83,7 +79,6 @@ public class MainActivity extends BaseActivity {
     private NavigationView navigationView;
     ImageButton navigationEditImageButton;
     View navigationHeaderLayout;
-    private String avatar;
 
     private int catsTabClickCount = 0;
     boolean doubleBackToExitPressedOnce = false;
@@ -104,8 +99,6 @@ public class MainActivity extends BaseActivity {
 
         presenter = new MainPresenter(this);
         presenter.loadUserInfo();
-
-        avatar = Profile.getUserAvatar(this);
 
         view = findViewById(R.id.hiddenWindow);
         timerText = findViewById(R.id.timerText);
@@ -405,35 +398,11 @@ public class MainActivity extends BaseActivity {
             usernameTextView.setText(username);
     }
 
-    public void updateNavigationAvatar(String url) {
-        if (url != null)
-            Glide.with(this)
-                    .asBitmap()
-                    .load(url)
-                    .into(avatarImageView);
-        else
-            updateNavigationAvatar();
-    }
-
-    private void updateNavigationAvatar() {
-        if (avatar != null)
-            Glide.with(this)
-                    .asBitmap()
-                    .load(avatar)
-                    .into(new SimpleTarget<Bitmap>() {
-                        final int THUMBSIZE = 250;
-
-                        @Override
-                        public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
-                            if (resource.getWidth() > THUMBSIZE)
-                                avatarImageView.setImageBitmap(ThumbnailUtils.extractThumbnail(resource,
-                                        THUMBSIZE, THUMBSIZE));
-                            else
-                                avatarImageView.setImageBitmap(resource);
-                        }
-                    });
-        else
-            avatarImageView.setImageBitmap(Utils.getBitmapWithColor(getResources().getColor(R.color.transparent)));
+    public void updateNavigationAvatar(String path) {
+        Glide.with(this)
+                .load(path != null ? path : R.drawable.user_avatar_default)
+                .apply(new RequestOptions().error(R.drawable.user_avatar_default))
+                .into(avatarImageView);
     }
 
     public Toolbar getToolbar(){

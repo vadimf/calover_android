@@ -69,7 +69,14 @@ public class SettingsActivity extends BaseActivity implements OnImagePickedListe
 
     @OnClick(R.id.avatar)
     public void onAvatarClicked() {
-        new ImagePickHelper().pickAnImage(this, 0);
+        new ImagePickHelper().pickAnImageWithRemoveOptions(this, 0, view -> {
+            if (avatar == null)
+                avatar = new PhotoWithPreview();
+            avatar.setPhoto("");
+            avatar.setThumbnail("");
+            avatar.setExpectedAction(PhotoWithPreview.Action.DELETE);
+            updateAvatar();
+        });
     }
 
     private void updateAvatar() {

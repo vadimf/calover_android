@@ -5,4 +5,10 @@
         <item>Camera</item>
         <item>Cancel</item>
     </string-array>
+    <string-array name="dlg_image_pick_with_remove">
+        <item>Gallery</item>
+        <item>Camera</item>
+        <item>Remove</item>
+        <item>Cancel</item>
+    </string-array>
 </resources>
