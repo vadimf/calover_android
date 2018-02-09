@@ -357,9 +357,9 @@ public class MainActivity extends BaseActivity {
         drawerBackButton = navigationHeaderLayout.findViewById(R.id.button_navigation_drawer_back);
 
         navigationEditImageButton.setOnClickListener(view -> {
-            needCheckUserSettings = true;
-            startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+            startSettingsEdit();
         });
+        navigationHeaderLayout.findViewById(R.id.change_button).setOnClickListener(view -> startSettingsEdit());
         drawerBackButton.setOnClickListener(view -> drawerLayout.closeDrawer(Gravity.LEFT));
         navigationView.setNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
@@ -393,6 +393,11 @@ public class MainActivity extends BaseActivity {
             }
             return false;
         });
+    }
+
+    private void startSettingsEdit() {
+        needCheckUserSettings = true;
+        startActivity(new Intent(MainActivity.this, SettingsActivity.class));
     }
 
     public void setNavigationUsername(String username) {

@@ -74,6 +74,17 @@
         android:layout_alignParentEnd="true"
         android:layout_marginRight="16dp"
         android:background="@color/transparent"
-        app:srcCompat="@drawable/ic_edit_white_24dp"/>
+        android:visibility="invisible"
+        app:srcCompat="@drawable/ic_edit_white_24dp" />
+
+    <Button
+        android:id="@+id/change_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/imageButton_edit"
+        style="@style/PrimaryBorderlessButton"
+        android:textColor="@color/white"
+        android:text="Change" />
 
 </RelativeLayout>
