@@ -1,46 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_gravity="center_horizontal|center_vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/boarding_rounded"
+    android:layout_height="454.4dp"
     android:elevation="8dp">
 
     <ImageView
+        android:id="@+id/roundedBg"
+        android:layout_width="267.5dp"
+        android:layout_height="454.4dp"
+        android:src="@drawable/boarding_rounded"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    
+    <ImageView
         android:id="@+id/imageView2"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
-        android:layout_marginStart="24dp"
+        android:layout_width="239dp"
+        android:layout_height="180dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
+        android:layout_marginEnd="12.5dp"
         android:scaleType="fitCenter"
         android:src="@drawable/illustration_onbording_1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageView
+        android:layout_width="244.4dp"
+        android:layout_height="68.4dp"
+        android:layout_marginStart="55dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/onboarding_line_1"
+        app:layout_constraintTop_toBottomOf="@+id/imageView2"
+        app:layout_constraintStart_toStartOf="@id/roundedBg" />
+
     <TextView
         android:id="@+id/textView2"
-        style="@style/PrimaryBigTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="8dp"
+        style="@style/OnBoardingText"
+        android:layout_width="267.5dp"
+        android:layout_height="120dp"
+        android:layout_marginTop="281dp"
         android:maxLines="4"
         android:text="@string/onboarding_text_1"
         android:textAlignment="center"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline" />
-
-    <android.support.constraint.Guideline
-        android:id="@+id/guideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.5" />
+        app:layout_constraintTop_toTopOf="@id/roundedBg"
+        app:layout_constraintStart_toStartOf="@id/roundedBg" />
 
 </android.support.constraint.ConstraintLayout>
