@@ -7,12 +7,12 @@
                 app:behavior_peekHeight="190dp">
 
     <Button
+        android:id="@+id/warnings_button"
         style="@style/OrangeColorButton"
         android:layout_width="wrap_content"
         android:layout_height="30dp"
         android:layout_marginStart="40dp"
-        android:text="@string/choose_which_warnings"
-        />
+        android:text="@string/choose_which_warnings" />
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -64,5 +64,14 @@
         </RadioGroup>
     </FrameLayout>
 
+    <ImageView
+        android:id="@+id/imageView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignBottom="@+id/warnings_button"
+        android:layout_alignParentStart="true"
+        app:srcCompat="@drawable/event_orange" />
 
 </RelativeLayout>
