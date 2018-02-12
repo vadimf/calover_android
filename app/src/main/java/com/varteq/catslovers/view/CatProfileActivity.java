@@ -43,7 +43,6 @@ import com.varteq.catslovers.model.CatProfile;
 import com.varteq.catslovers.model.Feedstation;
 import com.varteq.catslovers.model.GroupPartner;
 import com.varteq.catslovers.model.PhotoWithPreview;
-import com.varteq.catslovers.utils.Consts;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.utils.SystemPermissionHelper;
@@ -55,9 +54,9 @@ import com.varteq.catslovers.utils.qb.imagepick.OnImagePickedListener;
 import com.varteq.catslovers.view.adapters.GroupPartnersAdapter;
 import com.varteq.catslovers.view.adapters.PhotosAdapter;
 import com.varteq.catslovers.view.adapters.ViewColorsAdapter;
+import com.varteq.catslovers.view.dialog.AgeDialog;
 import com.varteq.catslovers.view.dialog.ColorPickerDialog;
 import com.varteq.catslovers.view.dialog.EditTextDialog;
-import com.varteq.catslovers.view.dialog.WrappedDatePickerDialog;
 import com.varteq.catslovers.view.presenter.CatProfilePresenter;
 import com.varteq.catslovers.view.qb.AttachmentImageActivity;
 
@@ -808,12 +807,19 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
 
     @OnClick(R.id.age_value_textView)
     void onAgeClick() {
-        Calendar calendar = Calendar.getInstance();
+        /*Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.YEAR, -Consts.CAT_MAX_YEARS_OLD);
         Long minDate = calendar.getTimeInMillis();
         new WrappedDatePickerDialog(CatProfileActivity.this, petBirthdayMillis, minDate, (datePicker, i, i1, i2) -> {
             petBirthdayMillis = TimeUtils.getTimeInMillis(i, i1, i2);
             ageValueTextView.setText(presenter.getAgeInString(petBirthdayMillis));
+        });*/
+        new AgeDialog(this, new Date(petBirthdayMillis), new AgeDialog.OnClickListener() {
+            @Override
+            public void onAgeChanged(Date birthday) {
+                petBirthdayMillis = birthday.getTime();
+                ageValueTextView.setText(presenter.getAgeInString(petBirthdayMillis));
+            }
         });
     }
 

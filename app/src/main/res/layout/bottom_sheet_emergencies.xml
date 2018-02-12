@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                android:layout_width="match_parent"
-                android:layout_height="160dp"
-                android:background="@color/transparent"
-                app:behavior_peekHeight="160dp">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="160dp"
+    android:background="@color/transparent"
+    app:behavior_peekHeight="160dp">
 
     <Button
         style="@style/RedColorButton"
@@ -12,7 +12,7 @@
         android:layout_height="30dp"
         android:layout_marginStart="40dp"
         android:text="@string/choose_which_emergencies"
-        />
+        android:id="@+id/button3" />
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -26,14 +26,46 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical">
 
-            <android.support.v7.widget.AppCompatRadioButton
-                android:id="@+id/radioButton_emergencies_poison"
+            <android.support.constraint.ConstraintLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/poison"
-                android:textColor="@color/rusty_red"
-                android:textStyle="bold"
-                app:buttonTint="@color/rusty_red"/>
+                android:layout_height="wrap_content">
+
+                <android.support.v7.widget.AppCompatRadioButton
+                    android:id="@+id/radioButton_emergencies_poison"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/rusty_red"
+                    android:textStyle="bold"
+                    app:buttonTint="@color/rusty_red"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/skull_imageView"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/skull_icon"
+                    app:layout_constraintBottom_toBottomOf="@+id/radioButton_emergencies_poison"
+                    app:layout_constraintDimensionRatio="w,1:1"
+                    app:layout_constraintStart_toEndOf="@+id/radioButton_emergencies_poison"
+                    app:layout_constraintTop_toTopOf="@+id/radioButton_emergencies_poison" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:text="@string/poison"
+                    android:textColor="@color/rusty_red"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/skull_imageView"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </android.support.constraint.ConstraintLayout>
 
             <android.support.v7.widget.AppCompatRadioButton
                 android:id="@+id/radioButton_emergencies_missing_cat"
@@ -54,6 +86,16 @@
                 app:buttonTint="@color/rusty_red"/>
         </RadioGroup>
     </FrameLayout>
+
+    <ImageView
+        android:id="@+id/imageView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignBottom="@+id/button3"
+        android:layout_alignParentStart="true"
+        app:srcCompat="@drawable/event_red" />
 
 
 </RelativeLayout>
