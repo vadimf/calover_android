@@ -440,6 +440,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     }
                 } else {
                     setStationActionName(getString(R.string.join_group));
+                    followButton.setBackground(getResources().getDrawable(R.drawable.ic_add_purple_24dp));
                     followButton.setVisibility(View.VISIBLE);
                 }
             } else {
