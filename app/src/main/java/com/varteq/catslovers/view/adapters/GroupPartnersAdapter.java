@@ -43,7 +43,7 @@ public class GroupPartnersAdapter extends RecyclerView.Adapter<GroupPartnersAdap
         public boolean onLongClick(View view) {
             RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) view.getLayoutParams();
             int itemPosition = lp.getViewLayoutPosition();
-            if (externalLongClickListener != null && !personList.get(itemPosition).getAvatar().equals(addNewPartnerString))
+            if (externalLongClickListener != null && (personList.get(itemPosition).getAvatar() == null || !personList.get(itemPosition).getAvatar().equals(addNewPartnerString)))
                 externalLongClickListener.onPersonClicked(personList.get(itemPosition));
             return true;
         }
