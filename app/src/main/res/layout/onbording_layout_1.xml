@@ -3,18 +3,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_gravity="center_horizontal|center_vertical"
     android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/innerOnboarding1"
+    android:layout_width="267.5dp"
     android:layout_height="454.4dp"
+    android:background="@drawable/boarding_rounded"
+    app:layout_constraintLeft_toLeftOf="parent"
+    app:layout_constraintRight_toRightOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintBottom_toBottomOf="parent"
     android:elevation="8dp">
 
-    <ImageView
-        android:id="@+id/roundedBg"
-        android:layout_width="267.5dp"
-        android:layout_height="454.4dp"
-        android:src="@drawable/boarding_rounded"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-    
     <ImageView
         android:id="@+id/imageView2"
         android:layout_width="239dp"
@@ -28,15 +30,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:layout_width="244.4dp"
-        android:layout_height="68.4dp"
-        android:layout_marginStart="55dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/onboarding_line_1"
-        app:layout_constraintTop_toBottomOf="@+id/imageView2"
-        app:layout_constraintStart_toStartOf="@id/roundedBg" />
-
     <TextView
         android:id="@+id/textView2"
         style="@style/OnBoardingText"
@@ -46,7 +39,20 @@
         android:maxLines="4"
         android:text="@string/onboarding_text_1"
         android:textAlignment="center"
-        app:layout_constraintTop_toTopOf="@id/roundedBg"
-        app:layout_constraintStart_toStartOf="@id/roundedBg" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</android.support.constraint.ConstraintLayout>
+
+    <ImageView
+        android:layout_width="244.4dp"
+        android:layout_height="68.4dp"
+        android:layout_marginStart="55dp"
+        android:layout_marginTop="196dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/onboarding_line_1"
+        app:layout_constraintTop_toTopOf="@+id/innerOnboarding1"
+        app:layout_constraintStart_toStartOf="@+id/innerOnboarding1"
+        android:elevation="8dp" />
 
 </android.support.constraint.ConstraintLayout>
