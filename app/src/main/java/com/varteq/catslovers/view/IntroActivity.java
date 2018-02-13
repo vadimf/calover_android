@@ -163,6 +163,9 @@ public class IntroActivity extends AppCompatActivity {
         dots[currentPage].setTextColor(getResources().getColor(R.color.white));
     }
 
+    /**
+     * Custom page adapter.
+     */
     private class IntroPagerAdapter extends PagerAdapter {
 
         @Override
@@ -189,6 +192,9 @@ public class IntroActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Custom listener.
+     */
     private class IntroPageChangeListener implements ViewPager.OnPageChangeListener {
 
         @Override
