@@ -777,10 +777,25 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
             selectAnimalTypePet();
             Toaster.shortToast(R.string.stray_cat_no_feedstation_error);
             return false;
-        } else if (catProfile.getPetName().isEmpty() || catProfile.getColorsList().isEmpty() || catProfile.getWeight() <= 0f) {
-            Toaster.longToast("You should fill in PetName, color(s), weight");
+        }
+        if (catProfile.getPetName().isEmpty()) {
+            showEmptyFieldError("PetName");
             return false;
-        } else return true;
+        }
+        if (catProfile.getColorsList().isEmpty()) {
+            showEmptyFieldError("color(s)");
+            return false;
+        }
+        if (catProfile.getWeight() <= 0f) {
+            showEmptyFieldError("weight");
+            return false;
+        }
+        return true;
+    }
+
+    private void showEmptyFieldError(String field) {
+        if (field != null && !field.isEmpty())
+            Toaster.longToast("You must fill the " + field);
     }
 
     private void setWeight(String weight) {
