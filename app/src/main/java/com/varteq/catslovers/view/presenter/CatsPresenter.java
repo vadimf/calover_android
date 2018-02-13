@@ -38,12 +38,12 @@ public class CatsPresenter {
         this.view = view;
     }
 
-    public void getCats(int catsSection) {
+    public void getCats(CatsFragment.Selection catsSection) {
         view.startRefreshing();
         Call<BaseResponse<List<RCat>>> call;
         Location location = Profile.getLocation(view.getContext());
 
-        if (catsSection == CatsFragment.CATS_SECTION_EXPLORE) {
+        if (catsSection.equals(CatsFragment.Selection.EXPLORE)) {
             if (location == null) return;
             call = ServiceGenerator.getApiServiceWithToken().getCatsInRadius(location.getLatitude(), location.getLongitude(), 20);
             call.enqueue(new Callback<BaseResponse<List<RCat>>>() {
@@ -103,7 +103,7 @@ public class CatsPresenter {
 
     }
 
-    private void onMyCatsLoaded(List<RCat> data, int catsSection) {
+    private void onMyCatsLoaded(List<RCat> data, CatsFragment.Selection catsSection) {
         Log.i(TAG, String.valueOf(data.size()));
         List<CatProfile> catProfiles = getCatProfiles(data);
         if (data.size() < 1) {
@@ -114,7 +114,7 @@ public class CatsPresenter {
         view.catsLoaded(catProfiles, catsSection);
     }
 
-    private void onCatsInRadiusLoaded(List<RCat> data, int catsSection) {
+    private void onCatsInRadiusLoaded(List<RCat> data, CatsFragment.Selection catsSection) {
         Log.i(TAG, String.valueOf(data.size()));
         List<CatProfile> catProfiles = getCatProfiles(data);
         if (data.size() < 1) {
