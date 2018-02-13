@@ -87,8 +87,6 @@ public class IntroActivity extends AppCompatActivity {
         viewPager.addOnPageChangeListener(viewPagerPageChangeListener);
         viewPager.setOffscreenPageLimit(2);
         viewPager.setClipToPadding(false);
-        viewPager.setPadding(Utils.convertDpToPx(46, this), Utils.convertDpToPx(5, this), Utils.convertDpToPx(46, this), Utils.convertDpToPx(15, this));
-        viewPager.setPageMargin(Utils.convertDpToPx(16.5f, this));
     }
 
     @OnClick({R.id.go_to_login_button, R.id.start_button})
