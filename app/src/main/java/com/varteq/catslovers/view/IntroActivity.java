@@ -6,6 +6,7 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,6 +65,8 @@ public class IntroActivity extends AppCompatActivity {
 
             View layout = LayoutInflater.from(getApplicationContext())
                     .inflate(resId, null, false);
+
+            scaleOnboardingView(layout);
 
             layouts.add(layout);
         }
@@ -161,59 +164,35 @@ public class IntroActivity extends AppCompatActivity {
         }
     }
 
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_intro);
-//
-//        myImageSwitcher = (ImageSwitcher) findViewById(R.id.intro_switcher);
-//
-//        myImageSwitcher.setFactory(new ViewSwitcher.ViewFactory() {
-//            @Override
-//            public View makeView() {
-//                ImageView switcherImageView = new ImageView(getApplicationContext());
-//                switcherImageView.setLayoutParams(new ImageSwitcher.LayoutParams(
-//                        ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.MATCH_PARENT
-//                ));
-//                switcherImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-//                switcherImageView.setImageResource(R.drawable.cat1);
-//                return switcherImageView;
-//            }
-//        });
-//
-//        Animation animationOut = AnimationUtils.loadAnimation(this, android.R.anim.slide_out_right);
-//        Animation animationIn = AnimationUtils.loadAnimation(this, android.R.anim.slide_in_left);
-//
-//        myImageSwitcher.setOutAnimation(animationIn);
-//        myImageSwitcher.setInAnimation(animationIn);
-//    }
-//
-//    @Override
-//    public boolean onTouchEvent(MotionEvent event) {
-//        switch (event.getAction()) {
-//            case MotionEvent.ACTION_DOWN:
-//                initialX = event.getX();
-//                break;
-//            case MotionEvent.ACTION_UP:
-//                float finalX = event.getX();
-//                if (initialX > finalX) {
-//                    counter++;
-//                    nextImage();
-//                }
-//                else if (counter > 0) {
-//                    counter--;
-//                    myImageSwitcher.showPrevious();
-//                }
-//                break;
-//        }
-//        return false;
-//    }
-//
-//    public void nextImage() {
-//        if (counter >= imageCount)
-//            counter = 0;
-//        if (counter < 0)
-//            counter = 0;
-//        myImageSwitcher.setImageResource(imageSwitcherImages[counter]);
-//    }
+    /**
+     * Scale onboarding view for high resolution displays.
+     *
+     * @param view View
+     */
+    private void scaleOnboardingView(View view) {
+
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+
+        int displayWidth = displayMetrics.widthPixels;
+        int displayHeight = displayMetrics.heightPixels;
+
+        float displayDensity = displayMetrics.density;
+
+        int displayWidthInDp = (int) (displayWidth / displayDensity);
+        int displayHeightInDp = (int) (displayHeight / displayDensity);
+
+        // Compare it with Pixel sizes (1080 x 1920, density - 3.0)
+        if (displayWidthInDp > 360 || displayHeightInDp > 640) {
+            float factorW = displayWidthInDp / 360.0f;
+            float factorH = displayHeightInDp / 640.0f;
+
+            // Get lower factor
+            float factor = factorW < factorH ? factorW : factorH;
+
+            // Scale onboarding view
+            view.setScaleX(factor);
+            view.setScaleY(factor);
+            view.requestLayout();
+        }
+    }
 }
