@@ -31,13 +31,13 @@ public class IntroActivity extends AppCompatActivity {
 
     private static final String TAG = IntroActivity.class.getSimpleName();
 
-    private final int imageSwitcherImages[] = {R.drawable.illustration_onbording_1,
-            R.drawable.illustration_onboarding_2,
+    private final int imageSwitcherImages[] = {R.drawable.onboarding_illustration_1,
+            R.drawable.onboarding_illustration_2,
             R.drawable.onboarding_illustration_3};
 
-    private final int onboardingLayouts[] = {R.layout.onbording_layout_1,
-            R.layout.onbording_layout_2,
-            R.layout.onbording_layout_3};
+    private final int onboardingLayouts[] = {R.layout.onboarding_layout_1,
+            R.layout.onboarding_layout_2,
+            R.layout.onboarding_layout_3};
 
     private List<View> layouts;
     private TextView[] dots;

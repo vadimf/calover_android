@@ -38,7 +38,7 @@
         android:layout_marginEnd="10.5dp"
         android:layout_marginBottom="267.4dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/illustration_onboarding_2"
+        android:src="@drawable/onboarding_illustration_2"
         app:layout_constraintEnd_toEndOf="@+id/innerOnboarding2"
         app:layout_constraintBottom_toBottomOf="@+id/innerOnboarding2"
         android:elevation="8dp" />
