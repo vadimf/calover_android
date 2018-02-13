@@ -16,7 +16,6 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.utils.Log;
@@ -267,7 +266,7 @@ public class ValidateNumberActivity extends BaseActivity implements TextWatcher 
     }
 
     public void onInvalidPhoneFormat(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+        Toaster.longToast(message);
         onBackPressed();
     }
 

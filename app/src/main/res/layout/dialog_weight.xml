@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    android:paddingTop="16dp">
+
+    <TextView
+        android:id="@+id/title_TextView"
+        style="@style/PrimaryBigTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Set cat weight"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <NumberPicker
+        android:id="@+id/kg_numberPicker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:theme="@style/PrimaryPicker"
+        app:layout_constraintEnd_toStartOf="@+id/years_textView"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title_TextView" />
+
+    <NumberPicker
+        android:id="@+id/g_numberPicker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:theme="@style/PrimaryPicker"
+        app:layout_constraintBottom_toBottomOf="@+id/kg_numberPicker"
+        app:layout_constraintEnd_toStartOf="@+id/textView8"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/years_textView"
+        app:layout_constraintTop_toTopOf="@+id/kg_numberPicker" />
+
+    <TextView
+        android:id="@+id/years_textView"
+        style="@style/PrimaryBigTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:text="."
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/kg_numberPicker"
+        app:layout_constraintEnd_toStartOf="@+id/g_numberPicker"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/kg_numberPicker"
+        app:layout_constraintTop_toTopOf="@+id/kg_numberPicker" />
+
+    <TextView
+        android:id="@+id/textView8"
+        style="@style/PrimaryTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="kg"
+        app:layout_constraintBottom_toBottomOf="@+id/kg_numberPicker"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/g_numberPicker"
+        app:layout_constraintTop_toTopOf="@+id/kg_numberPicker" />
+
+    <Button
+        android:id="@+id/dialog_cancel_button"
+        style="@style/PrimaryBorderlessButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dialogEditText"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_toStartOf="@+id/dialog_ok_button"
+        android:text="@android:string/no"
+        app:layout_constraintEnd_toStartOf="@+id/dialog_ok_button"
+        app:layout_constraintTop_toBottomOf="@+id/kg_numberPicker" />
+
+    <Button
+        android:id="@+id/dialog_ok_button"
+        style="@style/PrimaryBorderlessButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/dialogEditText"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@android:string/ok"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/kg_numberPicker" />
+
+</android.support.constraint.ConstraintLayout>
