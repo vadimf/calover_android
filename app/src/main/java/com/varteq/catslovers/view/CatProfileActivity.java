@@ -43,7 +43,6 @@ import com.varteq.catslovers.model.CatProfile;
 import com.varteq.catslovers.model.Feedstation;
 import com.varteq.catslovers.model.GroupPartner;
 import com.varteq.catslovers.model.PhotoWithPreview;
-import com.varteq.catslovers.utils.Consts;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
 import com.varteq.catslovers.utils.SystemPermissionHelper;
@@ -55,9 +54,10 @@ import com.varteq.catslovers.utils.qb.imagepick.OnImagePickedListener;
 import com.varteq.catslovers.view.adapters.GroupPartnersAdapter;
 import com.varteq.catslovers.view.adapters.PhotosAdapter;
 import com.varteq.catslovers.view.adapters.ViewColorsAdapter;
+import com.varteq.catslovers.view.dialog.AgeDialog;
 import com.varteq.catslovers.view.dialog.ColorPickerDialog;
 import com.varteq.catslovers.view.dialog.EditTextDialog;
-import com.varteq.catslovers.view.dialog.WrappedDatePickerDialog;
+import com.varteq.catslovers.view.dialog.WeightDialog;
 import com.varteq.catslovers.view.presenter.CatProfilePresenter;
 import com.varteq.catslovers.view.qb.AttachmentImageActivity;
 
@@ -777,10 +777,25 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
             selectAnimalTypePet();
             Toaster.shortToast(R.string.stray_cat_no_feedstation_error);
             return false;
-        } else if (catProfile.getPetName().isEmpty() || catProfile.getColorsList().isEmpty() || catProfile.getWeight() <= 0f) {
-            Toaster.longToast("You should fill in PetName, color(s), weight");
+        }
+        if (catProfile.getPetName().isEmpty()) {
+            showEmptyFieldError("PetName");
             return false;
-        } else return true;
+        }
+        if (catProfile.getColorsList().isEmpty()) {
+            showEmptyFieldError("color(s)");
+            return false;
+        }
+        if (catProfile.getWeight() <= 0f) {
+            showEmptyFieldError("weight");
+            return false;
+        }
+        return true;
+    }
+
+    private void showEmptyFieldError(String field) {
+        if (field != null && !field.isEmpty())
+            Toaster.longToast("You must fill the " + field);
     }
 
     private void setWeight(String weight) {
@@ -808,18 +823,25 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
 
     @OnClick(R.id.age_value_textView)
     void onAgeClick() {
-        Calendar calendar = Calendar.getInstance();
+        /*Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.YEAR, -Consts.CAT_MAX_YEARS_OLD);
         Long minDate = calendar.getTimeInMillis();
         new WrappedDatePickerDialog(CatProfileActivity.this, petBirthdayMillis, minDate, (datePicker, i, i1, i2) -> {
             petBirthdayMillis = TimeUtils.getTimeInMillis(i, i1, i2);
             ageValueTextView.setText(presenter.getAgeInString(petBirthdayMillis));
+        });*/
+        new AgeDialog(this, new Date(petBirthdayMillis), new AgeDialog.OnClickListener() {
+            @Override
+            public void onAgeChanged(Date birthday) {
+                petBirthdayMillis = birthday.getTime();
+                ageValueTextView.setText(presenter.getAgeInString(petBirthdayMillis));
+            }
         });
     }
 
     @OnClick(R.id.weight_value_textView)
     void onWeightClick() {
-        EditTextDialog editTextDialog = new EditTextDialog(this, "Enter cat's weight", "For example: 5.3",
+        /*EditTextDialog editTextDialog = new EditTextDialog(this, "Enter cat's weight", "For example: 5.3",
                 new EditTextDialog.OnClickListener() {
                     @Override
                     public void onPositiveButtonClick() {
@@ -845,7 +867,8 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
         editTextDialog.setWeightFilter();
         editTextDialog.setEditTextText((weight > 0 && !weightValueTextView.getText().toString().equals(DEFAULT_VALUE)) ? String.valueOf(weight) : null);
         editTextDialog.setEditTextInputType(InputType.TYPE_CLASS_PHONE);
-        editTextDialog.show();
+        editTextDialog.show();*/
+        new WeightDialog(this, weight, weight -> setWeight(String.valueOf(weight)));
     }
 
     @OnClick(R.id.catTypePet)

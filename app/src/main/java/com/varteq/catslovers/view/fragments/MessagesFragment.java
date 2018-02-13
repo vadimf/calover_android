@@ -18,7 +18,6 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
@@ -44,7 +43,6 @@ import com.varteq.catslovers.utils.qb.QbDialogHolder;
 import com.varteq.catslovers.utils.qb.callback.QbEntityCallbackImpl;
 import com.varteq.catslovers.view.presenter.MessagesPresenter;
 import com.varteq.catslovers.view.qb.ChatActivity;
-import com.varteq.catslovers.view.qb.DialogsActivity;
 import com.varteq.catslovers.view.qb.SelectUsersActivity;
 import com.varteq.catslovers.view.qb.adapter.DialogsAdapter;
 import com.varteq.catslovers.view.qb.dialog.ProgressDialogFragment;
@@ -62,7 +60,7 @@ import static android.app.Activity.RESULT_OK;
 
 public class MessagesFragment extends Fragment implements DialogsManager.ManagingDialogsCallbacks, SwipyRefreshLayout.OnRefreshListener {
 
-    private static final String TAG = DialogsActivity.class.getSimpleName();
+    private static final String TAG = MessagesFragment.class.getSimpleName();
     private static final int REQUEST_SELECT_PEOPLE = 174;
     private static final int REQUEST_DIALOG_ID_FOR_UPDATE = 165;
 
@@ -457,7 +455,7 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
                 progressBar.setVisibility(View.GONE);
                 swipyRefreshLayoutFriends.setRefreshing(false);
                 swipyRefreshLayoutGroups.setRefreshing(false);
-                Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toaster.shortToast(e.getMessage());
             }
         });
     }

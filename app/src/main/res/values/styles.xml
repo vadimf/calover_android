@@ -70,6 +70,16 @@
         <item name="android:textColor">@color/colorPrimary</item>
     </style>
 
+    <style name="PrimaryPicker" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:textColorPrimary">@color/colorPrimary</item>
+        <!-- Change edit color here. -->
+        <item name="android:editTextColor">@color/colorPrimary</item>
+    </style>
+
+    <style name="PrimaryProgressBar">
+        <item name="colorAccent">@color/colorPrimary</item>
+    </style>
+
     <style name="PrimaryTextView" parent="Theme.AppCompat.Light">
         <item name="android:textSize">@dimen/normal_text_size</item>
         <item name="android:textColor">@color/colorPrimary</item>

@@ -3,7 +3,6 @@ package com.varteq.catslovers.view.presenter;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Toast;
 
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoDevice;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUser;
@@ -45,6 +44,7 @@ import com.varteq.catslovers.utils.ChatHelper;
 import com.varteq.catslovers.utils.GenericOf;
 import com.varteq.catslovers.utils.Log;
 import com.varteq.catslovers.utils.Profile;
+import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.utils.Utils;
 import com.varteq.catslovers.utils.qb.CognitoAuthHelper;
 import com.varteq.catslovers.utils.qb.ItemToDisplay;
@@ -614,7 +614,7 @@ public class AuthPresenter {
                 return;
             if (e instanceof NotAuthorizedException) {
                 resetPassword(isSigningIn());
-                Toast.makeText(view, "Verification code sent. Please confirm you number again", Toast.LENGTH_LONG).show();
+                Toaster.longToast("Verification code sent. Please confirm you number again");
             }
             view.showDialogMessage("Sign-in failed", CognitoAuthHelper.formatException(e));
         }

@@ -10,6 +10,9 @@ import android.support.design.internal.BottomNavigationMenuView;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
@@ -49,7 +52,6 @@ public class MainActivity extends BaseActivity {
     private String TAG = MainActivity.class.getSimpleName();
     View view;
 
-    TextView timerText;
     BottomNavigationView mBottomNavigationView;
     Toolbar toolbar;
     View toolbarView;
@@ -60,7 +62,7 @@ public class MainActivity extends BaseActivity {
     ImageButton menuButton;
     LinearLayout catsToolsRelativeLayout;
     @BindView(R.id.frameLayout)
-    FrameLayout mainLayout;
+    ViewPager mainLayout;
     RoundedImageView avatarImageView;
     TextView usernameTextView;
     ImageButton drawerBackButton;
@@ -101,8 +103,6 @@ public class MainActivity extends BaseActivity {
         presenter = new MainPresenter(this);
         presenter.loadUserInfo();
 
-        view = findViewById(R.id.hiddenWindow);
-        timerText = findViewById(R.id.timerText);
         toolbar = findViewById(R.id.mainToolbar);
         toolbarView = getLayoutInflater().inflate(R.layout.toolbar_main, toolbar);
         toolbarTitle = findViewById(R.id.toolbarTitle);
@@ -153,22 +153,23 @@ public class MainActivity extends BaseActivity {
         }
 
         initNavigationDrawer();
-
-    }
-
-    private void runDialogTimer() {
-        new Handler().postDelayed(new Runnable() {
+        FragmentPagerAdapter adapter = new FragmentPagerAdapter(getSupportFragmentManager());
+        mainLayout.setAdapter(adapter);
+        mainLayout.setOffscreenPageLimit(2);
+        mainLayout.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
-            public void run() {
-                view.setVisibility(View.GONE);
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
             }
-        }, 2200);
-        new Handler().postDelayed(new Runnable() {
+
             @Override
-            public void run() {
-                timerText.setText("Success - 1 sec");
+            public void onPageSelected(int position) {
+                onTabChanged(position, true);
             }
-        }, 1000);
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+            }
+        });
     }
 
     //@OnClick(R.id.catsAddButton)
@@ -176,13 +177,49 @@ public class MainActivity extends BaseActivity {
         CatProfileActivity.startInCreateMode(this);
     }
 
-    private void setFragment(Fragment fragment) {
-        if (fragment != null) {
+    private void setFragment(int pos) {
+        if (mainLayout.getCurrentItem() == pos) return;
+        mainLayout.setCurrentItem(pos);
+        /*if (fragment != null) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.frameLayout, fragment)
                     .commit();
+        }*/
+
+    }
+
+    public class FragmentPagerAdapter extends FragmentStatePagerAdapter {
+        public FragmentPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int i) {
+            switch (i) {
+                case 0:
+                    return new MapFragment();
+                case 1:
+                    return new FeedFragment();
+                case 2:
+                    return new MessagesFragment();
+                case 3:
+                    return new CatsFragment();
+                default:
+                    return new MapFragment();
+            }
+        }
+
+        @Override
+        public int getCount() {
+            return 4;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return "OBJECT " + (position + 1);
         }
     }
+
 
     private void initListeners() {
         mBottomNavigationView.setOnNavigationItemSelectedListener(item -> {
@@ -190,48 +227,71 @@ public class MainActivity extends BaseActivity {
                 onCatsTabClicked();
             else catsTabClickCount = 0;*/
             if (item.getItemId() != navigationSelectedItemId) {
-                if (navigationSelectedItemId == item.getItemId()) return true;
-                showAllowedIcons(item.getItemId());
                 switch (item.getItemId()) {
                     case R.id.action_map:
-                        Log.d(TAG, "action_map");
-                        if (mapFragment == null)
-                            mapFragment = new MapFragment();
-                        setFragment(mapFragment);
-                        toolbarTitle.setText(getResources().getString(R.string.toolbar_title_feedstations));
-                        catsToolsRelativeLayout.setVisibility(View.VISIBLE);
-
-                        presenter.checkInvitations();
+                        onTabChanged(0, false);
                         break;
                     case R.id.action_feed:
-                        Log.d(TAG, "action_feed");
-
-                        if (feedFragment == null)
-                            feedFragment = new FeedFragment();
-                        setFragment(feedFragment);
-
-                        toolbarTitle.setText(getResources().getString(R.string.toolbar_title_feed));
-                        catsToolsRelativeLayout.setVisibility(View.VISIBLE);
+                        onTabChanged(1, false);
                         break;
                     case R.id.action_chat:
-                        Log.d(TAG, "action_chat");
-                        showChat();
-                        toolbarTitle.setText(getResources().getString(R.string.toolbar_title_chat));
-                        catsToolsRelativeLayout.setVisibility(View.VISIBLE);
+                        onTabChanged(2, false);
                         break;
                     case R.id.action_cats:
-                        Log.d(TAG, "action_cats");
-                        if (catsFragment == null)
-                            catsFragment = new CatsFragment();
-                        setFragment(catsFragment);
-                        toolbarTitle.setText(getResources().getString(R.string.toolbar_title_cats));
-                        catsToolsRelativeLayout.setVisibility(View.VISIBLE);
+                        onTabChanged(3, false);
                         break;
                 }
             }
             navigationSelectedItemId = item.getItemId();
             return true;
         });
+    }
+
+    private void onTabChanged(int pos, boolean isFromViewPager) {
+        showAllowedIcons(pos);
+        switch (pos) {
+            case 0:
+                if (isFromViewPager)
+                    mBottomNavigationView.setSelectedItemId(R.id.action_map);
+                else {
+                    Log.d(TAG, "action_map");
+                    toolbarTitle.setText(getResources().getString(R.string.toolbar_title_feedstations));
+                    catsToolsRelativeLayout.setVisibility(View.VISIBLE);
+                    presenter.checkInvitations();
+                    setFragment(0);
+                }
+                break;
+            case 1:
+                if (isFromViewPager)
+                    mBottomNavigationView.setSelectedItemId(R.id.action_feed);
+                else {
+                    Log.d(TAG, "action_feed");
+                    toolbarTitle.setText(getResources().getString(R.string.toolbar_title_feed));
+                    catsToolsRelativeLayout.setVisibility(View.VISIBLE);
+                    setFragment(1);
+                }
+                break;
+            case 2:
+                if (isFromViewPager)
+                    mBottomNavigationView.setSelectedItemId(R.id.action_chat);
+                else {
+                    Log.d(TAG, "action_chat");
+                    toolbarTitle.setText(getResources().getString(R.string.toolbar_title_chat));
+                    catsToolsRelativeLayout.setVisibility(View.VISIBLE);
+                    setFragment(2);
+                }
+                break;
+            case 3:
+                if (isFromViewPager)
+                    mBottomNavigationView.setSelectedItemId(R.id.action_cats);
+                else {
+                    Log.d(TAG, "action_cats");
+                    toolbarTitle.setText(getResources().getString(R.string.toolbar_title_cats));
+                    catsToolsRelativeLayout.setVisibility(View.VISIBLE);
+                    setFragment(3);
+                }
+                break;
+        }
     }
 
     private Handler sendLogsTimer;
@@ -248,24 +308,24 @@ public class MainActivity extends BaseActivity {
 //        }
 //    }
 
-    private void showAllowedIcons(int itemId) {
+    private void showAllowedIcons(int pos) {
         catsNotificationButton.setVisibility(View.VISIBLE);
         catsAddButton.setVisibility(View.VISIBLE);
 
-        switch (itemId) {
-            case R.id.action_map:
+        switch (pos) {
+            case 0:
                 catsAddButton.setVisibility(View.GONE);
                 break;
-            case R.id.action_cats:
+            case 3:
                 catsNotificationButton.setVisibility(View.GONE);
                 break;
         }
     }
 
     public void showChat() {
-        if (messagesFragment == null)
+        /*if (messagesFragment == null)
             messagesFragment = new MessagesFragment();
-        setFragment(messagesFragment);
+        setFragment(messagesFragment);*/
         //startActivity(new Intent(MainActivity.this, DialogsActivity.class));
     }
 

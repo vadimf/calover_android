@@ -709,4 +709,35 @@ public class FeedstationPresenter {
             }
         });
     }
+
+    public void report(Integer id) {
+        if (id == null) return;
+
+        Call<BaseResponse<ErrorData>> call = ServiceGenerator.getApiServiceWithToken().reportFeedstation(id);
+        call.enqueue(new Callback<BaseResponse<ErrorData>>() {
+            @Override
+            public void onResponse(Call<BaseResponse<ErrorData>> call, Response<BaseResponse<ErrorData>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    new BaseParser<ErrorData>(response) {
+
+                        @Override
+                        protected void onSuccess(ErrorData data) {
+                            Toaster.shortToast("feedstation reported");
+                        }
+
+                        @Override
+                        protected void onFail(ErrorResponse error) {
+                            if (error != null)
+                                Log.d(TAG, error.getMessage() + error.getCode());
+                        }
+                    };
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseResponse<ErrorData>> call, Throwable t) {
+                Log.e(TAG, "reportFeedstation onFailure " + t.getMessage());
+            }
+        });
+    }
 }

@@ -15,6 +15,7 @@ import android.widget.ProgressBar;
 import com.varteq.catslovers.R;
 import com.varteq.catslovers.model.FeedPost;
 import com.varteq.catslovers.utils.Log;
+import com.varteq.catslovers.utils.Toaster;
 import com.varteq.catslovers.utils.qb.imagepick.ImagePickHelper;
 import com.varteq.catslovers.utils.qb.imagepick.OnImagePickedListener;
 import com.varteq.catslovers.view.presenter.NewFeedPostPresenter;
@@ -79,8 +80,10 @@ public class NewFeedPostActivity extends BaseActivity implements OnImagePickedLi
                 new ImagePickHelper().pickAnImageOrVideo(this, REQUEST_CODE_ATTACHMENT);
                 return true;
             case R.id.app_bar_save:
+                if (isPostEmpty()) return true;
                 Log.d(TAG, "app_bar_save");
                 //progressBar.setVisibility(View.VISIBLE);
+                showKeyboard(false, postEditText);
                 showWaitDialog();
                 presenter.createFeed(postEditText.getText().toString(), mediaFile, preview, mediaType);
                 return true;
@@ -90,6 +93,15 @@ public class NewFeedPostActivity extends BaseActivity implements OnImagePickedLi
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private boolean isPostEmpty() {
+        if (preview == null && (postEditText.getText() == null ||
+                postEditText.getText().toString().isEmpty())) {
+            Toaster.shortToast("Post shouldn't be empty");
+            return true;
+        }
+        return false;
     }
 
     @Override

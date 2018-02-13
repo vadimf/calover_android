@@ -165,4 +165,7 @@ public interface ApiService {
     @POST("feedback")
     Call<BaseResponse> sendFeedback(@Field("subject") String subject,
                                     @Field("description") String description);
+
+    @POST("feedstations/{id}/report")
+    Call<BaseResponse<ErrorData>> reportFeedstation(@Path("id") int feedstationId);
 }

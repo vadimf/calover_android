@@ -140,6 +140,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
     public static final String MODE_KEY = "mode_key";
     private MenuItem saveMenu;
     private MenuItem editMenu;
+    private MenuItem reportMenu;
     private int countOfSelectedPhotos = 0;
     private List<PhotoWithPreview> photosToRemove;
 
@@ -354,7 +355,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
         feedstationCatsAdapter = new FeedstationCatsAdapter(catProfileList, new FeedstationCatsAdapter.OnCatClickListener() {
             @Override
             public void onCatClicked(CatProfile catProfile) {
-
+                CatProfileActivity.startInViewMode(FeedstationActivity.this, catProfile);
             }
         });
         catsRecyclerView.setAdapter(feedstationCatsAdapter);
@@ -460,6 +461,8 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
             saveMenu.setVisible(false);
         if (editMenu != null)
             editMenu.setVisible(true);
+        if (reportMenu != null)
+            reportMenu.setVisible(true);
 
         timeToFeedLayout.setVisibility(View.GONE);
         if (feedstation.getIsPublic())
@@ -502,6 +505,8 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
             saveMenu.setVisible(true);
         if (editMenu != null)
             editMenu.setVisible(false);
+        if (reportMenu != null)
+            reportMenu.setVisible(false);
 
         timeToFeedTimerLayout.setVisibility(View.GONE);
         if (feedstation.getIsPublic())
@@ -520,14 +525,17 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
 
         saveMenu = menu.findItem(R.id.app_bar_save);
         editMenu = menu.findItem(R.id.app_bar_edit);
+        reportMenu = menu.findItem(R.id.app_bar_report);
 
         if (saveMenu != null && editMenu != null) {
             if (currentMode.equals(FeedstationScreenMode.VIEW_MODE)) {
                 saveMenu.setVisible(false);
                 editMenu.setVisible(true);
+                reportMenu.setVisible(true);
             } else {
                 saveMenu.setVisible(true);
                 editMenu.setVisible(false);
+                reportMenu.setVisible(false);
             }
         }
         return true;
@@ -560,12 +568,27 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
                 }
                 Toaster.longToast("Only admins can modify feedstations");
                 return true;
+            case R.id.app_bar_report:
+                Log.d(TAG, "app_bar_report");
+                report();
+                return true;
             case android.R.id.home:
                 onBackPressed();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void report() {
+        new AlertDialog.Builder(FeedstationActivity.this)
+                .setTitle("Report this feedstation?")
+                .setNegativeButton(R.string.no, null)
+                .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
+                    presenter.report(feedstation.getId());
+                })
+                .create()
+                .show();
     }
 
     public void setCatsListNumber(String catsListNumber){
@@ -772,7 +795,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
         public int getCount() {
             if (pagerPhotoList == null)
                 return 0;
-            else return pagerPhotoList.size() < 4 ? pagerPhotoList.size() : 3;
+            else return pagerPhotoList.size() < 5 ? pagerPhotoList.size() : 4;
         }
 
         @Override
