@@ -799,7 +799,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
         public int getCount() {
             if (pagerPhotoList == null)
                 return 0;
-            else return pagerPhotoList.size() < 4 ? pagerPhotoList.size() : 3;
+            else return pagerPhotoList.size() < 5 ? pagerPhotoList.size() : 4;
         }
 
         @Override
