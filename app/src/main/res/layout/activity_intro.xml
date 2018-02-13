@@ -54,9 +54,8 @@
     <android.support.v4.view.ViewPager
         android:id="@+id/view_pager"
         android:layout_width="wrap_content"
-        android:layout_height="500dp"
+        android:layout_height="520dp"
         android:layout_above="@+id/linearLayout"
-        android:layout_marginBottom="20.6dp"
         app:layout_constraintBottom_toTopOf="@id/linearLayout" />
 
 
