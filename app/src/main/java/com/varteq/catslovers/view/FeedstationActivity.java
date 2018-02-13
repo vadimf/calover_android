@@ -355,7 +355,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
         feedstationCatsAdapter = new FeedstationCatsAdapter(catProfileList, new FeedstationCatsAdapter.OnCatClickListener() {
             @Override
             public void onCatClicked(CatProfile catProfile) {
-
+                CatProfileActivity.startInViewMode(FeedstationActivity.this, catProfile);
             }
         });
         catsRecyclerView.setAdapter(feedstationCatsAdapter);
