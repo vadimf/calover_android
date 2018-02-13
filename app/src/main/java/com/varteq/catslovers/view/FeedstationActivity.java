@@ -585,11 +585,7 @@ public class FeedstationActivity extends BaseActivity implements OnImagePickedLi
                 .setTitle("Report this feedstation?")
                 .setNegativeButton(R.string.no, null)
                 .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
-                        /*if (feedstation.getUserRole() != null && feedstation.getUserRole().equals(Feedstation.UserRole.ADMIN)) {
-                            presenter.uploadFeedstationWithPhotos(feedstation);
-                            return;
-                        }
-                        Toaster.longToast("Only admins can modify feedstations");*/
+                    presenter.report(feedstation.getId());
                 })
                 .create()
                 .show();
