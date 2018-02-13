@@ -57,6 +57,7 @@ import com.varteq.catslovers.view.adapters.ViewColorsAdapter;
 import com.varteq.catslovers.view.dialog.AgeDialog;
 import com.varteq.catslovers.view.dialog.ColorPickerDialog;
 import com.varteq.catslovers.view.dialog.EditTextDialog;
+import com.varteq.catslovers.view.dialog.WeightDialog;
 import com.varteq.catslovers.view.presenter.CatProfilePresenter;
 import com.varteq.catslovers.view.qb.AttachmentImageActivity;
 
@@ -825,7 +826,7 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
 
     @OnClick(R.id.weight_value_textView)
     void onWeightClick() {
-        EditTextDialog editTextDialog = new EditTextDialog(this, "Enter cat's weight", "For example: 5.3",
+        /*EditTextDialog editTextDialog = new EditTextDialog(this, "Enter cat's weight", "For example: 5.3",
                 new EditTextDialog.OnClickListener() {
                     @Override
                     public void onPositiveButtonClick() {
@@ -851,7 +852,8 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
         editTextDialog.setWeightFilter();
         editTextDialog.setEditTextText((weight > 0 && !weightValueTextView.getText().toString().equals(DEFAULT_VALUE)) ? String.valueOf(weight) : null);
         editTextDialog.setEditTextInputType(InputType.TYPE_CLASS_PHONE);
-        editTextDialog.show();
+        editTextDialog.show();*/
+        new WeightDialog(this, weight, weight -> setWeight(String.valueOf(weight)));
     }
 
     @OnClick(R.id.catTypePet)
