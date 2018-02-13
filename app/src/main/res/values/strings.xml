@@ -197,5 +197,6 @@
     <string name="network_error">Network error</string>
     <string name="sign_out">Sign out</string>
     <string name="send_feedback">Send Feedback</string>
+    <string name="menu_report">Report</string>
 
 </resources>
