@@ -83,6 +83,7 @@ public class NewFeedPostActivity extends BaseActivity implements OnImagePickedLi
                 if (isPostEmpty()) return true;
                 Log.d(TAG, "app_bar_save");
                 //progressBar.setVisibility(View.VISIBLE);
+                showKeyboard(false, postEditText);
                 showWaitDialog();
                 presenter.createFeed(postEditText.getText().toString(), mediaFile, preview, mediaType);
                 return true;

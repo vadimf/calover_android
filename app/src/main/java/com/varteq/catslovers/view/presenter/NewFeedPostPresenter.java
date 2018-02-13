@@ -56,6 +56,7 @@ public class NewFeedPostPresenter {
             @Override
             public void onError(QBResponseException errors) {
                 Log.e(TAG, "createObject Feeds onError " + errors.getMessage());
+                view.hideWaitDialog();
             }
         });
     }
@@ -77,6 +78,7 @@ public class NewFeedPostPresenter {
         @Override
         public void onError(QBResponseException errors) {
             Log.e(TAG, "uploadFile Feeds onError " + errors.getMessage());
+            view.hideWaitDialog();
         }
     };
 
