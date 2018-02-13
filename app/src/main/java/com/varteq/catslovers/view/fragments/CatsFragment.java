@@ -45,6 +45,8 @@ public class CatsFragment extends Fragment {
     Button friendsSliderButton;
     @BindView(R.id.button_slider_explore)
     Button exploreSliderButton;
+    @BindView(R.id.progress_layout)
+    View progressLayout;
     private HashMap<String, List<CatProfile>> catsHashMap;
     private CatsListAdapter catsListAdapter;
     private boolean listUpdated;
@@ -66,6 +68,8 @@ public class CatsFragment extends Fragment {
         catsListAdapter = new CatsListAdapter(catsHashMap, this::onCatClicked);
         catsRecyclerView.setAdapter(catsListAdapter);
         catsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        progressLayout.setOnTouchListener((view1, motionEvent) -> true);
 
         return view;
     }
@@ -174,7 +178,7 @@ public class CatsFragment extends Fragment {
     }
 
     public void catsLoaded(List<CatProfile> catProfiles, int catsSection) {
-
+        stopRefreshing();
         listUpdated = true;
         catsHashMap.clear();
         if (!catProfiles.isEmpty()) {
@@ -268,4 +272,11 @@ public class CatsFragment extends Fragment {
 
     }
 
+    public void startRefreshing() {
+        progressLayout.setVisibility(View.VISIBLE);
+    }
+
+    public void stopRefreshing() {
+        progressLayout.setVisibility(View.GONE);
+    }
 }

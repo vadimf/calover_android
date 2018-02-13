@@ -39,6 +39,7 @@ public class CatsPresenter {
     }
 
     public void getCats(int catsSection) {
+        view.startRefreshing();
         Call<BaseResponse<List<RCat>>> call;
         Location location = Profile.getLocation(view.getContext());
 
@@ -58,6 +59,7 @@ public class CatsPresenter {
                         protected void onFail(ErrorResponse error) {
                             if (error != null)
                                 Log.d(TAG, error.getMessage() + error.getCode());
+                            view.stopRefreshing();
                         }
                     };
                 }
@@ -65,6 +67,7 @@ public class CatsPresenter {
                 @Override
                 public void onFailure(Call<BaseResponse<List<RCat>>> call, Throwable t) {
                     Log.e(TAG, "getCats onFailure " + t.getMessage());
+                    view.stopRefreshing();
                 }
             });
 
@@ -85,6 +88,7 @@ public class CatsPresenter {
                         protected void onFail(ErrorResponse error) {
                             if (error != null)
                                 Log.d(TAG, error.getMessage() + error.getCode());
+                            view.stopRefreshing();
                         }
                     };
                 }
@@ -92,6 +96,7 @@ public class CatsPresenter {
                 @Override
                 public void onFailure(Call<BaseResponse<List<RCat>>> call, Throwable t) {
                     Log.e(TAG, "getCats onFailure " + t.getMessage());
+                    view.stopRefreshing();
                 }
             });
         }

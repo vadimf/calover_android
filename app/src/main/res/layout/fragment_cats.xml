@@ -1,18 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:background="@color/white"
-              android:orientation="vertical">
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
 
     <LinearLayout
+        android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:orientation="horizontal"
         android:paddingBottom="4dp"
         android:paddingLeft="8dp"
-        android:paddingRight="8dp">
+        android:paddingRight="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <Button
             android:id="@+id/button_slider_private"
@@ -21,8 +26,7 @@
             android:background="@drawable/shape_border_primary_color_button_left_unselected"
             android:text="Private"
 
-            android:textAllCaps="false"
-            />
+            android:textAllCaps="false" />
 
         <Button
             android:id="@+id/button_slider_public"
@@ -30,8 +34,7 @@
             android:layout_height="30dp"
             android:background="@drawable/shape_border_primary_color_button_unselected"
             android:text="Public"
-            android:textAllCaps="false"
-            />
+            android:textAllCaps="false" />
 
         <Button
             android:id="@+id/button_slider_friends"
@@ -39,8 +42,7 @@
             android:layout_height="30dp"
             android:background="@drawable/shape_border_primary_color_button_unselected"
             android:text="Friends"
-            android:textAllCaps="false"
-            />
+            android:textAllCaps="false" />
 
         <Button
             android:id="@+id/button_slider_explore"
@@ -48,16 +50,34 @@
             android:layout_height="30dp"
             android:background="@drawable/shape_border_primary_color_button_right_unselected"
             android:text="Explore"
-            android:textAllCaps="false"
-            />
+            android:textAllCaps="false" />
 
     </LinearLayout>
 
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/cats_RecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
 
     </android.support.v7.widget.RecyclerView>
-</LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/progress_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ProgressBar
+            style="@style/CenterProgressBarStyle"
+            android:theme="@style/PrimaryProgressBar" />
+    </RelativeLayout>
+
+</android.support.constraint.ConstraintLayout>
