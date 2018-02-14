@@ -328,11 +328,17 @@ public class MapPresenter {
                     event.setType(Event.Type.EMERGENCY);
                     break;
             }
-            event.setAddress(rEvent.getAddress());
-            event.setDate(TimeUtils.getLocalDateFromUtc(rEvent.getCreated()));
-            event.setDescription(rEvent.getDescription());
-            event.setLatLng(new LatLng(rEvent.getLat(), rEvent.getLng()));
-            event.setName(rEvent.getName());
+
+            try {
+                event.setAddress(rEvent.getAddress());
+                event.setDate(TimeUtils.getLocalDateFromUtc(rEvent.getCreated()));
+                event.setDescription(rEvent.getDescription());
+                event.setLatLng(new LatLng(rEvent.getLat(), rEvent.getLng()));
+                event.setName(rEvent.getName());
+            } catch (Exception error) {
+                Log.d(MapPresenter.class.getSimpleName(), error.getMessage());
+            }
+
 
             eventList.add(event);
         }
