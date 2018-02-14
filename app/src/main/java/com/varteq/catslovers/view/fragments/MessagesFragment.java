@@ -455,7 +455,10 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
                 progressBar.setVisibility(View.GONE);
                 swipyRefreshLayoutFriends.setRefreshing(false);
                 swipyRefreshLayoutGroups.setRefreshing(false);
-                Toaster.shortToast(e.getMessage());
+
+                if (e != null && e.getMessage() != null) {
+                    Toaster.shortToast(e.getMessage());
+                }
             }
         });
     }
