@@ -469,7 +469,12 @@ public class CatProfilePresenter {
                             Toaster.longToast("An error occurred while saving");
                             view.hideWaitDialog();
                             isCatUploading = false;
-                            Log.e("uploadCatWithPhotos ", exception.getMessage());
+
+                            String exceptionMessage = "";
+                            if (exception != null && exception.getMessage() != null) {
+                                exceptionMessage = exception.getMessage();
+                            }
+                            Log.e("uploadCatWithPhotos ", exceptionMessage);
                         }
 
                         @Override

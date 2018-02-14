@@ -114,7 +114,12 @@ public class SettingsPresenter {
 
         @Override
         public void onError(Context context, UploadInfo uploadInfo, ServerResponse serverResponse, Exception exception) {
-            Log.e("uploadUserSettings ", exception.getMessage());
+
+            String exceptionMessage = "";
+            if (exception != null && exception.getMessage() != null) {
+                exceptionMessage = exception.getMessage();
+            }
+            Log.e("uploadUserSettings ", exceptionMessage);
             if (checkNetworkErrAndShowSnackbar(exception)) {
                 view.hideWaitDialog();
                 return;
@@ -195,7 +200,7 @@ public class SettingsPresenter {
     }
 
     private boolean checkNetworkErrAndShowSnackbar(Exception exception) {
-        return checkNetworkErrAndShowSnackbar(exception.toString());
+        return exception != null && checkNetworkErrAndShowSnackbar(exception.toString());
     }
 
     private boolean checkNetworkErrAndShowSnackbar(String exception) {
