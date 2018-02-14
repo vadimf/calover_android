@@ -136,7 +136,7 @@ public class CatsFragment extends Fragment {
     public void onResume() {
         super.onResume();
         if (!listUpdated) {
-            getCats(selectedCatsSection);
+            getCats(getSelectedCatsSection());
             listUpdated = true;
         }
     }
@@ -148,6 +148,11 @@ public class CatsFragment extends Fragment {
 
     private void getCats(Selection section) {
         presenter.getCats(section);
+    }
+
+    private Selection getSelectedCatsSection() {
+
+        return selectedCatsSection != null ? selectedCatsSection : Selection.PRIVATE;
     }
 
     public void catsLoaded(List<CatProfile> catProfiles, Selection catsSection) {
