@@ -990,11 +990,11 @@ public class CatProfileActivity extends BaseActivity implements View.OnClickList
                     @Override
                     public void onPositiveButtonClick() {
                         String enteredValue = getEditTextDialog().getEditText().getText().toString();
-                        if (enteredValue.length() > 1) {
+                        if (enteredValue.length() > 1 && enteredValue.length() < 16) {
                             petNameTextView.setText(enteredValue);
                             dismiss();
                         } else {
-                            Toaster.shortToast("Enter at least 2 symbols");
+                            Toaster.shortToast("Name length should be between 2 and 15 characters");
                         }
                     }
 
