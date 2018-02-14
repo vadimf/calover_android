@@ -50,7 +50,7 @@ public class CatsFragment extends Fragment {
     private CatsListAdapter catsListAdapter;
     private boolean listUpdated;
     private CatsPresenter presenter;
-    private Selection selectedCatsSection;
+    private Selection selectedCatsSection = Selection.PRIVATE;
     private int navigationSelectedItemId;
 
 
@@ -62,7 +62,7 @@ public class CatsFragment extends Fragment {
 
         catsHashMap = new HashMap<>();
 
-        getCats(Selection.PRIVATE);
+        getCats(selectedCatsSection);
         listUpdated = true;
 
         catsListAdapter = new CatsListAdapter(catsHashMap, this::onCatClicked);
