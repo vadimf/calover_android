@@ -1,20 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item
-        android:title="Private"
-        android:id="@+id/action_private"
-        app:showAsAction="ifRoom" />
-    <item
-        android:title="Public"
-        android:id="@+id/action_public"
-        app:showAsAction="ifRoom" />
-    <item
-        android:title="Friends"
-        android:id="@+id/action_friends"
-        app:showAsAction="ifRoom" />
-    <item
-        android:title="Explore"
-        android:id="@+id/action_explore"
-        app:showAsAction="ifRoom" />
+    <group android:id="@+id/menu_group_cat">
+        <item
+            android:title="Private"
+            android:id="@+id/action_private"
+            app:showAsAction="ifRoom" />
+        <item
+            android:title="Public"
+            android:id="@+id/action_public"
+            app:showAsAction="ifRoom" />
+        <item
+            android:title="Friends"
+            android:id="@+id/action_friends"
+            app:showAsAction="ifRoom" />
+        <item
+            android:title="Explore"
+            android:id="@+id/action_explore"
+            app:showAsAction="ifRoom" />
+    </group>
 </menu>
