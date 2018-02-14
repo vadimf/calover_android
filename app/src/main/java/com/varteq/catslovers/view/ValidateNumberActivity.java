@@ -36,7 +36,7 @@ public class ValidateNumberActivity extends BaseActivity implements TextWatcher 
 
     private String TAG = ValidateNumberActivity.class.getSimpleName();
     public static String PHONE_NUMBER_KEY = "phone_number";
-    private final int MAX_CHARS_COUNT = 2;
+    private final int MAX_CHARS_COUNT = 6;
     @BindView(R.id.editText1)
     EditText editText1;
     @BindView(R.id.editText2)
@@ -112,7 +112,8 @@ public class ValidateNumberActivity extends BaseActivity implements TextWatcher 
                 return;
             }
         }
-        String code = editText1.getText().toString() + editText2.getText().toString() + editText3.getText().toString();
+        //String code = editText1.getText().toString() + editText2.getText().toString() + editText3.getText().toString();
+        String code = editText2.getText().toString();
         Log.d(TAG, "confirmCode");
         presenter.confirmCode(code);
     }

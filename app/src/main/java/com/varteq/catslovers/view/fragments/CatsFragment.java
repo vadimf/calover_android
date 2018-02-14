@@ -30,11 +30,6 @@ import butterknife.ButterKnife;
 
 public class CatsFragment extends Fragment {
 
-    public final static int CATS_SECTION_PRIVATE = 0;
-    public final static int CATS_SECTION_PUBLIC = 1;
-    public final static int CATS_SECTION_FRIENDS = 2;
-    public final static int CATS_SECTION_EXPLORE = 3;
-
     public enum Selection {
         PRIVATE,
         PUBLIC,
@@ -46,24 +41,16 @@ public class CatsFragment extends Fragment {
 
     @BindView(R.id.cats_RecyclerView)
     RecyclerView catsRecyclerView;
-    /*@BindView(R.id.button_slider_public)
-    Button publicSliderButton;
-    @BindView(R.id.button_slider_private)
-    Button privateSliderButton;
-    @BindView(R.id.button_slider_friends)
-    Button friendsSliderButton;
-    @BindView(R.id.button_slider_explore)
-    Button exploreSliderButton;*/
     @BindView(R.id.progress_layout)
     View progressLayout;
     @BindView(R.id.cats_navigation)
     BottomNavigationView navigationView;
-    ;
+
     private HashMap<String, List<CatProfile>> catsHashMap;
     private CatsListAdapter catsListAdapter;
     private boolean listUpdated;
     private CatsPresenter presenter;
-    private Selection selectedCatsSection;
+    private Selection selectedCatsSection = Selection.PRIVATE;
     private int navigationSelectedItemId;
 
 
@@ -75,7 +62,7 @@ public class CatsFragment extends Fragment {
 
         catsHashMap = new HashMap<>();
 
-        getCats(Selection.PRIVATE);
+        getCats(selectedCatsSection);
         listUpdated = true;
 
         catsListAdapter = new CatsListAdapter(catsHashMap, this::onCatClicked);
@@ -149,7 +136,7 @@ public class CatsFragment extends Fragment {
     public void onResume() {
         super.onResume();
         if (!listUpdated) {
-            getCats(selectedCatsSection);
+            getCats(getSelectedCatsSection());
             listUpdated = true;
         }
     }
@@ -159,75 +146,13 @@ public class CatsFragment extends Fragment {
         getCats(selectedCatsSection);
     }
 
-    /*@OnClick(R.id.button_slider_public)
-    void publicSliderButtonClicked() {
-        selectedCatsSection = CATS_SECTION_PUBLIC;
-        getCats(selectedCatsSection);
-    }
-
-    @OnClick(R.id.button_slider_private)
-    void privateSliderButtonClicked() {
-        selectedCatsSection = CATS_SECTION_PRIVATE;
-        getCats(selectedCatsSection);
-    }
-
-    @OnClick(R.id.button_slider_friends)
-    void friendsSliderButtonClicked() {
-        selectedCatsSection = CATS_SECTION_FRIENDS;
-        getCats(selectedCatsSection);
-    }
-
-    @OnClick(R.id.button_slider_explore)
-    void exploreSliderButtonClicked() {
-        selectedCatsSection = CATS_SECTION_EXPLORE;
-        getCats(selectedCatsSection);
-    }*/
-
     private void getCats(Selection section) {
-        clearSliderButtonSelection();
-        /*switch (section) {
-            case CatsFragment.CATS_SECTION_PRIVATE:
-                selectButton(privateSliderButton);
-                break;
-            case CatsFragment.CATS_SECTION_PUBLIC:
-                selectButton(publicSliderButton);
-                break;
-            case CatsFragment.CATS_SECTION_FRIENDS:
-                selectButton(friendsSliderButton);
-                break;
-            case CatsFragment.CATS_SECTION_EXPLORE:
-                selectButton(exploreSliderButton);
-                break;
-        }*/
         presenter.getCats(section);
     }
 
-    /*private void selectButton(Button button) {
-        button.setTextColor(getResources().getColor(R.color.white));
-        int backgroundResouaurce;
-        switch (button.getId()) {
-            case R.id.button_slider_private:
-                backgroundResource = R.drawable.shape_border_primary_color_button_left_selected;
-                break;
-            case R.id.button_slider_explore:
-                backgroundResource = R.drawable.shape_border_primary_color_button_right_selected;
-                break;
-            default:
-                backgroundResource = R.drawable.shape_border_primary_color_button_selected;
-                break;
-        }
-        button.setBackground(getResources().getDrawable(backgroundResource));
-    }*/
+    private Selection getSelectedCatsSection() {
 
-    private void clearSliderButtonSelection() {
-        /*privateSliderButton.setBackground(getResources().getDrawable(R.drawable.shape_border_primary_color_button_left_unselected));
-        privateSliderButton.setTextColor(getResources().getColor(R.color.colorPrimary));
-        publicSliderButton.setBackground(getResources().getDrawable(R.drawable.shape_border_primary_color_button_unselected));
-        publicSliderButton.setTextColor(getResources().getColor(R.color.colorPrimary));
-        friendsSliderButton.setBackground(getResources().getDrawable(R.drawable.shape_border_primary_color_button_unselected));
-        friendsSliderButton.setTextColor(getResources().getColor(R.color.colorPrimary));
-        exploreSliderButton.setBackground(getResources().getDrawable(R.drawable.shape_border_primary_color_button_right_unselected));
-        exploreSliderButton.setTextColor(getResources().getColor(R.color.colorPrimary));*/
+        return selectedCatsSection != null ? selectedCatsSection : Selection.PRIVATE;
     }
 
     public void catsLoaded(List<CatProfile> catProfiles, Selection catsSection) {
@@ -326,10 +251,12 @@ public class CatsFragment extends Fragment {
     }
 
     public void startRefreshing() {
+        navigationView.getMenu().setGroupEnabled(R.id.menu_group_cat, false);
         progressLayout.setVisibility(View.VISIBLE);
     }
 
     public void stopRefreshing() {
         progressLayout.setVisibility(View.GONE);
+        navigationView.getMenu().setGroupEnabled(R.id.menu_group_cat, true);
     }
 }

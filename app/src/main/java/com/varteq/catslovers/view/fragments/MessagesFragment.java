@@ -106,7 +106,6 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
     private QBSystemMessagesManager systemMessagesManager;
     private QBIncomingMessagesManager incomingMessagesManager;
     private DialogsManager dialogsManager;
-    private QBUser currentUser;
 
     private MessagesPresenter presenter;
 
@@ -150,7 +149,6 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
 
         dialogsManager = new DialogsManager();
 
-        currentUser = ChatHelper.getCurrentUser();
         presenter = new MessagesPresenter(this);
 
         friendsDialogsList = new ArrayList<>();
@@ -455,7 +453,10 @@ public class MessagesFragment extends Fragment implements DialogsManager.Managin
                 progressBar.setVisibility(View.GONE);
                 swipyRefreshLayoutFriends.setRefreshing(false);
                 swipyRefreshLayoutGroups.setRefreshing(false);
-                Toaster.shortToast(e.getMessage());
+
+                if (e != null && e.getMessage() != null) {
+                    Toaster.shortToast(e.getMessage());
+                }
             }
         });
     }

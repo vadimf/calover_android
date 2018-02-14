@@ -55,11 +55,12 @@ public class ConfirmNumberActivity extends AppCompatActivity {
     }
 
     private void confirmNumber() {
-        if (isNumberValid()) {
+        String phoneNumber = countryCodePicker.getSelectedCountryCodeWithPlus() + numberEditText.getText().toString().replaceAll("[^0-9]", "");
+
+        if (isNumberValid(phoneNumber)) {
             Log.d(TAG, "confirmNumber");
             Intent intent = new Intent(ConfirmNumberActivity.this, ValidateNumberActivity.class);
-            String number = countryCodePicker.getSelectedCountryCodeWithPlus() + numberEditText.getText().toString();
-            intent.putExtra(PHONE_NUMBER_KEY, number);
+            intent.putExtra(PHONE_NUMBER_KEY, phoneNumber);
             startActivity(intent);
         }
     }
@@ -70,14 +71,13 @@ public class ConfirmNumberActivity extends AppCompatActivity {
         requestFocus(numberEditText);
     }
 
-    private boolean isNumberValid() {
-        String number = countryCodePicker.getSelectedCountryCodeWithPlus() + numberEditText.getText().toString();
+    private boolean isNumberValid(String phoneNumber) {
         if (numberEditText.getText() == null ||
-                number.isEmpty()) {
+                phoneNumber.isEmpty()) {
             numberEditText.setError("Number should not be empty");
             return false;
-        } else if (number.length() < 11 ||
-                !Patterns.PHONE.matcher(number).matches()) {
+        } else if (phoneNumber.length() < 11 ||
+                !Patterns.PHONE.matcher(phoneNumber).matches()) {
             numberEditText.setError("Incorrect number");
             return false;
         } else return true;

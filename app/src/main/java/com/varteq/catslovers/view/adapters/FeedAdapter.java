@@ -24,6 +24,9 @@ import com.varteq.catslovers.view.MediaViewerActivity;
 
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder> {
 
     private List<FeedPost> feedList;
@@ -65,6 +68,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
 
         holder.nameTextView.setText(feed.getName());
         holder.likeImageButton.setLikes(feed.getIsUserLiked(currentUserId), feed.getLikes() != null ? feed.getLikes().size() : 0, position);
+        holder.commentsTextView.setText(String.valueOf(feed.getCommentsCount()));
 
         boolean isAvatarExist = feed.getAvatar() != null && !feed.getAvatar().isEmpty();
         Glide.with(holder.itemView)
@@ -127,46 +131,47 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
     }
 
     class FeedViewHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.imageView)
         ImageView imageView;
+        @BindView(R.id.toolbarGradientView)
         View toolbarGradientView;
+        @BindView(R.id.nameTextView)
         TextView nameTextView;
+        @BindView(R.id.timeTextView)
         TextView timeTextView;
-        //TextView likesTextView;
+        @BindView(R.id.likesTextView)
+        TextView likesTextView;
+        @BindView(R.id.likeButton)
+        ImageButton likeButton;
+        @BindView(R.id.comentsTextView)
+        TextView commentsTextView;
+        @BindView(R.id.comentsButton)
+        ImageButton commentsButton;
+        @BindView(R.id.avatarImageView)
         RoundedImageView avatarImageView;
-        //ImageButton menuButton;
+        @BindView(R.id.messageTextView)
         TextView messageTextView;
-        //ImageButton likeButton;
-        //ImageButton goIntoButton;
+        @BindView(R.id.cardView)
         CardView cardView;
-        //RelativeLayout headerRelativeLayout;
+        @BindView(R.id.timeUnderTextView)
         TextView timeUnderTextView;
+        @BindView(R.id.playImageView)
         ImageView playImageView;
+        @BindView(R.id.media_layout)
         RelativeLayout mediaLayout;
+        @BindView(R.id.empty_view)
         View emptyView;
         LikeImageButton likeImageButton;
+        //R.id.menuButton
+        //R.id.goIntoButton
+        //ImageButton goIntoButton;
+        //ImageButton menuButton;
 
         public FeedViewHolder(View itemView) {
             super(itemView);
 
-            imageView = itemView.findViewById(R.id.imageView);
-            toolbarGradientView = itemView.findViewById(R.id.toolbarGradientView);
-            nameTextView = itemView.findViewById(R.id.nameTextView);
-            timeTextView = itemView.findViewById(R.id.timeTextView);
-            avatarImageView = itemView.findViewById(R.id.avatarImageView);
-            messageTextView = itemView.findViewById(R.id.messageTextView);
-            //menuButton = itemView.findViewById(R.id.menuButton);
-            ImageButton likeButton = itemView.findViewById(R.id.likeButton);
-            //goIntoButton = itemView.findViewById(R.id.goIntoButton);
-            TextView likesTextView = itemView.findViewById(R.id.likesTextView);
+            ButterKnife.bind(this, itemView);
             likeImageButton = new LikeImageButton(likeButton, likesTextView, likeChangedListener, handler);
-
-            cardView = itemView.findViewById(R.id.cardView);
-            //headerRelativeLayout = itemView.findViewById(R.id.headerRelativeLayout);
-            timeUnderTextView = itemView.findViewById(R.id.timeUnderTextView);
-            playImageView = itemView.findViewById(R.id.playImageView);
-
-            mediaLayout = itemView.findViewById(R.id.media_layout);
-            emptyView = itemView.findViewById(R.id.empty_view);
 
             imageView.setOnClickListener(view -> {
                 int position = getAdapterPosition();

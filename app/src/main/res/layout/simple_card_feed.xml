@@ -148,5 +148,31 @@
             app:layout_constraintStart_toEndOf="@+id/likeButton"
             app:layout_constraintTop_toTopOf="@+id/likeButton" />
 
+        <ImageButton
+            android:id="@+id/comentsButton"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="8dp"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toBottomOf="@+id/likeButton"
+            app:layout_constraintDimensionRatio="h,1:1"
+            app:layout_constraintStart_toEndOf="@+id/likesTextView"
+            app:layout_constraintTop_toTopOf="@+id/likeButton"
+            android:background="@drawable/ic_chat_bubble_outline_24_px" />
+
+        <TextView
+            android:id="@+id/comentsTextView"
+            style="@style/SecondaryTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="8dp"
+            tools:text="34k"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@+id/likeButton"
+            app:layout_constraintStart_toEndOf="@+id/comentsButton"
+            app:layout_constraintTop_toTopOf="@+id/likeButton" />
+
     </android.support.constraint.ConstraintLayout>
 </android.support.v7.widget.CardView>

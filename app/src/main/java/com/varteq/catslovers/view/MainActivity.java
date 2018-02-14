@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.design.internal.BottomNavigationMenuView;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
@@ -80,7 +81,7 @@ public class MainActivity extends BaseActivity {
 
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
-    ImageButton navigationEditImageButton;
+    @Nullable ImageButton navigationEditImageButton;
     View navigationHeaderLayout;
 
     private int catsTabClickCount = 0;
@@ -411,9 +412,12 @@ public class MainActivity extends BaseActivity {
         drawerBackButton = navigationHeaderLayout.findViewById(R.id.button_navigation_drawer_back);
         appVersionTextView = navigationView.findViewById(R.id.textView_version);
 
-        navigationEditImageButton.setOnClickListener(view -> {
-            startSettingsEdit();
-        });
+        if (navigationEditImageButton != null) {
+            navigationEditImageButton.setOnClickListener(view -> {
+                startSettingsEdit();
+            });
+        }
+
         navigationHeaderLayout.findViewById(R.id.change_button).setOnClickListener(view -> startSettingsEdit());
         drawerBackButton.setOnClickListener(view -> drawerLayout.closeDrawer(Gravity.LEFT));
         appVersionTextView.setText(Utils.getAppInfo(this));

@@ -3,6 +3,7 @@ package com.varteq.catslovers.model;
 import android.net.Uri;
 
 import com.quickblox.core.request.QBRequestGetBuilder;
+import com.quickblox.core.request.QBRequestUpdateBuilder;
 import com.quickblox.customobjects.model.QBCustomObject;
 
 import java.util.ArrayList;
@@ -18,11 +19,16 @@ public class QBFeedPost extends QBCustomObject {
     public static final String STATION_ID_FIELD = "station_id";
     public static final String PREVIEW_FIELD = "preview";
     public static final String USERS_LIKED_FIELD = "users_liked_post";
+    public static final String COMMENTS_IDS_FIELD = "comments_ids";
+
+    public QBFeedPost() {
+        setClassName(CLASS_NAME);
+    }
 
     public QBFeedPost(String message, String stationId) {
+        this();
         putString("description", message);
         putString(STATION_ID_FIELD, stationId);
-        setClassName(CLASS_NAME);
     }
 
     public QBFeedPost(String id, List<Integer> usersLiked, String message, String stationId) {
@@ -31,9 +37,13 @@ public class QBFeedPost extends QBCustomObject {
         putArray(USERS_LIKED_FIELD, usersLiked);
     }
 
+    public static QBRequestUpdateBuilder getAddCommentUpdateBuilder(String commentId) {
+        return new QBRequestUpdateBuilder().addToSet(COMMENTS_IDS_FIELD, commentId);
+    }
+
     public QBFeedPost(String id) {
+        this();
         setCustomObjectId(id);
-        setClassName(CLASS_NAME);
     }
 
     public static FeedPost toFeedPost(QBCustomObject object, String avatar, String userName) {
@@ -60,10 +70,18 @@ public class QBFeedPost extends QBCustomObject {
                 usersIds.add(Integer.parseInt((String) o));
         }
 
+        List<Object> commentsObjects = object.getArray(COMMENTS_IDS_FIELD);
+        List<String> commentsIds = null;
+        if (commentsObjects != null && !commentsObjects.isEmpty()) {
+            commentsIds = new ArrayList<>();
+            for (Object o : commentsObjects)
+                commentsIds.add((String) o);
+        }
+
         return new FeedPost(object.getCustomObjectId(), object.getUserId(), object.getCreatedAt(),
-                avatar,
-                userName,
-                object.getString("description"), previewName, mediaName, usersIds, Integer.parseInt(object.getString(STATION_ID_FIELD)), type);
+                avatar, userName,
+                object.getString("description"), previewName, mediaName, usersIds,
+                Integer.parseInt(object.getString(STATION_ID_FIELD)), commentsIds, type);
     }
 
     public static QBRequestGetBuilder getRequestBuilder(List<String> ids) {

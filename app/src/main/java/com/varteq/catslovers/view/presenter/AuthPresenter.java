@@ -725,7 +725,7 @@ public class AuthPresenter {
     }
 
     private boolean checkNetworkErrAndShowSnackbar(Exception exception) {
-        return checkNetworkErrAndShowSnackbar(exception.toString());
+        return exception != null && checkNetworkErrAndShowSnackbar(exception.toString());
     }
 
     private boolean checkNetworkErrAndShowSnackbar(String exception) {
@@ -786,7 +786,12 @@ public class AuthPresenter {
 
         @Override
         public void onError(Context context, UploadInfo uploadInfo, ServerResponse serverResponse, Exception exception) {
-            Log.e("uploadAvatar ", exception.getMessage());
+
+            String exceptionMessage = "";
+            if (exception != null && exception.getMessage() != null) {
+                exceptionMessage = exception.getMessage();
+            }
+            Log.e("uploadAvatar ", exceptionMessage);
             if (checkNetworkErrAndShowSnackbar(exception)) {
                 view.hideWaitDialog();
                 return;

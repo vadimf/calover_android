@@ -13,8 +13,8 @@ android {
         applicationId "com.varteq.catslovers"
         minSdkVersion 19
         targetSdkVersion 26
-        versionCode 26
-        versionName "1.8.19"
+        versionCode 27
+        versionName "1.8.20"
         setProperty("archivesBaseName", "catsLovers-$BUILD_DATE-v$versionName-c$versionCode")
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"

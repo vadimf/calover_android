@@ -125,7 +125,7 @@
             android:layout_marginEnd="16dp"
             android:layout_marginTop="8dp"
             android:ems="10"
-            android:hint="My cat name is..."
+            android:hint="My cat's name is..."
             android:inputType="textPersonName"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/have_cat_textView"

@@ -23,6 +23,7 @@ public class FeedPost implements Serializable {
     private String name;
     private String message;
     private List<Integer> likes;
+    private List<String> commentsIds;
     private FeedPostType type;
 
     public enum FeedPostType {
@@ -46,7 +47,7 @@ public class FeedPost implements Serializable {
     }
 
     public FeedPost(String id, Integer userId, Date date, String avatar, String userName, String message,
-                    String previewName, String mediaName, List<Integer> likes, Integer stationId, FeedPostType type) {
+                    String previewName, String mediaName, List<Integer> likes, Integer stationId, List<String> commentsIds, FeedPostType type) {
         this.id = id;
         this.userId = userId;
         this.date = date;
@@ -58,6 +59,7 @@ public class FeedPost implements Serializable {
         this.type = type;
         this.likes = likes;
         this.stationId = stationId;
+        this.commentsIds = commentsIds;
     }
 
     public FeedPost(String id, Date date, Uri previewUri, Uri mediaUri, String avatar, String name, String message, List<Integer> likes, FeedPostType type) {
@@ -170,6 +172,14 @@ public class FeedPost implements Serializable {
 
     public Integer getStationId() {
         return stationId;
+    }
+
+    public List<String> getCommentsIds() {
+        return commentsIds;
+    }
+
+    public int getCommentsCount() {
+        return commentsIds != null ? commentsIds.size() : 0;
     }
 
     public boolean getIsUserLiked(Integer id) {

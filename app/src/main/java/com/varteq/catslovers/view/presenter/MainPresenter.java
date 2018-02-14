@@ -259,7 +259,7 @@ public class MainPresenter {
 
 
     private boolean checkNetworkErrAndShowToast(Exception exception) {
-        return checkNetworkErrAndShowToast(exception.toString());
+        return exception != null && checkNetworkErrAndShowToast(exception.toString());
     }
 
     private boolean checkNetworkErrAndShowToast(String exception) {
